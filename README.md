@@ -41,3 +41,14 @@ PLAYVAULT/
       ├─ core.js
       └─ render.js
 ```
+
+## Enemy family
+
+ABYSSFALL: ECLIPSE의 첫 적군 자산도 공용 자산으로 분리합니다.
+
+- **Abyssal Grunt · 심연의 하수인** — 근접 추적형
+- **Fallen Priest · 타락한 성직자** — 원거리 마도형
+- **Shadow Beast · 그림자 짐승** — 중장 돌진형
+- **The Abyssal Watcher · 심연의 감시자** — 보스
+
+적 스프라이트는 `assets/enemies/`에서 관리하며 기본 상태는 `idle / run / attack / hurt / death`입니다.
