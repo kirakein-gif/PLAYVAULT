@@ -23,7 +23,7 @@
         idx=Math.min(1,Math.floor((18-p.hurtPose)/5)%2);
       }else if(p.attackPose>0){
         anim='attack';
-        idx=Math.floor(now/62)%4;
+        idx=Math.min(3,Math.floor((now-(p.attackAt||now))/58));
       }else if(p.moving){
         anim='run';
         idx=Math.floor(p.step*1.75)%6;
@@ -46,7 +46,22 @@
     ctx.restore();
     if(p.shield>0&&!A.dead){ctx.strokeStyle='rgba(116,226,255,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,32,0,Math.PI*2);ctx.stroke()}
   }
-  function attackArt(fx){const im=imgs[`${fx.kind}_attack`];if(!im?.complete)return;const w=fx.kind==='dawn'?(A.mobile?270:250):(A.mobile?260:242),h=w*im.height/im.width,t=fx.l/fx.max;ctx.save();ctx.globalAlpha=Math.min(1,t*1.4);ctx.translate(fx.x,fx.y);if(Math.cos(fx.a)<0)ctx.scale(-1,1);ctx.drawImage(im,-w*.45,-h*.48,w,h);ctx.restore()}
+  function attackArt(fx){
+    const t=Math.max(0,fx.l/fx.max),a=fx.a||0;
+    ctx.save();ctx.translate(fx.x,fx.y);ctx.rotate(a);ctx.globalAlpha=Math.min(1,t*1.35);
+    if(fx.kind==='dawn'){
+      const r=(1-t)*38+82;
+      ctx.strokeStyle='rgba(255,218,102,.95)';ctx.lineWidth=8*t+2;ctx.beginPath();ctx.arc(0,0,r,-.95,.95);ctx.stroke();
+      ctx.strokeStyle='rgba(105,225,255,.8)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,r+14,-.78,.78);ctx.stroke();
+      ctx.fillStyle='rgba(255,244,180,.9)';for(let i=0;i<5;i++){const x=38+i*18,y=(i-2)*13;ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);ctx.fillRect(-4,-4,8,8);ctx.restore()}
+    }else{
+      const r=(1-t)*42+92;
+      ctx.strokeStyle='rgba(95,226,255,.96)';ctx.lineWidth=9*t+3;ctx.beginPath();ctx.arc(0,0,r,-1.05,1.05);ctx.stroke();
+      ctx.strokeStyle='rgba(145,109,255,.86)';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,r+15,-.88,.88);ctx.stroke();
+      ctx.fillStyle='rgba(102,225,255,.85)';for(let i=0;i<5;i++){ctx.save();ctx.translate(42+i*20,(i-2)*15);ctx.rotate(Math.PI/4);ctx.fillRect(-4,-4,8,8);ctx.restore()}
+    }
+    ctx.restore()
+  }
   function slash(fx){if(fx.art)return attackArt(fx);const t=fx.l/fx.max;ctx.save();ctx.globalAlpha=t;ctx.strokeStyle=fx.color||A.player.hero.accent;ctx.lineWidth=5;ctx.beginPath();ctx.arc(fx.x,fx.y,fx.r,fx.a-.8,fx.a+.8);ctx.stroke();ctx.restore()}
   function enemy(e){ctx.save();ctx.translate(e.x,e.y);ctx.beginPath();ctx.ellipse(0,e.r*.65,e.r,e.r*.42,0,0,Math.PI*2);ctx.fillStyle='#0006';ctx.fill();const f=e.flash>0;if(e.type==='crawler'){ctx.fillStyle=f?'#fff':'#762e43';ctx.beginPath();ctx.moveTo(-e.r,8);ctx.quadraticCurveTo(0,-e.r*1.2,e.r,8);ctx.quadraticCurveTo(0,e.r,-e.r,8);ctx.fill();ctx.fillStyle='#ffb0bd';ctx.fillRect(-6,-3,3,3);ctx.fillRect(3,-3,3,3);ctx.strokeStyle='#d68b98';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-8,-9);ctx.lineTo(-14,-17);ctx.moveTo(8,-9);ctx.lineTo(14,-17);ctx.stroke()}else if(e.type==='shooter'){ctx.fillStyle=f?'#fff':'#294c6a';ctx.beginPath();ctx.moveTo(-e.r,10);ctx.quadraticCurveTo(0,-e.r*1.25,e.r,10);ctx.quadraticCurveTo(0,e.r*.8,-e.r,10);ctx.fill();ctx.fillStyle='#7fdcff';ctx.beginPath();ctx.arc(0,-2,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#132135';ctx.beginPath();ctx.arc(0,-2,2,0,Math.PI*2);ctx.fill()}else if(e.type==='brute'){ctx.fillStyle=f?'#fff':'#60594c';ctx.beginPath();for(let i=0;i<6;i++){const a=i*Math.PI/3-Math.PI/6,x=Math.cos(a)*e.r,y=Math.sin(a)*e.r;i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath();ctx.fill();ctx.fillStyle='#ff6a55';ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fill()}else{ctx.fillStyle=f?'#fff':'#4d2765';ctx.beginPath();ctx.moveTo(-34,22);ctx.quadraticCurveTo(0,-50,34,22);ctx.quadraticCurveTo(0,42,-34,22);ctx.fill();ctx.strokeStyle='#dd9dff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-18,-13);ctx.lineTo(-29,-28);ctx.moveTo(18,-13);ctx.lineTo(29,-28);ctx.stroke();ctx.fillStyle='#f6c8ff';ctx.fillRect(-12,-5,6,4);ctx.fillRect(6,-5,6,4)}ctx.restore();if(e.type!=='crawler'||e.hp<e.max){const w=e.r*2.2;ctx.fillStyle='#0009';ctx.fillRect(e.x-w/2,e.y-e.r-13,w,5);ctx.fillStyle=e.type==='boss'?'#d86fff':'#ff6176';ctx.fillRect(e.x-w/2,e.y-e.r-13,w*Math.max(0,e.hp/e.max),5)}}
   function projectile(q){ctx.save();ctx.translate(q.x,q.y);if(q.kind==='crescent'){ctx.rotate(Math.atan2(q.vy,q.vx));ctx.strokeStyle='#9b82ff';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,10,-1.05,1.05);ctx.stroke()}else{ctx.fillStyle=q.color;ctx.shadowColor=q.color;ctx.shadowBlur=12;ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0}ctx.restore()}
