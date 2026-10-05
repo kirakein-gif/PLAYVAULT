@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#090b14"><title>ABYSSFALL: ECLIPSE · PLAYVAULT</title><link rel="stylesheet" href="game.css"></head><body>
+<main id="shell">
+    <canvas id="game" aria-label="ABYSSFALL ECLIPSE 게임 화면"></canvas>
+
+    <section id="hud" class="glass">
+      <div class="hudTop">
+        <div>
+          <div class="eyebrow">ABYSSFALL : ECLIPSE</div>
+          <div id="heroName">Dawn Seeker</div>
+        </div>
+        <a class="homeLink" href="../../index.html">PLAYVAULT</a>
+      </div>
+      <div class="row small"><span id="floorText">FLOOR 1</span><span id="roomText">ROOM 0,0</span><span>처치 <b id="killText">0</b></span></div>
+      <div class="bar"><i id="hpFill"></i></div>
+      <div class="row small"><span>HP <b id="hpText">100</b></span><span>Lv <b id="levelText">1</b></span><span>적 <b id="enemyText">0</b></span></div>
+      <div class="bar xp"><i id="xpFill"></i></div>
+    </section>
+
+    <section id="abilityDock" class="glass" aria-label="능력 정보">
+      <div class="ability active"><span class="ico" id="basicIcon">✦</span><div><b id="basicName">추적 룬탄</b><small>자동 공격</small></div></div>
+      <div class="ability"><span class="ico" id="specialIcon">☀</span><div><b id="specialName">태양낙인</b><small id="specialCdText">SPECIAL</small></div></div>
+    </section>
+
+    <section id="mobileControls" aria-label="모바일 조작">
+      <div id="joyBase"><div id="joyKnob"></div></div>
+      <button id="specialBtn" type="button"><span id="specialBtnIcon">☀</span><small>특수기</small></button>
+    </section>
+
+    <section id="start" class="overlay show">
+      <div class="startCard">
+        <p class="eyebrow big">PLAYVAULT ORIGINAL</p>
+        <h1>ABYSSFALL <em>ECLIPSE</em></h1>
+        <p class="lead">빛과 그림자. 같은 심연을 향하는 두 명의 유물 사냥꾼.</p>
+        <div class="heroChoices">
+          <button class="heroCard dawn selected" data-hero="dawn" type="button">
+            <div class="portrait"><img id="dawnPortrait" alt="Dawn Seeker"></div>
+            <div class="heroCopy"><span>DAWN SEEKER</span><b>여명의 추적자</b><p>강한 원거리 룬탄과 넓은 성광 폭발. 안정적인 생존형.</p></div>
+          </button>
+          <button class="heroCard night" data-hero="night" type="button">
+            <div class="portrait"><img id="nightPortrait" alt="Night Veil"></div>
+            <div class="heroCopy"><span>NIGHT VEIL</span><b>밤의 장막</b><p>빠른 월광 칼날과 그림자 질주. 공격적인 기동형.</p></div>
+          </button>
+        </div>
+        <div class="controlHint">WASD / 방향키 이동 · 공격 자동 · SPACE 특수기 · 모바일 조이스틱 + 특수기 버튼</div>
+        <button id="startBtn" class="primary" type="button">심연으로 들어가기</button>
+      </div>
+    </section>
+
+    <section id="levelUp" class="overlay">
+      <div class="levelCard">
+        <p class="eyebrow big">RELIC AWAKENED</p>
+        <h2>성물 공명</h2>
+        <p class="lead">하나의 힘을 선택하세요.</p>
+        <div id="upgradeCards"></div>
+      </div>
+    </section>
+
+    <section id="gameOver" class="overlay">
+      <div class="overCard">
+        <p class="eyebrow big">RUN ENDED</p>
+        <h2>심연에 삼켜졌습니다</h2>
+        <p id="resultText" class="lead"></p>
+        <div class="overActions"><button id="retryBtn" class="primary" type="button">다시 도전</button><a href="../../index.html">PLAYVAULT</a></div>
+      </div>
+    </section>
+
+    <div id="toast" aria-live="polite"></div>
+  </main>
+<script src="game.js"></script>
+</body></html>
