@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "format": "horizontal sprite strip",
+  "states": [
+    "idle",
+    "run",
+    "attack",
+    "hurt",
+    "death"
+  ],
+  "enemies": {
+    "abyss-grunt": {
+      "type": "crawler",
+      "name": "Abyssal Grunt",
+      "ko": "심연의 하수인",
+      "frameSize": 128,
+      "frames": 5,
+      "file": "abyss-grunt.webp"
+    },
+    "fallen-priest": {
+      "type": "shooter",
+      "name": "Fallen Priest",
+      "ko": "타락한 성직자",
+      "frameSize": 128,
+      "frames": 5,
+      "file": "fallen-priest.webp"
+    },
+    "shadow-beast": {
+      "type": "brute",
+      "name": "Shadow Beast",
+      "ko": "그림자 짐승",
+      "frameSize": 128,
+      "frames": 5,
+      "file": "shadow-beast.webp"
+    },
+    "abyss-watcher": {
+      "type": "boss",
+      "name": "The Abyssal Watcher",
+      "ko": "심연의 감시자",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 6,
+      "file": "abyss-watcher.webp"
+    }
+  }
+}
