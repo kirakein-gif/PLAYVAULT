@@ -20,12 +20,13 @@
   };
 
   const partCounts = { dawn: 4, night: 3 };
+  const sharedPaths = { dawn: 'dawn-seeker', night: 'night-veil' };
 
   async function load(name) {
     try {
       const pieces = [];
       for (let i = 0; i < partCounts[name]; i++) {
-        const res = await fetch(`assets/atlases/${name}.${i}.b64?v=3`, { cache: 'force-cache' });
+        const res = await fetch(`../../assets/characters/${sharedPaths[name]}/atlas/${i}.b64?v=5`, { cache: 'force-cache' });
         if (!res.ok) throw new Error(`${name} atlas chunk ${i}: ${res.status}`);
         pieces.push((await res.text()).trim());
       }
