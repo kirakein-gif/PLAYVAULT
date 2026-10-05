@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "atlas": {
+    "width": 384,
+    "height": 260,
+    "cellWidth": 64,
+    "cellHeight": 52,
+    "columns": 6,
+    "rows": 5,
+    "animations": {
+      "idle": {
+        "row": 0,
+        "frames": 4
+      },
+      "run": {
+        "row": 1,
+        "frames": 6
+      },
+      "attack": {
+        "row": 2,
+        "frames": 4
+      },
+      "hurt": {
+        "row": 3,
+        "frames": 2
+      },
+      "death": {
+        "row": 4,
+        "frames": 4
+      }
+    }
+  },
+  "characters": {
+    "dawn-seeker": {
+      "name": "Dawn Seeker",
+      "role": "Relic Guardian",
+      "theme": "dawn/light",
+      "palette": [
+        "ivory",
+        "gold",
+        "sky-blue"
+      ],
+      "atlasParts": 4,
+      "portrait": "assets/characters/dawn-seeker/portrait.webp"
+    },
+    "night-veil": {
+      "name": "Night Veil",
+      "role": "Spellblade",
+      "theme": "night/shadow",
+      "palette": [
+        "indigo",
+        "violet",
+        "cyan"
+      ],
+      "atlasParts": 3,
+      "portrait": "assets/characters/night-veil/portrait.webp"
+    }
+  }
+}
