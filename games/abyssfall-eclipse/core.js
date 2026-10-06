@@ -62,7 +62,7 @@
     AF.rooms[best].boss=true;AF.rooms[best].type='boss';AF.rooms[best].clear=false;AF.rooms[best].spawned=false;
   }
   AF.cur=()=>AF.rooms[AF.current];
-  function enemy(x,y,type){const sc=1+(AF.floor-1)*.24,defs={crawler:{r:17,hp:38,s:1.25,d:9},shooter:{r:16,hp:30,s:.88,d:8},brute:{r:24,hp:82,s:.64,d:15},boss:{r:39,hp:320,s:.78,d:19}},q=defs[type];return{x,y,type,r:q.r,hp:q.hp*sc,max:q.hp*sc,s:q.s,d:q.d*sc,fire:40+Math.random()*80,alive:true,flash:0,phase:Math.random()*6.28,attackPose:0,hurtPose:0,deadAt:0,moving:false,faceX:-1}}
+  function enemy(x,y,type){const sc=1+(AF.floor-1)*.24,defs={crawler:{r:17,hp:38,s:1.25,d:9},shooter:{r:16,hp:30,s:.88,d:8},brute:{r:24,hp:82,s:.64,d:15},boss:{r:39,hp:320,s:.78,d:19}},q=defs[type];return{x,y,type,r:q.r,hp:q.hp*sc,max:q.hp*sc,s:q.s,d:q.d*sc,fire:40+Math.random()*80,alive:true,flash:0,phase:Math.random()*6.28,attackPose:0,hurtPose:0,deadAt:0,moving:false,faceX:-1,bossCd:85,bossTelegraph:0,bossTelegraphMax:0,bossPattern:-1,bossAim:0,bossPhase:0,phaseAnnounced:0,bossAction:'추적 중'}}
   function spawnRoom(r){
     if(r.spawned||r.clear)return;
     r.spawned=true;
@@ -186,6 +186,45 @@
   }
   function doors(){const p=AF.player,r=AF.cur(),g=58,mx=W/2,my=arena.y+arena.h/2;let d=null;if(p.x<=arena.x+p.r+1&&r.clear&&r.doors.W&&Math.abs(p.y-my)<g)d='W';else if(p.x>=arena.x+arena.w-p.r-1&&r.clear&&r.doors.E&&Math.abs(p.y-my)<g)d='E';else if(p.y<=arena.y+p.r+1&&r.clear&&r.doors.N&&Math.abs(p.x-mx)<g)d='N';else if(p.y>=arena.y+arena.h-p.r-1&&r.clear&&r.doors.S&&Math.abs(p.x-mx)<g)d='S';if(d){const v=dirs[d],rr=AF.cur(),nk=key(rr.x+v[0],rr.y+v[1]);if(AF.rooms[nk])enter(nk,opp[d])}}
 
+  const bossPhase=e=>e.hp/e.max<.34?2:e.hp/e.max<.67?1:0;
+  function startBossPattern(e,p){
+    const phase=bossPhase(e),alive=AF.cur().enemies.filter(x=>x.alive&&x!==e).length;
+    let pool=phase===0?[0,1]:phase===1?[0,1,2]:[0,0,1,2];
+    if(alive>5)pool=pool.filter(v=>v!==2);
+    const pattern=pool[Math.random()*pool.length|0];
+    e.bossPhase=phase;e.bossPattern=pattern;e.bossAim=Math.atan2(p.y-e.y,p.x-e.x);e.attackPose=28;
+    const tele=pattern===0?46:pattern===1?58:52;
+    e.bossTelegraph=e.bossTelegraphMax=tele;
+    e.bossAction=pattern===0?'핏빛 창':pattern===1?'심연의 고리':'그림자 소환';
+  }
+  function resolveBossPattern(e){
+    if(!e.alive)return;
+    const phase=e.bossPhase||0,pattern=e.bossPattern;
+    if(pattern===0){
+      const shots=3+phase*2,spread=.13,speed=5.2+phase*.45,dmg=e.d*(.56+phase*.06);
+      for(let i=0;i<shots;i++){
+        const o=(i-(shots-1)/2)*spread,a=e.bossAim+o;
+        AF.projectiles.push({team:'e',kind:'bossLance',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:7,dmg,life:155,color:'#ff365f'});
+      }
+    }else if(pattern===1){
+      const n=10+phase*4,speed=3.2+phase*.32,dmg=e.d*(.48+phase*.05),off=Math.random()*Math.PI;
+      for(let i=0;i<n;i++){
+        const a=off+i*Math.PI*2/n;
+        AF.projectiles.push({team:'e',kind:'bossOrb',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:7,dmg,life:190,color:'#d858ff'});
+      }
+    }else{
+      const n=2+phase;
+      for(let i=0;i<n;i++){
+        const a=i*Math.PI*2/n+Math.random()*.5,rad=78+Math.random()*30,type=phase>=2&&i===0?'brute':(Math.random()<.42?'shooter':'crawler');
+        const m=enemy(e.x+Math.cos(a)*rad,e.y+Math.sin(a)*rad,type);
+        m.summoned=true;m.hp*=.82+phase*.10;m.max=m.hp;m.d*=.88+phase*.08;
+        AF.cur().enemies.push(m);
+      }
+    }
+    e.bossPattern=-1;e.bossTelegraph=0;e.bossAction='추적 중';
+    e.bossCd=Math.max(54,118-phase*16-Math.min(18,(AF.floor-1)*2));
+  }
+
   AF.update=dt=>{const p=AF.player;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}let m=Math.hypot(vx,vy);p.moving=m>.04;if(m){vx/=m;vy/=m;p.x+=vx*p.speed*dt;p.y+=vy*p.speed*dt;p.faceX=vx;p.faceY=vy;p.step+=dt*.42}
     const sigil=relicCount('dash-sigil');
     if(m&&sigil){
@@ -216,13 +255,27 @@
       if(!e.alive)continue;
       if(e.flash>0)e.flash-=dt;if(e.attackPose>0)e.attackPose-=dt;if(e.hurtPose>0)e.hurtPose-=dt;
       const ox=e.x,oy=e.y,dx=p.x-e.x,dy=p.y-e.y,dist=Math.hypot(dx,dy)||1;e.faceX=dx;
-      if(e.type==='shooter'){
+      if(e.type==='boss'){
+        const phase=bossPhase(e);
+        if(phase>e.phaseAnnounced){e.phaseAnnounced=phase;AF.toast(phase===1?'심연의 감시자 · PHASE II':'심연의 감시자 · PHASE III')}
+        e.bossPhase=phase;
+        if(e.bossTelegraph>0){
+          e.bossTelegraph-=dt;e.moving=false;
+          if(e.bossTelegraph<=0)resolveBossPattern(e);
+        }else{
+          e.bossCd-=dt;
+          if(e.bossCd<=0)startBossPattern(e,p);
+          else{
+            const pace=phase===2?.72:.56;e.x+=dx/dist*e.s*pace*dt;e.y+=dy/dist*e.s*pace*dt;
+          }
+        }
+      }else if(e.type==='shooter'){
         if(dist>210){e.x+=dx/dist*e.s*dt;e.y+=dy/dist*e.s*dt}else if(dist<150){e.x-=dx/dist*e.s*dt;e.y-=dy/dist*e.s*dt}
         e.fire-=dt;
         if(e.fire<=0&&dist<360){e.fire=95;e.attackPose=18;const a=Math.atan2(dy,dx);AF.projectiles.push({team:'e',kind:'orb',x:e.x,y:e.y,vx:Math.cos(a)*3.9,vy:Math.sin(a)*3.9,r:6,dmg:e.d,life:150,color:'#ff4c78'})}
       }else{e.x+=dx/dist*e.s*dt;e.y+=dy/dist*e.s*dt}
       e.x=Math.max(arena.x+e.r,Math.min(arena.x+arena.w-e.r,e.x));e.y=Math.max(arena.y+e.r,Math.min(arena.y+arena.h-e.r,e.y));
-      e.moving=Math.hypot(e.x-ox,e.y-oy)>.08;
+      if(e.type!=='boss'||e.bossTelegraph<=0)e.moving=Math.hypot(e.x-ox,e.y-oy)>.08;
       if(dist<p.r+e.r&&p.inv<=0){e.attackPose=e.type==='boss'?22:14;hurt(e.d,dx/dist,dy/dist)}
     }
     for(let i=AF.projectiles.length-1;i>=0;i--){const q=AF.projectiles[i];q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;if(q.life<=0||q.x<arena.x-20||q.x>arena.x+arena.w+20||q.y<arena.y-20||q.y>arena.y+arena.h+20){AF.projectiles.splice(i,1);continue}if(q.team==='p'){const e=r.enemies.find(e=>e.alive&&Math.hypot(e.x-q.x,e.y-q.y)<e.r+q.r);if(e){damage(e,q.dmg);if(q.pierce>0)q.pierce--;else AF.projectiles.splice(i,1)}}else if(p.inv<=0&&Math.hypot(p.x-q.x,p.y-q.y)<p.r+q.r){hurt(q.dmg,q.vx/4,q.vy/4);AF.projectiles.splice(i,1)}}
