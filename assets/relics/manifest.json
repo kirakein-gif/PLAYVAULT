@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "style": "PLAYVAULT pixel relics",
+  "relics": {
+    "relic-blade": {
+      "name": "유물의 칼날",
+      "file": "relic-blade.webp",
+      "rarity": "rare"
+    },
+    "dash-sigil": {
+      "name": "질주의 문장",
+      "file": "dash-sigil.webp",
+      "rarity": "rare"
+    },
+    "guardian-seal": {
+      "name": "수호자의 인장",
+      "file": "guardian-seal.webp",
+      "rarity": "rare"
+    },
+    "resonance-core": {
+      "name": "공명 핵",
+      "file": "resonance-core.webp",
+      "rarity": "rare"
+    },
+    "condensed-crystal": {
+      "name": "응축 수정",
+      "file": "condensed-crystal.webp",
+      "rarity": "rare"
+    }
+  }
+}
