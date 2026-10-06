@@ -241,12 +241,14 @@
       }
       if(e.type==='boss'){
         const now=performance.now(),room=AF.cur();
+        AF.paused=false;AF.transitioning=false;
         AF.projectiles=AF.projectiles.filter(q=>q.team==='p');
         room.enemies.forEach(x=>{if(x!==e&&x.alive){x.alive=false;x.hp=0;x.deadAt=now}});
-        room.clear=true;room.bossDefeated=true;room.portalUnlockAt=now+1450;room.used=false;
-        p.inv=Math.max(p.inv,180);AF.bossClearUntil=now+1450;e.bossAction='격파';
-        sound()?.stopMusic();setTimeout(()=>sound()?.sfx('portalOpen'),1080);
-        AF.toast('심연의 감시자를 물리쳤습니다 · 하층 통로가 열립니다')
+        room.clear=true;room.bossDefeated=true;room.portalUnlockAt=now+720;room.used=false;
+        p.inv=Math.max(p.inv,150);p.basic=Math.max(p.basic,28);
+        AF.bossClearUntil=now+720;e.bossAction='격파';
+        sound()?.stopMusic();setTimeout(()=>{sound()?.sfx('portalOpen');sound()?.startExplore()},430);
+        AF.toast('심연의 감시자를 물리쳤습니다 · 중앙 통로가 열립니다')
       }
     }
   }
@@ -400,7 +402,7 @@
     ui.clearScreen?.classList.add('show');
   };
   AF.nextFloor=(source='exit')=>{
-    sound()?.startExplore();sound()?.sfx('portal');AF.transitioning=false;AF.bossClearUntil=0;AF.floor++;
+    AF.paused=false;sound()?.startExplore();sound()?.sfx('portal');AF.transitioning=false;AF.bossClearUntil=0;AF.floor++;
     AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();
     const healRate=source==='boss'?.30:source==='endless'?.38:.16;
     AF.player.x=W/2;AF.player.y=arena.y+arena.h/2;
