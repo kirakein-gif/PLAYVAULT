@@ -98,7 +98,7 @@
     A.lastSfx[name]=now;
 
     switch(name){
-      case 'start': tone(196,.18,.045,'sine');tone(293.66,.28,.032,'sine',.0?A.sfxGain:A.sfxGain,.08);break;
+      case 'start': tone(196,.18,.045,'sine');tone(293.66,.28,.032,'sine',A.sfxGain,.08);break;
       case 'basic':
         tone(variant==='night'?410:520,.055,.018,variant==='night'?'triangle':'sine',A.sfxGain,0,variant==='night'?-90:75);break;
       case 'hit': noise(.045,.025,1500);tone(120,.045,.018,'triangle');break;
