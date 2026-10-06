@@ -725,8 +725,8 @@
     const total=Math.max(150,p.hero.specialCd-p.specialBoost),remain=Math.max(0,p.special),seconds=remain/60,ready=remain<=0,progress=ready?1:Math.max(0,Math.min(1,1-remain/total));
     ui.specialCdText.textContent=ready?'READY':seconds<10?seconds.toFixed(1)+'s':Math.ceil(seconds)+'s';
     ui.specialBtn.classList.toggle('cooling',!ready);ui.specialBtn.classList.toggle('ready',ready);
-    ui.specialBtn.style.setProperty('--cd',(progress*100).toFixed(1)+'%');
-    if(ui.specialBtnTimer)ui.specialBtnTimer.textContent=ready?'READY':seconds.toFixed(seconds<10?1:0);
+    ui.specialBtn.style.setProperty('--cd-angle',(progress*360).toFixed(1)+'deg');
+    if(ui.specialBtnTimer)ui.specialBtnTimer.textContent=ready?'READY':(seconds<10?seconds.toFixed(1):Math.ceil(seconds))+'s';
     const ability=ui.specialCdText.closest('.ability');if(ability){ability.classList.toggle('skillReady',ready);ability.classList.toggle('skillCooling',!ready)}
   };
   let toastTimer;AF.toast=t=>{ui.toast.textContent=t;ui.toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>ui.toast.classList.remove('show'),1100)};
