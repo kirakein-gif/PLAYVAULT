@@ -81,3 +81,11 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - Elite-room count rises by zone; later floors can contain additional treasure/recovery rooms.
 - Between-floor healing is partial rather than full, so damage and recovery decisions carry through a run.
 - 12F now triggers the campaign CLEAR screen; 13F+ remains optional endless descent.
+
+## ABYSSFALL v20 balance pass
+
+- Reworked enemy growth to quadratic HP/damage scaling so deeper floors keep pace with player builds.
+- Increased elite durability/damage scaling and raised boss base HP substantially.
+- Boss single-hit burst damage is capped to prevent strong relic builds from skipping the whole encounter in seconds.
+- Bosses now open a central descent portal after defeat instead of automatically changing floors.
+- On 12F, entering the post-boss portal triggers the CLEAR results screen; on earlier boss floors it descends normally.
