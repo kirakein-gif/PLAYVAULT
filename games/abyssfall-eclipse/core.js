@@ -35,7 +35,7 @@
   AF.stageName=()=>AF.stageNames[AF.zoneIndex()];
   AF.isBossFloor=(floor=AF.floor)=>floor%3===0;
   AF.roomTarget=(floor=AF.floor)=>{const plan=[8,9,10,11,12,13,14,15,16,17,18,20];return floor<=12?plan[floor-1]:Math.min(28,20+Math.ceil((floor-12)/2))};
-  AF.roomLabels={start:'입구',combat:'일반전투',treasure:'보물방',recovery:'회복방',elite:'엘리트방',exit:'하층 통로',boss:'보스방'};
+  AF.roomLabels={start:'입구',combat:'일반전투',treasure:'보물방',recovery:'회복방',elite:'엘리트방',exit:'하층 계단',boss:'보스방'};
   AF.roomLabel=r=>AF.roomLabels[r?.type]||'일반전투';
 
   function fit(){const s=Math.min(innerWidth/W,innerHeight/H);canvas.style.width=`${Math.floor(W*s)}px`;canvas.style.height=`${Math.floor(H*s)}px`} fit();addEventListener('resize',fit);
@@ -77,7 +77,7 @@
     for(const k in R){
       const r=R[k];r.doors={};
       for(const [d,v] of Object.entries(dirs))r.doors[d]=!!R[key(r.x+v[0],r.y+v[1])];
-      Object.assign(r,{seen:false,clear:false,spawned:false,enemies:[],type:'combat',used:false,eliteRewarded:false,boss:false,exit:false,gimmickTimer:105+Math.random()*70,windWarn:0,windActive:0,windDir:1,hazards:[]});
+      Object.assign(r,{seen:false,clear:false,spawned:false,enemies:[],type:'combat',used:false,eliteRewarded:false,boss:false,exit:false,sealAltar:false,sealBroken:false,gimmickTimer:105+Math.random()*70,windWarn:0,windActive:0,windDir:1,hazards:[]});
     }
     R['0,0'].seen=R['0,0'].clear=true;R['0,0'].type='start';R['0,0'].spawned=true;
     return R
@@ -96,7 +96,7 @@
   }
   function assignRoomTypes(targetKey){
     const entries=Object.entries(AF.rooms).filter(([k])=>k!=='0,0'&&k!==targetKey);
-    for(const [,r] of entries){r.type='combat';r.used=false;r.eliteRewarded=false;r.clear=false;r.spawned=false;r.boss=false;r.exit=false}
+    for(const [,r] of entries){r.type='combat';r.used=false;r.eliteRewarded=false;r.clear=false;r.spawned=false;r.boss=false;r.exit=false;r.sealAltar=false;r.sealBroken=false}
     entries.sort(()=>Math.random()-.5);
     let pos=0;
     const treasureCount=AF.floor>=8?2:1,recoveryCount=AF.floor>=10?2:1;
@@ -112,7 +112,25 @@
     assignRoomTypes(best);
     const target=AF.rooms[best],boss=AF.isBossFloor();
     target.boss=boss;target.exit=!boss;target.type=boss?'boss':'exit';target.clear=false;target.spawned=false;target.used=false;
-    AF.objectiveRoom=best;AF.objectiveDistance=D[best]||0;
+    AF.objectiveRoom=best;AF.objectiveDistance=D[best]||0;AF.bossUnlocked=!boss;AF.lockedDoorAt=0;
+
+    if(boss){
+      const need=AF.floor===3?2:AF.floor===6?3:AF.floor===9?3:4;
+      const candidates=Object.entries(AF.rooms)
+        .filter(([k,r])=>k!=='0,0'&&k!==best&&(r.type==='combat'||r.type==='elite'))
+        .sort((a,b)=>(D[b[0]]||0)-(D[a[0]]||0));
+      const chosen=[];
+      // Prefer distant rooms, but avoid stacking all altars next to one another.
+      for(const item of candidates){
+        if(chosen.length>=need)break;
+        const r=item[1];
+        if(chosen.some(x=>Math.abs(x.x-r.x)+Math.abs(x.y-r.y)<=1)&&candidates.length>need+2)continue;
+        chosen.push(r);
+      }
+      for(const item of candidates){if(chosen.length>=need)break;if(!chosen.includes(item[1]))chosen.push(item[1])}
+      chosen.forEach(r=>{r.sealAltar=true;r.sealBroken=false});
+      AF.sealNeed=chosen.length;
+    }else AF.sealNeed=0;
   }
   AF.cur=()=>AF.rooms[AF.current];
   function roomRand(r,n){const v=Math.sin((r.x*97+r.y*193+AF.floor*389+n*71.17))*43758.5453;return v-Math.floor(v)}
@@ -247,8 +265,8 @@
         room.clear=true;room.bossDefeated=true;room.portalUnlockAt=now+720;room.used=false;
         p.inv=Math.max(p.inv,150);p.basic=Math.max(p.basic,28);
         AF.bossClearUntil=now+720;e.bossAction='격파';
-        sound()?.stopMusic();setTimeout(()=>{sound()?.sfx('portalOpen');sound()?.startExplore()},430);
-        AF.toast('심연의 감시자를 물리쳤습니다 · 중앙 통로가 열립니다')
+        sound()?.stopMusic();setTimeout(()=>{sound()?.sfx('stairsOpen');sound()?.startExplore()},430);
+        AF.toast('심연의 감시자를 물리쳤습니다')
       }
     }
   }
@@ -341,6 +359,18 @@
     if(!r||r.used)return;
     const p=AF.player,cx=W/2,cy=arena.y+arena.h/2,d=Math.hypot(p.x-cx,p.y-cy);
     if(d>58)return;
+    if(r.sealAltar&&r.clear&&!r.sealBroken){
+      r.sealBroken=true;sound()?.sfx('sealBreak');
+      for(let i=0;i<18;i++)AF.particles.push({x:cx+(Math.random()-.5)*54,y:cy+(Math.random()-.5)*42,vx:(Math.random()-.5)*2.1,vy:-.7-Math.random()*1.6,l:28,color:'#b69cff'});
+      AF.toast('낡은 제단의 문양이 꺼졌다.');
+      const remain=Object.values(AF.rooms).filter(x=>x.sealAltar&&!x.sealBroken).length;
+      if(remain===0&&!AF.bossUnlocked){
+        AF.bossUnlocked=true;
+        const bossRoom=AF.rooms[AF.objectiveRoom];if(bossRoom)bossRoom.bossLocked=false;
+        setTimeout(()=>{sound()?.sfx('gateOpen');AF.toast('어딘가에서 무거운 문이 열리는 소리가 났다.')},520);
+      }
+      return;
+    }
     if(r.type==='treasure'){
       r.used=true;sound()?.sfx('chest');AF.toast('보물상자를 열었습니다');treasureReward();
     }else if(r.type==='recovery'){
@@ -348,26 +378,25 @@
       for(let i=0;i<18;i++)AF.particles.push({x:cx+(Math.random()-.5)*50,y:cy+(Math.random()-.5)*50,vx:(Math.random()-.5)*1.4,vy:-1-Math.random()*1.4,l:30,color:'#69e5b6'});
       AF.toast(`회복의 샘 · HP +${heal}`);
     }else if(r.type==='exit'&&r.clear&&!AF.transitioning){
-      r.used=true;AF.transitioning=true;p.inv=Math.max(p.inv,90);
-      AF.toast('하층 통로 개방 · 더 깊은 심연으로');
+      r.used=true;AF.transitioning=true;p.inv=Math.max(p.inv,90);sound()?.sfx('stairsDown');
+      AF.toast('아래층으로 내려간다...');
       setTimeout(()=>{
         if(AF.started&&!AF.dead&&AF.cur()===r)AF.nextFloor('exit');
         AF.transitioning=false;
-      },650);
+      },760);
     }else if(r.type==='boss'&&r.bossDefeated&&performance.now()>=(r.portalUnlockAt||0)&&!AF.transitioning){
-      r.used=true;AF.transitioning=true;p.inv=Math.max(p.inv,110);
+      r.used=true;AF.transitioning=true;p.inv=Math.max(p.inv,110);sound()?.sfx('stairsDown');
+      AF.toast('아래로 이어지는 계단을 내려간다...');
       if(AF.floor===12&&!AF.endless){
-        AF.toast('심연의 핵에 도달했습니다');
         setTimeout(()=>{
           if(AF.started&&!AF.dead&&AF.cur()===r)AF.finishRun();
           AF.transitioning=false;
-        },650);
+        },820);
       }else{
-        AF.toast('하층 통로 개방 · 더 깊은 심연으로');
         setTimeout(()=>{
           if(AF.started&&!AF.dead&&AF.cur()===r)AF.nextFloor('boss');
           AF.transitioning=false;
-        },650);
+        },760);
       }
     }
   }
@@ -402,7 +431,7 @@
     ui.clearScreen?.classList.add('show');
   };
   AF.nextFloor=(source='exit')=>{
-    AF.paused=false;sound()?.startExplore();sound()?.sfx('portal');AF.transitioning=false;AF.bossClearUntil=0;AF.floor++;
+    AF.paused=false;sound()?.startExplore();AF.transitioning=false;AF.bossClearUntil=0;AF.floor++;
     AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();
     const healRate=source==='boss'?.30:source==='endless'?.38:.16;
     AF.player.x=W/2;AF.player.y=arena.y+arena.h/2;
@@ -426,11 +455,26 @@
     AF.current=nk;const r=AF.cur();r.seen=true;AF.projectiles=[];AF.slashes=[];if(!r.clear)spawnRoom(r);
     const p=AF.player;if(from==='W'){p.x=arena.x+35;p.y=arena.y+arena.h/2}else if(from==='E'){p.x=arena.x+arena.w-35;p.y=arena.y+arena.h/2}else if(from==='N'){p.x=W/2;p.y=arena.y+35}else if(from==='S'){p.x=W/2;p.y=arena.y+arena.h-35}
     p.inv=r.type==='boss'?120:35;
-    const msg={treasure:'보물방 · 중앙의 상자를 찾아보세요',recovery:'회복방 · 중앙의 샘에 다가가세요',elite:'엘리트방 · 강적이 문을 봉쇄했습니다',exit:'하층 통로 · 적을 쓰러뜨리고 중앙의 계단을 여세요',boss:'보스방 · 심연의 감시자가 기다립니다',combat:'일반전투방'}[r.type]||'새 방 발견';
+    const msg={treasure:'보물방 · 중앙의 상자를 찾아보세요',recovery:'회복방 · 중앙의 샘에 다가가세요',elite:'엘리트방 · 강적이 문을 봉쇄했습니다',exit:'아래로 내려가는 길이 이 방 어딘가에 있다',boss:'거대한 문 너머에서 인기척이 느껴진다',combat:'일반전투방'}[r.type]||'새 방 발견';
     if(r.type==='boss'){sound()?.startBoss();sound()?.sfx('bossIntro')}
     AF.toast(msg);
   }
-  function doors(){const p=AF.player,r=AF.cur(),g=58,mx=W/2,my=arena.y+arena.h/2;let d=null;if(p.x<=arena.x+p.r+1&&r.clear&&r.doors.W&&Math.abs(p.y-my)<g)d='W';else if(p.x>=arena.x+arena.w-p.r-1&&r.clear&&r.doors.E&&Math.abs(p.y-my)<g)d='E';else if(p.y<=arena.y+p.r+1&&r.clear&&r.doors.N&&Math.abs(p.x-mx)<g)d='N';else if(p.y>=arena.y+arena.h-p.r-1&&r.clear&&r.doors.S&&Math.abs(p.x-mx)<g)d='S';if(d){const v=dirs[d],rr=AF.cur(),nk=key(rr.x+v[0],rr.y+v[1]);if(AF.rooms[nk])enter(nk,opp[d])}}
+  function doors(){
+    const p=AF.player,r=AF.cur(),g=58,mx=W/2,my=arena.y+arena.h/2;let d=null;
+    if(p.x<=arena.x+p.r+1&&r.clear&&r.doors.W&&Math.abs(p.y-my)<g)d='W';
+    else if(p.x>=arena.x+arena.w-p.r-1&&r.clear&&r.doors.E&&Math.abs(p.y-my)<g)d='E';
+    else if(p.y<=arena.y+p.r+1&&r.clear&&r.doors.N&&Math.abs(p.x-mx)<g)d='N';
+    else if(p.y>=arena.y+arena.h-p.r-1&&r.clear&&r.doors.S&&Math.abs(p.x-mx)<g)d='S';
+    if(!d)return;
+    const v=dirs[d],rr=AF.cur(),nk=key(rr.x+v[0],rr.y+v[1]),target=AF.rooms[nk];if(!target)return;
+    if(target.type==='boss'&&!AF.bossUnlocked){
+      const now=performance.now();
+      if(now-(AF.lockedDoorAt||0)>900){AF.lockedDoorAt=now;sound()?.sfx('gateLocked');AF.toast('문은 꿈쩍도 하지 않는다.')}
+      if(d==='W')p.x+=22;else if(d==='E')p.x-=22;else if(d==='N')p.y+=22;else p.y-=22;
+      return;
+    }
+    enter(nk,opp[d]);
+  }
 
   const bossPhase=e=>e.hp/e.max<.34?2:e.hp/e.max<.67?1:0;
   function startBossPattern(e,p){
@@ -584,7 +628,7 @@
     }
     for(let i=AF.pickups.length-1;i>=0;i--){const q=AF.pickups[i],dx=p.x-q.x,dy=p.y-q.y,d=Math.hypot(dx,dy)||1;q.x+=q.vx*dt;q.y+=q.vy*dt;q.vx*=Math.pow(.9,dt);q.vy*=Math.pow(.9,dt);if(d<130){q.x+=dx/d*4.8*dt;q.y+=dy/d*4.8*dt}if(d<p.r+12){gainXp(q.val);AF.pickups.splice(i,1)}}
     AF.particles.forEach(q=>{q.x+=q.vx*dt;q.y+=q.vy*dt;q.l-=dt});AF.particles=AF.particles.filter(q=>q.l>0);AF.shockwaves.forEach(q=>{q.r+=(q.max-q.r)*.18*dt;q.l-=dt});AF.shockwaves=AF.shockwaves.filter(q=>q.l>0);AF.slashes.forEach(q=>q.l-=dt);AF.slashes=AF.slashes.filter(q=>q.l>0);if(r.spawned&&!r.boss&&!r.enemies.some(e=>e.alive)){
-      const wasClear=r.clear;r.clear=true;if(!wasClear&&r.type==='exit')sound()?.sfx('portalOpen');
+      const wasClear=r.clear;r.clear=true;if(!wasClear&&r.type==='exit')sound()?.sfx('stairsOpen');
       if(!wasClear){
         const lantern=relicCount('pilgrim-lantern');
         if(lantern&&(r.type==='combat'||r.type==='elite')){
