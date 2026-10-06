@@ -189,6 +189,30 @@
     ctx.restore()
   }
   function slash(fx){if(fx.art)return attackArt(fx);const t=fx.l/fx.max;ctx.save();ctx.globalAlpha=t;ctx.strokeStyle=fx.color||A.player.hero.accent;ctx.lineWidth=5;ctx.beginPath();ctx.arc(fx.x,fx.y,fx.r,fx.a-.8,fx.a+.8);ctx.stroke();ctx.restore()}
+  function bossEntrance(e){
+    if(e.type!=='boss'||e.intro<=0)return;
+    const max=e.introMax||1,progress=1-e.intro/max,now=performance.now();
+    ctx.save();
+    const haze=ctx.createRadialGradient(e.x,e.y,10,e.x,e.y,105);
+    haze.addColorStop(0,`rgba(90,42,118,${.18+.18*(1-progress)})`);
+    haze.addColorStop(1,'rgba(20,10,30,0)');
+    ctx.fillStyle=haze;ctx.fillRect(e.x-120,e.y-120,240,240);
+    for(let i=0;i<10;i++){
+      const phase=i*.83+now/540;
+      const rise=(progress*55+i*7)%78;
+      const x=e.x+Math.sin(phase*1.7)*(34+i%3*8);
+      const y=e.y+36-rise;
+      const r=18+(i%4)*6;
+      const g=ctx.createRadialGradient(x,y,2,x,y,r);
+      g.addColorStop(0,`rgba(126,86,154,${.19+.14*(1-progress)})`);
+      g.addColorStop(1,'rgba(45,29,62,0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+    }
+    ctx.strokeStyle=`rgba(196,111,255,${.18+.34*Math.sin(now/120)**2})`;ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(e.x,e.y+8,48+progress*24,0,Math.PI*2);ctx.stroke();
+    ctx.restore();
+  }
+
   function bossTelegraph(e){
     if(e.type!=='boss'||e.bossTelegraph<=0)return;
     const max=e.bossTelegraphMax||1,progress=1-e.bossTelegraph/max,pulse=.45+.35*Math.sin(performance.now()/85);
@@ -211,7 +235,7 @@
 
   function enemy(e){
     const im=A.enemyImgs?.[e.type],now=performance.now(),boss=e.type==='boss';
-    if(boss)bossTelegraph(e);
+    if(boss){bossEntrance(e);if(e.intro<=0)bossTelegraph(e)}
     const fw=boss?160:128,fh=fw;
     let frame=0;
     if(!e.alive&&e.deadAt)frame=boss?5:4;
@@ -241,7 +265,8 @@
     }
     ctx.beginPath();ctx.ellipse(0,boss?23:14,boss?42:e.r*1.15,boss?10:6,0,0,Math.PI*2);ctx.fillStyle='#0008';ctx.fill();
     if(e.faceX<0&&!boss)ctx.scale(-1,1);
-    if(!e.alive&&e.deadAt)ctx.globalAlpha=Math.max(.18,1-(now-e.deadAt)/520);
+    if(!e.alive&&e.deadAt)ctx.globalAlpha=Math.max(.18,1-(now-e.deadAt)/900);
+    else if(boss&&e.intro>0)ctx.globalAlpha=.18+.72*(1-e.intro/(e.introMax||1));
     else if(e.flash>0&&Math.floor(e.flash/2)%2===0)ctx.globalAlpha=.55;
 
     if(im?.complete&&im.naturalWidth){
@@ -309,6 +334,18 @@
     ctx.fillText(`THE ABYSSAL WATCHER · PHASE ${phase} · ${b.bossAction||'추적 중'}`,W/2,y-5);
     ctx.textAlign='left'
   }
-  function draw(){ctx.clearRect(0,0,W,H);backdrop();if(!A.started||!A.player||!A.rooms[A.current])return;arenaDraw();roomFeature(A.cur());A.pickups.forEach(pickup);A.cur().enemies.filter(e=>e.alive||(e.deadAt&&performance.now()-e.deadAt<520)).forEach(enemy);A.projectiles.forEach(projectile);A.shockwaves.forEach(s=>{ctx.save();ctx.globalAlpha=Math.max(0,s.l/28);ctx.strokeStyle=s.color;ctx.lineWidth=5;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke();ctx.restore()});A.slashes.forEach(slash);player();A.particles.forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.l/22);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);ctx.restore()});minimap();bossbar()}
+  function bossVictory(){
+    const left=(A.bossClearUntil||0)-performance.now();if(left<=0)return;
+    const t=Math.min(1,left/2300),fade=Math.min(1,(2300-left)/260, left/420);
+    ctx.save();ctx.globalAlpha=Math.max(.15,fade);
+    ctx.fillStyle='rgba(5,6,12,.36)';ctx.fillRect(arena.x,arena.y,arena.w,arena.h);
+    ctx.textAlign='center';
+    ctx.fillStyle='#ffe5a6';ctx.font=`900 ${A.mobile?24:28}px sans-serif`;ctx.fillText('BOSS DEFEATED',W/2,arena.y+arena.h*.46);
+    ctx.fillStyle='#e9d6ff';ctx.font=`700 ${A.mobile?14:16}px sans-serif`;ctx.fillText('심연의 감시자를 물리쳤습니다',W/2,arena.y+arena.h*.46+30);
+    ctx.fillStyle='rgba(255,255,255,.62)';ctx.font='600 11px sans-serif';ctx.fillText('잠시 후 다음 층으로 이동합니다',W/2,arena.y+arena.h*.46+52);
+    ctx.textAlign='left';ctx.restore();
+  }
+
+  function draw(){ctx.clearRect(0,0,W,H);backdrop();if(!A.started||!A.player||!A.rooms[A.current])return;arenaDraw();roomFeature(A.cur());A.pickups.forEach(pickup);A.cur().enemies.filter(e=>e.alive||(e.deadAt&&performance.now()-e.deadAt<950)).forEach(enemy);A.projectiles.forEach(projectile);A.shockwaves.forEach(s=>{ctx.save();ctx.globalAlpha=Math.max(0,s.l/28);ctx.strokeStyle=s.color;ctx.lineWidth=5;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke();ctx.restore()});A.slashes.forEach(slash);player();A.particles.forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.l/22);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);ctx.restore()});minimap();bossbar();bossVictory()}
   let last=performance.now();function frame(t){const dt=Math.min(2.2,(t-last)/16.67);last=t;if(A.started&&!A.paused&&!A.dead)A.update(dt);draw();requestAnimationFrame(frame)}requestAnimationFrame(frame);
 })();
