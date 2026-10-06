@@ -61,3 +61,8 @@
 .relicPanel .relicInfo{min-width:0;max-width:190px}
 .relicPanel .relicInfo small{display:block;margin-top:2px;font-size:8px;line-height:1.35;color:#8792aa;white-space:normal}
 .relicPanel .relicName{font-size:10px;font-weight:800}
+
+.upgrade .rarity-epic{color:#d89cff}
+.upgrade .rarity-legendary{color:#ffcc58;text-shadow:0 0 12px rgba(255,190,65,.28)}
+.upgrade.relicChoice:has(.rarity-epic){border-color:rgba(190,115,255,.20)}
+.upgrade.relicChoice:has(.rarity-legendary){border-color:rgba(255,204,88,.28);box-shadow:0 0 28px rgba(255,187,58,.05)}
