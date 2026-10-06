@@ -25,3 +25,20 @@
   .relicFlash{top:172px;max-width:calc(100vw - 28px)}
   .relicFlash b{font-size:12px;overflow:hidden;text-overflow:ellipsis}
 }
+.hudActionsRelic{position:absolute;right:13px;bottom:12px;z-index:2}
+#relicButton{height:26px;border:1px solid rgba(255,215,110,.22);border-radius:9px;background:rgba(27,30,49,.9);color:#ffd46f;font-size:9px;font-weight:900;letter-spacing:.4px;padding:0 8px;cursor:pointer}
+#relicButton span{display:inline-grid;place-items:center;min-width:17px;height:17px;margin-left:4px;border-radius:999px;background:rgba(255,212,96,.13);color:#fff1bd;font-size:9px}
+.relicPanel{position:fixed;z-index:34;right:max(14px,env(safe-area-inset-right));top:118px;width:min(300px,calc(100vw - 28px));max-height:250px;overflow:auto;padding:10px;border-radius:14px;background:rgba(10,12,23,.96);border:1px solid rgba(255,215,110,.18);box-shadow:0 18px 45px rgba(0,0,0,.45);backdrop-filter:blur(10px);opacity:0;transform:translateY(-8px) scale(.98);pointer-events:none;transition:.16s}
+.relicPanel.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.relicPanelHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;color:#ffe09a;font-size:12px}
+#relicClose{width:28px;height:28px;border:0;border-radius:8px;background:rgba(255,255,255,.06);color:#cfd6e7;font-size:18px;line-height:1;cursor:pointer}
+.relicPanel .relicList{display:flex;flex-wrap:wrap;gap:6px;overflow:visible}
+.relicPanel .relicChip{height:28px;padding:3px 8px}
+.relicPanel .relicName{display:inline!important}
+@media(max-width:700px),(pointer:coarse){
+  #hud{padding-bottom:11px}
+  .hudActionsRelic{right:12px;bottom:10px}
+  #relicButton{height:24px;padding:0 7px}
+  .relicPanel{top:auto;bottom:145px;right:12px;width:min(285px,calc(100vw - 24px));max-height:210px}
+  .relicFlash{top:auto;bottom:145px}
+}
