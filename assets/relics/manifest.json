@@ -1,31 +1,36 @@
 {
-  "version": 2,
+  "version": 3,
   "style": "PLAYVAULT pixel relics",
   "relics": {
     "relic-blade": {
       "name": "유물의 칼날",
       "file": "relic-blade.webp",
-      "rarity": "rare"
+      "rarity": "rare",
+      "effect": "공격 +8 · 기본 공격 관통 +1 · 3회마다 공명 참격"
     },
     "dash-sigil": {
       "name": "질주의 문장",
       "file": "dash-sigil.webp",
-      "rarity": "rare"
+      "rarity": "rare",
+      "effect": "이속 +0.22 · 공격 가속 · 이동 중 질주 충격파"
     },
     "guardian-seal": {
       "name": "수호자의 인장",
       "file": "guardian-seal.webp",
-      "rarity": "rare"
+      "rarity": "rare",
+      "effect": "최대 HP +28 · 피격 시 보호막과 근접 반격"
     },
     "resonance-core": {
       "name": "공명 핵",
       "file": "resonance-core.webp",
-      "rarity": "rare"
+      "rarity": "rare",
+      "effect": "특수기 쿨/범위 강화 · 사용 후 잔향 추가 발동"
     },
     "condensed-crystal": {
       "name": "응축 수정",
       "file": "condensed-crystal.webp",
-      "rarity": "rare"
+      "rarity": "rare",
+      "effect": "공격 +4 · 최대 HP +14 · 주기적 수정 탄막"
     }
   }
 }
