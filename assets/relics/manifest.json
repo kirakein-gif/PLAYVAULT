@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "style": "PLAYVAULT pixel relics",
   "relics": {
     "relic-blade": {
@@ -31,6 +31,50 @@
       "file": "condensed-crystal.webp",
       "rarity": "rare",
       "effect": "공격 +4 · 최대 HP +14 · 주기적 수정 탄막"
+    },
+    "solar-shard": {
+      "name": "태양의 파편",
+      "file": "solar-shard.webp",
+      "rarity": "epic",
+      "hero": "dawn",
+      "effect": "Dawn 전용 · 룬탄 관통 +1"
+    },
+    "eclipse-fang": {
+      "name": "월식의 송곳니",
+      "file": "eclipse-fang.webp",
+      "rarity": "epic",
+      "hero": "night",
+      "effect": "Night 전용 · 적 처치 시 추가 월광 칼날"
+    },
+    "twin-grail": {
+      "name": "쌍둥이 성배",
+      "file": "twin-grail.webp",
+      "rarity": "epic",
+      "effect": "체력이 낮을수록 모든 피해 증가"
+    },
+    "abyss-mirror": {
+      "name": "심연의 거울",
+      "file": "abyss-mirror.webp",
+      "rarity": "epic",
+      "effect": "일정 확률로 적 투사체 반사"
+    },
+    "pilgrim-lantern": {
+      "name": "순례자의 등불",
+      "file": "pilgrim-lantern.webp",
+      "rarity": "rare",
+      "effect": "전투방 클리어 시 소량 회복"
+    },
+    "red-vow": {
+      "name": "붉은 서약",
+      "file": "red-vow.webp",
+      "rarity": "epic",
+      "effect": "최대 HP 감소 대신 공격력 대폭 증가"
+    },
+    "time-gear": {
+      "name": "시간의 톱니",
+      "file": "time-gear.webp",
+      "rarity": "legendary",
+      "effect": "특수기 사용 시 일정 확률로 쿨타임 즉시 초기화"
     }
   }
 }
