@@ -9,7 +9,7 @@
   const arena = mobile ? {x:36,y:150,w:W-72,h:H-205} : {x:42,y:76,w:876,h:520};
   Object.assign(AF,{canvas,ctx,W,H,mobile,arena});
 
-  const ui=AF.ui={start:$('start'),startBtn:$('startBtn'),levelUp:$('levelUp'),upgradeCards:$('upgradeCards'),gameOver:$('gameOver'),retryBtn:$('retryBtn'),heroName:$('heroName'),floorText:$('floorText'),roomText:$('roomText'),killText:$('killText'),hpText:$('hpText'),levelText:$('levelText'),enemyText:$('enemyText'),hpFill:$('hpFill'),xpFill:$('xpFill'),basicName:$('basicName'),basicIcon:$('basicIcon'),specialName:$('specialName'),specialIcon:$('specialIcon'),specialCdText:$('specialCdText'),specialBtn:$('specialBtn'),specialBtnIcon:$('specialBtnIcon'),resultText:$('resultText'),toast:$('toast')};
+  const ui=AF.ui={start:$('start'),startBtn:$('startBtn'),levelUp:$('levelUp'),upgradeCards:$('upgradeCards'),gameOver:$('gameOver'),retryBtn:$('retryBtn'),heroName:$('heroName'),floorText:$('floorText'),roomText:$('roomText'),killText:$('killText'),hpText:$('hpText'),levelText:$('levelText'),enemyText:$('enemyText'),hpFill:$('hpFill'),xpFill:$('xpFill'),basicName:$('basicName'),basicIcon:$('basicIcon'),specialName:$('specialName'),specialIcon:$('specialIcon'),specialCdText:$('specialCdText'),specialBtn:$('specialBtn'),specialBtnIcon:$('specialBtnIcon'),resultText:$('resultText'),toast:$('toast'),relicList:$('relicList'),relicFlash:$('relicFlash'),relicFlashIcon:$('relicFlashIcon'),relicFlashName:$('relicFlashName')};
   const SPR={dawn_idle:'assets/heroes/dawn_idle.webp',dawn_run:'assets/heroes/dawn_run.webp',dawn_attack:'assets/heroes/dawn_attack.webp',night_idle:'assets/heroes/night_idle.webp',night_run:'assets/heroes/night_run.webp',night_attack:'assets/heroes/night_attack.webp'};
   const imgs=AF.imgs={}; Object.entries(SPR).forEach(([k,s])=>{const im=new Image();im.src=s;imgs[k]=im});
   const ENEMY_SPR={
@@ -25,7 +25,7 @@
     dawn:{key:'dawn',name:'Dawn Seeker',ko:'여명의 추적자',color:'#ffd46f',accent:'#66d9ff',maxHp:120,speed:3.15,basicName:'추적 룬탄',basicIcon:'✦',rate:34,damage:17,proj:8.1,specialName:'태양낙인',specialIcon:'☀',specialCd:430,idle:'dawn_idle',run:'dawn_run',attack:'dawn_attack',drawW:mobile?112:98},
     night:{key:'night',name:'Night Veil',ko:'밤의 장막',color:'#7bdfff',accent:'#9273ff',maxHp:96,speed:3.75,basicName:'월광 칼날',basicIcon:'☾',rate:26,damage:13,proj:9.2,specialName:'월영 질주',specialIcon:'◒',specialCd:360,idle:'night_idle',run:'night_run',attack:'night_attack',drawW:mobile?106:94}
   };
-  AF.selected='dawn'; AF.floor=1; AF.kills=0; AF.rooms={}; AF.current='0,0'; AF.started=false; AF.paused=true; AF.dead=false; AF.player=null; AF.projectiles=[]; AF.particles=[]; AF.shockwaves=[]; AF.pickups=[]; AF.slashes=[];
+  AF.selected='dawn'; AF.floor=1; AF.kills=0; AF.relics={}; AF.rooms={}; AF.current='0,0'; AF.started=false; AF.paused=true; AF.dead=false; AF.player=null; AF.projectiles=[]; AF.particles=[]; AF.shockwaves=[]; AF.pickups=[]; AF.slashes=[];
   AF.keys={}; AF.joy={x:0,y:0,active:false,id:null};
   const dirs={N:[0,-1],S:[0,1],E:[1,0],W:[-1,0]}, opp={N:'S',S:'N',E:'W',W:'E'}, key=(x,y)=>`${x},${y}`;
   AF.dirs=dirs;
@@ -78,7 +78,7 @@
     }
   }
   function heroUI(){const h=AF.player.hero;ui.heroName.textContent=`${h.name} · ${h.ko}`;ui.basicName.textContent=h.basicName;ui.basicIcon.textContent=h.basicIcon;ui.specialName.textContent=h.specialName;ui.specialIcon.textContent=h.specialIcon;ui.specialBtnIcon.textContent=h.specialIcon}
-  AF.newRun=()=>{const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.rooms=makeDungeon(8);AF.current='0,0';markBoss();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,attackAt:0,hurtPose:0,deathAt:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');heroUI();AF.hud();AF.toast(`${h.ko} · ${h.name}`)};
+  AF.newRun=()=>{const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.rooms=makeDungeon(8);AF.current='0,0';markBoss();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,attackAt:0,hurtPose:0,deathAt:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name}`)};
   ui.startBtn.addEventListener('click',AF.newRun);ui.retryBtn.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
 
   function nearest(){const a=AF.cur().enemies.filter(e=>e.alive);return a.length?a.reduce((x,y)=>Math.hypot(x.x-AF.player.x,x.y-AF.player.y)<Math.hypot(y.x-AF.player.x,y.y-AF.player.y)?x:y):null}
@@ -97,7 +97,7 @@
     opts.sort(()=>Math.random()-.5).slice(0,3).forEach(o=>{
       const b=document.createElement('button');b.className='upgrade';
       b.innerHTML=`<span class="uicon">${o.i}</span><b>${o.n}</b><p>${o.d}</p>`;
-      b.onclick=()=>{o.f(AF.player);ui.levelUp.classList.remove('show');AF.paused=false;AF.hud()};
+      b.onclick=()=>{o.f(AF.player);if(o.relic)AF.addRelic(o);ui.levelUp.classList.remove('show');AF.paused=false;AF.hud()};
       ui.upgradeCards.appendChild(b);
     });
     ui.levelUp.classList.add('show');
@@ -113,11 +113,11 @@
   }
   function treasureReward(){
     chooseReward([
-      {i:'⚔',n:'유물의 칼날',d:'기본 공격 피해 +8',f:p=>p.atk+=8},
-      {i:'✧',n:'질주의 문장',d:'이동속도 +0.22 · 공격 간격 추가 감소',f:p=>{p.speed+=.22;p.rate+=2}},
-      {i:'◈',n:'수호자의 인장',d:'최대 체력 +28 · 즉시 35 회복',f:p=>{p.maxHp+=28;p.hp=Math.min(p.maxHp,p.hp+35)}},
-      {i:'✹',n:'공명 핵',d:'특수기 대기시간 크게 감소 · 범위 증가',f:p=>{p.specialBoost+=42;p.range+=10}},
-      {i:'◆',n:'응축 수정',d:'공격 +4 · 최대 체력 +14',f:p=>{p.atk+=4;p.maxHp+=14;p.hp=Math.min(p.maxHp,p.hp+14)}}
+      {id:'relic-blade',i:'⚔',n:'유물의 칼날',d:'기본 공격 피해 +8',relic:true,f:p=>p.atk+=8},
+      {id:'dash-sigil',i:'✧',n:'질주의 문장',d:'이동속도 +0.22 · 공격 간격 추가 감소',relic:true,f:p=>{p.speed+=.22;p.rate+=2}},
+      {id:'guardian-seal',i:'◈',n:'수호자의 인장',d:'최대 체력 +28 · 즉시 35 회복',relic:true,f:p=>{p.maxHp+=28;p.hp=Math.min(p.maxHp,p.hp+35)}},
+      {id:'resonance-core',i:'✹',n:'공명 핵',d:'특수기 대기시간 크게 감소 · 범위 증가',relic:true,f:p=>{p.specialBoost+=42;p.range+=10}},
+      {id:'condensed-crystal',i:'◆',n:'응축 수정',d:'공격 +4 · 최대 체력 +14',relic:true,f:p=>{p.atk+=4;p.maxHp+=14;p.hp=Math.min(p.maxHp,p.hp+14)}}
     ],'보물 발견','상자에서 유물 하나를 선택하세요.');
   }
   function roomFeature(r){
@@ -169,6 +169,33 @@
         AF.toast(`엘리트 격파 · 공명 +${bonus}`);
       }
     }AF.hud()};
+
+  AF.addRelic=o=>{
+    const id=o.id||o.n,prev=AF.relics[id];
+    AF.relics[id]={id:id,name:o.n,icon:o.i,count:(prev?.count||0)+1};
+    if(ui.relicFlash){
+      ui.relicFlashIcon.textContent=o.i;
+      ui.relicFlashName.textContent=(prev?'유물 강화 · ':'유물 획득 · ')+o.n+(prev?' ×'+(prev.count+1):'');
+      ui.relicFlash.classList.add('show');
+      clearTimeout(AF._relicFlashTimer);
+      AF._relicFlashTimer=setTimeout(()=>ui.relicFlash.classList.remove('show'),1600);
+    }
+    AF.drawRelics();
+    AF.toast((prev?'유물 강화 · ':'유물 획득 · ')+o.n);
+  };
+  AF.drawRelics=()=>{
+    if(!ui.relicList)return;
+    const relics=Object.values(AF.relics);
+    ui.relicList.innerHTML='';
+    if(!relics.length){
+      const empty=document.createElement('span');empty.className='relicEmpty';empty.textContent='없음';ui.relicList.appendChild(empty);return;
+    }
+    relics.forEach(r=>{
+      const chip=document.createElement('div');chip.className='relicChip';chip.title=r.name;
+      chip.innerHTML='<span class="relicIcon">'+r.icon+'</span><span class="relicName">'+r.name+'</span>'+(r.count>1?'<b>×'+r.count+'</b>':'');
+      ui.relicList.appendChild(chip);
+    });
+  };
 
   AF.hud=()=>{const p=AF.player;if(!p)return;const r=AF.cur();ui.floorText.textContent=`${AF.floor}F · ${AF.stageName()}`;ui.roomText.textContent=`ROOM ${AF.current} · ${AF.roomLabel(r)}`;ui.killText.textContent=AF.kills;ui.hpText.textContent=Math.max(0,Math.round(p.hp));ui.levelText.textContent=p.level;ui.enemyText.textContent=r.enemies.filter(e=>e.alive).length;ui.hpFill.style.width=`${Math.max(0,p.hp/p.maxHp*100)}%`;ui.xpFill.style.width=`${Math.max(0,p.xp/p.nextXp*100)}%`;const cd=Math.max(0,Math.ceil(p.special/60));ui.specialCdText.textContent=cd?`${cd}s`:'READY';ui.specialBtn.classList.toggle('cooling',cd>0)};
   let toastTimer;AF.toast=t=>{ui.toast.textContent=t;ui.toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>ui.toast.classList.remove('show'),1100)};
