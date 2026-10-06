@@ -71,3 +71,13 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - Differentiated enemy behavior: Abyssal Grunt dash, Fallen Priest aimed cast, Shadow Beast telegraphed heavy charge.
 - Added floor gimmicks: cathedral holy zone, graveyard chilling fog, tower crosswind, altar abyss-rift warnings/explosions.
 - 4F boss defeat now ends the first loop with a CLEAR results screen, relic summary, local best records, restart/lobby actions, and optional endless continuation from 5F.
+
+## ABYSSFALL v19 12-floor campaign
+
+- Main campaign expanded to 12 floors across four 3-floor zones: cathedral, graveyard, broken tower, abyss altar.
+- Room targets grow by depth: 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20 rooms through 12F.
+- Dungeon generation now creates a guaranteed backbone plus branching side paths, making deeper floors longer and less direct.
+- Boss floors are 3F, 6F, 9F, and 12F. Other floors end at a farthest-room descent portal after its encounter is cleared.
+- Elite-room count rises by zone; later floors can contain additional treasure/recovery rooms.
+- Between-floor healing is partial rather than full, so damage and recovery decisions carry through a run.
+- 12F now triggers the campaign CLEAR screen; 13F+ remains optional endless descent.
