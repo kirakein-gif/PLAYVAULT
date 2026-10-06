@@ -37,6 +37,12 @@
   AF.roomTarget=(floor=AF.floor)=>{const plan=[8,9,10,11,12,13,14,15,16,17,18,20];return floor<=12?plan[floor-1]:Math.min(28,20+Math.ceil((floor-12)/2))};
   AF.roomLabels={start:'입구',combat:'일반전투',treasure:'보물방',recovery:'회복방',elite:'엘리트방',exit:'하층 계단',boss:'보스방'};
   AF.roomLabel=r=>AF.roomLabels[r?.type]||'일반전투';
+  AF.tracePools=[
+    ['해가 검어지던 날, 첫 번째 종은 울리지 않았다.','빛이 끊긴 뒤에도 문은 안에서 잠겼다.','…아래를 보지 마라.'],
+    ['이름을 적지 마라.','세 번째 관에는 아무것도 없었다.','돌아온 자의 얼굴을 보지 마라.'],
+    ['우리는 닫은 것이 아니다.','기계는 멈췄는데, 바늘은 아직 내려간다.','아래에서 오는 신호를 끊을 수 없다.'],
+    ['여기까지 온 것은 처음이 아니다.','문은 바깥을 막기 위해 세운 것이 아니다.','…그것은 아직 위를 보고 있다.']
+  ];
 
   function fit(){const s=Math.min(innerWidth/W,innerHeight/H);canvas.style.width=`${Math.floor(W*s)}px`;canvas.style.height=`${Math.floor(H*s)}px`} fit();addEventListener('resize',fit);
   document.querySelectorAll('.heroCard').forEach(b=>b.addEventListener('click',()=>{AF.selected=b.dataset.hero;document.querySelectorAll('.heroCard').forEach(x=>x.classList.toggle('selected',x===b))}));
@@ -77,7 +83,7 @@
     for(const k in R){
       const r=R[k];r.doors={};
       for(const [d,v] of Object.entries(dirs))r.doors[d]=!!R[key(r.x+v[0],r.y+v[1])];
-      Object.assign(r,{seen:false,clear:false,spawned:false,enemies:[],type:'combat',used:false,eliteRewarded:false,boss:false,exit:false,sealAltar:false,sealBroken:false,gimmickTimer:105+Math.random()*70,windWarn:0,windActive:0,windDir:1,hazards:[]});
+      Object.assign(r,{seen:false,clear:false,spawned:false,enemies:[],type:'combat',used:false,eliteRewarded:false,boss:false,exit:false,sealAltar:false,sealBroken:false,traceText:'',traceSeen:false,traceSide:'',gimmickTimer:105+Math.random()*70,windWarn:0,windActive:0,windDir:1,hazards:[]});
     }
     R['0,0'].seen=R['0,0'].clear=true;R['0,0'].type='start';R['0,0'].spawned=true;
     return R
@@ -96,7 +102,7 @@
   }
   function assignRoomTypes(targetKey){
     const entries=Object.entries(AF.rooms).filter(([k])=>k!=='0,0'&&k!==targetKey);
-    for(const [,r] of entries){r.type='combat';r.used=false;r.eliteRewarded=false;r.clear=false;r.spawned=false;r.boss=false;r.exit=false;r.sealAltar=false;r.sealBroken=false}
+    for(const [,r] of entries){r.type='combat';r.used=false;r.eliteRewarded=false;r.clear=false;r.spawned=false;r.boss=false;r.exit=false;r.sealAltar=false;r.sealBroken=false;r.traceText='';r.traceSeen=false;r.traceSide=''}
     entries.sort(()=>Math.random()-.5);
     let pos=0;
     const treasureCount=AF.floor>=8?2:1,recoveryCount=AF.floor>=10?2:1;
@@ -131,9 +137,32 @@
       chosen.forEach(r=>{r.sealAltar=true;r.sealBroken=false});
       AF.sealNeed=chosen.length;
     }else AF.sealNeed=0;
+
+    // Sparse, non-essential traces: never a checklist, never required for progression.
+    const traceCount=AF.isBossFloor()?2:1;
+    const traceCandidates=Object.entries(AF.rooms)
+      .filter(([k,r])=>k!=='0,0'&&k!==best&&!r.sealAltar&&(r.type==='combat'||r.type==='elite'))
+      .sort(()=>Math.random()-.5);
+    const pool=AF.tracePools[AF.zoneIndex()]||AF.tracePools[0];
+    for(let i=0;i<Math.min(traceCount,traceCandidates.length);i++){
+      const r=traceCandidates[i][1];
+      r.traceText=pool[(AF.floor+i+r.x*3+r.y*5+pool.length*20)%pool.length];
+      r.traceSide=((Math.abs(r.x*7+r.y*11+AF.floor+i)%2)===0)?'left':'right';
+    }
   }
   AF.cur=()=>AF.rooms[AF.current];
   function roomRand(r,n){const v=Math.sin((r.x*97+r.y*193+AF.floor*389+n*71.17))*43758.5453;return v-Math.floor(v)}
+  AF.tracePoint=r=>{
+    const left=r?.traceSide!=='right';
+    return{x:left?arena.x+58:arena.x+arena.w-58,y:arena.y+arena.h*.56};
+  };
+  function updateTrace(r){
+    if(!r?.traceText||r.traceSeen||!r.clear)return;
+    const p=AF.player,t=AF.tracePoint(r);
+    if(Math.hypot(p.x-t.x,p.y-t.y)>62)return;
+    r.traceSeen=true;
+    AF.toast(r.traceText);
+  }
   AF.stageZone=(r,kind,i=0)=>{
     if(!r)return{x:W/2,y:arena.y+arena.h/2,r:70};
     if(kind==='holy')return{x:arena.x+arena.w*(.30+.40*roomRand(r,11)),y:arena.y+arena.h*(.42+.34*roomRand(r,12)),r:74};
@@ -527,7 +556,7 @@
         AF.cur().enemies.forEach(e=>{if(e.alive&&Math.hypot(e.x-p.x,e.y-p.y)<rad)damage(e,dmg)});
       }
     }else p.sigilCharge=Math.max(0,(p.sigilCharge||0)-dt*1.4);
-    clamp();doors();const r=AF.cur();roomFeature(r);if(!r.clear)spawnRoom(r);updateStageGimmick(r,dt);clamp();
+    clamp();doors();const r=AF.cur();roomFeature(r);updateTrace(r);if(!r.clear)spawnRoom(r);updateStageGimmick(r,dt);clamp();
     const crystal=relicCount('condensed-crystal');
     if(crystal){
       p.crystalTimer=(p.crystalTimer??80)-dt;
