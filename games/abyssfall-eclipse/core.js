@@ -9,7 +9,7 @@
   const arena = mobile ? {x:36,y:150,w:W-72,h:H-205} : {x:42,y:76,w:876,h:520};
   Object.assign(AF,{canvas,ctx,W,H,mobile,arena});
 
-  const ui=AF.ui={start:$('start'),startBtn:$('startBtn'),levelUp:$('levelUp'),upgradeCards:$('upgradeCards'),gameOver:$('gameOver'),retryBtn:$('retryBtn'),heroName:$('heroName'),floorText:$('floorText'),roomText:$('roomText'),killText:$('killText'),hpText:$('hpText'),levelText:$('levelText'),enemyText:$('enemyText'),hpFill:$('hpFill'),xpFill:$('xpFill'),basicName:$('basicName'),basicIcon:$('basicIcon'),specialName:$('specialName'),specialIcon:$('specialIcon'),specialCdText:$('specialCdText'),specialBtn:$('specialBtn'),specialBtnIcon:$('specialBtnIcon'),resultText:$('resultText'),toast:$('toast'),relicList:$('relicList'),relicFlash:$('relicFlash'),relicFlashIcon:$('relicFlashIcon'),relicFlashName:$('relicFlashName')};
+  const ui=AF.ui={start:$('start'),startBtn:$('startBtn'),levelUp:$('levelUp'),upgradeCards:$('upgradeCards'),gameOver:$('gameOver'),retryBtn:$('retryBtn'),heroName:$('heroName'),floorText:$('floorText'),roomText:$('roomText'),killText:$('killText'),hpText:$('hpText'),levelText:$('levelText'),enemyText:$('enemyText'),hpFill:$('hpFill'),xpFill:$('xpFill'),basicName:$('basicName'),basicIcon:$('basicIcon'),specialName:$('specialName'),specialIcon:$('specialIcon'),specialCdText:$('specialCdText'),specialBtn:$('specialBtn'),specialBtnIcon:$('specialBtnIcon'),resultText:$('resultText'),toast:$('toast'),relicList:$('relicList'),relicButton:$('relicButton'),relicCount:$('relicCount'),relicPanel:$('relicPanel'),relicClose:$('relicClose'),relicFlash:$('relicFlash'),relicFlashIcon:$('relicFlashIcon'),relicFlashName:$('relicFlashName')};
   const SPR={dawn_idle:'assets/heroes/dawn_idle.webp',dawn_run:'assets/heroes/dawn_run.webp',dawn_attack:'assets/heroes/dawn_attack.webp',night_idle:'assets/heroes/night_idle.webp',night_run:'assets/heroes/night_run.webp',night_attack:'assets/heroes/night_attack.webp'};
   const imgs=AF.imgs={}; Object.entries(SPR).forEach(([k,s])=>{const im=new Image();im.src=s;imgs[k]=im});
   const ENEMY_SPR={
@@ -41,6 +41,7 @@
   function resetJoy(){Object.assign(AF.joy,{x:0,y:0,active:false,id:null});joyKnob.style.transform='translate(0,0)'}
   function moveJoy(e){const r=joyBase.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=e.clientX-cx,dy=e.clientY-cy,d=Math.hypot(dx,dy)||1,m=32;if(d>m){dx=dx/d*m;dy=dy/d*m}AF.joy.x=dx/m;AF.joy.y=dy/m;joyKnob.style.transform=`translate(${dx}px,${dy}px)`}
   joyBase.addEventListener('pointerdown',e=>{e.preventDefault();AF.joy.active=true;AF.joy.id=e.pointerId;joyBase.setPointerCapture?.(e.pointerId);moveJoy(e)});joyBase.addEventListener('pointermove',e=>{if(AF.joy.active&&e.pointerId===AF.joy.id){e.preventDefault();moveJoy(e)}});joyBase.addEventListener('pointerup',resetJoy);joyBase.addEventListener('pointercancel',resetJoy);addEventListener('blur',()=>{resetJoy();AF.keys={}});ui.specialBtn.addEventListener('pointerdown',e=>{e.preventDefault();AF.useSpecial()});
+  if(ui.relicButton){const closeRelics=()=>{ui.relicPanel.classList.remove('show');ui.relicPanel.setAttribute('aria-hidden','true')};ui.relicButton.addEventListener('click',()=>{const open=!ui.relicPanel.classList.contains('show');ui.relicPanel.classList.toggle('show',open);ui.relicPanel.setAttribute('aria-hidden',open?'false':'true')});ui.relicClose&&ui.relicClose.addEventListener('click',closeRelics);}
 
   function makeDungeon(n){const R={[key(0,0)]:{x:0,y:0}};let x=0,y=0,a=0;while(Object.keys(R).length<n&&a++<500){const ds=Object.keys(dirs),d=ds[Math.random()*4|0],v=dirs[d];x+=v[0];y+=v[1];R[key(x,y)]??={x,y}}for(const k in R){const r=R[k];r.doors={};for(const [d,v] of Object.entries(dirs))r.doors[d]=!!R[key(r.x+v[0],r.y+v[1])];Object.assign(r,{seen:false,clear:false,spawned:false,enemies:[],type:'combat',used:false,eliteRewarded:false})}R['0,0'].seen=R['0,0'].clear=true;R['0,0'].type='start';R['0,0'].spawned=true;return R}
   function assignRoomTypes(){
@@ -184,17 +185,12 @@
     AF.toast((prev?'유물 강화 · ':'유물 획득 · ')+o.n);
   };
   AF.drawRelics=()=>{
+    const relics=Object.values(AF.relics),total=relics.reduce((n,r)=>n+r.count,0);
+    if(ui.relicCount)ui.relicCount.textContent=total;
     if(!ui.relicList)return;
-    const relics=Object.values(AF.relics);
     ui.relicList.innerHTML='';
-    if(!relics.length){
-      const empty=document.createElement('span');empty.className='relicEmpty';empty.textContent='없음';ui.relicList.appendChild(empty);return;
-    }
-    relics.forEach(r=>{
-      const chip=document.createElement('div');chip.className='relicChip';chip.title=r.name;
-      chip.innerHTML='<span class="relicIcon">'+r.icon+'</span><span class="relicName">'+r.name+'</span>'+(r.count>1?'<b>×'+r.count+'</b>':'');
-      ui.relicList.appendChild(chip);
-    });
+    if(!relics.length){const empty=document.createElement('span');empty.className='relicEmpty';empty.textContent='아직 획득한 유물이 없습니다.';ui.relicList.appendChild(empty);return}
+    relics.forEach(r=>{const chip=document.createElement('div');chip.className='relicChip';chip.title=r.name;chip.innerHTML='<span class="relicIcon">'+r.icon+'</span><span class="relicName">'+r.name+'</span>'+(r.count>1?'<b>×'+r.count+'</b>':'');ui.relicList.appendChild(chip)});
   };
 
   AF.hud=()=>{const p=AF.player;if(!p)return;const r=AF.cur();ui.floorText.textContent=`${AF.floor}F · ${AF.stageName()}`;ui.roomText.textContent=`ROOM ${AF.current} · ${AF.roomLabel(r)}`;ui.killText.textContent=AF.kills;ui.hpText.textContent=Math.max(0,Math.round(p.hp));ui.levelText.textContent=p.level;ui.enemyText.textContent=r.enemies.filter(e=>e.alive).length;ui.hpFill.style.width=`${Math.max(0,p.hp/p.maxHp*100)}%`;ui.xpFill.style.width=`${Math.max(0,p.xp/p.nextXp*100)}%`;const cd=Math.max(0,Math.ceil(p.special/60));ui.specialCdText.textContent=cd?`${cd}s`:'READY';ui.specialBtn.classList.toggle('cooling',cd>0)};
