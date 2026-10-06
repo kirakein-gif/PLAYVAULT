@@ -83,7 +83,7 @@
     for(const k in R){
       const r=R[k];r.doors={};
       for(const [d,v] of Object.entries(dirs))r.doors[d]=!!R[key(r.x+v[0],r.y+v[1])];
-      Object.assign(r,{seen:false,clear:false,spawned:false,enemies:[],type:'combat',used:false,eliteRewarded:false,boss:false,exit:false,sealAltar:false,sealBroken:false,traceText:'',traceSeen:false,traceSide:'',gimmickTimer:105+Math.random()*70,windWarn:0,windActive:0,windDir:1,hazards:[]});
+      Object.assign(r,{seen:false,clear:false,spawned:false,enemies:[],type:'combat',used:false,eliteRewarded:false,boss:false,exit:false,sealAltar:false,sealBroken:false,traceText:'',traceSeen:false,traceSide:'',gimmickTimer:80+Math.random()*150,windWarn:0,windActive:0,windDir:1,windX:1,windY:0,windStrength:1.2,windDuration:70,fogCount:1+Math.floor(Math.random()*4),hazards:[]});
     }
     R['0,0'].seen=R['0,0'].clear=true;R['0,0'].type='start';R['0,0'].spawned=true;
     return R
@@ -166,14 +166,24 @@
   AF.stageZone=(r,kind,i=0)=>{
     if(!r)return{x:W/2,y:arena.y+arena.h/2,r:70};
     if(kind==='holy')return{x:arena.x+arena.w*(.30+.40*roomRand(r,11)),y:arena.y+arena.h*(.42+.34*roomRand(r,12)),r:74};
-    if(kind==='fog')return{x:arena.x+arena.w*(i? .67:.34)+((roomRand(r,20+i)-.5)*70),y:arena.y+arena.h*(i?.62:.42)+((roomRand(r,30+i)-.5)*80),r:88};
+    if(kind==='fog'){
+      const x=arena.x+55+roomRand(r,20+i)*(arena.w-110);
+      const y=arena.y+55+roomRand(r,40+i)*(arena.h-110);
+      const rad=58+roomRand(r,60+i)*62;
+      return{x,y,r:rad};
+    }
     return{x:W/2,y:arena.y+arena.h/2,r:70};
   };
+  AF.fogCount=r=>Math.max(1,Math.min(4,r?.fogCount||2));
   const activeStageRoom=r=>r&&!r.clear&&!(AF.bossClearUntil&&performance.now()<AF.bossClearUntil)&&(r.type==='combat'||r.type==='elite'||r.type==='exit'||r.type==='boss');
   function stageMoveScale(r,p){
     if(!activeStageRoom(r)||AF.zoneIndex()!==1)return 1;
-    for(let i=0;i<2;i++){const z=AF.stageZone(r,'fog',i);if(Math.hypot(p.x-z.x,p.y-z.y)<z.r)return .78}
-    return 1;
+    let scale=1;
+    for(let i=0;i<AF.fogCount(r);i++){
+      const z=AF.stageZone(r,'fog',i);
+      if(Math.hypot(p.x-z.x,p.y-z.y)<z.r)scale=Math.min(scale,.72+roomRand(r,90+i)*.14);
+    }
+    return scale;
   }
   function updateStageGimmick(r,dt){
     if(!r)return;
@@ -187,30 +197,45 @@
         if(p.holyTick>18){p.holyTick=0;AF.particles.push({x:p.x+(Math.random()-.5)*28,y:p.y+12,vx:(Math.random()-.5)*.4,vy:-1-Math.random()*.7,l:22,color:'#ffe7a0'})}
       }
     }else if(idx===2){
-      if(r.windWarn>0){r.windWarn-=dt;if(r.windWarn<=0){r.windWarn=0;r.windActive=70}}
-      else if(r.windActive>0){
+      if(r.windWarn>0){
+        r.windWarn-=dt;
+        if(r.windWarn<=0){r.windWarn=0;r.windActive=r.windDuration||70}
+      }else if(r.windActive>0){
         r.windActive-=dt;
-        const push=r.windDir*(1.35+Math.min(.55,(AF.floor-1)*.05))*dt;
-        p.x+=push;
-        r.enemies.forEach(e=>{if(e.alive&&e.type!=='boss')e.x+=push*.42});
+        const push=(r.windStrength||1.2)*dt;
+        p.x+=(r.windX||0)*push;p.y+=(r.windY||0)*push;
+        r.enemies.forEach(e=>{if(e.alive&&e.type!=='boss'){e.x+=(r.windX||0)*push*.38;e.y+=(r.windY||0)*push*.38}});
       }else{
         r.gimmickTimer-=dt;
-        if(r.gimmickTimer<=0){r.windDir=roomRand(r,70+Math.floor(performance.now()/1000))>.5?1:-1;r.windWarn=42;r.gimmickTimer=205+roomRand(r,88)*55}
+        if(r.gimmickTimer<=0){
+          const a=Math.random()*Math.PI*2;
+          r.windX=Math.cos(a);r.windY=Math.sin(a);r.windDir=r.windX>=0?1:-1;
+          r.windStrength=.75+Math.random()*1.65+(r.type==='boss'?.25:0);
+          r.windDuration=34+Math.random()*82+(r.type==='boss'?24:0);
+          r.windWarn=20+Math.random()*38;
+          r.gimmickTimer=85+Math.random()*210-(r.type==='boss'?25:0);
+        }
       }
     }else if(idx===3){
       r.gimmickTimer-=dt;
       if(r.gimmickTimer<=0){
-        const ox=(Math.random()-.5)*150,oy=(Math.random()-.5)*120;
-        r.hazards.push({x:Math.max(arena.x+55,Math.min(arena.x+arena.w-55,p.x+ox)),y:Math.max(arena.y+55,Math.min(arena.y+arena.h-55,p.y+oy)),t:52,max:52,hit:false,life:0});
-        r.gimmickTimer=125+Math.random()*55;
+        const count=1+(Math.random()<(r.type==='boss'?.78:.42)?1:0)+(r.type==='boss'&&Math.random()<.42?1:0);
+        for(let i=0;i<count;i++){
+          const nearPlayer=i===0&&Math.random()<.62;
+          const x=nearPlayer?Math.max(arena.x+50,Math.min(arena.x+arena.w-50,p.x+(Math.random()-.5)*190)):arena.x+55+Math.random()*(arena.w-110);
+          const y=nearPlayer?Math.max(arena.y+50,Math.min(arena.y+arena.h-50,p.y+(Math.random()-.5)*160)):arena.y+55+Math.random()*(arena.h-110);
+          const rad=44+Math.random()*52,warn=28+Math.random()*46;
+          r.hazards.push({x,y,r:rad,t:warn,max:warn,hit:false,life:0});
+        }
+        r.gimmickTimer=(r.type==='boss'?58:82)+Math.random()*(r.type==='boss'?105:170);
       }
       for(const h of r.hazards){
         if(!h.hit){
           h.t-=dt;
           if(h.t<=0){
-            h.hit=true;h.life=24;AF.shockwaves.push({x:h.x,y:h.y,r:10,max:70,l:22,color:'#ff4867'});
+            h.hit=true;h.life=22+Math.random()*12;AF.shockwaves.push({x:h.x,y:h.y,r:10,max:h.r,l:22,color:'#ff4867'});
             const d=Math.hypot(p.x-h.x,p.y-h.y);
-            if(d<68&&p.inv<=0)hurt(10+AF.floor*1.8,(p.x-h.x)/(d||1),(p.y-h.y)/(d||1));
+            if(d<h.r&&p.inv<=0)hurt((8+AF.floor*1.15)*(0.82+h.r/130),(p.x-h.x)/(d||1),(p.y-h.y)/(d||1));
           }
         }else h.life-=dt;
       }
@@ -218,7 +243,7 @@
     }
   }
   AF.stageTip=()=>{
-    const tips=['성광 지대 · 빛의 원 안에서 특수기 충전 가속','냉기 안개 · 안개 안에서는 이동속도 감소','붕괴의 바람 · 경고 후 강한 횡풍이 몰아칩니다','심연 균열 · 붉은 균열이 폭발하기 전에 벗어나세요'];
+    const tips=['바닥 어딘가에 희미한 빛이 남아 있다.','안개가 짙다.','바람 소리가 가까워졌다.','바닥 아래에서 불길한 진동이 느껴진다.'];
     return tips[AF.zoneIndex()];
   };
   function enemy(x,y,type){
@@ -467,7 +492,7 @@
     AF.player.hp=Math.min(AF.player.maxHp,AF.player.hp+Math.max(10,Math.round(AF.player.maxHp*healRate)));
     AF.player.inv=45;AF.projectiles=[];AF.pickups=[];AF.slashes=[];
     AF.toast(`FLOOR ${AF.floor} · ${AF.stageName()} · ${Object.keys(AF.rooms).length} ROOMS`);
-    AF.hud();setTimeout(()=>{if(AF.started&&!AF.dead)AF.toast(AF.stageTip())},950)
+    AF.hud();if((AF.floor-1)%3===0)setTimeout(()=>{if(AF.started&&!AF.dead)AF.toast(AF.stageTip())},950)
   };
   function hurt(n,nx,ny){const p=AF.player;if(p.shield>0){const b=Math.min(p.shield,n);p.shield-=b;n-=b;if(n<=0){p.inv=18;return}}p.hp-=Math.round(n);sound()?.sfx('hurt');p.inv=48;p.hurtPose=18;p.x+=nx*18;p.y+=ny*18;
     const seal=relicCount('guardian-seal');
