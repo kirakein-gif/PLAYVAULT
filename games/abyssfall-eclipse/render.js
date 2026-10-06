@@ -422,7 +422,7 @@
     const vals=Object.values(A.rooms),minX=Math.min(...vals.map(r=>r.x)),maxX=Math.max(...vals.map(r=>r.x)),minY=Math.min(...vals.map(r=>r.y)),maxY=Math.max(...vals.map(r=>r.y));
     const bw=A.mobile?96:136,bh=A.mobile?72:100,bx=A.mobile?(arena.x+arena.w-bw-10):(W-bw-18),by=A.mobile?(arena.y+10):15;
     const spanX=Math.max(1,maxX-minX),spanY=Math.max(1,maxY-minY),base=A.mobile?9:13,s=Math.max(4.5,Math.min(base,(bw-24)/spanX,(bh-28)/spanY)),cx=bx+bw/2,cy=by+bh/2+7;
-    const colors={start:'#8b9ab9',combat:'#6f83a8',treasure:'#e8b64f',recovery:'#55d8a5',elite:'#ef637a',exit:'#71e1c3',boss:'#bd6eff'};
+    const colors={start:'#8b9ab9',combat:'#6f83a8',treasure:'#e8b64f',recovery:'#55d8a5',elite:'#ef637a',exit:'#9b8b73',boss:'#bd6eff'};
     ctx.save();ctx.fillStyle='rgba(7,9,19,.76)';ctx.strokeStyle='#ffffff1a';rr(bx,by,bw,bh,12);ctx.fill();ctx.stroke();
     ctx.fillStyle=A.player.hero.color;ctx.font='700 10px sans-serif';ctx.fillText('MAP',bx+10,by+14);
     for(const k in A.rooms){
