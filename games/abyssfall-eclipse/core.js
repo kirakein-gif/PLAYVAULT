@@ -121,7 +121,7 @@
     if(kind==='fog')return{x:arena.x+arena.w*(i? .67:.34)+((roomRand(r,20+i)-.5)*70),y:arena.y+arena.h*(i?.62:.42)+((roomRand(r,30+i)-.5)*80),r:88};
     return{x:W/2,y:arena.y+arena.h/2,r:70};
   };
-  const activeStageRoom=r=>r&&!r.clear&&!(AF.bossClearUntil&&performance.now()<AF.bossClearUntil)&&(r.type==='combat'||r.type==='elite'||r.type==='boss');
+  const activeStageRoom=r=>r&&!r.clear&&!(AF.bossClearUntil&&performance.now()<AF.bossClearUntil)&&(r.type==='combat'||r.type==='elite'||r.type==='exit'||r.type==='boss');
   function stageMoveScale(r,p){
     if(!activeStageRoom(r)||AF.zoneIndex()!==1)return 1;
     for(let i=0;i<2;i++){const z=AF.stageZone(r,'fog',i);if(Math.hypot(p.x-z.x,p.y-z.y)<z.r)return .78}
