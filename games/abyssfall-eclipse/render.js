@@ -189,8 +189,29 @@
     ctx.restore()
   }
   function slash(fx){if(fx.art)return attackArt(fx);const t=fx.l/fx.max;ctx.save();ctx.globalAlpha=t;ctx.strokeStyle=fx.color||A.player.hero.accent;ctx.lineWidth=5;ctx.beginPath();ctx.arc(fx.x,fx.y,fx.r,fx.a-.8,fx.a+.8);ctx.stroke();ctx.restore()}
+  function bossTelegraph(e){
+    if(e.type!=='boss'||e.bossTelegraph<=0)return;
+    const max=e.bossTelegraphMax||1,progress=1-e.bossTelegraph/max,pulse=.45+.35*Math.sin(performance.now()/85);
+    ctx.save();
+    if(e.bossPattern===0){
+      const len=Math.max(W,H)*1.2,a=e.bossAim;
+      ctx.translate(e.x,e.y);ctx.rotate(a);
+      ctx.strokeStyle=`rgba(255,60,92,${.18+.38*progress})`;ctx.lineWidth=18-8*progress;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(len,0);ctx.stroke();
+      ctx.strokeStyle=`rgba(255,190,200,${.35+.45*pulse})`;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(len,0);ctx.stroke();
+    }else if(e.bossPattern===1){
+      ctx.translate(e.x,e.y);
+      for(let i=0;i<3;i++){const r=38+i*34+progress*20;ctx.strokeStyle=`rgba(218,86,255,${.18+.30*progress})`;ctx.lineWidth=4-i;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.stroke()}
+      for(let i=0;i<8;i++){const a=i*Math.PI/4+performance.now()/900;ctx.fillStyle=`rgba(255,92,122,${.28+.24*pulse})`;ctx.beginPath();ctx.arc(Math.cos(a)*105,Math.sin(a)*105,4,0,Math.PI*2);ctx.fill()}
+    }else if(e.bossPattern===2){
+      const n=2+(e.bossPhase||0),r=82;
+      for(let i=0;i<n;i++){const a=i*Math.PI*2/n+.25;const x=e.x+Math.cos(a)*r,y=e.y+Math.sin(a)*r;ctx.strokeStyle=`rgba(195,101,255,${.30+.30*pulse})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,20+7*progress,0,Math.PI*2);ctx.stroke();ctx.fillStyle='rgba(118,62,170,.12)';ctx.fill()}
+    }
+    ctx.restore();
+  }
+
   function enemy(e){
     const im=A.enemyImgs?.[e.type],now=performance.now(),boss=e.type==='boss';
+    if(boss)bossTelegraph(e);
     const fw=boss?160:128,fh=fw;
     let frame=0;
     if(!e.alive&&e.deadAt)frame=boss?5:4;
@@ -209,6 +230,9 @@
 
     ctx.save();
     ctx.translate(e.x,e.y+bob);
+    if(e.summoned&&e.alive){
+      const pulse=.35+.25*Math.sin(now/150+e.phase);ctx.globalAlpha=.5;ctx.strokeStyle=`rgba(196,103,255,${pulse})`;ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,size*.34,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;
+    }
     if(e.elite&&e.alive){
       const pulse=.45+.35*Math.sin(now/180+e.phase);
       ctx.globalAlpha=.55;ctx.strokeStyle=`rgba(255,86,111,${pulse})`;ctx.lineWidth=3;
@@ -244,6 +268,10 @@
       ctx.rotate(Math.atan2(q.vy,q.vx));ctx.shadowColor='#ffd36b';ctx.shadowBlur=10;ctx.strokeStyle='#ffe39a';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,9,-.9,.9);ctx.stroke();ctx.shadowBlur=0;
     }else if(q.kind==='crystal'){
       ctx.rotate(Math.atan2(q.vy,q.vx)+Math.PI/4);ctx.shadowColor=q.color;ctx.shadowBlur=12;ctx.fillStyle='#bdf6ff';ctx.fillRect(-5,-5,10,10);ctx.strokeStyle='#6fdfff';ctx.lineWidth=2;ctx.strokeRect(-5,-5,10,10);ctx.shadowBlur=0;
+    }else if(q.kind==='bossLance'){
+      ctx.rotate(Math.atan2(q.vy,q.vx));ctx.shadowColor='#ff365f';ctx.shadowBlur=14;ctx.fillStyle='#ffb2bf';ctx.beginPath();ctx.moveTo(13,0);ctx.lineTo(-7,-5);ctx.lineTo(-3,0);ctx.lineTo(-7,5);ctx.closePath();ctx.fill();ctx.strokeStyle='#ff365f';ctx.lineWidth=2;ctx.stroke();ctx.shadowBlur=0;
+    }else if(q.kind==='bossOrb'){
+      ctx.shadowColor='#d858ff';ctx.shadowBlur=15;ctx.fillStyle='#6d174f';ctx.beginPath();ctx.arc(0,0,q.r+2,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#ff7ab5';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,q.r+4,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;
     }else{
       ctx.fillStyle=q.color;ctx.shadowColor=q.color;ctx.shadowBlur=12;ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0
     }
@@ -267,7 +295,16 @@
     }
     ctx.restore();
   }
-  function bossbar(){const b=A.cur().enemies.find(e=>e.alive&&e.type==='boss');if(!b)return;const w=Math.min(380,W-180),x=(W-w)/2,y=A.mobile?72:28;ctx.fillStyle='#05060dbf';rr(x-2,y-2,w+4,20,9);ctx.fill();ctx.fillStyle='#2a1234';ctx.fillRect(x,y,w,16);ctx.fillStyle='#c665e6';ctx.fillRect(x,y,w*Math.max(0,b.hp/b.max),16);ctx.fillStyle='#f4dcff';ctx.font='700 10px sans-serif';ctx.textAlign='center';ctx.fillText('THE ABYSSAL WATCHER · 심연의 감시자',W/2,y-5);ctx.textAlign='left'}
+  function bossbar(){
+    const b=A.cur().enemies.find(e=>e.alive&&e.type==='boss');if(!b)return;
+    const w=Math.min(410,W-170),x=(W-w)/2,y=A.mobile?72:28,phase=(b.bossPhase||0)+1;
+    ctx.fillStyle='#05060de6';rr(x-2,y-2,w+4,22,9);ctx.fill();
+    ctx.fillStyle='#2a1234';ctx.fillRect(x,y,w,16);
+    ctx.fillStyle=phase===3?'#ff3f62':phase===2?'#d75ad8':'#c665e6';ctx.fillRect(x,y,w*Math.max(0,b.hp/b.max),16);
+    ctx.fillStyle='#f4dcff';ctx.font='700 10px sans-serif';ctx.textAlign='center';
+    ctx.fillText(`THE ABYSSAL WATCHER · PHASE ${phase} · ${b.bossAction||'추적 중'}`,W/2,y-5);
+    ctx.textAlign='left'
+  }
   function draw(){ctx.clearRect(0,0,W,H);backdrop();if(!A.started||!A.player||!A.rooms[A.current])return;arenaDraw();roomFeature(A.cur());A.pickups.forEach(pickup);A.cur().enemies.filter(e=>e.alive||(e.deadAt&&performance.now()-e.deadAt<520)).forEach(enemy);A.projectiles.forEach(projectile);A.shockwaves.forEach(s=>{ctx.save();ctx.globalAlpha=Math.max(0,s.l/28);ctx.strokeStyle=s.color;ctx.lineWidth=5;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke();ctx.restore()});A.slashes.forEach(slash);player();A.particles.forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.l/22);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);ctx.restore()});minimap();bossbar()}
   let last=performance.now();function frame(t){const dt=Math.min(2.2,(t-last)/16.67);last=t;if(A.started&&!A.paused&&!A.dead)A.update(dt);draw();requestAnimationFrame(frame)}requestAnimationFrame(frame);
 })();
