@@ -97,7 +97,7 @@
     ui.upgradeCards.innerHTML='';
     opts.sort(()=>Math.random()-.5).slice(0,3).forEach(o=>{
       const b=document.createElement('button');b.className='upgrade';
-      b.innerHTML=`<span class="uicon">${o.i}</span><b>${o.n}</b><p>${o.d}</p>`;
+      b.innerHTML=(o.img?'<img class="rewardImg" src="'+o.img+'" alt=""><span class="rarity">RARE RELIC</span>':'<span class="uicon">'+o.i+'</span>')+'<b>'+o.n+'</b><p>'+o.d+'</p>';
       b.onclick=()=>{o.f(AF.player);if(o.relic)AF.addRelic(o);ui.levelUp.classList.remove('show');AF.paused=false;AF.hud()};
       ui.upgradeCards.appendChild(b);
     });
@@ -114,11 +114,11 @@
   }
   function treasureReward(){
     chooseReward([
-      {id:'relic-blade',i:'⚔',n:'유물의 칼날',d:'기본 공격 피해 +8',relic:true,f:p=>p.atk+=8},
-      {id:'dash-sigil',i:'✧',n:'질주의 문장',d:'이동속도 +0.22 · 공격 간격 추가 감소',relic:true,f:p=>{p.speed+=.22;p.rate+=2}},
-      {id:'guardian-seal',i:'◈',n:'수호자의 인장',d:'최대 체력 +28 · 즉시 35 회복',relic:true,f:p=>{p.maxHp+=28;p.hp=Math.min(p.maxHp,p.hp+35)}},
-      {id:'resonance-core',i:'✹',n:'공명 핵',d:'특수기 대기시간 크게 감소 · 범위 증가',relic:true,f:p=>{p.specialBoost+=42;p.range+=10}},
-      {id:'condensed-crystal',i:'◆',n:'응축 수정',d:'공격 +4 · 최대 체력 +14',relic:true,f:p=>{p.atk+=4;p.maxHp+=14;p.hp=Math.min(p.maxHp,p.hp+14)}}
+      {id:'relic-blade',i:'⚔',img:'../../assets/relics/relic-blade.webp?v=2',n:'유물의 칼날',d:'기본 공격 피해 +8',relic:true,f:p=>p.atk+=8},
+      {id:'dash-sigil',i:'✧',img:'../../assets/relics/dash-sigil.webp?v=2',n:'질주의 문장',d:'이동속도 +0.22 · 공격 간격 추가 감소',relic:true,f:p=>{p.speed+=.22;p.rate+=2}},
+      {id:'guardian-seal',i:'◈',img:'../../assets/relics/guardian-seal.webp?v=2',n:'수호자의 인장',d:'최대 체력 +28 · 즉시 35 회복',relic:true,f:p=>{p.maxHp+=28;p.hp=Math.min(p.maxHp,p.hp+35)}},
+      {id:'resonance-core',i:'✹',img:'../../assets/relics/resonance-core.webp?v=2',n:'공명 핵',d:'특수기 대기시간 크게 감소 · 범위 증가',relic:true,f:p=>{p.specialBoost+=42;p.range+=10}},
+      {id:'condensed-crystal',i:'◆',img:'../../assets/relics/condensed-crystal.webp?v=2',n:'응축 수정',d:'공격 +4 · 최대 체력 +14',relic:true,f:p=>{p.atk+=4;p.maxHp+=14;p.hp=Math.min(p.maxHp,p.hp+14)}}
     ],'보물 발견','상자에서 유물 하나를 선택하세요.');
   }
   function roomFeature(r){
@@ -173,9 +173,9 @@
 
   AF.addRelic=o=>{
     const id=o.id||o.n,prev=AF.relics[id];
-    AF.relics[id]={id:id,name:o.n,icon:o.i,count:(prev?.count||0)+1};
+    AF.relics[id]={id:id,name:o.n,icon:o.i,img:o.img||prev?.img||'',count:(prev?.count||0)+1};
     if(ui.relicFlash){
-      ui.relicFlashIcon.textContent=o.i;
+      if(ui.relicFlashIcon){ui.relicFlashIcon.src=o.img||'';ui.relicFlashIcon.alt=o.n;}
       ui.relicFlashName.textContent=(prev?'유물 강화 · ':'유물 획득 · ')+o.n+(prev?' ×'+(prev.count+1):'');
       ui.relicFlash.classList.add('show');
       clearTimeout(AF._relicFlashTimer);
@@ -190,7 +190,7 @@
     if(!ui.relicList)return;
     ui.relicList.innerHTML='';
     if(!relics.length){const empty=document.createElement('span');empty.className='relicEmpty';empty.textContent='아직 획득한 유물이 없습니다.';ui.relicList.appendChild(empty);return}
-    relics.forEach(r=>{const chip=document.createElement('div');chip.className='relicChip';chip.title=r.name;chip.innerHTML='<span class="relicIcon">'+r.icon+'</span><span class="relicName">'+r.name+'</span>'+(r.count>1?'<b>×'+r.count+'</b>':'');ui.relicList.appendChild(chip)});
+    relics.forEach(r=>{const chip=document.createElement('div');chip.className='relicChip';chip.title=r.name;chip.innerHTML=(r.img?'<img class="relicImage" src="'+r.img+'" alt="">':'<span class="relicIcon">'+r.icon+'</span>')+'<span class="relicName">'+r.name+'</span>'+(r.count>1?'<b>×'+r.count+'</b>':'');ui.relicList.appendChild(chip)});
   };
 
   AF.hud=()=>{const p=AF.player;if(!p)return;const r=AF.cur();ui.floorText.textContent=`${AF.floor}F · ${AF.stageName()}`;ui.roomText.textContent=`ROOM ${AF.current} · ${AF.roomLabel(r)}`;ui.killText.textContent=AF.kills;ui.hpText.textContent=Math.max(0,Math.round(p.hp));ui.levelText.textContent=p.level;ui.enemyText.textContent=r.enemies.filter(e=>e.alive).length;ui.hpFill.style.width=`${Math.max(0,p.hp/p.maxHp*100)}%`;ui.xpFill.style.width=`${Math.max(0,p.xp/p.nextXp*100)}%`;const cd=Math.max(0,Math.ceil(p.special/60));ui.specialCdText.textContent=cd?`${cd}s`:'READY';ui.specialBtn.classList.toggle('cooling',cd>0)};
