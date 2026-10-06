@@ -121,3 +121,10 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - Broken Tower wind now changes direction, angle, strength, warning time, duration, and recurrence instead of using a uniform horizontal gust.
 - Abyss Altar rifts vary in count, position, radius, warning time, damage, and recurrence; boss rooms can produce denser sequences.
 - Future-depth design direction: ice inertia, physical obstacles, pressure-plate/projectile traps, heat/lava zones, and eventually overlapping environmental rules in deeper Abyss floors.
+
+## ABYSSFALL v27 special cooldown feedback
+
+- The mobile special button now displays remaining cooldown time directly inside the button.
+- A clockwise gold radial ring fills as the skill recharges.
+- When ready, the button switches to READY with a gold outline and subtle pulse glow.
+- The desktop ability panel mirrors cooling/ready state visually.
