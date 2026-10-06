@@ -339,7 +339,7 @@
     return m+':'+String(s).padStart(2,'0');
   }
   function saveClearRecord(timeMs){
-    const key='abyssfallRecordsV1',hero=AF.player.hero.key;
+    const key='abyssfallRecordsV2',hero=AF.player.hero.key;
     let all={};try{all=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(_){}
     const prev=all[hero]||{clears:0,bestTime:0,maxKills:0,bestLevel:0};
     const rec={
