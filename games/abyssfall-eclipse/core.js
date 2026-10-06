@@ -43,7 +43,7 @@
   joyBase.addEventListener('pointerdown',e=>{e.preventDefault();AF.joy.active=true;AF.joy.id=e.pointerId;joyBase.setPointerCapture?.(e.pointerId);moveJoy(e)});joyBase.addEventListener('pointermove',e=>{if(AF.joy.active&&e.pointerId===AF.joy.id){e.preventDefault();moveJoy(e)}});joyBase.addEventListener('pointerup',resetJoy);joyBase.addEventListener('pointercancel',resetJoy);addEventListener('blur',()=>{resetJoy();AF.keys={}});ui.specialBtn.addEventListener('pointerdown',e=>{e.preventDefault();AF.useSpecial()});
   if(ui.relicButton){const closeRelics=()=>{ui.relicPanel.classList.remove('show');ui.relicPanel.setAttribute('aria-hidden','true')};ui.relicButton.addEventListener('click',()=>{const open=!ui.relicPanel.classList.contains('show');ui.relicPanel.classList.toggle('show',open);ui.relicPanel.setAttribute('aria-hidden',open?'false':'true')});ui.relicClose&&ui.relicClose.addEventListener('click',closeRelics);}
 
-  function makeDungeon(n){const R={[key(0,0)]:{x:0,y:0}};let x=0,y=0,a=0;while(Object.keys(R).length<n&&a++<500){const ds=Object.keys(dirs),d=ds[Math.random()*4|0],v=dirs[d];x+=v[0];y+=v[1];R[key(x,y)]??={x,y}}for(const k in R){const r=R[k];r.doors={};for(const [d,v] of Object.entries(dirs))r.doors[d]=!!R[key(r.x+v[0],r.y+v[1])];Object.assign(r,{seen:false,clear:false,spawned:false,enemies:[],type:'combat',used:false,eliteRewarded:false})}R['0,0'].seen=R['0,0'].clear=true;R['0,0'].type='start';R['0,0'].spawned=true;return R}
+  function makeDungeon(n){const R={[key(0,0)]:{x:0,y:0}};let x=0,y=0,a=0;while(Object.keys(R).length<n&&a++<500){const ds=Object.keys(dirs),d=ds[Math.random()*4|0],v=dirs[d];x+=v[0];y+=v[1];R[key(x,y)]??={x,y}}for(const k in R){const r=R[k];r.doors={};for(const [d,v] of Object.entries(dirs))r.doors[d]=!!R[key(r.x+v[0],r.y+v[1])];Object.assign(r,{seen:false,clear:false,spawned:false,enemies:[],type:'combat',used:false,eliteRewarded:false,gimmickTimer:105+Math.random()*70,windWarn:0,windActive:0,windDir:1,hazards:[]})}R['0,0'].seen=R['0,0'].clear=true;R['0,0'].type='start';R['0,0'].spawned=true;return R}
   function assignRoomTypes(){
     const entries=Object.entries(AF.rooms).filter(([k,r])=>k!=='0,0'&&!r.boss);
     for(const [,r] of entries){r.type='combat';r.used=false;r.eliteRewarded=false;r.clear=false;r.spawned=false}
@@ -62,6 +62,65 @@
     AF.rooms[best].boss=true;AF.rooms[best].type='boss';AF.rooms[best].clear=false;AF.rooms[best].spawned=false;
   }
   AF.cur=()=>AF.rooms[AF.current];
+  function roomRand(r,n){const v=Math.sin((r.x*97+r.y*193+AF.floor*389+n*71.17))*43758.5453;return v-Math.floor(v)}
+  AF.stageZone=(r,kind,i=0)=>{
+    if(!r)return{x:W/2,y:arena.y+arena.h/2,r:70};
+    if(kind==='holy')return{x:arena.x+arena.w*(.30+.40*roomRand(r,11)),y:arena.y+arena.h*(.42+.34*roomRand(r,12)),r:74};
+    if(kind==='fog')return{x:arena.x+arena.w*(i? .67:.34)+((roomRand(r,20+i)-.5)*70),y:arena.y+arena.h*(i?.62:.42)+((roomRand(r,30+i)-.5)*80),r:88};
+    return{x:W/2,y:arena.y+arena.h/2,r:70};
+  };
+  const activeStageRoom=r=>r&&!r.clear&&(r.type==='combat'||r.type==='elite'||r.type==='boss');
+  function stageMoveScale(r,p){
+    if(!activeStageRoom(r)||((AF.floor-1)%4)!==1)return 1;
+    for(let i=0;i<2;i++){const z=AF.stageZone(r,'fog',i);if(Math.hypot(p.x-z.x,p.y-z.y)<z.r)return .78}
+    return 1;
+  }
+  function updateStageGimmick(r,dt){
+    if(!r)return;
+    const idx=(AF.floor-1)%4,p=AF.player;
+    if(!activeStageRoom(r)){r.windWarn=0;r.windActive=0;return}
+    if(idx===0){
+      const z=AF.stageZone(r,'holy');
+      if(Math.hypot(p.x-z.x,p.y-z.y)<z.r){
+        p.special=Math.max(0,p.special-dt*.48);
+        p.holyTick=(p.holyTick||0)+dt;
+        if(p.holyTick>18){p.holyTick=0;AF.particles.push({x:p.x+(Math.random()-.5)*28,y:p.y+12,vx:(Math.random()-.5)*.4,vy:-1-Math.random()*.7,l:22,color:'#ffe7a0'})}
+      }
+    }else if(idx===2){
+      if(r.windWarn>0){r.windWarn-=dt;if(r.windWarn<=0){r.windWarn=0;r.windActive=70}}
+      else if(r.windActive>0){
+        r.windActive-=dt;
+        const push=r.windDir*(1.35+Math.min(.55,(AF.floor-1)*.05))*dt;
+        p.x+=push;
+        r.enemies.forEach(e=>{if(e.alive&&e.type!=='boss')e.x+=push*.42});
+      }else{
+        r.gimmickTimer-=dt;
+        if(r.gimmickTimer<=0){r.windDir=roomRand(r,70+Math.floor(performance.now()/1000))>.5?1:-1;r.windWarn=42;r.gimmickTimer=205+roomRand(r,88)*55}
+      }
+    }else if(idx===3){
+      r.gimmickTimer-=dt;
+      if(r.gimmickTimer<=0){
+        const ox=(Math.random()-.5)*150,oy=(Math.random()-.5)*120;
+        r.hazards.push({x:Math.max(arena.x+55,Math.min(arena.x+arena.w-55,p.x+ox)),y:Math.max(arena.y+55,Math.min(arena.y+arena.h-55,p.y+oy)),t:52,max:52,hit:false,life:0});
+        r.gimmickTimer=125+Math.random()*55;
+      }
+      for(const h of r.hazards){
+        if(!h.hit){
+          h.t-=dt;
+          if(h.t<=0){
+            h.hit=true;h.life=24;AF.shockwaves.push({x:h.x,y:h.y,r:10,max:70,l:22,color:'#ff4867'});
+            const d=Math.hypot(p.x-h.x,p.y-h.y);
+            if(d<68&&p.inv<=0)hurt(10+AF.floor*1.8,(p.x-h.x)/(d||1),(p.y-h.y)/(d||1));
+          }
+        }else h.life-=dt;
+      }
+      r.hazards=r.hazards.filter(h=>!h.hit||h.life>0);
+    }
+  }
+  AF.stageTip=()=>{
+    const tips=['성광 지대 · 빛의 원 안에서 특수기 충전 가속','냉기 안개 · 안개 안에서는 이동속도 감소','붕괴의 바람 · 경고 후 강한 횡풍이 몰아칩니다','심연 균열 · 붉은 균열이 폭발하기 전에 벗어나세요'];
+    return tips[(AF.floor-1)%4];
+  };
   function enemy(x,y,type){const sc=1+(AF.floor-1)*.24,defs={crawler:{r:17,hp:38,s:1.25,d:9},shooter:{r:16,hp:30,s:.88,d:8},brute:{r:24,hp:82,s:.64,d:15},boss:{r:39,hp:320,s:.78,d:19}},q=defs[type];return{x,y,type,r:q.r,hp:q.hp*sc,max:q.hp*sc,s:q.s,d:q.d*sc,fire:40+Math.random()*80,alive:true,flash:0,phase:Math.random()*6.28,attackPose:0,hurtPose:0,deadAt:0,moving:false,faceX:-1,bossCd:85,bossTelegraph:0,bossTelegraphMax:0,bossPattern:-1,bossAim:0,bossPhase:0,phaseAnnounced:0,bossAction:'추적 중',intro:0,introMax:0}}
   function spawnRoom(r){
     if(r.spawned||r.clear)return;
@@ -79,7 +138,7 @@
     }
   }
   function heroUI(){const h=AF.player.hero;ui.heroName.textContent=`${h.name} · ${h.ko}`;ui.basicName.textContent=h.basicName;ui.basicIcon.textContent=h.basicIcon;ui.specialName.textContent=h.specialName;ui.specialIcon.textContent=h.specialIcon;ui.specialBtnIcon.textContent=h.specialIcon}
-  AF.newRun=()=>{const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.endless=false;AF.cleared=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(8);AF.current='0,0';markBoss();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name}`)};
+  AF.newRun=()=>{const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.endless=false;AF.cleared=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(8);AF.current='0,0';markBoss();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name}`);setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===1)AF.toast(AF.stageTip())},950)};
   ui.startBtn.addEventListener('click',AF.newRun);ui.retryBtn.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearRestart?.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearLobby?.addEventListener('click',()=>{AF.clearScreen?.classList.remove('show');AF.started=false;AF.paused=true;ui.start.classList.add('show')});
@@ -249,7 +308,7 @@
     if(ui.clearRecord)ui.clearRecord.textContent=p.hero.ko+' 클리어 '+rec.clears+'회 · 최고 처치 '+rec.maxKills+' · 최고 Lv '+rec.bestLevel+' · 최고 기록 '+formatRunTime(rec.bestTime);
     ui.clearScreen?.classList.add('show');
   };
-  AF.nextFloor=()=>{AF.bossClearUntil=0;AF.floor++;AF.rooms=makeDungeon(Math.min(13,8+AF.floor));AF.current='0,0';markBoss();AF.player.x=W/2;AF.player.y=arena.y+arena.h/2;AF.player.hp=AF.player.maxHp;AF.player.inv=30;AF.projectiles=[];AF.pickups=[];AF.slashes=[];AF.toast(`FLOOR ${AF.floor} · ${AF.stageName()}`);AF.hud()};
+  AF.nextFloor=()=>{AF.bossClearUntil=0;AF.floor++;AF.rooms=makeDungeon(Math.min(13,8+AF.floor));AF.current='0,0';markBoss();AF.player.x=W/2;AF.player.y=arena.y+arena.h/2;AF.player.hp=AF.player.maxHp;AF.player.inv=30;AF.projectiles=[];AF.pickups=[];AF.slashes=[];AF.toast(`FLOOR ${AF.floor} · ${AF.stageName()}`);AF.hud();setTimeout(()=>{if(AF.started&&!AF.dead)AF.toast(AF.stageTip())},950)};
   function hurt(n,nx,ny){const p=AF.player;if(p.shield>0){const b=Math.min(p.shield,n);p.shield-=b;n-=b;if(n<=0){p.inv=18;return}}p.hp-=Math.round(n);p.inv=48;p.hurtPose=18;p.x+=nx*18;p.y+=ny*18;
     const seal=relicCount('guardian-seal');
     if(seal&&n>0&&(p.guardianCd||0)<=0){
@@ -309,7 +368,7 @@
     e.bossCd=Math.max(54,118-phase*16-Math.min(18,(AF.floor-1)*2));
   }
 
-  AF.update=dt=>{const p=AF.player;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}let m=Math.hypot(vx,vy);p.moving=m>.04;if(m){vx/=m;vy/=m;p.x+=vx*p.speed*dt;p.y+=vy*p.speed*dt;p.faceX=vx;p.faceY=vy;p.step+=dt*.42}
+  AF.update=dt=>{const p=AF.player;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}const moveScale=stageMoveScale(AF.cur(),p);let m=Math.hypot(vx,vy);p.moving=m>.04;if(m){vx/=m;vy/=m;p.x+=vx*p.speed*moveScale*dt;p.y+=vy*p.speed*moveScale*dt;p.faceX=vx;p.faceY=vy;p.step+=dt*.42}
     const sigil=relicCount('dash-sigil');
     if(m&&sigil){
       p.sigilCharge=(p.sigilCharge||0)+dt;
@@ -321,7 +380,7 @@
         AF.cur().enemies.forEach(e=>{if(e.alive&&Math.hypot(e.x-p.x,e.y-p.y)<rad)damage(e,dmg)});
       }
     }else p.sigilCharge=Math.max(0,(p.sigilCharge||0)-dt*1.4);
-    clamp();doors();const r=AF.cur();roomFeature(r);if(!r.clear)spawnRoom(r);
+    clamp();doors();const r=AF.cur();roomFeature(r);if(!r.clear)spawnRoom(r);updateStageGimmick(r,dt);clamp();
     const crystal=relicCount('condensed-crystal');
     if(crystal){
       p.crystalTimer=(p.crystalTimer??80)-dt;
