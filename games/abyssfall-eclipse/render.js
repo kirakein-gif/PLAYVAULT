@@ -182,9 +182,24 @@
       ctx.globalAlpha=active?.9:.55;ctx.fillStyle=active?'#aef6df':'#aeb5c0';ctx.font='800 11px sans-serif';ctx.textAlign='center';
       ctx.fillText(active?'하층 통로 개방':'하층 통로 봉인',cx,cy-34);
     }else if(r.type==='boss'){
-      ctx.globalAlpha=.16;ctx.strokeStyle='#c96dff';ctx.lineWidth=3;
-      ctx.beginPath();ctx.arc(cx,cy,105,0,Math.PI*2);ctx.stroke();
-      ctx.beginPath();ctx.arc(cx,cy,72,0,Math.PI*2);ctx.stroke();
+      if(r.bossDefeated){
+        const unlocked=performance.now()>=(r.portalUnlockAt||0),pulse=.5+.5*Math.sin(now/220);
+        ctx.globalAlpha=unlocked?.85:.34;
+        const glow=ctx.createRadialGradient(cx,cy+10,4,cx,cy+10,88);
+        glow.addColorStop(0,unlocked?`rgba(112,236,202,${.20+.15*pulse})`:'rgba(135,103,170,.12)');
+        glow.addColorStop(1,'rgba(90,70,120,0)');ctx.fillStyle=glow;ctx.fillRect(cx-95,cy-85,190,180);
+        ctx.strokeStyle=unlocked?'#76ebc7':'#8b76a5';ctx.lineWidth=4;
+        ctx.beginPath();ctx.ellipse(cx,cy+14,58,27,0,0,Math.PI*2);ctx.stroke();
+        ctx.beginPath();ctx.ellipse(cx,cy+14,39,18,0,0,Math.PI*2);ctx.stroke();
+        ctx.strokeStyle=unlocked?`rgba(177,255,230,${.45+.28*pulse})`:'rgba(180,155,205,.25)';ctx.lineWidth=2;
+        for(let i=0;i<8;i++){const a=i*Math.PI/4+now/950;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*30,cy+14+Math.sin(a)*13);ctx.lineTo(cx+Math.cos(a)*55,cy+14+Math.sin(a)*24);ctx.stroke()}
+        ctx.globalAlpha=unlocked?.95:.60;ctx.fillStyle=unlocked?'#c4ffe9':'#c7bad7';ctx.font='800 11px sans-serif';ctx.textAlign='center';
+        ctx.fillText(unlocked?(A.floor===12&&!A.endless?'심연의 핵으로':'하층 통로 개방'):'통로 형성 중',cx,cy-38);
+      }else{
+        ctx.globalAlpha=.16;ctx.strokeStyle='#c96dff';ctx.lineWidth=3;
+        ctx.beginPath();ctx.arc(cx,cy,105,0,Math.PI*2);ctx.stroke();
+        ctx.beginPath();ctx.arc(cx,cy,72,0,Math.PI*2);ctx.stroke();
+      }
     }
 
     ctx.restore();ctx.textAlign='left';
@@ -402,7 +417,7 @@
       const r=A.rooms[k],adj=Object.values(A.rooms).some(v=>v.seen&&Math.abs(v.x-r.x)+Math.abs(v.y-r.y)===1);
       if(!r.seen&&!adj)continue;
       const x=cx+(r.x-(minX+maxX)/2)*s,y=cy+(r.y-(minY+maxY)/2)*s;
-      ctx.fillStyle=r.seen?(colors[r.type]||colors.combat):'rgba(255,255,255,.10)';
+      ctx.fillStyle=r.seen?(r.bossDefeated?'#71e1c3':(colors[r.type]||colors.combat)):'rgba(255,255,255,.10)';
       const dot=s<7?6:8,half=dot/2;ctx.fillRect(x-half,y-half,dot,dot);
       if(k===A.current){ctx.strokeStyle='#fff7b7';ctx.lineWidth=2;ctx.strokeRect(x-half-2,y-half-2,dot+4,dot+4)}
       if(r.seen&&(r.type==='treasure'||r.type==='recovery')&&r.used){ctx.fillStyle='rgba(5,7,12,.55)';ctx.fillRect(x-2,y-2,4,4)}
@@ -421,13 +436,14 @@
   }
   function bossVictory(){
     const left=(A.bossClearUntil||0)-performance.now();if(left<=0)return;
-    const t=Math.min(1,left/2300),fade=Math.min(1,(2300-left)/260, left/420);
+    const total=1450,fade=Math.min(1,(total-left)/220,left/300);
     ctx.save();ctx.globalAlpha=Math.max(.15,fade);
-    ctx.fillStyle='rgba(5,6,12,.36)';ctx.fillRect(arena.x,arena.y,arena.w,arena.h);
+    ctx.fillStyle='rgba(5,6,12,.32)';ctx.fillRect(arena.x,arena.y,arena.w,arena.h);
     ctx.textAlign='center';
-    ctx.fillStyle='#ffe5a6';ctx.font=`900 ${A.mobile?24:28}px sans-serif`;ctx.fillText('BOSS DEFEATED',W/2,arena.y+arena.h*.46);
-    ctx.fillStyle='#e9d6ff';ctx.font=`700 ${A.mobile?14:16}px sans-serif`;ctx.fillText('심연의 감시자를 물리쳤습니다',W/2,arena.y+arena.h*.46+30);
-    ctx.fillStyle='rgba(255,255,255,.62)';ctx.font='600 11px sans-serif';ctx.fillText(A.floor===12&&!A.endless?'12층 원정 기록을 정리합니다':'잠시 후 다음 층으로 이동합니다',W/2,arena.y+arena.h*.46+52);
+    ctx.fillStyle='#ffe5a6';ctx.font=`900 ${A.mobile?24:28}px sans-serif`;ctx.fillText('BOSS DEFEATED',W/2,arena.y+arena.h*.45);
+    ctx.fillStyle='#e9d6ff';ctx.font=`700 ${A.mobile?14:16}px sans-serif`;ctx.fillText('심연의 감시자를 물리쳤습니다',W/2,arena.y+arena.h*.45+30);
+    ctx.fillStyle='rgba(255,255,255,.68)';ctx.font='600 11px sans-serif';
+    ctx.fillText(A.floor===12&&!A.endless?'심연의 핵으로 향하는 통로가 열립니다':'중앙에 하층 통로가 열립니다',W/2,arena.y+arena.h*.45+52);
     ctx.textAlign='left';ctx.restore();
   }
 
