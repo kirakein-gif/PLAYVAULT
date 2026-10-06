@@ -14,9 +14,9 @@
     if(A.ctx || !AudioCtx) return !!A.ctx;
     const ctx=A.ctx=new AudioCtx();
     A.master=ctx.createGain();A.musicGain=ctx.createGain();A.sfxGain=ctx.createGain();
-    A.musicGain.gain.value=.105;A.sfxGain.gain.value=.30;
+    A.musicGain.gain.value=.42;A.sfxGain.gain.value=.62;
     A.musicGain.connect(A.master);A.sfxGain.connect(A.master);A.master.connect(ctx.destination);
-    A.master.gain.value=A.muted?0:.72;
+    A.master.gain.value=A.muted?0:.92;
     return true;
   }
 
@@ -52,7 +52,7 @@
     o.connect(g);g.connect(A.musicGain);o.start();A.musicNodes.push(o,g);
   }
 
-  function musicNote(freq,vol=.035,dur=1.7,type='sine'){
+  function musicNote(freq,vol=.080,dur=1.7,type='sine'){
     if(!A.ctx||A.muted)return;
     tone(freq,dur,vol,type,A.musicGain,0);
     tone(freq*2,Math.min(.9,dur*.55),vol*.22,'sine',A.musicGain,.04);
@@ -64,29 +64,34 @@
   };
 
   A.startExplore=()=>{
-    if(!ensure()||!A.unlocked||A.mode==='explore')return;
+    if(!ensure())return;
+    if(A.ctx.state==='suspended'){A.ctx.resume().then(()=>{A.unlocked=true;A.startExplore()}).catch(()=>{});return}
+    A.unlocked=true;if(A.mode==='explore')return;
     clearMusic();A.mode='explore';
-    drone(55,.018,'sine',-6);drone(82.41,.010,'triangle',5);
-    const notes=[220,246.94,261.63,196,174.61,196];
+    // Phone-friendly register: the first version was too low to reproduce on mobile speakers.
+    drone(110,.050,'sine',-5);drone(164.81,.028,'triangle',4);drone(220,.012,'sine',1);
+    const notes=[329.63,392,440,293.66,261.63,293.66,329.63,246.94];
     let i=0;
-    musicNote(notes[i++%notes.length],.030,2.1);
-    A.timers.push(setInterval(()=>musicNote(notes[i++%notes.length],.028,2.2),3000));
-    A.timers.push(setInterval(()=>tone(i%2?65.41:55,.32,.010,'sine',A.musicGain,0,-5),1500));
+    musicNote(notes[i++%notes.length],.090,2.0);
+    A.timers.push(setInterval(()=>musicNote(notes[i++%notes.length],.082,2.15),2700));
+    A.timers.push(setInterval(()=>tone(i%2?164.81:146.83,.38,.038,'sine',A.musicGain,0,-12),1350));
   };
 
   A.startBoss=()=>{
-    if(!ensure()||!A.unlocked||A.mode==='boss')return;
+    if(!ensure())return;
+    if(A.ctx.state==='suspended'){A.ctx.resume().then(()=>{A.unlocked=true;A.startBoss()}).catch(()=>{});return}
+    A.unlocked=true;if(A.mode==='boss')return;
     clearMusic();A.mode='boss';
-    drone(48.99,.024,'sawtooth',-7);drone(73.42,.010,'triangle',4);
+    drone(98,.060,'sawtooth',-7);drone(146.83,.032,'triangle',4);
     let beat=0;
     const pulse=()=>{
-      tone(beat%4===3?61.74:49,.20,beat%4===0?.036:.022,'sine',A.musicGain,0,-12);
-      if(beat%4===2)noise(.09,.012,360);
+      tone(beat%4===3?146.83:110,.22,beat%4===0?.085:.052,'sine',A.musicGain,0,-18);
+      if(beat%4===2)noise(.10,.026,620);
       beat++;
     };
     pulse();A.timers.push(setInterval(pulse,620));
-    const notes=[146.83,138.59,123.47,110];let i=0;
-    A.timers.push(setInterval(()=>musicNote(notes[i++%notes.length],.026,1.1,'triangle'),2480));
+    const notes=[220,207.65,196,174.61];let i=0;
+    A.timers.push(setInterval(()=>musicNote(notes[i++%notes.length],.070,1.15,'triangle'),2480));
   };
 
   A.stopMusic=()=>clearMusic();
@@ -100,23 +105,23 @@
     switch(name){
       case 'start': tone(196,.18,.045,'sine');tone(293.66,.28,.032,'sine',A.sfxGain,.08);break;
       case 'basic':
-        tone(variant==='night'?410:520,.055,.018,variant==='night'?'triangle':'sine',A.sfxGain,0,variant==='night'?-90:75);break;
-      case 'hit': noise(.045,.025,1500);tone(120,.045,.018,'triangle');break;
-      case 'hurt': noise(.10,.055,850);tone(95,.13,.05,'sawtooth',A.sfxGain,0,-35);break;
-      case 'enemyDeath': tone(145,.13,.030,'triangle',A.sfxGain,0,-70);noise(.07,.025,700);break;
+        tone(variant==='night'?410:520,.060,.032,variant==='night'?'triangle':'sine',A.sfxGain,0,variant==='night'?-90:75);break;
+      case 'hit': noise(.05,.040,1600);tone(180,.055,.030,'triangle');break;
+      case 'hurt': noise(.11,.090,1100);tone(140,.15,.085,'sawtooth',A.sfxGain,0,-35);break;
+      case 'enemyDeath': tone(196,.15,.055,'triangle',A.sfxGain,0,-70);noise(.07,.025,700);break;
       case 'special':
-        if(variant==='night'){tone(240,.24,.080,'sine',A.sfxGain,0,520);noise(.13,.045,2100,.03)}
-        else{tone(330,.30,.080,'sine',A.sfxGain,0,520);tone(660,.34,.038,'sine',A.sfxGain,.05,-180)}
+        if(variant==='night'){tone(280,.25,.135,'sine',A.sfxGain,0,520);noise(.14,.075,2300,.03)}
+        else{tone(392,.31,.135,'sine',A.sfxGain,0,520);tone(784,.35,.070,'sine',A.sfxGain,.05,-180)}
         break;
-      case 'chest': tone(392,.16,.045,'sine');tone(523.25,.22,.050,'sine',A.sfxGain,.11);break;
-      case 'relic': tone(523.25,.18,.055,'sine');tone(659.25,.22,.048,'sine',A.sfxGain,.09);tone(783.99,.28,.040,'sine',A.sfxGain,.18);break;
-      case 'heal': tone(261.63,.18,.040,'sine');tone(392,.30,.035,'sine',A.sfxGain,.08);break;
-      case 'portal': tone(130.81,.42,.055,'sine',A.sfxGain,0,130);noise(.20,.022,520);break;
-      case 'portalOpen': tone(98,.42,.060,'triangle',A.sfxGain,0,98);tone(196,.46,.035,'sine',A.sfxGain,.08,100);break;
-      case 'bossIntro': tone(55,.72,.090,'sawtooth',A.sfxGain,0,-16);noise(.34,.060,430,.08);break;
-      case 'bossWarn': tone(174.61,.17,.045,'square',A.sfxGain,0,45);break;
-      case 'bossCast': tone(92.5,.23,.060,'sawtooth',A.sfxGain,0,-25);noise(.09,.035,900);break;
-      case 'bossDefeat': tone(130.81,.34,.075,'triangle',A.sfxGain,0,-75);tone(65.41,.72,.065,'sine',A.sfxGain,.12,-22);noise(.28,.045,600);break;
+      case 'chest': tone(392,.18,.085,'sine');tone(523.25,.24,.095,'sine',A.sfxGain,.11);break;
+      case 'relic': tone(523.25,.20,.105,'sine');tone(659.25,.24,.095,'sine',A.sfxGain,.09);tone(783.99,.30,.080,'sine',A.sfxGain,.18);break;
+      case 'heal': tone(329.63,.20,.080,'sine');tone(440,.30,.070,'sine',A.sfxGain,.08);break;
+      case 'portal': tone(196,.42,.105,'sine',A.sfxGain,0,130);noise(.20,.022,520);break;
+      case 'portalOpen': tone(164.81,.42,.115,'triangle',A.sfxGain,0,98);tone(329.63,.46,.080,'sine',A.sfxGain,.08,100);break;
+      case 'bossIntro': tone(110,.72,.145,'sawtooth',A.sfxGain,0,-16);noise(.34,.100,700,.08);break;
+      case 'bossWarn': tone(261.63,.17,.085,'square',A.sfxGain,0,45);break;
+      case 'bossCast': tone(146.83,.23,.110,'sawtooth',A.sfxGain,0,-25);noise(.10,.060,1200);break;
+      case 'bossDefeat': tone(196,.34,.125,'triangle',A.sfxGain,0,-75);tone(98,.72,.110,'sine',A.sfxGain,.12,-22);noise(.28,.045,600);break;
       case 'clear': tone(261.63,.28,.050,'sine');tone(329.63,.34,.048,'sine',A.sfxGain,.13);tone(392,.48,.042,'sine',A.sfxGain,.27);break;
       case 'gameOver': tone(196,.35,.050,'triangle',A.sfxGain,0,-70);tone(110,.62,.035,'sine',A.sfxGain,.18,-35);break;
     }
@@ -125,7 +130,7 @@
   A.toggle=async()=>{
     await A.unlock();
     A.muted=!A.muted;
-    if(A.master)A.master.gain.setTargetAtTime(A.muted?0:.72,A.ctx.currentTime,.025);
+    if(A.master)A.master.gain.setTargetAtTime(A.muted?0:.92,A.ctx.currentTime,.025);
     try{localStorage.setItem('playvaultMuted',A.muted?'1':'0')}catch(_){}
     A.updateButton();
   };
