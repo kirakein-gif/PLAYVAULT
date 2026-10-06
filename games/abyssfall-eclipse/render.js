@@ -416,7 +416,7 @@
     ctx.textAlign='center';
     ctx.fillStyle='#ffe5a6';ctx.font=`900 ${A.mobile?24:28}px sans-serif`;ctx.fillText('BOSS DEFEATED',W/2,arena.y+arena.h*.46);
     ctx.fillStyle='#e9d6ff';ctx.font=`700 ${A.mobile?14:16}px sans-serif`;ctx.fillText('심연의 감시자를 물리쳤습니다',W/2,arena.y+arena.h*.46+30);
-    ctx.fillStyle='rgba(255,255,255,.62)';ctx.font='600 11px sans-serif';ctx.fillText('잠시 후 다음 층으로 이동합니다',W/2,arena.y+arena.h*.46+52);
+    ctx.fillStyle='rgba(255,255,255,.62)';ctx.font='600 11px sans-serif';ctx.fillText(A.floor===4&&!A.endless?'첫 순환 클리어 결과를 정리합니다':'잠시 후 다음 층으로 이동합니다',W/2,arena.y+arena.h*.46+52);
     ctx.textAlign='left';ctx.restore();
   }
 
