@@ -37,7 +37,7 @@
 .relicPanel .relicName{display:inline!important}
 @media(max-width:700px),(pointer:coarse){
   #hud{padding-bottom:11px}
-  .hudActionsRelic{right:12px;bottom:10px}
+  .hudActionsRelic{right:12px;top:48px;bottom:auto}
   #relicButton{height:24px;padding:0 7px}
   .relicPanel{top:auto;bottom:145px;right:12px;width:min(285px,calc(100vw - 24px));max-height:210px}
   .relicFlash{top:auto;bottom:145px}
