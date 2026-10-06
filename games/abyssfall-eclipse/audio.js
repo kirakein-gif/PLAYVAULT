@@ -118,6 +118,22 @@
       case 'heal': tone(329.63,.20,.080,'sine');tone(440,.30,.070,'sine',A.sfxGain,.08);break;
       case 'portal': tone(196,.42,.105,'sine',A.sfxGain,0,130);noise(.20,.022,520);break;
       case 'portalOpen': tone(164.81,.42,.115,'triangle',A.sfxGain,0,98);tone(329.63,.46,.080,'sine',A.sfxGain,.08,100);break;
+      case 'sealBreak':
+        tone(293.66,.22,.090,'triangle',A.sfxGain,0,-90);tone(146.83,.34,.075,'sine',A.sfxGain,.05,-42);noise(.16,.055,950,.03);break;
+      case 'gateLocked':
+        tone(92,.12,.130,'square',A.sfxGain,0,-18);noise(.11,.090,520);break;
+      case 'gateOpen':
+        tone(82.41,.52,.150,'sawtooth',A.sfxGain,0,-28);noise(.62,.125,420,.04);
+        tone(61.74,.78,.105,'triangle',A.sfxGain,.12,-14);noise(.35,.080,720,.32);break;
+      case 'stairsOpen':
+        tone(110,.38,.105,'triangle',A.sfxGain,0,-32);noise(.45,.100,560,.02);
+        tone(73.42,.55,.080,'sine',A.sfxGain,.12,-18);break;
+      case 'stairsDown':
+        noise(.08,.055,900,0);tone(180,.07,.045,'triangle',A.sfxGain,0,-35);
+        noise(.08,.052,820,.13);tone(165,.07,.043,'triangle',A.sfxGain,.13,-35);
+        noise(.08,.048,760,.27);tone(150,.07,.040,'triangle',A.sfxGain,.27,-32);
+        noise(.08,.045,700,.42);tone(136,.08,.038,'triangle',A.sfxGain,.42,-28);
+        noise(.10,.040,620,.58);tone(122,.10,.035,'triangle',A.sfxGain,.58,-22);break;
       case 'bossIntro': tone(110,.72,.145,'sawtooth',A.sfxGain,0,-16);noise(.34,.100,700,.08);break;
       case 'bossWarn': tone(261.63,.17,.085,'square',A.sfxGain,0,45);break;
       case 'bossCast': tone(146.83,.23,.110,'sawtooth',A.sfxGain,0,-25);noise(.10,.060,1200);break;
