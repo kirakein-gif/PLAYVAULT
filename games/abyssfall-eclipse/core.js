@@ -116,7 +116,6 @@
     }
     if(burst){
       for(const o of [-.20,.20])AF.projectiles.push({team:'p',kind:'relicBlade',x:p.x,y:p.y,vx:Math.cos(a+o)*(h.proj*.92),vy:Math.sin(a+o)*(h.proj*.92),r:6,dmg:(h.damage+p.atk)*(.48+.08*blade),pierce:0,life:82,color:'#ffd36b'});
-      AF.toast('유물의 칼날 · 공명 참격');
     }
   }
   AF.useSpecial=()=>{const p=AF.player;if(!AF.started||AF.paused||AF.dead||!p||p.special>0)return;const h=p.hero;p.special=Math.max(150,h.specialCd-p.specialBoost);p.attackPose=24;p.attackAt=performance.now();if(relicCount('resonance-core'))p.echoTimer=18;if(h.key==='dawn'){const rad=155+p.range;AF.shockwaves.push({x:p.x,y:p.y,r:10,max:rad,l:28,color:'#ffd86a'});AF.cur().enemies.forEach(e=>{if(e.alive&&Math.hypot(e.x-p.x,e.y-p.y)<rad)damage(e,42+p.atk*1.8)});p.shield=Math.min(40,p.shield+16);p.inv=Math.max(p.inv,20);AF.slashes.push({art:true,kind:'dawn',x:p.x,y:p.y,a:Math.atan2(p.faceY,p.faceX),l:18,max:18});AF.toast('태양낙인 · 성광 폭발')}else{let dx=p.faceX,dy=p.faceY,l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;const sx=p.x,sy=p.y;p.x+=dx*(120+p.range*.4);p.y+=dy*(120+p.range*.4);clamp();p.inv=34;AF.slashes.push({x:(sx+p.x)/2,y:(sy+p.y)/2,a:Math.atan2(dy,dx),l:24,max:24,r:125,color:'#7ce8ff',art:true,kind:'night'});AF.cur().enemies.forEach(e=>{if(e.alive&&seg(sx,sy,p.x,p.y,e.x,e.y,e.r+45))damage(e,50+p.atk*1.8)});AF.toast('월영 질주 · 그림자 참격')}};
@@ -209,7 +208,6 @@
         if(target){
           const a=Math.atan2(target.y-p.y,target.x-p.x),dmg=8+crystal*4+p.atk*.16;
           for(const o of [-.16,0,.16])AF.projectiles.push({team:'p',kind:'crystal',x:p.x,y:p.y,vx:Math.cos(a+o)*7.4,vy:Math.sin(a+o)*7.4,r:6,dmg,pierce:0,life:105,color:'#8cecff'});
-          AF.toast('응축 수정 · 자동 탄막');
         }
       }
     }
