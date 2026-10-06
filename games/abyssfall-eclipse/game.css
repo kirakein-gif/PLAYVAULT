@@ -4,3 +4,24 @@
 /* PLAYVAULT project build */
 #game{will-change:width,height}
 @media(max-width:700px),(pointer:coarse){#hud{top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));width:min(360px,calc(100vw - 20px))}#joyBase{width:112px;height:112px}#specialBtn{width:88px;height:88px}}
+.relicRow{display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:7px;border-top:1px solid rgba(255,255,255,.07)}
+.relicLabel{flex:0 0 auto;font-size:9px;font-weight:900;letter-spacing:1.2px;color:#ffd46f}
+.relicList{display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;min-width:0;flex:1}
+.relicList::-webkit-scrollbar{display:none}
+.relicEmpty{font-size:9px;color:#68738d;padding:3px 0}
+.relicChip{height:25px;flex:0 0 auto;display:flex;align-items:center;gap:4px;padding:3px 7px;border-radius:8px;background:rgba(31,35,58,.92);border:1px solid rgba(255,215,110,.16);box-shadow:inset 0 0 14px rgba(255,202,80,.03)}
+.relicChip .relicIcon{font-size:13px;color:#ffd46f}
+.relicChip .relicName{font-size:9px;color:#dfe5f5;white-space:nowrap}
+.relicChip b{font-size:9px;color:#ffdc7b}
+.relicFlash{position:fixed;z-index:35;left:50%;top:155px;transform:translate(-50%,-8px) scale(.96);opacity:0;pointer-events:none;display:flex;align-items:center;gap:9px;padding:10px 15px;border-radius:13px;background:linear-gradient(135deg,rgba(43,35,22,.94),rgba(18,16,24,.94));border:1px solid rgba(255,211,107,.35);box-shadow:0 12px 34px rgba(0,0,0,.45),0 0 30px rgba(255,195,64,.08);transition:.2s}
+.relicFlash.show{opacity:1;transform:translate(-50%,0) scale(1)}
+.relicFlash span{font-size:24px;color:#ffd46f;text-shadow:0 0 14px rgba(255,211,107,.45)}
+.relicFlash b{font-size:13px;color:#fff3c9;white-space:nowrap}
+@media(max-width:700px),(pointer:coarse){
+  .relicRow{margin-top:6px;padding-top:6px}
+  .relicChip{height:23px;padding:2px 6px}
+  .relicChip .relicName{display:none}
+  .relicChip .relicIcon{font-size:14px}
+  .relicFlash{top:172px;max-width:calc(100vw - 28px)}
+  .relicFlash b{font-size:12px;overflow:hidden;text-overflow:ellipsis}
+}
