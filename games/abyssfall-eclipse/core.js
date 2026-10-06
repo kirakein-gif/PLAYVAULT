@@ -468,7 +468,7 @@
     if(!d)return;
     const v=dirs[d],rr=AF.cur(),nk=key(rr.x+v[0],rr.y+v[1]),target=AF.rooms[nk];if(!target)return;
     if(target.type==='boss'&&!AF.bossUnlocked){
-      const now=performance.now();
+      target.seen=true;const now=performance.now();
       if(now-(AF.lockedDoorAt||0)>900){AF.lockedDoorAt=now;sound()?.sfx('gateLocked');AF.toast('문은 꿈쩍도 하지 않는다.')}
       if(d==='W')p.x+=22;else if(d==='E')p.x-=22;else if(d==='N')p.y+=22;else p.y-=22;
       return;
