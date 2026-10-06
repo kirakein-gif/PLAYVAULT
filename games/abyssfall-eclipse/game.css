@@ -42,3 +42,16 @@
   .relicPanel{top:auto;bottom:145px;right:12px;width:min(285px,calc(100vw - 24px));max-height:210px}
   .relicFlash{top:auto;bottom:145px}
 }
+.rewardImg{display:block;width:72px;height:72px;object-fit:contain;image-rendering:pixelated;margin:0 0 8px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.38))}
+.upgrade .rarity{display:block;font-size:9px;font-weight:900;letter-spacing:1.2px;color:#ffd46f;margin-bottom:2px}
+.relicImage{width:22px;height:22px;object-fit:contain;image-rendering:pixelated;flex:0 0 auto}
+.relicPanel .relicImage{width:28px;height:28px}
+.relicFlash img{width:36px;height:36px;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 0 12px rgba(255,211,107,.35))}
+@media(max-width:700px),(pointer:coarse){
+  .rewardImg{width:58px;height:58px;margin-bottom:5px}
+  .upgrade{display:grid;grid-template-columns:64px 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center}
+  .upgrade .rewardImg{grid-row:1/3;grid-column:1}
+  .upgrade .rarity,.upgrade b,.upgrade p{grid-column:2}
+  .upgrade .rarity{align-self:end}
+  .upgrade b{margin:1px 0 3px}
+}
