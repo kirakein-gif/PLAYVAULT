@@ -436,7 +436,7 @@
   }
   function bossVictory(){
     const left=(A.bossClearUntil||0)-performance.now();if(left<=0)return;
-    const total=1450,fade=Math.min(1,(total-left)/220,left/300);
+    const total=720,fade=Math.min(1,(total-left)/140,left/180);
     ctx.save();ctx.globalAlpha=Math.max(.15,fade);
     ctx.fillStyle='rgba(5,6,12,.32)';ctx.fillRect(arena.x,arena.y,arena.w,arena.h);
     ctx.textAlign='center';
@@ -448,5 +448,23 @@
   }
 
   function draw(){ctx.clearRect(0,0,W,H);backdrop();if(!A.started||!A.player||!A.rooms[A.current])return;arenaDraw();roomFeature(A.cur());A.pickups.forEach(pickup);A.cur().enemies.filter(e=>e.alive||(e.deadAt&&performance.now()-e.deadAt<950)).forEach(enemy);A.projectiles.forEach(projectile);A.shockwaves.forEach(s=>{ctx.save();ctx.globalAlpha=Math.max(0,s.l/28);ctx.strokeStyle=s.color;ctx.lineWidth=5;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke();ctx.restore()});A.slashes.forEach(slash);player();A.particles.forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.l/22);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);ctx.restore()});minimap();bossbar();bossVictory()}
-  let last=performance.now();function frame(t){const dt=Math.min(2.2,(t-last)/16.67);last=t;if(A.started&&!A.paused&&!A.dead)A.update(dt);draw();requestAnimationFrame(frame)}requestAnimationFrame(frame);
+  let last=performance.now(),lastFrameError=0;
+  function frame(t){
+    const dt=Math.min(2.2,(t-last)/16.67);last=t;
+    try{
+      if(A.started&&!A.paused&&!A.dead)A.update(dt);
+      draw();
+    }catch(err){
+      console.error('ABYSSFALL frame recovered:',err);
+      const now=performance.now();
+      if(now-lastFrameError>1200){
+        lastFrameError=now;
+        if(A.cur?.()?.bossDefeated){A.paused=false;A.transitioning=false}
+        A.toast?.('화면 오류를 복구했습니다');
+      }
+    }finally{
+      requestAnimationFrame(frame);
+    }
+  }
+  requestAnimationFrame(frame);
 })();
