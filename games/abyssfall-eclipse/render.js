@@ -272,6 +272,10 @@
       ctx.rotate(Math.atan2(q.vy,q.vx));ctx.shadowColor='#ff365f';ctx.shadowBlur=14;ctx.fillStyle='#ffb2bf';ctx.beginPath();ctx.moveTo(13,0);ctx.lineTo(-7,-5);ctx.lineTo(-3,0);ctx.lineTo(-7,5);ctx.closePath();ctx.fill();ctx.strokeStyle='#ff365f';ctx.lineWidth=2;ctx.stroke();ctx.shadowBlur=0;
     }else if(q.kind==='bossOrb'){
       ctx.shadowColor='#d858ff';ctx.shadowBlur=15;ctx.fillStyle='#6d174f';ctx.beginPath();ctx.arc(0,0,q.r+2,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#ff7ab5';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,q.r+4,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;
+    }else if(q.kind==='moonFang'){
+      ctx.rotate(Math.atan2(q.vy,q.vx));ctx.shadowColor='#9b7cff';ctx.shadowBlur=13;ctx.strokeStyle='#c7b7ff';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,11,-1.1,1.1);ctx.stroke();ctx.shadowBlur=0;
+    }else if(q.kind==='reflected'){
+      ctx.rotate(Math.atan2(q.vy,q.vx));ctx.shadowColor='#9fdcff';ctx.shadowBlur=14;ctx.strokeStyle='#d7f6ff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-8,-5);ctx.lineTo(10,0);ctx.lineTo(-8,5);ctx.closePath();ctx.stroke();ctx.shadowBlur=0;
     }else{
       ctx.fillStyle=q.color;ctx.shadowColor=q.color;ctx.shadowBlur=12;ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0
     }
