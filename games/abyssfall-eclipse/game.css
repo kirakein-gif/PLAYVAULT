@@ -55,3 +55,9 @@
   .upgrade .rarity{align-self:end}
   .upgrade b{margin:1px 0 3px}
 }
+.relicChip .relicInfo{display:flex;flex-direction:column;min-width:0}
+.relicChip .relicInfo small{display:none}
+.relicPanel .relicChip{height:auto;min-height:44px;align-items:center;flex:1 1 130px}
+.relicPanel .relicInfo{min-width:0;max-width:190px}
+.relicPanel .relicInfo small{display:block;margin-top:2px;font-size:8px;line-height:1.35;color:#8792aa;white-space:normal}
+.relicPanel .relicName{font-size:10px;font-weight:800}
