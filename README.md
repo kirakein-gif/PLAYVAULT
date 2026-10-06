@@ -105,3 +105,10 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - Reaching the boss entrance too early produces a heavy locked-door clunk and the discovered gate remains dimly marked on the minimap.
 - Floor transitions have been visually changed from glowing portals to physical stone staircases.
 - Boss defeat now reveals stairs in the floor, and descending uses layered stone-footstep audio rather than a teleport sound.
+
+## ABYSSFALL v25 environmental storytelling
+
+- Added rare wall traces that carry short, cryptic fragments instead of explicit lore exposition.
+- Traces appear sparingly in combat/elite rooms and are never required for progression.
+- Approaching a trace after a room is safe reveals a single fragment; there is no journal, counter, checklist, or explanation.
+- A recurring eclipse-like wall mark visually links otherwise disconnected fragments across regions.
