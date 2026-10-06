@@ -64,3 +64,10 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - 보스방 — The Abyssal Watcher 전투
 
 보물방과 회복방은 층마다 기본 1개씩 배치하고, 엘리트방은 진행층에 따라 늘어납니다.
+
+## ABYSSFALL v18 completion pass
+
+- Rebuilt 1F–4F rooms with a shared angled/top-down perspective, upper wall planes, integrated entrances, and room-type mood props.
+- Differentiated enemy behavior: Abyssal Grunt dash, Fallen Priest aimed cast, Shadow Beast telegraphed heavy charge.
+- Added floor gimmicks: cathedral holy zone, graveyard chilling fog, tower crosswind, altar abyss-rift warnings/explosions.
+- 4F boss defeat now ends the first loop with a CLEAR results screen, relic summary, local best records, restart/lobby actions, and optional endless continuation from 5F.
