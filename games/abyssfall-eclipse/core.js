@@ -96,7 +96,7 @@
     titleEl.textContent=title;leadEl.textContent=lead;
     ui.upgradeCards.innerHTML='';
     opts.sort(()=>Math.random()-.5).slice(0,3).forEach(o=>{
-      const b=document.createElement('button');b.className='upgrade';
+      const b=document.createElement('button');b.className='upgrade'+(o.img?' relicChoice':'');
       b.innerHTML=(o.img?'<img class="rewardImg" src="'+o.img+'" alt=""><span class="rarity">RARE RELIC</span>':'<span class="uicon">'+o.i+'</span>')+'<b>'+o.n+'</b><p>'+o.d+'</p>';
       b.onclick=()=>{o.f(AF.player);if(o.relic)AF.addRelic(o);ui.levelUp.classList.remove('show');AF.paused=false;AF.hud()};
       ui.upgradeCards.appendChild(b);
