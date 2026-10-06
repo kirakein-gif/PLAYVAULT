@@ -69,7 +69,7 @@
     if(kind==='fog')return{x:arena.x+arena.w*(i? .67:.34)+((roomRand(r,20+i)-.5)*70),y:arena.y+arena.h*(i?.62:.42)+((roomRand(r,30+i)-.5)*80),r:88};
     return{x:W/2,y:arena.y+arena.h/2,r:70};
   };
-  const activeStageRoom=r=>r&&!r.clear&&(r.type==='combat'||r.type==='elite'||r.type==='boss');
+  const activeStageRoom=r=>r&&!r.clear&&!(AF.bossClearUntil&&performance.now()<AF.bossClearUntil)&&(r.type==='combat'||r.type==='elite'||r.type==='boss');
   function stageMoveScale(r,p){
     if(!activeStageRoom(r)||((AF.floor-1)%4)!==1)return 1;
     for(let i=0;i<2;i++){const z=AF.stageZone(r,'fog',i);if(Math.hypot(p.x-z.x,p.y-z.y)<z.r)return .78}
@@ -460,9 +460,9 @@
           else{e.x+=dx/dist*e.s*.88*dt;e.y+=dy/dist*e.s*.88*dt}
         }
       }
-      const hitWall=e.x<arena.x+e.r||e.x>arena.x+arena.w-e.r||e.y<arena.y+e.r||e.y>arena.y+arena.h-e.r;if(hitWall&&e.type==='brute'&&e.charge>0){e.charge=0;e.stun=30}e.x=Math.max(arena.x+e.r,Math.min(arena.x+arena.w-e.r,e.x));e.y=Math.max(arena.y+e.r,Math.min(arena.y+arena.h-e.r,e.y));
+      const hitWall=e.x<arena.x+e.r||e.x>arena.x+arena.w-e.r||e.y<arena.y+e.r||e.y>arena.y+arena.h-e.r;if(hitWall&&e.type==='brute'&&e.charge>0){e.charge=0;e.stun=30;AF.shockwaves.push({x:e.x,y:e.y,r:8,max:64,l:18,color:'#ff9b63'})}e.x=Math.max(arena.x+e.r,Math.min(arena.x+arena.w-e.r,e.x));e.y=Math.max(arena.y+e.r,Math.min(arena.y+arena.h-e.r,e.y));
       if(e.type!=='boss'||e.bossTelegraph<=0)e.moving=Math.hypot(e.x-ox,e.y-oy)>.08;
-      if(dist<p.r+e.r&&p.inv<=0&&!(e.type==='boss'&&e.intro>0)){e.attackPose=e.type==='boss'?22:14;const mult=e.type==='brute'&&e.charge>0?1.45:e.type==='crawler'&&e.dash>0?1.18:1;hurt(e.d*mult,dx/dist,dy/dist);if(e.type==='brute'&&e.charge>0){e.charge=0;e.stun=24}}
+      const cdx=p.x-e.x,cdy=p.y-e.y,cdist=Math.hypot(cdx,cdy)||1;if(cdist<p.r+e.r&&p.inv<=0&&!(e.type==='boss'&&e.intro>0)){e.attackPose=e.type==='boss'?22:14;const mult=e.type==='brute'&&e.charge>0?1.45:e.type==='crawler'&&e.dash>0?1.18:1;hurt(e.d*mult,cdx/cdist,cdy/cdist);if(e.type==='brute'&&e.charge>0){e.charge=0;e.stun=24;AF.shockwaves.push({x:e.x,y:e.y,r:8,max:58,l:18,color:'#ff9b63'})}}
     }
     for(let i=AF.projectiles.length-1;i>=0;i--){
       const q=AF.projectiles[i];q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;
