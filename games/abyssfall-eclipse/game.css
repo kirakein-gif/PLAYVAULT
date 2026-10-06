@@ -89,3 +89,11 @@
   .clearActions{display:grid;grid-template-columns:1fr 1fr}
   .clearActions .primary{grid-column:1/-1}
 }
+
+.topActions{display:flex;align-items:center;gap:6px}
+.soundBtn{width:31px;height:31px;display:grid;place-items:center;border-radius:9px;border:1px solid rgba(255,255,255,.11);background:rgba(18,21,36,.76);color:#e9eefc;font-size:15px;padding:0;cursor:pointer;line-height:1}
+.soundBtn:active{transform:scale(.94)}
+@media(max-width:700px),(pointer:coarse){
+  .topActions{margin-left:auto}
+  .soundBtn{width:30px;height:30px;font-size:14px}
+}
