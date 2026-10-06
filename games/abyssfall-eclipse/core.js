@@ -116,7 +116,7 @@
         const count=Math.min(3,1+Math.floor((fang-1)/2)),base=(p.hero.damage+p.atk)*(.46+.07*fang);
         for(let i=0;i<Math.min(count,targets.length);i++){const t=targets[i],a=Math.atan2(t.y-e.y,t.x-e.x);AF.projectiles.push({team:'p',kind:'moonFang',x:e.x,y:e.y,vx:Math.cos(a)*8.6,vy:Math.sin(a)*8.6,r:7,dmg:base,pierce:0,life:92,color:'#9b7cff'})}
       }
-      if(e.type==='boss'){AF.projectiles=AF.projectiles.filter(q=>q.team==='p');p.inv=Math.max(p.inv,180);AF.bossClearUntil=performance.now()+2300;e.bossAction='격파';AF.toast('심연의 감시자를 물리쳤습니다');setTimeout(AF.nextFloor,2400)}
+      if(e.type==='boss'){const now=performance.now();AF.projectiles=AF.projectiles.filter(q=>q.team==='p');AF.cur().enemies.forEach(x=>{if(x!==e&&x.alive){x.alive=false;x.hp=0;x.deadAt=now}});p.inv=Math.max(p.inv,240);AF.bossClearUntil=now+2300;e.bossAction='격파';AF.toast('심연의 감시자를 물리쳤습니다');setTimeout(AF.nextFloor,2400)}
     }
   }
   AF.damage=damage;
