@@ -30,8 +30,11 @@
   const dirs={N:[0,-1],S:[0,1],E:[1,0],W:[-1,0]}, opp={N:'S',S:'N',E:'W',W:'E'}, key=(x,y)=>`${x},${y}`;
   AF.dirs=dirs;
   AF.stageNames=['버려진 성당','침묵의 묘지','무너진 탑','심연의 제단'];
-  AF.stageName=()=>AF.stageNames[(AF.floor-1)%AF.stageNames.length];
-  AF.roomLabels={start:'입구',combat:'일반전투',treasure:'보물방',recovery:'회복방',elite:'엘리트방',boss:'보스방'};
+  AF.zoneIndex=(floor=AF.floor)=>Math.floor((floor-1)/3)%AF.stageNames.length;
+  AF.stageName=()=>AF.stageNames[AF.zoneIndex()];
+  AF.isBossFloor=(floor=AF.floor)=>floor%3===0;
+  AF.roomTarget=(floor=AF.floor)=>{const plan=[8,9,10,11,12,13,14,15,16,17,18,20];return floor<=12?plan[floor-1]:Math.min(28,20+Math.ceil((floor-12)/2))};
+  AF.roomLabels={start:'입구',combat:'일반전투',treasure:'보물방',recovery:'회복방',elite:'엘리트방',exit:'하층 통로',boss:'보스방'};
   AF.roomLabel=r=>AF.roomLabels[r?.type]||'일반전투';
 
   function fit(){const s=Math.min(innerWidth/W,innerHeight/H);canvas.style.width=`${Math.floor(W*s)}px`;canvas.style.height=`${Math.floor(H*s)}px`} fit();addEventListener('resize',fit);
@@ -43,23 +46,72 @@
   joyBase.addEventListener('pointerdown',e=>{e.preventDefault();AF.joy.active=true;AF.joy.id=e.pointerId;joyBase.setPointerCapture?.(e.pointerId);moveJoy(e)});joyBase.addEventListener('pointermove',e=>{if(AF.joy.active&&e.pointerId===AF.joy.id){e.preventDefault();moveJoy(e)}});joyBase.addEventListener('pointerup',resetJoy);joyBase.addEventListener('pointercancel',resetJoy);addEventListener('blur',()=>{resetJoy();AF.keys={}});ui.specialBtn.addEventListener('pointerdown',e=>{e.preventDefault();AF.useSpecial()});
   if(ui.relicButton){const closeRelics=()=>{ui.relicPanel.classList.remove('show');ui.relicPanel.setAttribute('aria-hidden','true')};ui.relicButton.addEventListener('click',()=>{const open=!ui.relicPanel.classList.contains('show');ui.relicPanel.classList.toggle('show',open);ui.relicPanel.setAttribute('aria-hidden',open?'false':'true')});ui.relicClose&&ui.relicClose.addEventListener('click',closeRelics);}
 
-  function makeDungeon(n){const R={[key(0,0)]:{x:0,y:0}};let x=0,y=0,a=0;while(Object.keys(R).length<n&&a++<500){const ds=Object.keys(dirs),d=ds[Math.random()*4|0],v=dirs[d];x+=v[0];y+=v[1];R[key(x,y)]??={x,y}}for(const k in R){const r=R[k];r.doors={};for(const [d,v] of Object.entries(dirs))r.doors[d]=!!R[key(r.x+v[0],r.y+v[1])];Object.assign(r,{seen:false,clear:false,spawned:false,enemies:[],type:'combat',used:false,eliteRewarded:false,gimmickTimer:105+Math.random()*70,windWarn:0,windActive:0,windDir:1,hazards:[]})}R['0,0'].seen=R['0,0'].clear=true;R['0,0'].type='start';R['0,0'].spawned=true;return R}
-  function assignRoomTypes(){
-    const entries=Object.entries(AF.rooms).filter(([k,r])=>k!=='0,0'&&!r.boss);
-    for(const [,r] of entries){r.type='combat';r.used=false;r.eliteRewarded=false;r.clear=false;r.spawned=false}
-    entries.sort(()=>Math.random()-.5);
-    if(entries[0]){entries[0][1].type='treasure';entries[0][1].clear=true;entries[0][1].spawned=true}
-    if(entries[1]){entries[1][1].type='recovery';entries[1][1].clear=true;entries[1][1].spawned=true}
-    const eliteCount=Math.min(AF.floor>=4?2:1,Math.max(0,entries.length-2));
-    for(let i=0;i<eliteCount;i++){const r=entries[2+i]?.[1];if(r)r.type='elite'}
+  function makeDungeon(n){
+    const R={[key(0,0)]:{x:0,y:0}},path=['0,0'];
+    let x=0,y=0,attempt=0;
+    const backbone=Math.min(n-1,Math.max(4,Math.round(n*.48)));
+    while(path.length<=backbone&&attempt++<700){
+      const options=Object.values(dirs).map(v=>[x+v[0],y+v[1]]).filter(([nx,ny])=>!R[key(nx,ny)]);
+      if(!options.length){
+        const back=R[path[Math.max(0,path.length-2)]];x=back.x;y=back.y;continue;
+      }
+      const [nx,ny]=options[Math.random()*options.length|0];x=nx;y=ny;R[key(x,y)]={x,y};path.push(key(x,y));
+    }
+    attempt=0;
+    while(Object.keys(R).length<n&&attempt++<1600){
+      const keys=Object.keys(R),base=R[keys[Math.random()*keys.length|0]];
+      const shuffled=Object.values(dirs).slice().sort(()=>Math.random()-.5);
+      let added=false;
+      for(const v of shuffled){
+        const nx=base.x+v[0],ny=base.y+v[1],nk=key(nx,ny);
+        if(R[nk])continue;
+        const near=Object.values(dirs).reduce((c,d)=>c+(R[key(nx+d[0],ny+d[1])]?1:0),0);
+        if(near>2&&Math.random()<.72)continue;
+        R[nk]={x:nx,y:ny};added=true;break;
+      }
+      if(!added&&attempt%80===0){
+        const base2=R[keys[keys.length-1]],v=shuffled[0],nx=base2.x+v[0],ny=base2.y+v[1];R[key(nx,ny)]??={x:nx,y:ny};
+      }
+    }
+    for(const k in R){
+      const r=R[k];r.doors={};
+      for(const [d,v] of Object.entries(dirs))r.doors[d]=!!R[key(r.x+v[0],r.y+v[1])];
+      Object.assign(r,{seen:false,clear:false,spawned:false,enemies:[],type:'combat',used:false,eliteRewarded:false,boss:false,exit:false,gimmickTimer:105+Math.random()*70,windWarn:0,windActive:0,windDir:1,hazards:[]});
+    }
+    R['0,0'].seen=R['0,0'].clear=true;R['0,0'].type='start';R['0,0'].spawned=true;
+    return R
   }
-  function markBoss(){
+  function floorDistances(){
     const D={[AF.current]:0},q=[AF.current];
-    while(q.length){const k=q.shift(),r=AF.rooms[k];for(const [d,v] of Object.entries(dirs)){if(!r.doors[d])continue;const nk=key(r.x+v[0],r.y+v[1]);if(D[nk]==null){D[nk]=D[k]+1;q.push(nk)}}}
-    let best=AF.current;for(const k in D)if(D[k]>D[best])best=k;
-    AF.rooms[best].boss=true;AF.rooms[best].type='boss';
-    assignRoomTypes();
-    AF.rooms[best].boss=true;AF.rooms[best].type='boss';AF.rooms[best].clear=false;AF.rooms[best].spawned=false;
+    while(q.length){
+      const k=q.shift(),r=AF.rooms[k];
+      for(const [d,v] of Object.entries(dirs)){
+        if(!r.doors[d])continue;
+        const nk=key(r.x+v[0],r.y+v[1]);
+        if(D[nk]==null){D[nk]=D[k]+1;q.push(nk)}
+      }
+    }
+    return D
+  }
+  function assignRoomTypes(targetKey){
+    const entries=Object.entries(AF.rooms).filter(([k])=>k!=='0,0'&&k!==targetKey);
+    for(const [,r] of entries){r.type='combat';r.used=false;r.eliteRewarded=false;r.clear=false;r.spawned=false;r.boss=false;r.exit=false}
+    entries.sort(()=>Math.random()-.5);
+    let pos=0;
+    const treasureCount=AF.floor>=8?2:1,recoveryCount=AF.floor>=10?2:1;
+    for(let i=0;i<treasureCount&&entries[pos];i++,pos++){const r=entries[pos][1];r.type='treasure';r.clear=true;r.spawned=true}
+    for(let i=0;i<recoveryCount&&entries[pos];i++,pos++){const r=entries[pos][1];r.type='recovery';r.clear=true;r.spawned=true}
+    const eliteGoal=AF.floor<=3?1:AF.floor<=6?2:AF.floor<=9?3:4;
+    const eliteCount=Math.min(eliteGoal,Math.max(0,entries.length-pos));
+    for(let i=0;i<eliteCount;i++,pos++){const r=entries[pos]?.[1];if(r)r.type='elite'}
+  }
+  function setupFloorObjective(){
+    const D=floorDistances();let best='0,0';
+    for(const k in D)if(D[k]>D[best])best=k;
+    assignRoomTypes(best);
+    const target=AF.rooms[best],boss=AF.isBossFloor();
+    target.boss=boss;target.exit=!boss;target.type=boss?'boss':'exit';target.clear=false;target.spawned=false;target.used=false;
+    AF.objectiveRoom=best;AF.objectiveDistance=D[best]||0;
   }
   AF.cur=()=>AF.rooms[AF.current];
   function roomRand(r,n){const v=Math.sin((r.x*97+r.y*193+AF.floor*389+n*71.17))*43758.5453;return v-Math.floor(v)}
@@ -71,13 +123,13 @@
   };
   const activeStageRoom=r=>r&&!r.clear&&!(AF.bossClearUntil&&performance.now()<AF.bossClearUntil)&&(r.type==='combat'||r.type==='elite'||r.type==='boss');
   function stageMoveScale(r,p){
-    if(!activeStageRoom(r)||((AF.floor-1)%4)!==1)return 1;
+    if(!activeStageRoom(r)||AF.zoneIndex()!==1)return 1;
     for(let i=0;i<2;i++){const z=AF.stageZone(r,'fog',i);if(Math.hypot(p.x-z.x,p.y-z.y)<z.r)return .78}
     return 1;
   }
   function updateStageGimmick(r,dt){
     if(!r)return;
-    const idx=(AF.floor-1)%4,p=AF.player;
+    const idx=AF.zoneIndex(),p=AF.player;
     if(!activeStageRoom(r)){r.windWarn=0;r.windActive=0;return}
     if(idx===0){
       const z=AF.stageZone(r,'holy');
@@ -119,7 +171,7 @@
   }
   AF.stageTip=()=>{
     const tips=['성광 지대 · 빛의 원 안에서 특수기 충전 가속','냉기 안개 · 안개 안에서는 이동속도 감소','붕괴의 바람 · 경고 후 강한 횡풍이 몰아칩니다','심연 균열 · 붉은 균열이 폭발하기 전에 벗어나세요'];
-    return tips[(AF.floor-1)%4];
+    return tips[AF.zoneIndex()];
   };
   function enemy(x,y,type){const sc=1+(AF.floor-1)*.24,defs={crawler:{r:17,hp:38,s:1.25,d:9},shooter:{r:16,hp:30,s:.88,d:8},brute:{r:24,hp:82,s:.64,d:15},boss:{r:39,hp:320,s:.78,d:19}},q=defs[type];return{x,y,type,r:q.r,hp:q.hp*sc,max:q.hp*sc,s:q.s,d:q.d*sc,fire:40+Math.random()*80,alive:true,flash:0,phase:Math.random()*6.28,attackPose:0,hurtPose:0,deadAt:0,moving:false,faceX:-1,aiCd:45+Math.random()*55,aiWindup:0,dash:0,charge:0,stun:0,aimX:0,aimY:0,shotAngle:0,bossCd:85,bossTelegraph:0,bossTelegraphMax:0,bossPattern:-1,bossAim:0,bossPhase:0,phaseAnnounced:0,bossAction:'추적 중',intro:0,introMax:0}}
   function spawnRoom(r){
@@ -138,11 +190,11 @@
     }
   }
   function heroUI(){const h=AF.player.hero;ui.heroName.textContent=`${h.name} · ${h.ko}`;ui.basicName.textContent=h.basicName;ui.basicIcon.textContent=h.basicIcon;ui.specialName.textContent=h.specialName;ui.specialIcon.textContent=h.specialIcon;ui.specialBtnIcon.textContent=h.specialIcon}
-  AF.newRun=()=>{const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.endless=false;AF.cleared=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(8);AF.current='0,0';markBoss();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name}`);setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===1)AF.toast(AF.stageTip())},950)};
+  AF.newRun=()=>{const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.endless=false;AF.cleared=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name} · ${Object.keys(AF.rooms).length} ROOMS`);setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===1)AF.toast(AF.stageTip())},950)};
   ui.startBtn.addEventListener('click',AF.newRun);ui.retryBtn.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearRestart?.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearLobby?.addEventListener('click',()=>{AF.clearScreen?.classList.remove('show');AF.started=false;AF.paused=true;ui.start.classList.add('show')});
-  ui.endlessBtn?.addEventListener('click',()=>{AF.endless=true;AF.cleared=true;AF.clearScreen?.classList.remove('show');AF.paused=false;AF.nextFloor()});
+  ui.endlessBtn?.addEventListener('click',()=>{AF.endless=true;AF.cleared=true;AF.clearScreen?.classList.remove('show');AF.paused=false;AF.nextFloor('endless')});
 
   function nearest(){const a=AF.cur().enemies.filter(e=>e.alive);return a.length?a.reduce((x,y)=>Math.hypot(x.x-AF.player.x,x.y-AF.player.y)<Math.hypot(y.x-AF.player.x,y.y-AF.player.y)?x:y):null}
   const relicCount=id=>AF.relics[id]?.count||0;
@@ -178,7 +230,7 @@
         const count=Math.min(3,1+Math.floor((fang-1)/2)),base=(p.hero.damage+p.atk)*(.46+.07*fang);
         for(let i=0;i<Math.min(count,targets.length);i++){const t=targets[i],a=Math.atan2(t.y-e.y,t.x-e.x);AF.projectiles.push({team:'p',kind:'moonFang',x:e.x,y:e.y,vx:Math.cos(a)*8.6,vy:Math.sin(a)*8.6,r:7,dmg:base,pierce:0,life:92,color:'#9b7cff'})}
       }
-      if(e.type==='boss'){const now=performance.now();AF.projectiles=AF.projectiles.filter(q=>q.team==='p');AF.cur().enemies.forEach(x=>{if(x!==e&&x.alive){x.alive=false;x.hp=0;x.deadAt=now}});p.inv=Math.max(p.inv,240);AF.bossClearUntil=now+2300;e.bossAction='격파';AF.toast('심연의 감시자를 물리쳤습니다');setTimeout(()=>{if(AF.floor===4&&!AF.endless)AF.finishRun();else AF.nextFloor()},2400)}
+      if(e.type==='boss'){const now=performance.now();AF.projectiles=AF.projectiles.filter(q=>q.team==='p');AF.cur().enemies.forEach(x=>{if(x!==e&&x.alive){x.alive=false;x.hp=0;x.deadAt=now}});p.inv=Math.max(p.inv,240);AF.bossClearUntil=now+2300;e.bossAction='격파';AF.toast('심연의 감시자를 물리쳤습니다');setTimeout(()=>{if(AF.floor===12&&!AF.endless)AF.finishRun();else AF.nextFloor('boss')},2400)}
     }
   }
   AF.damage=damage;
@@ -276,6 +328,10 @@
       r.used=true;const heal=Math.max(30,Math.round(p.maxHp*.45));p.hp=Math.min(p.maxHp,p.hp+heal);p.shield=Math.min(40,p.shield+10);
       for(let i=0;i<18;i++)AF.particles.push({x:cx+(Math.random()-.5)*50,y:cy+(Math.random()-.5)*50,vx:(Math.random()-.5)*1.4,vy:-1-Math.random()*1.4,l:30,color:'#69e5b6'});
       AF.toast(`회복의 샘 · HP +${heal}`);
+    }else if(r.type==='exit'&&r.clear){
+      r.used=true;p.inv=Math.max(p.inv,70);AF.paused=true;
+      AF.toast('하층 통로 개방 · 더 깊은 심연으로');
+      setTimeout(()=>{if(AF.started&&!AF.dead&&AF.cur()===r){AF.paused=false;AF.nextFloor('exit')}},700);
     }
   }
   function formatRunTime(ms){
@@ -308,7 +364,16 @@
     if(ui.clearRecord)ui.clearRecord.textContent=p.hero.ko+' 클리어 '+rec.clears+'회 · 최고 처치 '+rec.maxKills+' · 최고 Lv '+rec.bestLevel+' · 최고 기록 '+formatRunTime(rec.bestTime);
     ui.clearScreen?.classList.add('show');
   };
-  AF.nextFloor=()=>{AF.bossClearUntil=0;AF.floor++;AF.rooms=makeDungeon(Math.min(13,8+AF.floor));AF.current='0,0';markBoss();AF.player.x=W/2;AF.player.y=arena.y+arena.h/2;AF.player.hp=AF.player.maxHp;AF.player.inv=30;AF.projectiles=[];AF.pickups=[];AF.slashes=[];AF.toast(`FLOOR ${AF.floor} · ${AF.stageName()}`);AF.hud();setTimeout(()=>{if(AF.started&&!AF.dead)AF.toast(AF.stageTip())},950)};
+  AF.nextFloor=(source='exit')=>{
+    AF.bossClearUntil=0;AF.floor++;
+    AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();
+    const healRate=source==='boss'?.30:source==='endless'?.38:.16;
+    AF.player.x=W/2;AF.player.y=arena.y+arena.h/2;
+    AF.player.hp=Math.min(AF.player.maxHp,AF.player.hp+Math.max(10,Math.round(AF.player.maxHp*healRate)));
+    AF.player.inv=45;AF.projectiles=[];AF.pickups=[];AF.slashes=[];
+    AF.toast(`FLOOR ${AF.floor} · ${AF.stageName()} · ${Object.keys(AF.rooms).length} ROOMS`);
+    AF.hud();setTimeout(()=>{if(AF.started&&!AF.dead)AF.toast(AF.stageTip())},950)
+  };
   function hurt(n,nx,ny){const p=AF.player;if(p.shield>0){const b=Math.min(p.shield,n);p.shield-=b;n-=b;if(n<=0){p.inv=18;return}}p.hp-=Math.round(n);p.inv=48;p.hurtPose=18;p.x+=nx*18;p.y+=ny*18;
     const seal=relicCount('guardian-seal');
     if(seal&&n>0&&(p.guardianCd||0)<=0){
@@ -324,7 +389,7 @@
     AF.current=nk;const r=AF.cur();r.seen=true;AF.projectiles=[];AF.slashes=[];if(!r.clear)spawnRoom(r);
     const p=AF.player;if(from==='W'){p.x=arena.x+35;p.y=arena.y+arena.h/2}else if(from==='E'){p.x=arena.x+arena.w-35;p.y=arena.y+arena.h/2}else if(from==='N'){p.x=W/2;p.y=arena.y+35}else if(from==='S'){p.x=W/2;p.y=arena.y+arena.h-35}
     p.inv=r.type==='boss'?120:35;
-    const msg={treasure:'보물방 · 중앙의 상자를 찾아보세요',recovery:'회복방 · 중앙의 샘에 다가가세요',elite:'엘리트방 · 강적이 문을 봉쇄했습니다',boss:'보스방 · 심연의 감시자가 기다립니다',combat:'일반전투방'}[r.type]||'새 방 발견';
+    const msg={treasure:'보물방 · 중앙의 상자를 찾아보세요',recovery:'회복방 · 중앙의 샘에 다가가세요',elite:'엘리트방 · 강적이 문을 봉쇄했습니다',exit:'하층 통로 · 적을 쓰러뜨리고 중앙의 계단을 여세요',boss:'보스방 · 심연의 감시자가 기다립니다',combat:'일반전투방'}[r.type]||'새 방 발견';
     AF.toast(msg);
   }
   function doors(){const p=AF.player,r=AF.cur(),g=58,mx=W/2,my=arena.y+arena.h/2;let d=null;if(p.x<=arena.x+p.r+1&&r.clear&&r.doors.W&&Math.abs(p.y-my)<g)d='W';else if(p.x>=arena.x+arena.w-p.r-1&&r.clear&&r.doors.E&&Math.abs(p.y-my)<g)d='E';else if(p.y<=arena.y+p.r+1&&r.clear&&r.doors.N&&Math.abs(p.x-mx)<g)d='N';else if(p.y>=arena.y+arena.h-p.r-1&&r.clear&&r.doors.S&&Math.abs(p.x-mx)<g)d='S';if(d){const v=dirs[d],rr=AF.cur(),nk=key(rr.x+v[0],rr.y+v[1]);if(AF.rooms[nk])enter(nk,opp[d])}}
