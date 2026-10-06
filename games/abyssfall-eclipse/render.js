@@ -146,6 +146,19 @@
     const cx=W/2,cy=arena.y+arena.h/2,now=performance.now();
     ctx.save();
 
+    if(r.traceText&&A.tracePoint){
+      const t=A.tracePoint(r),pulse=.5+.5*Math.sin(now/520);
+      ctx.save();ctx.translate(t.x,t.y);
+      ctx.globalAlpha=r.traceSeen?.16:(r.clear?.34:.14);
+      ctx.strokeStyle=`rgba(203,190,216,${.42+.14*pulse})`;ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(-15,0);ctx.lineTo(15,0);ctx.stroke();
+      ctx.beginPath();ctx.arc(0,0,5,Math.PI*.15,Math.PI*1.15);ctx.stroke();
+      ctx.globalAlpha*=.72;
+      ctx.beginPath();ctx.moveTo(-19,-18);ctx.lineTo(-9,-10);ctx.moveTo(12,12);ctx.lineTo(21,18);ctx.stroke();
+      ctx.restore();
+    }
+
     if(r.type==='treasure'){
       const pulse=.5+.5*Math.sin(now/280);
       ctx.globalAlpha=r.used?.38:.68;
