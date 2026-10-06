@@ -89,3 +89,11 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - Boss single-hit burst damage is capped to prevent strong relic builds from skipping the whole encounter in seconds.
 - Bosses now open a central descent portal after defeat instead of automatically changing floors.
 - On 12F, entering the post-boss portal triggers the CLEAR results screen; on earlier boss floors it descends normally.
+
+## ABYSSFALL v22 sound pass
+
+- Added a lightweight Web Audio sound manager with no external audio-file dependency.
+- Two procedural music states: quiet exploration ambience and a more rhythmic boss theme.
+- Added restrained SFX for basic attacks, hits/deaths, special skills, treasure/relic/heal events, portals, boss intro/warnings/casts/defeat, clear, and game over.
+- Automatic attacks are intentionally quiet and throttled so repeated fire does not become fatiguing.
+- Added a compact sound toggle in the HUD with mute state saved locally.
