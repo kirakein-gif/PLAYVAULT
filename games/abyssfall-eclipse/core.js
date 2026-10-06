@@ -173,11 +173,18 @@
     const tips=['성광 지대 · 빛의 원 안에서 특수기 충전 가속','냉기 안개 · 안개 안에서는 이동속도 감소','붕괴의 바람 · 경고 후 강한 횡풍이 몰아칩니다','심연 균열 · 붉은 균열이 폭발하기 전에 벗어나세요'];
     return tips[AF.zoneIndex()];
   };
-  function enemy(x,y,type){const sc=1+(AF.floor-1)*.24,defs={crawler:{r:17,hp:38,s:1.25,d:9},shooter:{r:16,hp:30,s:.88,d:8},brute:{r:24,hp:82,s:.64,d:15},boss:{r:39,hp:320,s:.78,d:19}},q=defs[type];return{x,y,type,r:q.r,hp:q.hp*sc,max:q.hp*sc,s:q.s,d:q.d*sc,fire:40+Math.random()*80,alive:true,flash:0,phase:Math.random()*6.28,attackPose:0,hurtPose:0,deadAt:0,moving:false,faceX:-1,aiCd:45+Math.random()*55,aiWindup:0,dash:0,charge:0,stun:0,aimX:0,aimY:0,shotAngle:0,bossCd:85,bossTelegraph:0,bossTelegraphMax:0,bossPattern:-1,bossAim:0,bossPhase:0,phaseAnnounced:0,bossAction:'추적 중',intro:0,introMax:0}}
+  function enemy(x,y,type){
+    const f=Math.max(0,AF.floor-1);
+    const normalHp=1+f*.32+f*f*.018,normalDmg=1+f*.12+f*f*.005;
+    const bossHp=1+f*.35+f*f*.020,bossDmg=1+f*.10+f*f*.006;
+    const defs={crawler:{r:17,hp:42,s:1.25,d:9},shooter:{r:16,hp:36,s:.88,d:8},brute:{r:24,hp:92,s:.64,d:15},boss:{r:39,hp:1100,s:.78,d:18}},q=defs[type];
+    const hpScale=type==='boss'?bossHp:normalHp,dmgScale=type==='boss'?bossDmg:normalDmg;
+    return{x,y,type,r:q.r,hp:q.hp*hpScale,max:q.hp*hpScale,s:q.s,d:q.d*dmgScale,fire:40+Math.random()*80,alive:true,flash:0,phase:Math.random()*6.28,attackPose:0,hurtPose:0,deadAt:0,moving:false,faceX:-1,aiCd:45+Math.random()*55,aiWindup:0,dash:0,charge:0,stun:0,aimX:0,aimY:0,shotAngle:0,bossCd:85,bossTelegraph:0,bossTelegraphMax:0,bossPattern:-1,bossAim:0,bossPhase:0,phaseAnnounced:0,bossAction:'추적 중',intro:0,introMax:0}
+  }
   function spawnRoom(r){
     if(r.spawned||r.clear)return;
     r.spawned=true;
-    if(r.type==='boss'||r.boss){const b=enemy(W/2,arena.y+155,'boss');b.intro=b.introMax=118;b.bossCd=82;b.bossAction='출현 중';r.enemies=[b];return}
+    if(r.type==='boss'||r.boss){const b=enemy(W/2,arena.y+155,'boss');b.intro=b.introMax=118;b.bossCd=48;b.bossAction='출현 중';r.enemies=[b];return}
     const elite=r.type==='elite';
     const n=(elite?3:3+(Math.random()*3|0))+Math.min(elite?2:3,(AF.floor-1)/2|0);
     for(let i=0;i<n;i++){
@@ -185,7 +192,7 @@
       let x=arena.x+80+Math.random()*(arena.w-160),y=arena.y+75+Math.random()*(arena.h-150);
       if(Math.hypot(x-AF.player.x,y-AF.player.y)<150){x=arena.x+80;y=arena.y+80}
       const e=enemy(x,y,type);
-      if(elite){e.elite=true;e.hp*=1.72;e.max=e.hp;e.d*=1.32;e.s*=1.07;e.r*=1.08}
+      if(elite){e.elite=true;const z=2.0+Math.min(.48,AF.floor*.04);e.hp*=z;e.max=e.hp;e.d*=1.42+Math.min(.20,AF.floor*.015);e.s*=1.08;e.r*=1.10}
       r.enemies.push(e);
     }
   }
@@ -219,6 +226,7 @@
     if(e.type==='boss'&&e.intro>0)return;
     const p=AF.player,grail=relicCount('twin-grail');
     if(grail){const missing=1-Math.max(0,p.hp)/p.maxHp;n*=1+missing*(.55+.18*(grail-1))}
+    if(e.type==='boss')n=Math.min(n,e.max*.10);
     e.hp-=n;e.flash=7;e.hurtPose=11;
     for(let i=0;i<6;i++)AF.particles.push({x:e.x,y:e.y,vx:(Math.random()-.5)*3.5,vy:(Math.random()-.5)*3.5,l:18,color:p.hero.color});
     if(e.hp<=0){
@@ -230,7 +238,14 @@
         const count=Math.min(3,1+Math.floor((fang-1)/2)),base=(p.hero.damage+p.atk)*(.46+.07*fang);
         for(let i=0;i<Math.min(count,targets.length);i++){const t=targets[i],a=Math.atan2(t.y-e.y,t.x-e.x);AF.projectiles.push({team:'p',kind:'moonFang',x:e.x,y:e.y,vx:Math.cos(a)*8.6,vy:Math.sin(a)*8.6,r:7,dmg:base,pierce:0,life:92,color:'#9b7cff'})}
       }
-      if(e.type==='boss'){const now=performance.now();AF.projectiles=AF.projectiles.filter(q=>q.team==='p');AF.cur().enemies.forEach(x=>{if(x!==e&&x.alive){x.alive=false;x.hp=0;x.deadAt=now}});p.inv=Math.max(p.inv,240);AF.bossClearUntil=now+2300;e.bossAction='격파';AF.toast('심연의 감시자를 물리쳤습니다');setTimeout(()=>{if(AF.floor===12&&!AF.endless)AF.finishRun();else AF.nextFloor('boss')},2400)}
+      if(e.type==='boss'){
+        const now=performance.now(),room=AF.cur();
+        AF.projectiles=AF.projectiles.filter(q=>q.team==='p');
+        room.enemies.forEach(x=>{if(x!==e&&x.alive){x.alive=false;x.hp=0;x.deadAt=now}});
+        room.clear=true;room.bossDefeated=true;room.portalUnlockAt=now+1450;room.used=false;
+        p.inv=Math.max(p.inv,180);AF.bossClearUntil=now+1450;e.bossAction='격파';
+        AF.toast('심연의 감시자를 물리쳤습니다 · 하층 통로가 열립니다')
+      }
     }
   }
   AF.damage=damage;
@@ -332,6 +347,15 @@
       r.used=true;p.inv=Math.max(p.inv,70);AF.paused=true;
       AF.toast('하층 통로 개방 · 더 깊은 심연으로');
       setTimeout(()=>{if(AF.started&&!AF.dead&&AF.cur()===r){AF.paused=false;AF.nextFloor('exit')}},700);
+    }else if(r.type==='boss'&&r.bossDefeated&&performance.now()>=(r.portalUnlockAt||0)){
+      r.used=true;p.inv=Math.max(p.inv,90);AF.paused=true;
+      if(AF.floor===12&&!AF.endless){
+        AF.toast('심연의 핵에 도달했습니다');
+        setTimeout(()=>{if(AF.started&&!AF.dead&&AF.cur()===r)AF.finishRun()},650);
+      }else{
+        AF.toast('하층 통로 개방 · 더 깊은 심연으로');
+        setTimeout(()=>{if(AF.started&&!AF.dead&&AF.cur()===r){AF.paused=false;AF.nextFloor('boss')}},700);
+      }
     }
   }
   function formatRunTime(ms){
@@ -468,7 +492,7 @@
         e.bossPhase=phase;
         if(e.intro>0){
           e.intro-=dt;e.moving=false;e.bossAction='출현 중';
-          if(e.intro<=0){e.intro=0;e.bossAction='추적 중';e.bossCd=72;AF.toast('심연의 감시자 · 전투 시작')}
+          if(e.intro<=0){e.intro=0;e.bossAction='추적 중';e.bossCd=48;AF.toast('심연의 감시자 · 전투 시작')}
         }else{
           if(phase>e.phaseAnnounced){e.phaseAnnounced=phase;AF.toast(phase===1?'심연의 감시자 · PHASE II':'심연의 감시자 · PHASE III')}
           if(e.bossTelegraph>0){
