@@ -1,8 +1,94 @@
 (() => {
   'use strict'; const A=window.AF,{ctx,W,H,arena,imgs}=A;
   function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h)}
-  function backdrop(){const g=ctx.createRadialGradient(W/2,H/2,70,W/2,H/2,Math.max(W,H)*.78);g.addColorStop(0,'#242039');g.addColorStop(1,'#080912');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
-  function arenaDraw(){const r=A.cur(),g=ctx.createLinearGradient(arena.x,arena.y,arena.x+arena.w,arena.y+arena.h);g.addColorStop(0,'#171a2a');g.addColorStop(1,'#0e101c');ctx.fillStyle=g;ctx.fillRect(arena.x,arena.y,arena.w,arena.h);ctx.strokeStyle='rgba(255,255,255,.035)';ctx.lineWidth=1;for(let y=arena.y;y<arena.y+arena.h;y+=44){ctx.beginPath();ctx.moveTo(arena.x,y);ctx.lineTo(arena.x+arena.w,y);ctx.stroke()}for(let x=arena.x;x<arena.x+arena.w;x+=44){ctx.beginPath();ctx.moveTo(x,arena.y);ctx.lineTo(x,arena.y+arena.h);ctx.stroke()}const wc='#7b7270',dc=r.clear?'#5fe0b1':'#ff5971',gap=58,mx=W/2,my=arena.y+arena.h/2,seg=(x1,y1,x2,y2,c)=>{ctx.strokeStyle=c;ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()};for(const d of ['N','S']){const y=d==='N'?arena.y:arena.y+arena.h;r.doors[d]?(seg(arena.x,y,mx-gap,y,wc),seg(mx+gap,y,arena.x+arena.w,y,wc),seg(mx-gap,y,mx+gap,y,dc)):seg(arena.x,y,arena.x+arena.w,y,wc)}for(const d of ['W','E']){const x=d==='W'?arena.x:arena.x+arena.w;r.doors[d]?(seg(x,arena.y,x,my-gap,wc),seg(x,my+gap,x,arena.y+arena.h,wc),seg(x,my-gap,x,my+gap,dc)):seg(x,arena.y,x,arena.y+arena.h,wc)}}
+  const THEMES=[
+    {name:'버려진 성당',outer0:'#221a32',outer1:'#080910',floor0:'#201c2b',floor1:'#11131d',wall:'#80756d',door:'#f0bc67',accent:'#ffd17d',grid:'rgba(255,235,205,.040)'},
+    {name:'침묵의 묘지',outer0:'#17263a',outer1:'#070b12',floor0:'#182332',floor1:'#0d141d',wall:'#66717a',door:'#74d7c8',accent:'#8ec8ff',grid:'rgba(190,220,255,.035)'},
+    {name:'무너진 탑',outer0:'#1d2240',outer1:'#070812',floor0:'#1a1d31',floor1:'#0d0f19',wall:'#6b657e',door:'#79c7ff',accent:'#a58aff',grid:'rgba(180,180,255,.038)'},
+    {name:'심연의 제단',outer0:'#31151d',outer1:'#080609',floor0:'#241218',floor1:'#10090d',wall:'#765960',door:'#e2556f',accent:'#ff536d',grid:'rgba(255,120,140,.035)'}
+  ];
+  const theme=()=>THEMES[(A.floor-1)%THEMES.length];
+  function hash(n){const x=Math.sin(n*12.9898+78.233)*43758.5453;return x-Math.floor(x)}
+  function roomSeed(){const r=A.cur();return (r?.x||0)*97+(r?.y||0)*193+A.floor*389}
+
+  function backdrop(){
+    const t=theme(),g=ctx.createRadialGradient(W/2,H/2,70,W/2,H/2,Math.max(W,H)*.78);
+    g.addColorStop(0,t.outer0);g.addColorStop(1,t.outer1);
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  }
+
+  function drawCathedral(){
+    const seed=roomSeed(),cx=W/2;
+    ctx.save();
+    ctx.globalAlpha=.26;
+    ctx.fillStyle='#c99a52';
+    for(let i=0;i<6;i++){const x=arena.x+65+i*(arena.w-130)/5;ctx.fillRect(x,arena.y+18,5,arena.h-36)}
+    ctx.globalAlpha=.20;ctx.fillStyle='#ffe3a5';
+    ctx.beginPath();ctx.ellipse(cx,arena.y+72,70,118,0,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=.42;ctx.strokeStyle='#f4d394';ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(cx,arena.y+70,42,Math.PI,0);ctx.lineTo(cx+42,arena.y+132);ctx.lineTo(cx-42,arena.y+132);ctx.closePath();ctx.stroke();
+    for(let i=0;i<8;i++){const x=arena.x+38+(i%4)*(arena.w-76)/3,y=i<4?arena.y+42:arena.y+arena.h-48;ctx.fillStyle='#f1bd55';ctx.globalAlpha=.55+.2*hash(seed+i);ctx.fillRect(x,y,3,12)}
+    ctx.restore();
+  }
+
+  function drawGraveyard(){
+    const seed=roomSeed();
+    ctx.save();ctx.globalAlpha=.34;
+    for(let i=0;i<12;i++){
+      const side=i%2,x=side?arena.x+arena.w-52:arena.x+24+(i%3)*18,y=arena.y+44+Math.floor(i/2)*68;
+      ctx.fillStyle=i%3===0?'#727d8a':'#59636f';
+      ctx.fillRect(x,y,20,28);ctx.fillRect(x+7,y-8,6,10);
+      if(i%3===0){ctx.fillRect(x+4,y+8,12,4)}
+    }
+    ctx.globalAlpha=.12;ctx.fillStyle='#a8d4ff';
+    ctx.beginPath();ctx.ellipse(W*.62,arena.y+arena.h*.44,180,95,-.25,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=.20;ctx.strokeStyle='#92a9bf';ctx.lineWidth=2;
+    for(let i=0;i<9;i++){const x=arena.x+30+hash(seed+i)*arena.w,y=arena.y+40+hash(seed+i+30)*arena.h;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+12,y-6);ctx.lineTo(x+20,y+5);ctx.stroke()}
+    ctx.restore();
+  }
+
+  function drawTower(){
+    const seed=roomSeed();
+    ctx.save();ctx.globalAlpha=.22;ctx.strokeStyle='#8b88b4';ctx.lineWidth=3;
+    for(let i=0;i<12;i++){const x=arena.x+hash(seed+i)*arena.w,y=arena.y+hash(seed+i+50)*arena.h;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+18,y+10);ctx.lineTo(x+7,y+24);ctx.stroke()}
+    ctx.globalAlpha=.16;ctx.fillStyle='#89caff';
+    for(let i=0;i<7;i++){const x=arena.x+50+hash(seed+i+80)*(arena.w-100),y=arena.y+50+hash(seed+i+90)*(arena.h-100);ctx.save();ctx.translate(x,y);ctx.rotate(hash(seed+i+120)*Math.PI);ctx.fillRect(-12,-3,24,6);ctx.restore()}
+    ctx.globalAlpha=.18;ctx.strokeStyle='#9ac5ff';ctx.lineWidth=2;
+    for(let i=0;i<5;i++){const y=arena.y+90+i*88;ctx.beginPath();ctx.moveTo(arena.x+70,y);ctx.quadraticCurveTo(W/2,y-35,arena.x+arena.w-70,y);ctx.stroke()}
+    ctx.restore();
+  }
+
+  function drawAltar(){
+    const seed=roomSeed(),cx=W/2,cy=arena.y+arena.h/2;
+    ctx.save();
+    ctx.globalAlpha=.30;ctx.strokeStyle='#b92b49';ctx.lineWidth=3;
+    for(let r=42;r<=165;r+=38){ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke()}
+    for(let i=0;i<8;i++){const a=i*Math.PI/4;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*30,cy+Math.sin(a)*30);ctx.lineTo(cx+Math.cos(a)*180,cy+Math.sin(a)*180);ctx.stroke()}
+    ctx.globalAlpha=.24;ctx.strokeStyle='#ff496b';ctx.lineWidth=2;
+    for(let i=0;i<14;i++){let x=arena.x+hash(seed+i)*arena.w,y=arena.y+hash(seed+i+20)*arena.h;ctx.beginPath();ctx.moveTo(x,y);for(let j=0;j<3;j++){x+=(hash(seed+i*9+j)-.5)*34;y+=12+hash(seed+i*7+j)*16;ctx.lineTo(x,y)}ctx.stroke()}
+    ctx.globalAlpha=.18;ctx.fillStyle='#ff304f';ctx.beginPath();ctx.arc(W*.73,arena.y+88,74,0,Math.PI*2);ctx.fill();ctx.fillStyle='#08070b';ctx.beginPath();ctx.arc(W*.75,arena.y+78,62,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }
+
+  function stageDecor(){
+    const idx=(A.floor-1)%4;
+    if(idx===0)drawCathedral();else if(idx===1)drawGraveyard();else if(idx===2)drawTower();else drawAltar();
+  }
+
+  function arenaDraw(){
+    const r=A.cur(),t=theme(),g=ctx.createLinearGradient(arena.x,arena.y,arena.x+arena.w,arena.y+arena.h);
+    g.addColorStop(0,t.floor0);g.addColorStop(1,t.floor1);ctx.fillStyle=g;ctx.fillRect(arena.x,arena.y,arena.w,arena.h);
+
+    ctx.strokeStyle=t.grid;ctx.lineWidth=1;
+    const tile=(A.floor-1)%4===1?52:44;
+    for(let y=arena.y;y<arena.y+arena.h;y+=tile){ctx.beginPath();ctx.moveTo(arena.x,y);ctx.lineTo(arena.x+arena.w,y);ctx.stroke()}
+    for(let x=arena.x;x<arena.x+arena.w;x+=tile){ctx.beginPath();ctx.moveTo(x,arena.y);ctx.lineTo(x,arena.y+arena.h);ctx.stroke()}
+    stageDecor();
+
+    const wc=t.wall,dc=r.clear?'#5fe0b1':t.door,gap=58,mx=W/2,my=arena.y+arena.h/2,seg=(x1,y1,x2,y2,c)=>{ctx.strokeStyle=c;ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()};
+    for(const d of ['N','S']){const y=d==='N'?arena.y:arena.y+arena.h;r.doors[d]?(seg(arena.x,y,mx-gap,y,wc),seg(mx+gap,y,arena.x+arena.w,y,wc),seg(mx-gap,y,mx+gap,y,dc)):seg(arena.x,y,arena.x+arena.w,y,wc)}
+    for(const d of ['W','E']){const x=d==='W'?arena.x:arena.x+arena.w;r.doors[d]?(seg(x,arena.y,x,my-gap,wc),seg(x,my+gap,x,arena.y+arena.h,wc),seg(x,my-gap,x,my+gap,dc)):seg(x,arena.y,x,arena.y+arena.h,wc)}
+  }
   function player(){
     const p=A.player,h=p.hero,atlas=window.AF_ATLAS,now=performance.now();
     const atlasImg=atlas?.loaded?.[h.key]?atlas.images[h.key]:null;
