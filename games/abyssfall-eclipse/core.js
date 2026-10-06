@@ -25,7 +25,7 @@
     dawn:{key:'dawn',name:'Dawn Seeker',ko:'여명의 추적자',color:'#ffd46f',accent:'#66d9ff',maxHp:120,speed:3.15,basicName:'추적 룬탄',basicIcon:'✦',rate:34,damage:17,proj:8.1,specialName:'태양낙인',specialIcon:'☀',specialCd:430,idle:'dawn_idle',run:'dawn_run',attack:'dawn_attack',drawW:mobile?112:98},
     night:{key:'night',name:'Night Veil',ko:'밤의 장막',color:'#7bdfff',accent:'#9273ff',maxHp:96,speed:3.75,basicName:'월광 칼날',basicIcon:'☾',rate:26,damage:13,proj:9.2,specialName:'월영 질주',specialIcon:'◒',specialCd:360,idle:'night_idle',run:'night_run',attack:'night_attack',drawW:mobile?106:94}
   };
-  AF.selected='dawn'; AF.floor=1; AF.kills=0; AF.relics={}; AF.rooms={}; AF.runStart=0; AF.endless=false; AF.cleared=false; AF.current='0,0'; AF.started=false; AF.paused=true; AF.dead=false; AF.player=null; AF.projectiles=[]; AF.particles=[]; AF.shockwaves=[]; AF.pickups=[]; AF.slashes=[];
+  AF.selected='dawn'; AF.floor=1; AF.kills=0; AF.relics={}; AF.rooms={}; AF.runStart=0; AF.endless=false; AF.cleared=false; AF.transitioning=false; AF.current='0,0'; AF.started=false; AF.paused=true; AF.dead=false; AF.player=null; AF.projectiles=[]; AF.particles=[]; AF.shockwaves=[]; AF.pickups=[]; AF.slashes=[];
   AF.keys={}; AF.joy={x:0,y:0,active:false,id:null};
   const dirs={N:[0,-1],S:[0,1],E:[1,0],W:[-1,0]}, opp={N:'S',S:'N',E:'W',W:'E'}, key=(x,y)=>`${x},${y}`;
   AF.dirs=dirs;
@@ -197,7 +197,7 @@
     }
   }
   function heroUI(){const h=AF.player.hero;ui.heroName.textContent=`${h.name} · ${h.ko}`;ui.basicName.textContent=h.basicName;ui.basicIcon.textContent=h.basicIcon;ui.specialName.textContent=h.specialName;ui.specialIcon.textContent=h.specialIcon;ui.specialBtnIcon.textContent=h.specialIcon}
-  AF.newRun=()=>{const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.endless=false;AF.cleared=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name} · ${Object.keys(AF.rooms).length} ROOMS`);setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===1)AF.toast(AF.stageTip())},950)};
+  AF.newRun=()=>{const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.endless=false;AF.cleared=false;AF.transitioning=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name} · ${Object.keys(AF.rooms).length} ROOMS`);setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===1)AF.toast(AF.stageTip())},950)};
   ui.startBtn.addEventListener('click',AF.newRun);ui.retryBtn.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearRestart?.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearLobby?.addEventListener('click',()=>{AF.clearScreen?.classList.remove('show');AF.started=false;AF.paused=true;ui.start.classList.add('show')});
@@ -343,18 +343,27 @@
       r.used=true;const heal=Math.max(30,Math.round(p.maxHp*.45));p.hp=Math.min(p.maxHp,p.hp+heal);p.shield=Math.min(40,p.shield+10);
       for(let i=0;i<18;i++)AF.particles.push({x:cx+(Math.random()-.5)*50,y:cy+(Math.random()-.5)*50,vx:(Math.random()-.5)*1.4,vy:-1-Math.random()*1.4,l:30,color:'#69e5b6'});
       AF.toast(`회복의 샘 · HP +${heal}`);
-    }else if(r.type==='exit'&&r.clear){
-      r.used=true;p.inv=Math.max(p.inv,70);AF.paused=true;
+    }else if(r.type==='exit'&&r.clear&&!AF.transitioning){
+      r.used=true;AF.transitioning=true;p.inv=Math.max(p.inv,90);
       AF.toast('하층 통로 개방 · 더 깊은 심연으로');
-      setTimeout(()=>{if(AF.started&&!AF.dead&&AF.cur()===r){AF.paused=false;AF.nextFloor('exit')}},700);
-    }else if(r.type==='boss'&&r.bossDefeated&&performance.now()>=(r.portalUnlockAt||0)){
-      r.used=true;p.inv=Math.max(p.inv,90);AF.paused=true;
+      setTimeout(()=>{
+        if(AF.started&&!AF.dead&&AF.cur()===r)AF.nextFloor('exit');
+        AF.transitioning=false;
+      },650);
+    }else if(r.type==='boss'&&r.bossDefeated&&performance.now()>=(r.portalUnlockAt||0)&&!AF.transitioning){
+      r.used=true;AF.transitioning=true;p.inv=Math.max(p.inv,110);
       if(AF.floor===12&&!AF.endless){
         AF.toast('심연의 핵에 도달했습니다');
-        setTimeout(()=>{if(AF.started&&!AF.dead&&AF.cur()===r)AF.finishRun()},650);
+        setTimeout(()=>{
+          if(AF.started&&!AF.dead&&AF.cur()===r)AF.finishRun();
+          AF.transitioning=false;
+        },650);
       }else{
         AF.toast('하층 통로 개방 · 더 깊은 심연으로');
-        setTimeout(()=>{if(AF.started&&!AF.dead&&AF.cur()===r){AF.paused=false;AF.nextFloor('boss')}},700);
+        setTimeout(()=>{
+          if(AF.started&&!AF.dead&&AF.cur()===r)AF.nextFloor('boss');
+          AF.transitioning=false;
+        },650);
       }
     }
   }
@@ -376,7 +385,7 @@
     return rec;
   }
   AF.finishRun=()=>{
-    if(AF.cleared)return;AF.cleared=true;AF.paused=true;AF.bossClearUntil=0;
+    if(AF.cleared)return;AF.cleared=true;AF.transitioning=false;AF.paused=true;AF.bossClearUntil=0;
     const elapsed=performance.now()-AF.runStart,rec=saveClearRecord(elapsed),p=AF.player;
     if(ui.clearStats)ui.clearStats.innerHTML=[
       ['캐릭터',p.hero.ko],['플레이 시간',formatRunTime(elapsed)],['총 처치',AF.kills+''],['최종 레벨','Lv '+p.level]
@@ -389,7 +398,7 @@
     ui.clearScreen?.classList.add('show');
   };
   AF.nextFloor=(source='exit')=>{
-    AF.bossClearUntil=0;AF.floor++;
+    AF.transitioning=false;AF.bossClearUntil=0;AF.floor++;
     AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();
     const healRate=source==='boss'?.30:source==='endless'?.38:.16;
     AF.player.x=W/2;AF.player.y=arena.y+arena.h/2;
