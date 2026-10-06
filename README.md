@@ -97,3 +97,11 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - Added restrained SFX for basic attacks, hits/deaths, special skills, treasure/relic/heal events, portals, boss intro/warnings/casts/defeat, clear, and game over.
 - Automatic attacks are intentionally quiet and throttled so repeated fire does not become fatiguing.
 - Added a compact sound toggle in the HUD with mute state saved locally.
+
+## ABYSSFALL v24 mysterious gates and stairs
+
+- Boss floors now hide several old altar devices in distant combat/elite rooms. They are not presented as a visible checklist.
+- After a cleared altar room is approached, its glyph quietly dies out. When the last one is disturbed, a distant heavy gate sound plays with only a subtle message that a door opened somewhere.
+- Reaching the boss entrance too early produces a heavy locked-door clunk and the discovered gate remains dimly marked on the minimap.
+- Floor transitions have been visually changed from glowing portals to physical stone staircases.
+- Boss defeat now reveals stairs in the floor, and descending uses layered stone-footstep audio rather than a teleport sound.
