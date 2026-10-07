@@ -170,7 +170,7 @@ function enemyDef(type){
 }
 function makeEnemy(type,x,y){
   const d=enemyDef(type);
-  return {type,x,y,w:d.w,h:d.h,hp:d.hp,maxHp:d.hp,s:d.s,d:d.d,alive:true,face:-1,cd:45+Math.random()*60,shot:50+Math.random()*70,phase:Math.random()*6.28,wind:0,inv:0,deadAt:0,stun:0,kbx:0,hitFlash:0,attackWind:0,attackRecover:0,dash:0,aimX:0,aimY:0,attackKind:''};
+  return {type,x,y,w:d.w,h:d.h,hp:d.hp,maxHp:d.hp,s:d.s,d:d.d,alive:true,face:-1,cd:45+Math.random()*60,shot:50+Math.random()*70,phase:Math.random()*6.28,wind:0,inv:0,deadAt:0,stun:0,kbx:0,hitFlash:0,attackWind:0,attackRecover:0,dash:0,aimX:0,aimY:0,attackKind:'',didHit:false};
 }
 
 function newGame(){
@@ -392,29 +392,100 @@ function circleRect(c,r){const x=clamp(c.x,r.x,r.x+r.w),y=clamp(c.y,r.y,r.y+r.h)
 function updateEnemies(dt){
   const h=hero(),r=activeRoom(),rs=roomState(r.id);
   for(const e of rs.enemies){
-    if(!e.alive)continue;if(e.inv>0)e.inv-=dt;
-    const dx=(h.x+h.w/2)-(e.x+e.w/2),dy=(h.y+h.h/2)-(e.y+e.h/2),dist=Math.hypot(dx,dy)||1;e.face=dx>=0?1:-1;
-    if(e.type==='bat'){
-      e.phase+=dt*.055;e.x+=Math.sign(dx)*e.s*.55*dt;e.y+=Math.sin(e.phase)*.75*dt;
-      if(dist<40&&h.inv<=0)hurt(e.d,e.face);
+    if(!e.alive)continue;
+    if(e.inv>0)e.inv-=dt;if(e.hitFlash>0)e.hitFlash-=dt;
+    const dx=(h.x+h.w/2)-(e.x+e.w/2),dy=(h.y+h.h/2)-(e.y+e.h/2),dist=Math.hypot(dx,dy)||1;
+    e.face=dx>=0?1:-1;
+
+    if(Math.abs(e.kbx||0)>.04){
+      e.x+=e.kbx*dt;e.kbx*=Math.pow(.72,dt);
+    }else e.kbx=0;
+
+    if(e.stun>0){
+      e.stun-=dt;e.attackWind=0;e.dash=0;
+      if(e.type!=='bat'&&e.type!=='gatekeeper')e.y=r.ground-e.h;
+      e.x=clamp(e.x,26,W-e.w-26);
+      continue;
+    }
+
+    if(e.type==='crawler'){
+      if(e.attackRecover>0)e.attackRecover-=dt;
+      else if(e.dash>0){
+        e.x+=e.aimX*5.6*dt;e.dash-=dt;
+        if(!e.didHit&&Math.abs(dx)<42&&Math.abs(dy)<42){e.didHit=true;hurt(e.d,e.aimX)}
+        if(e.dash<=0){e.dash=0;e.attackRecover=20}
+      }else if(e.attackWind>0){
+        e.attackWind-=dt;
+        if(e.attackWind<=0){e.attackWind=0;e.dash=11;e.didHit=false}
+      }else{
+        e.cd-=dt;
+        if(Math.abs(dx)<125&&e.cd<=0){e.attackWind=17;e.aimX=Math.sign(dx)||1;e.cd=72}
+        else if(Math.abs(dx)>70)e.x+=Math.sign(dx)*e.s*dt;
+      }
+    }else if(e.type==='guard'){
+      if(e.attackRecover>0)e.attackRecover-=dt;
+      else if(e.attackWind>0){
+        e.attackWind-=dt;
+        if(e.attackWind<=0){
+          e.attackWind=0;
+          state.fx.push({type:'enemySlash',x:e.x+e.w/2,y:e.y+22,face:e.aimX||e.face,life:12,max:12,color:'#b59a80'});
+          if(Math.abs(dx)<102&&Math.abs(dy)<68)hurt(e.d,e.aimX||e.face);
+          e.attackRecover=28;e.cd=60+Math.random()*25;
+        }
+      }else{
+        e.cd-=dt;
+        if(Math.abs(dx)<92&&e.cd<=0){e.attackWind=23;e.aimX=Math.sign(dx)||1}
+        else if(Math.abs(dx)>78)e.x+=Math.sign(dx)*e.s*dt;
+      }
+    }else if(e.type==='bat'){
+      e.phase+=dt*.055;
+      if(e.attackRecover>0){e.attackRecover-=dt;e.y+=Math.sin(e.phase)*.35*dt}
+      else if(e.dash>0){
+        e.x+=e.aimX*5.0*dt;e.y+=e.aimY*5.0*dt;e.dash-=dt;
+        if(!e.didHit&&dist<38){e.didHit=true;hurt(e.d,e.aimX>=0?1:-1)}
+        if(e.dash<=0){e.dash=0;e.attackRecover=28;e.cd=75+Math.random()*35}
+      }else if(e.attackWind>0){
+        e.attackWind-=dt;
+        if(e.attackWind<=0){
+          const l=Math.hypot(dx,dy)||1;e.aimX=dx/l;e.aimY=dy/l;e.dash=16;e.didHit=false;
+        }
+      }else{
+        e.cd-=dt;
+        e.x+=Math.sign(dx)*e.s*.35*dt;e.y+=Math.sin(e.phase)*.7*dt;
+        if(dist<170&&e.cd<=0)e.attackWind=14;
+      }
     }else if(e.type==='priest'){
-      e.shot-=dt;if(Math.abs(dx)>190)e.x+=Math.sign(dx)*e.s*dt;else if(Math.abs(dx)<120)e.x-=Math.sign(dx)*e.s*.7*dt;
-      if(e.shot<=0&&Math.abs(dx)<500){e.shot=95+Math.random()*45;const a=Math.atan2(dy,dx);state.enemyShots.push({x:e.x+e.w/2,y:e.y+18,vx:Math.cos(a)*4.2,vy:Math.sin(a)*4.2,r:6,dmg:e.d,life:190,color:'#9d82c7'})}
+      if(e.attackRecover>0)e.attackRecover-=dt;
+      else if(e.attackWind>0){
+        e.attackWind-=dt;
+        if(e.attackWind<=0){
+          e.attackWind=0;
+          state.enemyShots.push({x:e.x+e.w/2,y:e.y+18,vx:e.aimX*4.35,vy:e.aimY*4.35,r:6,dmg:e.d,life:190,color:'#9d82c7'});
+          state.fx.push({type:'castFlash',x:e.x+e.w/2,y:e.y+18,life:10,max:10,color:'#9d82c7'});
+          e.attackRecover=24;e.shot=92+Math.random()*48;
+        }
+      }else{
+        e.shot-=dt;
+        if(Math.abs(dx)>205)e.x+=Math.sign(dx)*e.s*dt;
+        else if(Math.abs(dx)<125)e.x-=Math.sign(dx)*e.s*.75*dt;
+        if(e.shot<=0&&Math.abs(dx)<520){
+          const l=Math.hypot(dx,dy)||1;e.aimX=dx/l;e.aimY=dy/l;e.attackWind=28;
+        }
+      }
     }else if(e.type==='gatekeeper'){
       e.cd-=dt;
       if(e.wind>0){e.wind-=dt;if(e.wind<=0){
         if(Math.abs(dx)<135&&Math.abs(dy)<90)hurt(e.d*1.15,e.face);
-        state.fx.push({type:'bossArc',x:e.x+e.w/2,y:e.y+55,face:e.face,life:16});
+        state.fx.push({type:'bossArc',x:e.x+e.w/2,y:e.y+55,face:e.face,life:16,max:16});
         e.cd=70+Math.random()*45;
       }}else if(e.cd<=0){e.wind=30;toast('철이 바닥을 긁는다.',500)}
       else if(Math.abs(dx)>105)e.x+=Math.sign(dx)*e.s*dt;
       if(dist<58&&h.inv<=0&&e.wind<=0)hurt(e.d*.65,e.face);
-    }else{
-      e.x+=Math.sign(dx)*e.s*dt;
-      if(Math.abs(dx)<e.w*.8+h.w*.5&&Math.abs(dy)<55&&h.inv<=0)hurt(e.d,e.face);
     }
+
     if(e.type!=='bat'&&e.type!=='gatekeeper')e.y=r.ground-e.h;
     e.x=clamp(e.x,26,W-e.w-26);
+    if(e.type==='bat')e.y=clamp(e.y,145,r.ground-55);
   }
 }
 function updateFx(dt){
