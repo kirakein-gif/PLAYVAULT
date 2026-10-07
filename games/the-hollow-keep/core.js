@@ -453,7 +453,11 @@ function drawHero(k,ghost=false){
   const moving=Math.abs(h.vx)>.35,bob=moving?Math.sin(h.anim)*1.4:0;
   const drawX=Math.round(h.x+h.w/2),drawY=Math.round(h.y+h.h+bob);
   if(!Number.isFinite(drawX)||!Number.isFinite(drawY))return;
-  ctx.save();ctx.translate(drawX,drawY);if(h.face<0)ctx.scale(-1,1);if(ghost)ctx.globalAlpha=.22;if(h.inv>0&&Math.floor(h.inv/5)%2===0)ctx.globalAlpha*=.5;
+  const land=Math.max(0,h.land||0),attackT=Math.max(0,h.attack||0)/(d.attackCd||1);
+  ctx.save();ctx.translate(drawX,drawY);
+  if(!ghost&&land>0)ctx.scale(1+land*.006,1-land*.004);
+  if(!ghost&&attackT>0)ctx.rotate((k==='noah'?-.055:-.025)*(h.face||1)*(1-attackT*.35));
+  if(h.face<0)ctx.scale(-1,1);if(ghost)ctx.globalAlpha=.24;if(h.inv>0&&Math.floor(h.inv/5)%2===0)ctx.globalAlpha*=.5;
   ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(0,1,d.w*.65,5,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle=d.color;ctx.beginPath();ctx.arc(0,-d.h+14,11,0,Math.PI*2);ctx.fill();
   ctx.fillStyle=d.key==='ethan'?'#d8cfb7':'#2b3150';ctx.beginPath();ctx.moveTo(-13,-d.h+25);ctx.lineTo(13,-d.h+25);ctx.lineTo(18,-5);ctx.lineTo(-15,-5);ctx.closePath();ctx.fill();
@@ -481,6 +485,9 @@ function drawFx(){
   for(const f of state.fx){
     const a=Math.max(0,Math.min(1,f.life/16));ctx.save();ctx.globalAlpha=a;
     if(f.type==='slash'){ctx.strokeStyle=f.color;ctx.lineWidth=5;ctx.beginPath();const cx=f.x+(f.face>0?0:f.w);ctx.arc(cx,f.y+22,52,f.face>0?-1.0:2.1,f.face>0?.8:4.0);ctx.stroke()}
+    else if(f.type==='muzzle'){ctx.strokeStyle=f.color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(f.x-f.face*3,f.y);ctx.lineTo(f.x+f.face*(16+(f.max-f.life)*2),f.y);ctx.stroke();ctx.fillStyle=f.color;ctx.beginPath();ctx.arc(f.x,f.y,3+f.life*.22,0,Math.PI*2);ctx.fill()}
+    else if(f.type==='swap'){const p=1-f.life/(f.max||18);ctx.strokeStyle=f.color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(f.x,f.y,14+p*34,0,Math.PI*2);ctx.stroke();ctx.globalAlpha*=.35;ctx.beginPath();ctx.arc(f.x,f.y,7+p*22,0,Math.PI*2);ctx.stroke()}
+    else if(f.type==='jumpDust'||f.type==='landDust'){ctx.fillStyle=f.color;const spread=f.type==='landDust'?24:16;for(let i=0;i<6;i++){const t=i/5-.5;ctx.globalAlpha=a*(.35+Math.abs(t)*.3);ctx.fillRect(f.x+t*spread-(f.max-f.life)*t*1.5,f.y-2-Math.abs(t)*4,3,2)}}
     else if(f.type==='spark'){ctx.fillStyle=f.color;for(let i=0;i<5;i++){const an=i*1.25+f.life;ctx.fillRect(f.x+Math.cos(an)*12,f.y+Math.sin(an)*12,3,3)}}
     else if(f.type==='dust'){ctx.fillStyle='#a09388';for(let i=0;i<7;i++)ctx.fillRect(f.x+(i-3)*5,f.y-(18-f.life)*2+(i%3)*4,4,4)}
     else if(f.type==='bossArc'){ctx.strokeStyle='#cdb27a';ctx.lineWidth=7;ctx.beginPath();ctx.arc(f.x,f.y,95,f.face>0?-1.2:2.0,f.face>0?.7:4.1);ctx.stroke()}
@@ -527,14 +534,16 @@ addEventListener('keydown',e=>{
   if(k==='e'&&!e.repeat)interact();
   if(k==='m'&&!e.repeat)toggleMap();
 });
-addEventListener('keyup',e=>{const k=e.key.toLowerCase();if(k==='a'||k==='arrowleft')setKey('left',false);if(k==='d'||k==='arrowright')setKey('right',false)});
+addEventListener('keyup',e=>{const k=e.key.toLowerCase();if(k==='a'||k==='arrowleft')setKey('left',false);if(k==='d'||k==='arrowright')setKey('right',false);if(e.code==='Space'||k==='k'||k==='z')releaseJump()});
 addEventListener('blur',()=>{state.keys.left=state.keys.right=false});
 
 document.querySelectorAll('[data-hold]').forEach(b=>{
   const key=b.dataset.hold;b.addEventListener('pointerdown',e=>{e.preventDefault();setKey(key,true);b.setPointerCapture?.(e.pointerId)});
   b.addEventListener('pointerup',e=>{e.preventDefault();setKey(key,false)});b.addEventListener('pointercancel',()=>setKey(key,false));b.addEventListener('pointerleave',()=>setKey(key,false));
 });
-ui.jumpBtn.addEventListener('pointerdown',e=>{e.preventDefault();doJump()});
+ui.jumpBtn.addEventListener('pointerdown',e=>{e.preventDefault();doJump();ui.jumpBtn.setPointerCapture?.(e.pointerId)});
+ui.jumpBtn.addEventListener('pointerup',e=>{e.preventDefault();releaseJump()});
+ui.jumpBtn.addEventListener('pointercancel',releaseJump);
 ui.attackBtn.addEventListener('pointerdown',e=>{e.preventDefault();doAttack()});
 ui.swapBtn.addEventListener('pointerdown',e=>{e.preventDefault();switchHero()});
 ui.useBtn.addEventListener('pointerdown',e=>{e.preventDefault();interact()});
