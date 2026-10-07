@@ -1,16 +1,65 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=require('node:path').join(__dirname,'../games/abyssfall-eclipse');
 function harness(mobile=false,dpr=1){
- let now=10000,raf;const timers=[],draws=[],elements=new Map();
+ let now=10000,raf,created=0;const timers=[],draws=[],elements=new Map(),listeners={};
  const gradient={addColorStop(){}};
  const ctx=new Proxy({drawImage(...a){draws.push(a)},createLinearGradient(){return gradient},createRadialGradient(){return gradient}}, {get(t,k){return k in t?t[k]:()=>{}}});
- function el(id){if(!elements.has(id))elements.set(id,{style:{setProperty(){}},dataset:{},classList:{add(){},remove(){},toggle(){}},addEventListener(){},setAttribute(){},appendChild(){},getBoundingClientRect(){return {left:0,top:0,width:112,height:112}},getContext(){return ctx},toDataURL(){return 'data:image/png;base64,'},querySelectorAll(){return []},closest(){return null},textContent:'',innerHTML:''});return elements.get(id)}
+ function el(id){if(!elements.has(id)){
+  const classes=new Set(),e={style:{setProperty(){}},dataset:{},children:[],classList:{add(x){classes.add(x)},remove(x){classes.delete(x)},contains(x){return classes.has(x)},toggle(){}},addEventListener(){},setAttribute(){},appendChild(c){this.children.push(c)},getBoundingClientRect(){return {left:0,top:0,width:112,height:112}},getContext(){return ctx},toDataURL(){return 'data:image/png;base64,'},querySelector(s){return el(id+s)},querySelectorAll(){return []},closest(){return null},textContent:'',innerHTML:''};elements.set(id,e);
+ }return elements.get(id)}
  class Image{constructor(){this.complete=true;this.naturalWidth=1536;this.width=1536;this.height=1024}set src(x){this._src=x;this.onload?.()}}
- const env={console,Image,performance:{now:()=>now},innerWidth:mobile?390:1440,innerHeight:mobile?844:960,devicePixelRatio:dpr,matchMedia:()=>({matches:mobile}),localStorage:{getItem(){return null},setItem(){}},document:{getElementById:el,querySelectorAll(){return []},documentElement:el('root'),createElement:()=>el('made')},addEventListener(){},setTimeout(fn,ms){timers.push({fn,at:now+ms});return timers.length},clearTimeout(){},requestAnimationFrame(fn){raf=fn},fetch:async()=>({ok:false,status:404})};env.window=env;vm.createContext(env);
+ const env={console,Image,performance:{now:()=>now},innerWidth:mobile?390:1440,innerHeight:mobile?844:960,devicePixelRatio:dpr,matchMedia:()=>({matches:mobile}),localStorage:{getItem(){return null},setItem(){}},document:{getElementById:el,querySelectorAll(){return []},documentElement:el('root'),createElement:()=>el('made'+created++)},addEventListener(type,fn){(listeners[type]??=[]).push(fn)},setTimeout(fn,ms){timers.push({fn,at:now+ms});return timers.length},clearTimeout(){},requestAnimationFrame(fn){raf=fn},fetch:async()=>({ok:false,status:404})};env.window=env;vm.createContext(env);
  for(const file of ['art.js','core.js','render.js'])vm.runInContext(fs.readFileSync(root+'/'+file,'utf8'),env,{filename:file});
  const A=env.AF;
  function advance(ms){now+=ms;for(let i=timers.length-1;i>=0;i--)if(timers[i].at<=now){const {fn}=timers.splice(i,1)[0];fn()}if(A.started&&!A.dead&&!A.paused)A.update(1)}
- return {env,A,draws,frame(){raf(now)},advance,elements};
+ return {env,A,draws,frame(){raf(now)},advance,elements,key(code,key,repeat=false,target={}){const event={code,key,repeat,target,preventDefault(){this.prevented=true}};for(const fn of listeners.keydown||[])fn(event);return event}};
+}
+
+// Player cadence and auto-targeting must not override a moving character's gait.
+{
+ const h=harness(),{A}=h;A.newRun();A.player.inv=9999;
+ const x=A.player.x;A.keys.d=true;
+ for(let i=0;i<60;i++)h.advance(17);
+ assert.ok(A.player.step>=7&&A.player.step<=9,'about eight run frames per second');
+ assert.ok(Math.abs(A.player.x-x-60*A.player.speed)<.01,'animation changes do not alter movement speed');
+ A.keys.d=false;A.player.faceX=-1;A.keys.w=true;h.advance(17);assert.equal(A.player.faceX,-1,'vertical movement preserves facing');A.keys.w=false;
+ const room=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${room.x},${room.y}`;A.update(1);A.player.basic=0;
+ room.enemies.forEach(e=>{e.x=A.player.x-60;e.y=A.player.y;e.s=0;e.aiCd=9999});A.keys.d=true;h.advance(17);
+ assert.ok(A.player.faceX>0,'automatic fire behind player preserves movement direction');
+ A.player.attackPose=14;A.player.hurtPose=0;A.player.inv=0;A.player.specialPose=0;h.draws.length=0;h.frame();
+ const frame=h.draws.find(d=>d[0]===h.env.AF_ART.images.heroes);assert.ok(frame);assert.equal(frame[2],278,'moving basic attack keeps run row');
+ A.player.specialPose=24;A.player.attackAt=10000;h.draws.length=0;h.frame();
+ assert.ok(h.draws.some(d=>d[0]===h.env.AF_ART.images.actions),'moving special still has attack animation');
+ console.log('PASS movement: grounded cadence, unchanged speed, stable facing, moving basic and special poses');
+}
+// Use genuine XP pickup flow, then choose the displayed option by its actual key.
+for(const code of ['Digit1','Digit2','Digit3','Numpad1','Numpad2','Numpad3']){
+ const h=harness(),{A}=h;A.newRun();const p=A.player;
+ A.pickups.push({x:p.x,y:p.y,val:p.nextXp});h.advance(17);
+ assert.equal(A.paused,true);assert.equal(A.rewardChoices.length,3);
+ const index=Number(code.slice(-1))-1,chosen=A.rewardChoices[index],before={...p},expected={...p};chosen.f(expected);
+ h.key(code,String(index+1),true);assert.equal(A.rewardChoices.length,3,'held keys do not auto-select');
+ h.key(code,String(index+1),false,{tagName:'INPUT'});assert.equal(A.rewardChoices.length,3,'editable fields keep their keys');
+ assert.equal(h.key(code,String(index+1)).prevented,true);
+ assert.equal(A.paused,false);assert.equal(A.rewardChoices.length,0);
+ for(const stat of ['atk','rate','range','specialBoost','maxHp','hp'])assert.equal(p[stat],expected[stat],chosen.n+': '+stat);
+ h.key(code,String(index+1));for(const stat of ['atk','rate','range','specialBoost','maxHp','hp'])assert.equal(p[stat],expected[stat],'selection applies only once');
+ assert.equal(h.elements.get('levelUp').classList.contains('show'),false);
+ assert.ok(Object.keys(before).length);
+}
+console.log('PASS rewards: 1/2/3 and numpad match displayed choices, no repeat/double apply or input-field hijack');
+{
+ const h=harness(),{A}=h;A.newRun();
+ const room=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${room.x},${room.y}`;A.update(1);
+ for(const d of Object.keys(room.doors))assert.equal(A.isDoorOpen(d),false,'combat closes actual doors');
+ A.player.inv=9999;room.enemies.forEach(e=>A.damage(e,e.max));h.advance(17);assert.equal(room.clear,true);
+ for(const d of Object.keys(room.doors).filter(d=>room.doors[d]))assert.equal(A.isDoorOpen(d),true,'cleared combat opens doors');
+ A.nextFloor();A.nextFloor();
+ const boss=Object.values(A.rooms).find(r=>r.type==='boss'),neighbor=Object.values(A.rooms).find(r=>Math.abs(r.x-boss.x)+Math.abs(r.y-boss.y)===1&&r.doors[Object.keys(A.dirs).find(d=>r.x+A.dirs[d][0]===boss.x&&r.y+A.dirs[d][1]===boss.y)]);
+ assert.ok(neighbor);neighbor.clear=true;A.current=`${neighbor.x},${neighbor.y}`;
+ const dir=Object.keys(A.dirs).find(d=>neighbor.x+A.dirs[d][0]===boss.x&&neighbor.y+A.dirs[d][1]===boss.y);
+ assert.equal(A.isDoorOpen(dir),false,'boss seal keeps door closed after combat');A.bossUnlocked=true;assert.equal(A.isDoorOpen(dir),true);
+ console.log('PASS doors: combat closure, clear opening, sealed boss remains locked');
 }
 for(const mobile of [false,true])for(const dpr of [1,2,3]){
  const h=harness(mobile,dpr),{A}=h;A.newRun();

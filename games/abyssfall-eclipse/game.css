@@ -147,3 +147,6 @@
 #hud .eyebrow{font-size:8px;letter-spacing:1.1px;white-space:nowrap}
 #hud #heroName{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.25;font-size:12px!important}
 .portrait img{image-rendering:pixelated}
+.upgrade{position:relative}
+.choiceKey{position:absolute;top:10px;right:12px;padding:3px 8px;border:1px solid #9b8b73;border-radius:4px;color:#ddd2ba;background:#171820;font:700 14px monospace}
+@media(pointer:coarse){.choiceKey{display:none}}

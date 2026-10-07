@@ -69,7 +69,13 @@
   AF.snapX=x=>Math.round(x*AF.renderScaleX)/AF.renderScaleX;
   AF.snapY=y=>Math.round(y*AF.renderScaleY)/AF.renderScaleY;
   document.querySelectorAll('.heroCard').forEach(b=>b.addEventListener('click',()=>{AF.selected=b.dataset.hero;document.querySelectorAll('.heroCard').forEach(x=>x.classList.toggle('selected',x===b));sound()?.unlock().then(ok=>{if(ok&&!AF.started)sound()?.startTitle()})}));
-  addEventListener('keydown',e=>{AF.keys[e.key.toLowerCase()]=true;if(e.code==='Space'){e.preventDefault();AF.useSpecial()}}); addEventListener('keyup',e=>AF.keys[e.key.toLowerCase()]=false);
+  addEventListener('keydown',e=>{
+    if(e.target?.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName||''))return;
+    const choice=/^(?:Digit|Numpad)([123])$/.exec(e.code);
+    if(choice&&AF.rewardChoices?.length){e.preventDefault();if(!e.repeat)AF.chooseReward(Number(choice[1])-1);return}
+    AF.keys[e.key.toLowerCase()]=true;
+    if(e.code==='Space'){e.preventDefault();AF.useSpecial()}
+  }); addEventListener('keyup',e=>AF.keys[e.key.toLowerCase()]=false);
   const joyBase=$('joyBase'),joyKnob=$('joyKnob');
   function resetJoy(){Object.assign(AF.joy,{x:0,y:0,active:false,id:null});joyKnob.style.transform='translate(0,0)'}
   function moveJoy(e){const r=joyBase.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=e.clientX-cx,dy=e.clientY-cy,d=Math.hypot(dx,dy)||1,m=32;if(d>m){dx=dx/d*m;dy=dy/d*m}AF.joy.x=dx/m;AF.joy.y=dy/m;joyKnob.style.transform=`translate(${dx}px,${dy}px)`}
@@ -174,6 +180,12 @@
     }
   }
   AF.cur=()=>AF.rooms[AF.current];
+  // Rendering and traversal share the same combat/seal lock state.
+  AF.isDoorOpen=(d,r=AF.cur())=>{
+    if(!r?.clear||!r.doors[d]||!dirs[d])return false;
+    const v=dirs[d],target=AF.rooms[key(r.x+v[0],r.y+v[1])];
+    return !!target&&!(target.type==='boss'&&!AF.bossUnlocked);
+  };
   function roomRand(r,n){const v=Math.sin((r.x*97+r.y*193+AF.floor*389+n*71.17))*43758.5453;return v-Math.floor(v)}
   AF.tracePoint=r=>{
     const left=r?.traceSide!=='right';
@@ -299,7 +311,7 @@
     document.documentElement.dataset.hero=h.key;
     ui.specialBtn.style.setProperty('--skill-ring',ring);ui.specialBtn.style.setProperty('--skill-glow',glow);
   }
-  AF.newRun=()=>{sound()?.unlock().then(()=>{sound()?.startExplore();sound()?.sfx('start')});const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.endless=false;AF.cleared=false;AF.transitioning=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name} · ${Object.keys(AF.rooms).length} ROOMS`);setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===1)AF.toast(AF.stageTip())},950)};
+  AF.newRun=()=>{AF.rewardChoices=[];sound()?.unlock().then(()=>{sound()?.startExplore();sound()?.sfx('start')});const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.endless=false;AF.cleared=false;AF.transitioning=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,specialPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name} · ${Object.keys(AF.rooms).length} ROOMS`);setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===1)AF.toast(AF.stageTip())},950)};
   ui.startBtn.addEventListener('click',AF.newRun);ui.retryBtn.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearRestart?.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearLobby?.addEventListener('click',()=>{sound()?.stopMusic();AF.clearScreen?.classList.remove('show');AF.started=false;AF.paused=true;ui.start.classList.add('show')});
@@ -357,7 +369,7 @@
   function fireBasic(){
     const p=AF.player,h=p.hero,e=nearest();if(!e)return;sound()?.sfx('basic',h.key);
     const a=Math.atan2(e.y-p.y,e.x-p.x),blade=relicCount('relic-blade'),solar=h.key==='dawn'?relicCount('solar-shard'):0;
-    p.faceX=Math.cos(a);p.faceY=Math.sin(a);p.attackPose=14;p.attackAt=performance.now();p.bladeShots=(p.bladeShots||0)+1;
+    if(!p.moving){if(Math.abs(Math.cos(a))>.35)p.faceX=Math.cos(a);p.faceY=Math.sin(a)}p.attackPose=14;p.attackAt=performance.now();p.bladeShots=(p.bladeShots||0)+1;
     const burst=blade>0&&p.bladeShots%3===0;
     if(h.key==='dawn'){
       const n=p.level>=7?2:1;
@@ -373,7 +385,7 @@
   AF.useSpecial=()=>{
     const p=AF.player;if(!AF.started||AF.paused||AF.dead||!p||p.special>0)return;
     const h=p.hero;sound()?.sfx('special',h.key);
-    p.special=Math.max(150,h.specialCd-p.specialBoost);p.attackPose=24;p.attackAt=performance.now();
+    p.special=Math.max(150,h.specialCd-p.specialBoost);p.attackPose=24;p.specialPose=24;p.attackAt=performance.now();
     if(relicCount('resonance-core'))p.echoTimer=18;
     if(h.key==='dawn'){
       const rad=155+p.range;
@@ -402,16 +414,24 @@
   function chooseReward(opts,title,lead){
     AF.paused=true;
     const titleEl=ui.levelUp.querySelector('h2'),leadEl=ui.levelUp.querySelector('.lead');
-    titleEl.textContent=title;leadEl.textContent=lead;
+    titleEl.textContent=title;leadEl.textContent=lead+(AF.mobile?'':' PC: 1 · 2 · 3');
     ui.upgradeCards.innerHTML='';
-    opts.sort(()=>Math.random()-.5).slice(0,3).forEach(o=>{
+    AF.rewardChoices=opts.sort(()=>Math.random()-.5).slice(0,3);
+    AF.rewardChoices.forEach((o,index)=>{
       const b=document.createElement('button');b.className='upgrade'+(o.img?' relicChoice':'');
       b.innerHTML=(o.img?'<img class="rewardImg" src="'+o.img+'" alt=""><span class="rarity rarity-'+(o.rarity||'rare')+'">'+(o.rarity==='legendary'?'LEGENDARY':o.rarity==='epic'?'EPIC':'RARE')+' RELIC</span>':'<span class="uicon">'+o.i+'</span>')+'<b>'+o.n+'</b><p>'+o.d+'</p>';
-      b.onclick=()=>{o.f(AF.player);if(o.relic)AF.addRelic(o);ui.levelUp.classList.remove('show');AF.paused=false;AF.hud()};
+      b.innerHTML='<span class="choiceKey" aria-hidden="true">'+(index+1)+'</span>'+b.innerHTML;
+      b.setAttribute('aria-keyshortcuts',String(index+1));
+      b.onclick=()=>AF.chooseReward(index);
       ui.upgradeCards.appendChild(b);
     });
     ui.levelUp.classList.add('show');
   }
+  AF.chooseReward=index=>{
+    const o=AF.rewardChoices?.[index];if(!o||!AF.paused)return;
+    AF.rewardChoices=[];o.f(AF.player);if(o.relic)AF.addRelic(o);
+    ui.levelUp.classList.remove('show');AF.paused=false;AF.hud();
+  };
   function upgrade(){
     chooseReward([
       {i:'✦',n:'성물 증폭',d:'기본 공격 피해 +5',f:p=>p.atk+=5},
@@ -556,7 +576,7 @@
       if(d==='W')p.x+=22;else if(d==='E')p.x-=22;else if(d==='N')p.y+=22;else p.y-=22;
       return;
     }
-    enter(nk,opp[d]);
+    if(AF.isDoorOpen(d,r))enter(nk,opp[d]);
   }
 
   const bossPhase=e=>e.hp/e.max<.34?2:e.hp/e.max<.67?1:0;
@@ -598,7 +618,7 @@
     e.bossCd=Math.max(54,118-phase*16-Math.min(18,(AF.floor-1)*2));
   }
 
-  AF.update=dt=>{const p=AF.player;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}const moveScale=stageMoveScale(AF.cur(),p);let m=Math.hypot(vx,vy);p.moving=m>.04;if(m){vx/=m;vy/=m;p.x+=vx*p.speed*moveScale*dt;p.y+=vy*p.speed*moveScale*dt;p.faceX=vx;p.faceY=vy;p.step+=dt*.42}
+  AF.update=dt=>{const p=AF.player;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.specialPose>0)p.specialPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}const moveScale=stageMoveScale(AF.cur(),p);let m=Math.hypot(vx,vy);p.moving=m>.04;if(m){vx/=m;vy/=m;p.x+=vx*p.speed*moveScale*dt;p.y+=vy*p.speed*moveScale*dt;if(Math.abs(vx)>.15)p.faceX=vx;p.faceY=vy;p.step+=dt*.13*moveScale*(p.speed/3.15)}
     const sigil=relicCount('dash-sigil');
     if(m&&sigil){
       p.sigilCharge=(p.sigilCharge||0)+dt;

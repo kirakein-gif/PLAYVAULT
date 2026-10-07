@@ -160,3 +160,13 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - Night now has narrower shoulders, lighter fitted practical armor, long visible violet hair, a softer human face, and tapered cloak panels.
 - Idle, run, hurt, attack, death, and selection artwork share the distinct designs. Authored anchors and per-character normalization preserve the smaller v31 display size.
 - Full built-in image generation prompts are recorded in `assets/art/hero-identity-provenance.txt`.
+
+## ABYSSFALL v33 calmer movement, physical scenery and sound
+
+- Run animation advances approximately 8 frames/second for Dawn and 9 for Night; movement speed is preserved. Vertical movement keeps horizontal facing, and moving automatic attacks no longer interrupt the gait or flip toward targets behind the player. Special attacks still animate.
+- Reward cards show PC shortcuts 1/2/3, including numpad keys. Keyboard and mouse use the same one-shot selection path; repeated held keys and editable fields do not consume a choice.
+- New weathered stone/wood/iron sprites cover closed/open doors in all four directions, closed/open chests, full/spent healing pools, intact/broken seal altars, and closed/open stair hatches. Doors close during combat, open on room clear, and remain closed toward a sealed boss entrance.
+- Projectile silhouettes are chipped blades, relic shards and pointed dark lances rather than glowing circles. Collision size, damage, speed and progression remain unchanged.
+- Original calm title/exploration/boss WAV loops remove detuned bass interference, subsonic oscillations and rhythmic pulses. Loop playback has no timer-driven note scheduling or live convolution; delayed loads cannot restart an old mode, and failed files use quiet harmonically aligned fallback tones. Harsh warning/gate sounds and music ducking are softened.
+- Generate the v33 loops with `tools/compose-calm-ambience.py` (Python/numpy). Prop generation prompt and provenance: `assets/art/props-provenance.txt`.
+- Validation: `node tests/polish-regression.cjs` and `node tests/audio-regression.cjs`; real browser checks for numeric selection, scenery states, desktop/mobile display and a single decoded looping music source.

@@ -1,6 +1,6 @@
 <!doctype html><meta charset="utf-8"><title>Eclipse local verification</title>
-<style>body{margin:0;background:#090a10;color:#eee;font:14px system-ui}nav{height:44px;display:flex;gap:8px;align-items:center;padding:0 10px}button{cursor:pointer}iframe{border:0;width:100%;height:calc(100vh - 44px)}</style>
-<nav><button id="dawn">Dawn</button><button id="night">Night</button><button id="move">Run right for 2 seconds</button><button id="combat">Combat</button><button id="floor">Next floor</button><button id="boss">Boss</button><button id="defeat">Defeat boss / descend</button><span id="status">Local test controls</span></nav>
+<style>body{margin:0;background:#090a10;color:#eee;font:14px system-ui}nav{height:44px;display:flex;gap:8px;align-items:center;padding:0 10px;overflow-x:auto}button{cursor:pointer;white-space:nowrap;flex-shrink:0}iframe{border:0;width:100%;height:calc(100vh - 44px)}</style>
+<nav><button id="dawn">Dawn</button><button id="night">Night</button><button id="move">Run right for 2 seconds</button><button id="combat">Combat</button><button id="clearRoom">Clear combat</button><button id="chest">Chest</button><button id="pool">Pool</button><button id="altar">Altar</button><button id="stairs">Stairs</button><button id="interact">Interact</button><button id="level">Level up</button><button id="freeze">Freeze / resume</button><button id="floor">Next floor</button><button id="boss">Boss</button><button id="defeat">Defeat boss / descend</button><span id="status">Local test controls</span></nav>
 <iframe id="game" src="../games/abyssfall-eclipse/"></iframe>
 <script>
 const frame=document.querySelector('iframe'),status=document.getElementById('status');
@@ -8,9 +8,20 @@ const get=()=>frame.contentWindow.AF;
 for(const key of ['dawn','night'])document.getElementById(key).onclick=()=>{const a=get();a.selected=key;a.newRun();status.textContent=key};
 document.getElementById('move').onclick=()=>{const a=get();a.keys.d=true;setTimeout(()=>a.keys.d=false,2000)};
 document.getElementById('combat').onclick=()=>{const a=get();a.player.inv=9999;const r=Object.values(a.rooms).find(r=>r.type==='combat');a.current=`${r.x},${r.y}`;a.player.x=a.W/2;a.player.y=a.arena.y+a.arena.h*.72;status.textContent='Combat: protection for visual inspection'};
+document.getElementById('clearRoom').onclick=()=>{const a=get();a.cur().enemies.filter(e=>e.alive).forEach(e=>a.damage(e,e.max));status.textContent='Combat defeated; doors open on next frame'};
+for(const [button,type] of [['chest','treasure'],['pool','recovery'],['stairs','exit'],['altar','altar']])document.getElementById(button).onclick=()=>{
+ const a=get();if(type==='altar'){while(!a.isBossFloor())a.nextFloor()}
+ const r=Object.values(a.rooms).find(r=>type==='altar'?r.sealAltar:r.type===type);
+ if(!r){status.textContent='Room absent on this floor';return}
+ a.current=`${r.x},${r.y}`;a.player.inv=99999;a.player.x=a.W/2+130;a.player.y=a.arena.y+a.arena.h*.72;
+ status.textContent=button+' prop';
+};
+document.getElementById('interact').onclick=()=>{const a=get();a.player.x=a.W/2;a.player.y=a.arena.y+a.arena.h/2;status.textContent='Approached object'};
+document.getElementById('level').onclick=()=>{const a=get();a.pickups.push({x:a.player.x,y:a.player.y,val:a.player.nextXp});status.textContent='XP pickup for keyboard choice test'};
+document.getElementById('freeze').onclick=()=>{const a=get();if(a.rewardChoices?.length)return;a.paused=!a.paused;if(a.paused)a.player.inv=0;else a.player.inv=9999;status.textContent=a.paused?'Visual frame frozen':'Simulation resumed'};
 document.getElementById('floor').onclick=()=>{get().nextFloor();status.textContent=`${get().floor}F`};
 document.getElementById('boss').onclick=()=>{const a=get();while(!a.isBossFloor())a.nextFloor();const r=Object.values(a.rooms).find(r=>r.type==='boss');a.current=`${r.x},${r.y}`;a.bossUnlocked=true;a.player.inv=99999;a.player.basic=99999;a.player.x=a.W/2;a.player.y=a.arena.y+a.arena.h*.8;frame.contentWindow.PV_AUDIO.startBoss();status.textContent=`${a.floor}F boss`};
 document.getElementById('defeat').onclick=()=>{const a=get(),e=a.cur().enemies.find(e=>e.type==='boss');e.intro=0;while(e.alive)a.damage(e,e.max);setTimeout(()=>{a.player.x=a.W/2;a.player.y=a.arena.y+a.arena.h/2},850);setTimeout(()=>status.textContent=`${a.floor}F, paused=${a.paused}, transitioning=${a.transitioning}`,2000)};
 const audioStatus=document.createElement('span');audioStatus.id='audioStatus';document.body.append(audioStatus);
-setInterval(()=>{const audio=frame.contentWindow.PV_AUDIO;audioStatus.textContent=audio?.ctx?`Audio ${audio.ctx.state}; mode ${audio.mode}; decoded ${Object.keys(audio.trackBuffers).length}; voices ${audio.voices}`:'Audio pending'},500);
+setInterval(()=>{const audio=frame.contentWindow.PV_AUDIO,a=get();audioStatus.textContent=(audio?.ctx?`Audio ${audio.ctx.state}; mode ${audio.mode}; decoded ${Object.keys(audio.trackBuffers).length}; loops ${audio.musicNodes.filter(n=>n.buffer&&n.loop).length}; voices ${audio.voices}`:'Audio pending')+(a?.started?`; doors ${Object.keys(a.cur().doors).filter(d=>a.cur().doors[d]).map(d=>d+':'+(a.isDoorOpen(d)?'open':'closed')).join(' ')}; paused ${a.paused}`:'')},500);
 </script>

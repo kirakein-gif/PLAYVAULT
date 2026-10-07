@@ -7,23 +7,20 @@
     unlocked:false, muted:false, mode:null, timers:[], musicNodes:[],
     lastSfx:{},voices:0,noiseBuffers:{},musicSession:0,
     // Optional original/licensed loop files. Procedural ambience remains the fallback.
-    tracks:{title:'../../assets/audio/title.wav',explore:'../../assets/audio/explore.wav',boss:'../../assets/audio/boss.wav'},trackBuffers:{}
+    tracks:{title:'../../assets/audio/title-calm.wav',explore:'../../assets/audio/explore-calm.wav',boss:'../../assets/audio/boss-calm.wav'},trackBuffers:{},trackLoads:{}
   };
 
   try { A.muted = localStorage.getItem('playvaultMuted') === '1'; } catch (_) {}
 
   function ensure(){
     if(A.ctx || !AudioCtx) return !!A.ctx;
-    const ctx=A.ctx=new AudioCtx();
+    const ctx=A.ctx=new AudioCtx({latencyHint:'playback'});
     A.master=ctx.createGain();A.musicGain=ctx.createGain();A.sfxGain=ctx.createGain();
-    A.musicGain.gain.value=.36;A.sfxGain.gain.value=.68;
+    A.musicGain.gain.value=.25;A.sfxGain.gain.value=.55;
     const filter=ctx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=2400;
     const compressor=ctx.createDynamicsCompressor();compressor.threshold.value=-15;compressor.knee.value=18;compressor.ratio.value=3;
     A.musicGain.connect(filter);filter.connect(A.master);A.sfxGain.connect(A.master);A.master.connect(compressor);compressor.connect(ctx.destination);
-    // A quiet stereo hall return; SFX warnings retain a clear dry attack.
-    const reverb=ctx.createConvolver(),wet=ctx.createGain(),ir=ctx.createBuffer(2,Math.floor(ctx.sampleRate*1.8),ctx.sampleRate);
-    for(let c=0;c<2;c++){const data=ir.getChannelData(c);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,3)*.18}
-    reverb.buffer=ir;wet.gain.value=.20;filter.connect(reverb);reverb.connect(wet);wet.connect(A.master);
+    // Hall tails are rendered into the file; no expensive live convolution.
     A.master.gain.value=A.muted?0:.92;
     return true;
   }
@@ -67,12 +64,6 @@
     o.connect(g);g.connect(A.musicBus||A.musicGain);o.start();A.musicNodes.push(o,g);
   }
 
-  function musicNote(freq,vol=.080,dur=1.7,type='sine'){
-    if(!A.ctx||A.muted)return;
-    tone(freq,dur,vol,type,A.musicBus||A.musicGain,0);
-    tone(freq*2,Math.min(.9,dur*.55),vol*.22,'sine',A.musicBus||A.musicGain,.04);
-  }
-
   A.unlock=async()=>{
     if(!ensure())return false;
     try{if(A.ctx.state!=='running')await A.ctx.resume();A.unlocked=A.ctx.state==='running';A.updateButton();return A.unlocked}catch(_){return false}
@@ -80,26 +71,31 @@
 
   function beginMode(mode){
     clearMusic();A.mode=mode;
-    const t=A.ctx.currentTime,bus=A.musicBus=A.ctx.createGain();bus.gain.value=0;bus.gain.setTargetAtTime(1,t,.35);bus.connect(A.musicGain);A.musicNodes.push(bus);
+    const bus=A.musicBus=A.ctx.createGain();bus.gain.value=0;bus.connect(A.musicGain);A.musicNodes.push(bus);
     const url=A.tracks[mode],session=A.musicSession;
-    if(!url)return;
     (async()=>{
       try{
         let buffer=A.trackBuffers[url];
-        if(!buffer){const res=await fetch(url);if(!res.ok)throw new Error('audio '+res.status);buffer=await A.ctx.decodeAudioData(await res.arrayBuffer());A.trackBuffers[url]=buffer}
+        if(!buffer){
+          if(!url)throw new Error('missing track');
+          if(!A.trackLoads[url])A.trackLoads[url]=(async()=>{const res=await fetch(url);if(!res.ok)throw new Error('audio '+res.status);return A.ctx.decodeAudioData(await res.arrayBuffer())})();
+          try{buffer=await A.trackLoads[url];A.trackBuffers[url]=buffer}finally{delete A.trackLoads[url]}
+        }
         if(session!==A.musicSession)return;
-        // Replace fallback only once a complete buffer is ready. Stale loads cannot restart old music.
-        A.timers.forEach(clearInterval);A.timers.length=0;
-        A.musicNodes.filter(n=>n!==bus).forEach(n=>{try{n.stop?.()}catch(_){}try{n.disconnect?.()}catch(_){}});A.musicNodes=[bus];
         const src=A.ctx.createBufferSource();src.buffer=buffer;src.loop=true;src.connect(bus);src.start();A.musicNodes.push(src);
-      }catch(err){console.warn('[PLAYVAULT] music fallback:',err.message)}
+        bus.gain.setTargetAtTime(1,A.ctx.currentTime,.7);
+      }catch(err){
+        if(session!==A.musicSession)return;
+        console.warn('[PLAYVAULT] music fallback:',err.message);
+        // Only fall back after a failed load, never play two scores during loading.
+        const root=mode==='boss'?98:110;drone(root,.060);drone(root*2,.012);
+        bus.gain.setTargetAtTime(1,A.ctx.currentTime,.8);
+      }
     })();
   }
   A.startTitle=()=>{
     if(!ensure()||!A.unlocked||A.mode==='title')return;
-    beginMode('title');drone(110,.025);drone(220,.010,'sine',3);
-    let i=0;const notes=[220,293.66,246.94,196];musicNote(notes[i++],.055,3.4);
-    A.timers.push(setInterval(()=>musicNote(notes[i++%4],.050,3.4),6200));
+    beginMode('title');
   };
 
   A.startExplore=()=>{
@@ -107,13 +103,6 @@
     if(A.ctx.state==='suspended'){A.ctx.resume().then(()=>{A.unlocked=true;A.startExplore()}).catch(()=>{});return}
     A.unlocked=true;if(A.mode==='explore')return;
     beginMode('explore');
-    // Phone-friendly register: the first version was too low to reproduce on mobile speakers.
-    drone(110,.050,'sine',-5);drone(164.81,.028,'triangle',4);drone(220,.012,'sine',1);
-    const notes=[329.63,392,440,293.66,261.63,293.66,329.63,246.94];
-    let i=0;
-    musicNote(notes[i++%notes.length],.060,3.8);
-    A.timers.push(setInterval(()=>musicNote(notes[i++%notes.length],.045,3.8),6400));
-    A.timers.push(setInterval(()=>tone(659.25,2.8,.015,'sine',A.musicBus||A.musicGain),17100));
   };
 
   A.startBoss=()=>{
@@ -121,15 +110,6 @@
     if(A.ctx.state==='suspended'){A.ctx.resume().then(()=>{A.unlocked=true;A.startBoss()}).catch(()=>{});return}
     A.unlocked=true;if(A.mode==='boss')return;
     beginMode('boss');
-    drone(98,.050,'triangle',-7);drone(146.83,.032,'triangle',4);
-    let beat=0;
-    const pulse=()=>{
-      tone(beat%4===3?146.83:110,.32,beat%4===0?.075:.040,'sine',A.musicBus||A.musicGain,0,-18);
-      beat++;
-    };
-    pulse();A.timers.push(setInterval(pulse,620));
-    const notes=[220,207.65,196,174.61];let i=0;
-    A.timers.push(setInterval(()=>musicNote(notes[i++%notes.length],.070,1.15,'triangle'),2480));
   };
 
   A.stopMusic=()=>clearMusic();
@@ -141,7 +121,7 @@
     A.lastSfx[name]=now;
     if(['basic','hit','enemyDeath'].includes(name)&&A.voices>=24)return;
     if(['bossWarn','bossIntro','special','hurt','gateOpen'].includes(name)){
-      const t=A.ctx.currentTime,g=A.musicGain.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.17,t,.025);g.setTargetAtTime(.36,t+.5,.20);
+      const t=A.ctx.currentTime,g=A.musicGain.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.20,t,.12);g.setTargetAtTime(.25,t+.7,.35);
     }
 
     switch(name){
@@ -149,7 +129,7 @@
       case 'basic':
         tone(variant==='night'?410:520,.060,.032,variant==='night'?'triangle':'sine',A.sfxGain,0,variant==='night'?-90:75);break;
       case 'hit': noise(.05,.040,1600);tone(180,.055,.030,'triangle');break;
-      case 'hurt': noise(.11,.090,1100);tone(140,.15,.085,'sawtooth',A.sfxGain,0,-35);break;
+      case 'hurt': noise(.11,.050,900);tone(140,.15,.050,'triangle',A.sfxGain,0,-35);break;
       case 'enemyDeath': tone(196,.15,.055,'triangle',A.sfxGain,0,-70);noise(.07,.025,700);break;
       case 'special':
         if(variant==='night'){tone(280,.25,.135,'sine',A.sfxGain,0,520);noise(.14,.075,2300,.03)}
@@ -163,10 +143,10 @@
       case 'sealBreak':
         tone(293.66,.22,.090,'triangle',A.sfxGain,0,-90);tone(146.83,.34,.075,'sine',A.sfxGain,.05,-42);noise(.16,.055,950,.03);break;
       case 'gateLocked':
-        tone(92,.12,.130,'square',A.sfxGain,0,-18);noise(.11,.090,520);break;
+        tone(92,.18,.060,'triangle',A.sfxGain,0,-18);noise(.11,.040,520);break;
       case 'gateOpen':
-        tone(82.41,.52,.150,'sawtooth',A.sfxGain,0,-28);noise(.62,.125,420,.04);
-        tone(61.74,.78,.105,'triangle',A.sfxGain,.12,-14);noise(.35,.080,720,.32);break;
+        tone(82.41,.52,.065,'triangle',A.sfxGain,0,-28);noise(.62,.060,420,.04);
+        tone(61.74,.78,.045,'sine',A.sfxGain,.12,-14);noise(.35,.035,720,.32);break;
       case 'stairsOpen':
         tone(110,.38,.105,'triangle',A.sfxGain,0,-32);noise(.45,.100,560,.02);
         tone(73.42,.55,.080,'sine',A.sfxGain,.12,-18);break;
@@ -176,9 +156,9 @@
         noise(.08,.048,760,.27);tone(150,.07,.040,'triangle',A.sfxGain,.27,-32);
         noise(.08,.045,700,.42);tone(136,.08,.038,'triangle',A.sfxGain,.42,-28);
         noise(.10,.040,620,.58);tone(122,.10,.035,'triangle',A.sfxGain,.58,-22);break;
-      case 'bossIntro': tone(110,.72,.145,'sawtooth',A.sfxGain,0,-16);noise(.34,.100,700,.08);break;
-      case 'bossWarn': tone(261.63,.17,.085,'square',A.sfxGain,0,45);break;
-      case 'bossCast': tone(146.83,.23,.110,'sawtooth',A.sfxGain,0,-25);noise(.10,.060,1200);break;
+      case 'bossIntro': tone(110,.72,.065,'triangle',A.sfxGain,0,-16);noise(.34,.040,700,.08);break;
+      case 'bossWarn': tone(261.63,.24,.045,'sine',A.sfxGain,0,45);break;
+      case 'bossCast': tone(146.83,.23,.065,'triangle',A.sfxGain,0,-25);noise(.10,.040,1000);break;
       case 'bossDefeat': tone(196,.34,.125,'triangle',A.sfxGain,0,-75);tone(98,.72,.110,'sine',A.sfxGain,.12,-22);noise(.28,.045,600);break;
       case 'clear': tone(261.63,.28,.050,'sine');tone(329.63,.34,.048,'sine',A.sfxGain,.13);tone(392,.48,.042,'sine',A.sfxGain,.27);break;
       case 'gameOver': tone(196,.35,.050,'triangle',A.sfxGain,0,-70);tone(110,.62,.035,'sine',A.sfxGain,.18,-35);break;
