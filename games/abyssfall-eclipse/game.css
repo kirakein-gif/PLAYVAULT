@@ -130,3 +130,17 @@
 }
 @media(max-height:500px) and (min-width:701px){#hud{padding:8px 12px;top:8px}#toast{top:auto;bottom:88px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+#hud .hudTop>div:first-child{min-width:0;flex:1}
+.topActions{flex-shrink:0}
+#hud #heroName{max-width:100%}
+[data-controls="touch"] #mobileControls{display:block}
+[data-controls="touch"] #abilityDock{display:none}
+@media(orientation:landscape) and (max-height:500px){
+ [data-controls="touch"] #hud{width:270px;padding:7px 10px}
+ [data-controls="touch"] .eyebrow{font-size:8px}
+ [data-controls="touch"] #heroName{font-size:11px!important}
+ [data-controls="touch"] .homeLink{display:none}
+ [data-controls="touch"] #joyBase{width:90px;height:90px;bottom:12px}
+ [data-controls="touch"] #joyKnob{left:25px;top:25px}
+ [data-controls="touch"] #specialBtn{width:72px;height:72px;bottom:12px}
+}

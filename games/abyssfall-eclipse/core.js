@@ -46,6 +46,7 @@
 
   // Keep gameplay coordinates fixed; resize only the presentation surface.
   function fit(){
+    document.documentElement.dataset.controls=mobile||matchMedia('(pointer:coarse)').matches||innerWidth<=700?'touch':'keyboard';
     const s=Math.min(innerWidth/W,innerHeight/H),dpr=Math.min(devicePixelRatio||1,2);
     const width=Math.max(1,Math.round(W*s)),height=Math.max(1,Math.round(H*s));
     canvas.style.width=`${width}px`;canvas.style.height=`${height}px`;

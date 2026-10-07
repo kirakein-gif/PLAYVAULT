@@ -1,5 +1,23 @@
 # PLAYVAULT
 
+## Eclipse art/audio polish (v30)
+
+- Stable sprite scale, authored torso/foot pivots, DPR capped at 2, nearest-pixel presentation; gameplay coordinates remain unchanged.
+- Reference-driven high-resolution hero actions, distinguishable enemies/Watcher, and four gothic room textures in `assets/art/`. Legacy art is retained as a load-failure fallback.
+- Floor textures and the north wall have separate sampling regions so the wall stays outside the playable floor. Variable fog, wind, rifts, hidden altars and 12-floor progression retain their original rules.
+- Thin hero-colored cooldown feedback, restrained telegraphs, clearer HUD/relic placement, and touch controls preserved through rotation. An ongoing run keeps its original world aspect ratio, using letterboxing on rotation.
+- Original looping title/exploration/boss WAV ambience, asynchronous loading with stale-load protection, procedural fallback, crossfade buses, music/SFX mixing, warning ducking, and bounded transient voices.
+- Art prompts and audio provenance are saved beside the assets. The music is original synthesized ambience; hardware listening remains necessary before treating it as a final mastered soundtrack.
+
+Verification:
+
+```
+node tests/polish-regression.cjs
+node tests/audio-regression.cjs
+```
+
+The first suite exercises 12 floors, hidden-altars, boss defeat/stairs/clear, combat rendering and atlas bounds in desktop/mobile coordinates at DPR 1/2/3. The second checks interrupted audio resume, current-mode file loading, fallback cleanup, mute and the voice limit. `tests/preview.html` is a separate local visual inspection fixture, not part of the player UI. Use a local HTTP server; opening the game as a file can block fetch-based music/legacy assets.
+
 개인 웹게임 플랫폼 저장소입니다. 게임은 `games/<slug>/` 단위로 추가합니다.
 
 ## Games

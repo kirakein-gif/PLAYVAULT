@@ -1,0 +1,7 @@
+Original ABYSSFALL ambience composed with tools/compose-ambience.py.
+No third-party recordings, samples, melodies or downloaded music were used.
+Title: 24 seconds. Exploration: 48 seconds. Boss: 32 seconds.
+22,050 Hz stereo, 16-bit PCM WAV, looped by Web Audio.
+These are original synthesized ambient pieces, not recorded orchestral music.
+Their phone-speaker balance still requires Samsung hardware listening.
+Music files load on demand. The procedural fallback remains for failed loads.

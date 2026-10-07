@@ -295,7 +295,7 @@
     if(p.faceX<0)ctx.scale(-1,1);
     if(!A.dead&&p.inv>0&&Math.floor(p.inv/4)%2===0)ctx.globalAlpha=.5;
 
-    if(atlasImg?.complete){
+    if(window.AF_ART?.loaded.heroes||atlasImg?.complete){
       let anim='idle',idx=0;
       if(A.dead&&p.deathAt){
         anim='death';
@@ -313,7 +313,7 @@
         anim='idle';
         idx=Math.floor(now/220)%4;
       }
-      const frame=atlas.frames[anim][idx]||atlas.frames.idle[0];
+      const frame=atlas?.frames[anim][idx]||atlas?.frames.idle[0]||[0,0];
       if(window.AF_ART?.loaded.heroes){
         const art=window.AF_ART;
         const f=art.hero(h.key,anim,idx);
