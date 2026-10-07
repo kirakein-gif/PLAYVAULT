@@ -22,8 +22,8 @@ function fit(){
 fit();addEventListener('resize',fit);
 
 const HEROES={
-  ethan:{key:'ethan',name:'Ethan',ko:'에단',maxHp:120,speed:3.0,jump:11.4,w:34,h:56,attackCd:24,color:'#e2d7b9',accent:'#e7c66f',detail:'#74d8ef'},
-  noah:{key:'noah',name:'Noah',ko:'노아',maxHp:95,speed:3.6,jump:13.6,w:32,h:53,attackCd:18,color:'#252943',accent:'#72dcef',detail:'#8f70c7'}
+  ethan:{key:'ethan',name:'Ethan',ko:'에단',maxHp:120,speed:3.0,jump:11.4,w:42,h:68,attackCd:24,color:'#e2d7b9',accent:'#e7c66f',detail:'#74d8ef'},
+  noah:{key:'noah',name:'Noah',ko:'노아',maxHp:95,speed:3.6,jump:13.6,w:39,h:64,attackCd:18,color:'#252943',accent:'#72dcef',detail:'#8f70c7'}
 };
 
 const state={
@@ -33,9 +33,16 @@ const state={
   roomState:{},projectiles:[],enemyShots:[],fx:[],keys:{},lastError:0
 };
 const heroes={
-  ethan:{hp:120,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0},
-  noah:{hp:95,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0}
+  ethan:{hp:120,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,w:HEROES.ethan.w,h:HEROES.ethan.h},
+  noah:{hp:95,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,w:HEROES.noah.w,h:HEROES.noah.h}
 };
+function syncHeroBody(k){
+  const h=heroes[k],d=HEROES[k];
+  h.w=d.w;h.h=d.h;
+  if(!Number.isFinite(h.x))h.x=120;
+  if(!Number.isFinite(h.y))h.y=(ROOMS?.[state?.current]?.ground||470)-d.h;
+  return h;
+}
 
 const room=(id,name,mx,my,zone,opts={})=>({id,name,mx,my,zone,ground:opts.ground??470,platforms:opts.platforms||[],L:opts.L||null,R:opts.R||null,objects:opts.objects||[],enemy:opts.enemy||[],trace:opts.trace||'',secret:opts.secret||null,boss:!!opts.boss});
 const ROOMS={
@@ -91,7 +98,7 @@ function roomState(id){
   if(!state.roomState[id]) state.roomState[id]={spawned:false,enemies:[],secretHp:3,secretOpen:false,traceSeen:false};
   return state.roomState[id];
 }
-function hero(){return heroes[state.active]}
+function hero(){return syncHeroBody(state.active)}
 function otherKey(){return state.active==='ethan'?'noah':'ethan'}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function activeRoom(){return ROOMS[state.current]}
@@ -168,17 +175,17 @@ function makeEnemy(type,x,y){
 function newGame(){
   state.started=true;state.paused=false;state.current='gate';state.active='ethan';state.visited=new Set(['gate']);state.kills=0;state.startTime=performance.now();
   state.elevatorOn=false;state.cellarOpen=false;state.bossDead=false;state.bellRung=false;state.chapterClear=false;state.checkpoint={room:'gate',x:120};state.roomState={};state.projectiles=[];state.enemyShots=[];state.fx=[];
-  for(const k of Object.keys(heroes)){Object.assign(heroes[k],{hp:HEROES[k].maxHp,alive:true,x:120,y:ROOMS.gate.ground-HEROES[k].h,vx:0,vy:0,onGround:true,face:1,attack:0,inv:0,anim:0})}
+  for(const k of Object.keys(heroes)){const d=HEROES[k];Object.assign(heroes[k],{hp:d.maxHp,alive:true,x:120,y:ROOMS.gate.ground-d.h,vx:0,vy:0,onGround:true,face:1,attack:0,inv:0,anim:0,w:d.w,h:d.h})}
   spawnRoom('gate');ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.chapterClear.classList.remove('show');audio.unlock();toast('성의 문이 다시 열렸다.',1700);updateHud();
 }
 function retry(){
   state.paused=false;state.current=state.checkpoint.room;state.active='ethan';state.projectiles=[];state.enemyShots=[];state.fx=[];
-  for(const k of Object.keys(heroes)){const h=heroes[k],d=HEROES[k];Object.assign(h,{hp:d.maxHp,alive:true,x:state.checkpoint.x,y:activeRoom().ground-d.h,vx:0,vy:0,onGround:true,inv:80})}
+  for(const k of Object.keys(heroes)){const h=heroes[k],d=HEROES[k];Object.assign(h,{hp:d.maxHp,alive:true,x:state.checkpoint.x,y:activeRoom().ground-d.h,vx:0,vy:0,onGround:true,inv:80,w:d.w,h:d.h})}
   ui.gameOver.classList.remove('show');state.visited.add(state.current);spawnRoom(state.current);toast('불이 아직 꺼지지 않았다.');updateHud();
 }
 function switchHero(){
   const next=otherKey();if(!heroes[next].alive){toast('대답이 없다.');return}
-  const a=hero(),b=heroes[next];b.x=a.x;b.y=a.y;b.vx=a.vx*.75;b.vy=a.vy;b.face=a.face;b.inv=Math.max(b.inv,20);state.active=next;audio.sfx('switch');updateHud();
+  const a=hero(),b=syncHeroBody(next);b.x=a.x;b.y=a.y+a.h-b.h;b.vx=a.vx*.75;b.vy=a.vy;b.face=a.face;b.inv=Math.max(b.inv,20);state.active=next;audio.sfx('switch');updateHud();
 }
 function changeRoom(id,spawnX=null){
   if(!ROOMS[id])return;
@@ -186,7 +193,7 @@ function changeRoom(id,spawnX=null){
   const h=hero(),r=ROOMS[id],d=HEROES[state.active];
   h.x=spawnX??(ROOMS[from]?.R===id?44:ROOMS[from]?.L===id?W-d.w-44:110);
   h.y=r.ground-d.h;h.vx=0;h.vy=0;h.onGround=true;h.inv=Math.max(h.inv,35);
-  heroes[otherKey()].x=clamp(h.x-h.face*40,8,W-HEROES[otherKey()].w-8);heroes[otherKey()].y=h.y;
+  {const ok=otherKey(),o=syncHeroBody(ok);o.x=clamp(h.x-h.face*48,8,W-o.w-8);o.y=h.y+h.h-o.h;}
   toast(r.name,700);updateHud();
 }
 function killHero(){
@@ -322,7 +329,7 @@ function updatePlayer(dt){
     if(r.id==='boss'&&to==='after'&&!state.bossDead){h.x=W-h.w-18;audio.sfx('clunk')}
     else if(to)changeRoom(to,44);else h.x=W-h.w+18;
   }
-  heroes[otherKey()].x=h.x;heroes[otherKey()].y=h.y;
+  {const ok=otherKey(),o=syncHeroBody(ok);o.x=clamp(h.x-h.face*46,8,W-o.w-8);o.y=h.y+h.h-o.h;o.face=h.face;}
 }
 function updateProjectiles(dt){
   for(const q of state.projectiles){q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;
@@ -415,9 +422,11 @@ function drawObjects(r){
   if(r.trace&&!rs.traceSeen){ctx.globalAlpha=.28;ctx.strokeStyle='#aca1b7';ctx.lineWidth=2;ctx.beginPath();ctx.arc(W-88,170,16,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(W-107,170);ctx.lineTo(W-69,170);ctx.stroke();ctx.globalAlpha=1}
 }
 function drawHero(k,ghost=false){
-  const h=heroes[k],d=HEROES[k];if(!h.alive)return;
+  const h=syncHeroBody(k),d=HEROES[k];if(!h.alive)return;
   const moving=Math.abs(h.vx)>.35,bob=moving?Math.sin(h.anim)*1.4:0;
-  ctx.save();ctx.translate(Math.round(h.x+h.w/2),Math.round(h.y+h.h+bob));if(h.face<0)ctx.scale(-1,1);if(ghost)ctx.globalAlpha=.22;if(h.inv>0&&Math.floor(h.inv/5)%2===0)ctx.globalAlpha*=.5;
+  const drawX=Math.round(h.x+h.w/2),drawY=Math.round(h.y+h.h+bob);
+  if(!Number.isFinite(drawX)||!Number.isFinite(drawY))return;
+  ctx.save();ctx.translate(drawX,drawY);if(h.face<0)ctx.scale(-1,1);if(ghost)ctx.globalAlpha=.22;if(h.inv>0&&Math.floor(h.inv/5)%2===0)ctx.globalAlpha*=.5;
   ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(0,1,d.w*.65,5,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle=d.color;ctx.beginPath();ctx.arc(0,-d.h+14,11,0,Math.PI*2);ctx.fill();
   ctx.fillStyle=d.key==='ethan'?'#d8cfb7':'#2b3150';ctx.beginPath();ctx.moveTo(-13,-d.h+25);ctx.lineTo(13,-d.h+25);ctx.lineTo(18,-5);ctx.lineTo(-15,-5);ctx.closePath();ctx.fill();
