@@ -35,8 +35,8 @@
   });
 
   AF.heroes={
-    dawn:{key:'dawn',name:'Dawn Seeker',ko:'여명의 추적자',color:'#ffd46f',accent:'#66d9ff',maxHp:120,speed:3.15,basicName:'추적 룬탄',basicIcon:'✦',rate:34,damage:17,proj:8.1,specialName:'태양낙인',specialIcon:'☀',specialCd:430,idle:'dawn_idle',run:'dawn_run',attack:'dawn_attack',drawW:mobile?112:98},
-    night:{key:'night',name:'Night Veil',ko:'밤의 장막',color:'#7bdfff',accent:'#9273ff',maxHp:96,speed:3.75,basicName:'월광 칼날',basicIcon:'☾',rate:26,damage:13,proj:9.2,specialName:'월영 질주',specialIcon:'◒',specialCd:360,idle:'night_idle',run:'night_run',attack:'night_attack',drawW:mobile?106:94}
+    dawn:{key:'dawn',name:'Ethan',ko:'에단',color:'#ffd46f',accent:'#66d9ff',maxHp:120,speed:3.15,basicName:'추적 룬탄',basicIcon:'✦',rate:34,damage:17,proj:8.1,specialName:'태양낙인',specialIcon:'☀',specialCd:430,idle:'dawn_idle',run:'dawn_run',attack:'dawn_attack',drawW:mobile?112:98},
+    night:{key:'night',name:'Noah',ko:'노아',color:'#7bdfff',accent:'#9273ff',maxHp:96,speed:3.75,basicName:'월광 칼날',basicIcon:'☾',rate:26,damage:13,proj:9.2,specialName:'월영 질주',specialIcon:'◒',specialCd:360,idle:'night_idle',run:'night_run',attack:'night_attack',drawW:mobile?106:94}
   };
   AF.selected='dawn'; AF.floor=1; AF.kills=0; AF.relics={}; AF.rooms={}; AF.runStart=0; AF.endless=false; AF.cleared=false; AF.transitioning=false; AF.current='0,0'; AF.started=false; AF.paused=true; AF.dead=false; AF.player=null; AF.projectiles=[]; AF.particles=[]; AF.shockwaves=[]; AF.pickups=[]; AF.slashes=[]; AF.soulBursts=[];
   AF.keys={}; AF.joy={x:0,y:0,active:false,id:null};
@@ -408,7 +408,7 @@
     if(relicCount('resonance-core'))p.echoTimer=18;
     if(h.key==='dawn'){
       const rad=155+p.range;
-      AF.shockwaves.push({x:p.x,y:p.y,r:10,max:rad,l:28,color:'#ffd86a'});
+      AF.shockwaves.push({x:p.x,y:p.y,r:10,max:rad,l:28,color:'#ffd86a',kind:'sunSeal',duration:28});
       AF.cur().enemies.forEach(e=>{if(e.alive&&Math.hypot(e.x-p.x,e.y-p.y)<rad)damage(e,42+p.atk*1.8)});
       p.shield=Math.min(40,p.shield+16);p.inv=Math.max(p.inv,20);
       AF.slashes.push({art:true,kind:'dawn',x:p.x,y:p.y,a:Math.atan2(p.faceY,p.faceX),l:18,max:18});
@@ -416,7 +416,7 @@
     }else{
       let dx=p.faceX,dy=p.faceY,l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;
       const sx=p.x,sy=p.y;p.x+=dx*(120+p.range*.4);p.y+=dy*(120+p.range*.4);clamp();p.inv=34;
-      AF.slashes.push({x:(sx+p.x)/2,y:(sy+p.y)/2,a:Math.atan2(dy,dx),l:24,max:24,r:125,color:'#7ce8ff',art:true,kind:'night'});
+      AF.slashes.push({x:(sx+p.x)/2,y:(sy+p.y)/2,a:Math.atan2(dy,dx),l:24,max:24,r:125,color:'#7ce8ff',art:true,kind:'night',sx,sy,ex:p.x,ey:p.y});
       AF.cur().enemies.forEach(e=>{if(e.alive&&seg(sx,sy,p.x,p.y,e.x,e.y,e.r+45))damage(e,50+p.atk*1.8)});
       AF.toast('월영 질주 · 그림자 참격');
     }
@@ -483,9 +483,9 @@
     const p=AF.player,cx=W/2,cy=arena.y+arena.h/2,d=Math.hypot(p.x-cx,p.y-cy);
     if(d>58)return;
     if(r.sealAltar&&r.clear&&!r.sealBroken){
-      r.sealBroken=true;sound()?.sfx('sealBreak');
-      for(let i=0;i<18;i++)AF.particles.push({x:cx+(Math.random()-.5)*54,y:cy+(Math.random()-.5)*42,vx:(Math.random()-.5)*2.1,vy:-.7-Math.random()*1.6,l:28,color:'#b69cff'});
-      AF.toast('낡은 제단의 문양이 꺼졌다.');
+      r.sealBroken=true;r.sealBreakAt=performance.now();sound()?.sfx('sealBreak');
+      for(let i=0;i<18;i++)AF.particles.push({x:cx+(Math.random()-.5)*24,y:cy-38+(Math.random()-.5)*18,vx:(Math.random()-.5)*2.1,vy:-.7-Math.random()*1.6,l:28,color:'#b69cff'});
+      AF.toast('제단 위의 봉인석이 깨졌다.');
       const remain=Object.values(AF.rooms).filter(x=>x.sealAltar&&!x.sealBroken).length;
       if(remain===0&&!AF.bossUnlocked){
         AF.bossUnlocked=true;

@@ -115,6 +115,20 @@ console.log('PASS hand launch: both facings, all target heights and directions, 
  assert.equal(A.isDoorOpen(dir),false,'boss seal keeps door closed after combat');A.bossUnlocked=true;assert.equal(A.isDoorOpen(dir),true);
  console.log('PASS doors: combat closure, clear opening, sealed boss remains locked');
 }
+// Every boss entrance orientation shares the seal lock; breaking the object leaves the table intact.
+{
+ const h=harness(),{A}=h;A.newRun();const room=A.cur();room.clear=true;
+ for(const [d,v] of Object.entries(A.dirs)){
+  room.doors[d]=true;A.rooms[`${room.x+v[0]},${room.y+v[1]}`]={x:room.x+v[0],y:room.y+v[1],type:'boss',doors:{},enemies:[]};
+  A.bossUnlocked=false;assert.equal(A.isDoorOpen(d),false);A.bossUnlocked=true;assert.equal(A.isDoorOpen(d),true);
+ }
+ room.sealAltar=true;room.sealBroken=false;A.player.x=A.W/2+130;A.player.y=A.arena.y+A.arena.h/2;
+ h.draws.length=0;h.frame();const before=h.draws.find(d=>d[0]===h.env.AF_ART.images.props);
+ A.player.x=A.W/2;A.bossUnlocked=false;A.update(1);assert.equal(room.sealBroken,true);assert.equal(A.bossUnlocked,true);
+ h.draws.length=0;h.frame();const after=h.draws.find(d=>d[0]===h.env.AF_ART.images.props);
+ assert.deepEqual(before.slice(1),after.slice(1),'seal object breaks without changing the altar image or position');
+ console.log('PASS seal object: intact table before/after, final seal unlock, four boss door directions');
+}
 for(const mobile of [false,true])for(const dpr of [1,2,3]){
  const h=harness(mobile,dpr),{A}=h;A.newRun();
  assert.equal(A.W,mobile?720:960);assert.equal(A.H,mobile?900:640);

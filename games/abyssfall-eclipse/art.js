@@ -7,7 +7,7 @@
     const im=new Image();art.images[key]=im;
     im.onload=()=>{art.loaded[key]=true;if(key==='relics')relicIcons(im);resolve(true)};
     im.onerror=()=>{art.loaded[key]=false;resolve(false)};
-    im.src=path+'?v=37';
+    im.src=path+'?v=38';
   })));
   function relicIcons(im){
     art.relicIcons={};
@@ -29,7 +29,7 @@
   const rows=[[0,544,1115,1717],[0,572,1144,1717],[0,530,1070,1642],[0,572,1144,1717]],scenes=new Map(),panels=new Map();
   const floorEdges=[[[.28,.82],[.32,.82],[.32,.79]],[[.32,.79],[.32,.79],[.32,.79]],[[.25,.80],[.29,.81],[.28,.77]],[[.28,.74],[.28,.76],[.28,.75]]];
   const zones=['cathedral','graveyard','tower','abyss'];
-  const patches={N:[.35,0,.30,.30],W:[0,.24,.14,.43],E:[.86,.24,.14,.43],S:[.32,.79,.36,.21]};
+  const patches={N:[.39,0,.22,.28],W:[0,.24,.10,.43],E:[.90,.24,.10,.43],S:[.40,.82,.20,.18]};
   function alignedPanel(zone,panel){
     const key=zone+':'+panel;if(panels.has(key))return panels.get(key);
     const im=art.images[zones[zone]],ys=rows[zone],c=document.createElement('canvas');c.width=916;c.height=572;
@@ -59,6 +59,19 @@
     for(const t of [.40,.73]){cc.beginPath();cc.moveTo(x,y+h*t);cc.lineTo(x+w,y+h*(t+(west?.05:-.05)));cc.stroke()}
     cc.restore();
   }
+  function southPassage(cc,zone){
+    // A break through the foreground wall, with stone steps descending out of view.
+    const x=407,y=475,w=102,h=97,base=alignedPanel(zone,1);
+    cc.save();cc.beginPath();cc.rect(x,y,w,h);cc.clip();
+    cc.fillStyle='#090a0c';cc.fillRect(x,y,w,h);
+    for(let i=0;i<8;i++){
+      const yy=y+i*12,inset=i*.7;
+      cc.drawImage(base,408,355,100,12,x+inset,yy,w-inset*2,10);
+      cc.fillStyle='rgba(5,6,8,'+(.18+i*.065)+')';cc.fillRect(x+inset,yy,w-inset*2,12);
+      cc.fillStyle='rgba(144,133,113,'+(.28-i*.025)+')';cc.fillRect(x+inset,yy,w-inset*2,1);
+    }
+    cc.restore();
+  }
   art.room=(zone,room,isOpen)=>{
     const key=zones[zone];if(!art.loaded[key])return null;
     const states=['N','W','E','S'].map(d=>!room.doors[d]?0:isOpen(d,room)?1:2),cache=zone+':'+states.join('');
@@ -80,6 +93,15 @@
       }
       cc.drawImage(p,x*c.width,y*c.height);
     });
+    // Every room uses exactly the same playable floor, including its borders.
+    // Alternate wall paintings may only affect the passage recesses.
+    const floor=alignedPanel(zone,1);
+    cc.drawImage(floor,.10*c.width,.28*c.height,.80*c.width,.54*c.height,
+      .10*c.width,.28*c.height,.80*c.width,.54*c.height);
+    if(states[3]===0){
+      // Repeat neighboring intact masonry instead of the atlas's ambiguous central steps.
+      cc.drawImage(alignedPanel(zone,0),250,469,122,103,397,469,122,103);
+    }else if(states[3]===1)southPassage(cc,zone);
     if(scenes.size>=12)scenes.delete(scenes.keys().next().value);
     scenes.set(cache,c);return c;
   };

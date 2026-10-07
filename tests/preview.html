@@ -5,6 +5,12 @@
 <script>
 const frame=document.querySelector('iframe'),status=document.getElementById('status');
 const get=()=>frame.contentWindow.AF;
+for(const [id,label,fn] of [
+ ['specialPreview','Special effect',()=>{const a=get();a.player.special=0;a.paused=false;a.useSpecial();for(const fx of a.slashes)fx.l=fx.max*.55;for(const fx of a.shockwaves){fx.l=16;fx.r=fx.max*.8}a.paused=true}],
+ ['windPreview','Tower wind',()=>{const a=get();while(a.floor<7)a.nextFloor();const r=Object.values(a.rooms).find(r=>r.type==='combat');a.current=`${r.x},${r.y}`;r.spawned=true;r.windActive=100;r.windX=.9;r.windY=.35;r.windStrength=1.8;a.paused=true}],
+ ['lockedPreview','Sealed gates',()=>{const a=get(),r=a.cur();r.clear=true;a.bossUnlocked=false;for(const [d,dx,dy] of [['N',0,-1],['S',0,1],['W',-1,0],['E',1,0]]){r.doors[d]=true;a.rooms[`${r.x+dx},${r.y+dy}`]={x:r.x+dx,y:r.y+dy,type:'boss',clear:false,doors:{},enemies:[]}}a.paused=true}],
+ ['sealPreview','Seal stone',()=>{const a=get(),r=a.cur();r.sealAltar=true;r.sealBroken=false;r.clear=true;r.spawned=true;r.enemies=[];a.player.x=a.W/2+130;a.paused=true}]
+]){const b=document.createElement('button');b.id=id;b.textContent=label;b.onclick=()=>{fn();status.textContent=label};document.querySelector('nav').append(b)}
 for(const key of ['dawn','night'])document.getElementById(key).onclick=()=>{const a=get();a.selected=key;a.newRun();status.textContent=key};
 document.getElementById('move').onclick=()=>{const a=get();a.keys.d=true;setTimeout(()=>a.keys.d=false,2000)};
 document.getElementById('combat').onclick=()=>{const a=get();a.player.inv=9999;const r=Object.values(a.rooms).find(r=>r.type==='combat');a.current=`${r.x},${r.y}`;a.player.x=a.W/2;a.player.y=a.arena.y+a.arena.h*.72;status.textContent='Combat: protection for visual inspection'};
