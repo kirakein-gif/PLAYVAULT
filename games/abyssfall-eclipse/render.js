@@ -439,7 +439,8 @@
     }
   }
   function projectile(q){
-    ctx.save();ctx.translate(A.snapX(q.x),A.snapY(q.y));ctx.rotate(Math.atan2(q.vy,q.vx));
+    const screen=A.projectileScreen(q);
+    ctx.save();ctx.translate(A.snapX(screen.x),A.snapY(screen.y));ctx.rotate(screen.angle);
     const hostile=['priestBolt','bossLance','bossOrb'].includes(q.kind);
     const moon=['crescent','moonFang'].includes(q.kind);
     const body=hostile?'#50303e':moon?'#515476':q.kind==='crystal'?'#45626e':'#786950';
@@ -528,7 +529,7 @@
     ctx.textAlign='left';ctx.restore();
   }
 
-  function draw(){ctx.clearRect(0,0,W,H);backdrop();if(!A.started||!A.player||!A.rooms[A.current])return;arenaDraw();roomFeature(A.cur());A.pickups.forEach(pickup);A.cur().enemies.filter(e=>e.alive||(e.deadAt&&performance.now()-e.deadAt<950)).forEach(enemy);A.projectiles.forEach(projectile);A.shockwaves.forEach(s=>{ctx.save();ctx.globalAlpha=Math.max(0,s.l/28);ctx.strokeStyle=s.color;ctx.lineWidth=5;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke();ctx.restore()});A.slashes.forEach(slash);player();A.soulBursts.forEach(absorbedSoul);A.particles.forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.l/22);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);ctx.restore()});foregroundWall();minimap();bossbar();bossVictory()}
+  function draw(){ctx.clearRect(0,0,W,H);backdrop();if(!A.started||!A.player||!A.rooms[A.current])return;arenaDraw();roomFeature(A.cur());A.pickups.forEach(pickup);A.cur().enemies.filter(e=>e.alive||(e.deadAt&&performance.now()-e.deadAt<950)).forEach(enemy);A.shockwaves.forEach(s=>{ctx.save();ctx.globalAlpha=Math.max(0,s.l/28);ctx.strokeStyle=s.color;ctx.lineWidth=5;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke();ctx.restore()});A.slashes.forEach(slash);player();A.projectiles.forEach(projectile);A.soulBursts.forEach(absorbedSoul);A.particles.forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.l/22);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);ctx.restore()});foregroundWall();minimap();bossbar();bossVictory()}
   let last=performance.now(),lastFrameError=0;
   function frame(t){
     const dt=Math.min(2.2,(t-last)/16.67);last=t;

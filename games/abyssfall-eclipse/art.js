@@ -7,7 +7,7 @@
     const im=new Image();art.images[key]=im;
     im.onload=()=>{art.loaded[key]=true;if(key==='relics')relicIcons(im);resolve(true)};
     im.onerror=()=>{art.loaded[key]=false;resolve(false)};
-    im.src=path+'?v=35';
+    im.src=path+'?v=36';
   })));
   function relicIcons(im){
     art.relicIcons={};
@@ -37,6 +37,28 @@
     for(let i=0;i<3;i++)cc.drawImage(im,0,ys[panel]+src[i]*height,im.width,(src[i+1]-src[i])*height,0,dst[i]*c.height,c.width,(dst[i+1]-dst[i])*c.height);
     panels.set(key,c);return c;
   }
+  // Open-wall masonry is permanent. Only a door leaf covers the aperture.
+  const sideApertures=[{W:[42,148,35,116],E:[837,149,36,116]},{W:[42,196,32,111],E:[842,195,33,111]},{W:[50,196,33,104],E:[836,195,32,106]},{W:[39,175,36,133],E:[839,175,36,133]}];
+  const doorWood=[[431,1195,48,63],[435,1248,48,43],[432,1150,45,45],[432,1218,48,56]];
+  function panelY(zone,y){
+    const [start,end]=floorEdges[zone][1],height=rows[zone][2]-rows[zone][1],u=y/height;
+    return 572*(u<start?u/start*.28:u<end?.28+(u-start)/(end-start)*.54:.82+(u-end)/(1-end)*.18);
+  }
+  art.sideAperture=(zone,d)=>{
+    const [x,y,w,h]=sideApertures[zone][d];return{x,y:panelY(zone,y),w,h:panelY(zone,y+h)-panelY(zone,y)};
+  };
+  function sideLeaf(cc,zone,d){
+    const {x,y,w,h}=art.sideAperture(zone,d),west=d==='W';
+    cc.save();cc.beginPath();
+    cc.moveTo(x,y+h*.30);cc.bezierCurveTo(x+w*.08,y+h*.12,x+w*.37,y+h*.01,x+w*.55,y);
+    cc.bezierCurveTo(x+w*.76,y+h*.05,x+w*.96,y+h*.18,x+w,y+h*.29);
+    cc.lineTo(x+w,y+h*(west?1:.92));cc.lineTo(x,y+h*(west?.92:1));cc.closePath();cc.clip();
+    cc.drawImage(art.images[zones[zone]],...doorWood[zone],x,y,w,h);
+    cc.fillStyle='rgba(9,8,10,.25)';cc.fillRect(x,y,w,h);
+    cc.strokeStyle='#343338';cc.lineWidth=2;
+    for(const t of [.40,.73]){cc.beginPath();cc.moveTo(x,y+h*t);cc.lineTo(x+w,y+h*(t+(west?.05:-.05)));cc.stroke()}
+    cc.restore();
+  }
   art.room=(zone,room,isOpen)=>{
     const key=zones[zone];if(!art.loaded[key])return null;
     const states=['N','W','E','S'].map(d=>!room.doors[d]?0:isOpen(d,room)?1:2),cache=zone+':'+states.join('');
@@ -45,6 +67,7 @@
     const cc=c.getContext('2d');cc.drawImage(alignedPanel(zone,1),0,0);
     ['N','W','E','S'].forEach((d,i)=>{
       if(states[i]===1)return;
+      if(states[i]===2&&(d==='W'||d==='E')){sideLeaf(cc,zone,d);return}
       const panel=states[i]===0?0:2,[x,y,w,h]=patches[d],p=document.createElement('canvas');
       p.width=Math.round(w*c.width);p.height=Math.round(h*c.height);const pc=p.getContext('2d');
       pc.drawImage(alignedPanel(zone,panel),x*c.width,y*c.height,w*c.width,h*c.height,0,0,p.width,p.height);

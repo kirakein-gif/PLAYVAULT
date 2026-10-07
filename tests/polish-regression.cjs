@@ -68,6 +68,26 @@ for(const mobile of [false,true])for(const d of ['N','S','W','E']){
  }
 }
 console.log('PASS integrated art: four actual crossings on desktop/mobile, all relic bounds, all zones and cached door states');
+// Elevated drawing must preserve floor-plane travel, damage and collision radius.
+for(const mobile of [false,true])for(const faceX of [-1,1]){
+ const h=harness(mobile),{A}=h;A.newRun();const p=A.player;p.faceX=faceX;
+ for(const type of ['crawler','shooter','brute','boss'])for(const [vx,vy] of [[7,0],[-7,0],[0,7],[0,-7],[5,5]]){
+  const target={type,x:p.x+vx*20,y:p.y+vy*20},q={x:p.x,y:p.y,vx,vy,r:5,dmg:21},before={...q};
+  A.presentProjectile(q,p,target);for(const k of Object.keys(before))assert.equal(q[k],before[k],k+' stays on collision plane');
+  const launch=A.projectileScreen(q);assert.ok(launch.y<p.y-25);assert.equal(Math.sign(launch.x-p.x),faceX);
+  q.visualAge=20;q.x=target.x;q.y=target.y;
+  const hit=A.projectileScreen(q);assert.ok(Math.abs(hit.x-target.x)<1e-8);assert.ok(hit.y<target.y);assert.ok(Number.isFinite(hit.angle));
+ }
+ const room=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${room.x},${room.y}`;A.update(0);
+ const target=room.enemies[0];room.enemies.forEach(e=>e.alive=false);target.alive=true;target.type='crawler';target.s=0;target.stun=9999;target.hp=target.max=1000;
+ p.hero=A.heroes.dawn;p.inv=9999;p.basic=0;target.x=p.x+110;target.y=p.y;A.update(1);
+ const shot=A.projectiles.find(q=>q.kind==='light');assert.ok(shot&&shot.visualDistance);const hp=target.hp;p.basic=9999;
+ for(let i=0;i<30&&A.projectiles.includes(shot);i++)A.update(1);
+ assert.equal(target.hp,hp-p.hero.damage-p.atk,'original projectile damage');assert.ok(!A.projectiles.includes(shot),'original collision removes spent projectile');
+ target.type='shooter';target.aiWindup=1;target.shotAngle=0;target.stun=0;target.faceX=1;p.basic=9999;
+ A.update(1);const bolt=A.projectiles.find(q=>q.kind==='priestBolt');assert.ok(bolt&&bolt.launchHeight>50,'real priest casts from staff height');
+}
+console.log('PASS hand launch: both facings, all target heights and directions, real player/priest firing, unchanged damage and collision');
 {
  const h=harness(),{A}=h;A.newRun();
  const pool=Object.values(A.rooms).find(r=>r.type==='recovery');A.current=`${pool.x},${pool.y}`;

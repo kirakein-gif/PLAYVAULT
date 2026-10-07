@@ -1,0 +1,24 @@
+<!doctype html><meta charset="utf-8"><title>Door masonry regression</title>
+<style>body{background:#101116;color:#ddd;font:16px system-ui;margin:24px}section{margin:16px 0}canvas{width:min(45vw,458px);height:auto;margin:8px}b{display:block;color:#a8dbc0}</style>
+<h1>측면 문틀 고정 검증</h1><p id="result">그림을 불러오는 중</p><div id="cases"></div>
+<script src="../games/abyssfall-eclipse/art.js?v=36"></script>
+<script>
+AF_ART.ready.then(()=>{
+ let failures=0;
+ for(let zone=0;zone<4;zone++){
+  const room={doors:{N:false,S:false,W:true,E:true}},open=AF_ART.room(zone,room,()=>true),closed=AF_ART.room(zone,room,()=>false);
+  if(!open||!closed){failures++;continue}
+  const a=open.getContext('2d').getImageData(0,0,916,572).data,b=closed.getContext('2d').getImageData(0,0,916,572).data;
+  const bounds=['W','E'].map(d=>AF_ART.sideAperture(zone,d));let changed=0,outside=0;
+  for(let y=0;y<572;y++)for(let x=0;x<916;x++){
+   const i=(y*916+x)*4;if(a[i]===b[i]&&a[i+1]===b[i+1]&&a[i+2]===b[i+2]&&a[i+3]===b[i+3])continue;
+   changed++;if(!bounds.some(r=>x>=r.x-1&&x<=r.x+r.w+1&&y>=r.y-1&&y<=r.y+r.h+1))outside++;
+  }
+  if(outside||!changed)failures++;
+  const section=document.createElement('section'),status=document.createElement('b');
+  status.textContent=(outside===0&&changed?'PASS':'FAIL')+' · '+['성당','묘지','탑','심연'][zone]+' · 문짝 바깥 변경 픽셀 '+outside+' · 문짝 변경 픽셀 '+changed;
+  section.append(status,closed,open);document.getElementById('cases').append(section);
+ }
+ document.getElementById('result').textContent=failures?'FAIL: '+failures+' cases':'PASS: 4개 구역 모두 문짝 외의 문틀·벽·바닥 픽셀이 동일합니다.';
+});
+</script>

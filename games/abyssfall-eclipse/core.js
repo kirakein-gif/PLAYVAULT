@@ -351,7 +351,7 @@
       if(fang){
         const targets=AF.cur().enemies.filter(x=>x.alive&&x!==e).sort((a,b)=>Math.hypot(a.x-e.x,a.y-e.y)-Math.hypot(b.x-e.x,b.y-e.y));
         const count=Math.min(3,1+Math.floor((fang-1)/2)),base=(p.hero.damage+p.atk)*(.46+.07*fang);
-        for(let i=0;i<Math.min(count,targets.length);i++){const t=targets[i],a=Math.atan2(t.y-e.y,t.x-e.x);AF.projectiles.push({team:'p',kind:'moonFang',x:e.x,y:e.y,vx:Math.cos(a)*8.6,vy:Math.sin(a)*8.6,r:7,dmg:base,pierce:0,life:92,color:'#9b7cff'})}
+        for(let i=0;i<Math.min(count,targets.length);i++){const t=targets[i],a=Math.atan2(t.y-e.y,t.x-e.x);launch({team:'p',kind:'moonFang',x:e.x,y:e.y,vx:Math.cos(a)*8.6,vy:Math.sin(a)*8.6,r:7,dmg:base,pierce:0,life:92,color:'#9b7cff'},e,t)}
       }
       if(e.type==='boss'){
         const now=performance.now(),room=AF.cur();
@@ -367,6 +367,24 @@
     }
   }
   AF.damage=damage;
+  function bodyHeight(actor){
+    const height=actor?.hero?30:({crawler:26,shooter:60,brute:38,boss:105}[actor?.type]||30);
+    return height*(mobile?1.22:1);
+  }
+  function presentProjectile(q,source,target){
+    const sign=(source.faceX||q.vx||1)<0?-1:1;
+    q.muzzleX=(source.hero?17:source.type==='shooter'?23:source.type==='boss'?42:0)*sign*(mobile?1.22:1);
+    q.launchHeight=bodyHeight(source);q.hitHeight=bodyHeight(target||source);
+    q.visualDistance=Math.max(40,Math.hypot((target?.x??source.x+q.vx*20)-source.x,(target?.y??source.y+q.vy*20)-source.y));
+    q.visualAge=0;return q;
+  }
+  AF.presentProjectile=presentProjectile;
+  function launch(q,source,target){AF.projectiles.push(presentProjectile(q,source,target))}
+  AF.projectileScreen=q=>{
+    const speed=Math.hypot(q.vx,q.vy),rate=speed/(q.visualDistance||1),t=q.visualDistance?Math.min(1,(q.visualAge||0)*rate):1;
+    const muzzle=(q.muzzleX||0)*(1-t),height=(q.launchHeight??30)*(1-t)+(q.hitHeight??30)*t;
+    return{x:q.x+muzzle,y:q.y-height,angle:Math.atan2(q.vy-(t<1?((q.hitHeight??30)-(q.launchHeight??30))*rate:0),q.vx-(t<1?(q.muzzleX||0)*rate:0))};
+  };
   function fireBasic(){
     const p=AF.player,h=p.hero,e=nearest();if(!e)return;sound()?.sfx('basic',h.key);
     const a=Math.atan2(e.y-p.y,e.x-p.x),blade=relicCount('relic-blade'),solar=h.key==='dawn'?relicCount('solar-shard'):0;
@@ -374,13 +392,13 @@
     const burst=blade>0&&p.bladeShots%3===0;
     if(h.key==='dawn'){
       const n=p.level>=7?2:1;
-      for(let i=0;i<n;i++){const o=(i-(n-1)/2)*.12;AF.projectiles.push({team:'p',kind:'light',x:p.x,y:p.y,vx:Math.cos(a+o)*h.proj,vy:Math.sin(a+o)*h.proj,r:5,dmg:h.damage+p.atk,pierce:blade+solar,life:100,color:solar?'#ffe58a':'#7deaff'})}
+      for(let i=0;i<n;i++){const o=(i-(n-1)/2)*.12;launch({team:'p',kind:'light',x:p.x,y:p.y,vx:Math.cos(a+o)*h.proj,vy:Math.sin(a+o)*h.proj,r:5,dmg:h.damage+p.atk,pierce:blade+solar,life:100,color:solar?'#ffe58a':'#7deaff'},p,e)}
     }else{
-      AF.projectiles.push({team:'p',kind:'crescent',x:p.x,y:p.y,vx:Math.cos(a)*h.proj,vy:Math.sin(a)*h.proj,r:9,dmg:h.damage+p.atk,pierce:1+(p.level/6|0)+blade,life:85,color:'#9c7cff'});
+      launch({team:'p',kind:'crescent',x:p.x,y:p.y,vx:Math.cos(a)*h.proj,vy:Math.sin(a)*h.proj,r:9,dmg:h.damage+p.atk,pierce:1+(p.level/6|0)+blade,life:85,color:'#9c7cff'},p,e);
       AF.slashes.push({x:p.x,y:p.y,a,l:14,max:14,r:36});
     }
     if(burst){
-      for(const o of [-.20,.20])AF.projectiles.push({team:'p',kind:'relicBlade',x:p.x,y:p.y,vx:Math.cos(a+o)*(h.proj*.92),vy:Math.sin(a+o)*(h.proj*.92),r:6,dmg:(h.damage+p.atk)*(.48+.08*blade),pierce:0,life:82,color:'#ffd36b'});
+      for(const o of [-.20,.20])launch({team:'p',kind:'relicBlade',x:p.x,y:p.y,vx:Math.cos(a+o)*(h.proj*.92),vy:Math.sin(a+o)*(h.proj*.92),r:6,dmg:(h.damage+p.atk)*(.48+.08*blade),pierce:0,life:82,color:'#ffd36b'},p,e);
     }
   }
   AF.useSpecial=()=>{
@@ -599,13 +617,13 @@
       const shots=3+phase*2,spread=.13,speed=5.2+phase*.45,dmg=e.d*(.56+phase*.06);
       for(let i=0;i<shots;i++){
         const o=(i-(shots-1)/2)*spread,a=e.bossAim+o;
-        AF.projectiles.push({team:'e',kind:'bossLance',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:7,dmg,life:155,color:'#ff365f'});
+        launch({team:'e',kind:'bossLance',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:7,dmg,life:155,color:'#ff365f'},e,AF.player);
       }
     }else if(pattern===1){
       const n=10+phase*4,speed=3.2+phase*.32,dmg=e.d*(.48+phase*.05),off=Math.random()*Math.PI;
       for(let i=0;i<n;i++){
         const a=off+i*Math.PI*2/n;
-        AF.projectiles.push({team:'e',kind:'bossOrb',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:7,dmg,life:190,color:'#d858ff'});
+        launch({team:'e',kind:'bossOrb',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:7,dmg,life:190,color:'#d858ff'},e,AF.player);
       }
     }else{
       const n=2+phase;
@@ -641,7 +659,7 @@
         const target=nearest();
         if(target){
           const a=Math.atan2(target.y-p.y,target.x-p.x),dmg=8+crystal*4+p.atk*.16;
-          for(const o of [-.16,0,.16])AF.projectiles.push({team:'p',kind:'crystal',x:p.x,y:p.y,vx:Math.cos(a+o)*7.4,vy:Math.sin(a+o)*7.4,r:6,dmg,pierce:0,life:105,color:'#8cecff'});
+          for(const o of [-.16,0,.16])launch({team:'p',kind:'crystal',x:p.x,y:p.y,vx:Math.cos(a+o)*7.4,vy:Math.sin(a+o)*7.4,r:6,dmg,pierce:0,life:105,color:'#8cecff'},p,target);
         }
       }
     }
@@ -689,8 +707,8 @@
           if(e.aiWindup<=0){
             e.aiWindup=0;e.attackPose=18;
             const a=e.shotAngle,speed=4.15+Math.min(.75,(AF.floor-1)*.08);
-            AF.projectiles.push({team:'e',kind:'priestBolt',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:6,dmg:e.d,life:155,color:'#ff6285'});
-            if(AF.floor>=3){for(const o of [-.13,.13])AF.projectiles.push({team:'e',kind:'priestBolt',x:e.x,y:e.y,vx:Math.cos(a+o)*(speed*.93),vy:Math.sin(a+o)*(speed*.93),r:5,dmg:e.d*.72,life:150,color:'#e86bff'})}
+            launch({team:'e',kind:'priestBolt',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:6,dmg:e.d,life:155,color:'#ff6285'},e,p);
+            if(AF.floor>=3){for(const o of [-.13,.13])launch({team:'e',kind:'priestBolt',x:e.x,y:e.y,vx:Math.cos(a+o)*(speed*.93),vy:Math.sin(a+o)*(speed*.93),r:5,dmg:e.d*.72,life:150,color:'#e86bff'},e,p)}
             e.fire=88+Math.random()*34;
           }
         }else{
@@ -717,7 +735,7 @@
       const cdx=p.x-e.x,cdy=p.y-e.y,cdist=Math.hypot(cdx,cdy)||1;if(cdist<p.r+e.r&&p.inv<=0&&!(e.type==='boss'&&e.intro>0)){e.attackPose=e.type==='boss'?22:14;const mult=e.type==='brute'&&e.charge>0?1.45:e.type==='crawler'&&e.dash>0?1.18:1;hurt(e.d*mult,cdx/cdist,cdy/cdist);if(e.type==='brute'&&e.charge>0){e.charge=0;e.stun=24;AF.shockwaves.push({x:e.x,y:e.y,r:8,max:58,l:18,color:'#ff9b63'})}}
     }
     for(let i=AF.projectiles.length-1;i>=0;i--){
-      const q=AF.projectiles[i];q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;
+      const q=AF.projectiles[i];q.visualAge=(q.visualAge||0)+dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;
       if(q.life<=0||q.x<arena.x-20||q.x>arena.x+arena.w+20||q.y<arena.y-20||q.y>arena.y+arena.h+20){AF.projectiles.splice(i,1);continue}
       if(q.team==='p'){
         const e=r.enemies.find(e=>e.alive&&Math.hypot(e.x-q.x,e.y-q.y)<e.r+q.r);
@@ -726,7 +744,7 @@
         const mirror=relicCount('abyss-mirror'),chance=Math.min(.55,.18+.07*Math.max(0,mirror-1));
         if(mirror&&Math.random()<chance){
           q.team='p';q.kind='reflected';q.vx*=-1.22;q.vy*=-1.22;q.dmg=q.dmg*1.25+p.atk*.22;q.pierce=0;q.life=Math.min(q.life,92);
-          q.x=p.x+q.vx*2;q.y=p.y+q.vy*2;p.inv=7;
+          q.x=p.x+q.vx*2;q.y=p.y+q.vy*2;presentProjectile(q,p,nearest());p.inv=7;
           for(let k=0;k<7;k++)AF.particles.push({x:p.x,y:p.y,vx:(Math.random()-.5)*3.4,vy:(Math.random()-.5)*3.4,l:18,color:'#9fdcff'});
         }else{hurt(q.dmg,q.vx/4,q.vy/4);AF.projectiles.splice(i,1)}
       }
