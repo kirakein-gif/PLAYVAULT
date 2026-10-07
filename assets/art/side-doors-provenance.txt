@@ -1,0 +1,8 @@
+ABYSSFALL ECLIPSE v34 narrow wall-inset doors
+Generated with the built-in image generation tool on 2026-10-07.
+Reference: assets/art/rooms-v2.webp, style/material only.
+Output: side-doors-v2.webp, 1024 x 1536 RGBA; lossless encoding, no pixel edits.
+Source: exec-607990f7-48c2-487c-a8c2-c3ffab6270ef.png
+
+Prompt:
+Create a transparent game sprite sheet with exactly FOUR wall-integrated narrow gothic door recesses in a 2-column 2-row layout. Use reference dungeon image ONLY for matching muted weathered stone/wood pixel-art material. Top row LEFT wall doorway CLOSED, same LEFT wall doorway OPEN; bottom row RIGHT wall doorway CLOSED, same RIGHT wall doorway OPEN. Crucial: these are flat narrow VERTICAL screen-aligned wall inserts, front elevation, ABSOLUTELY NO diagonal angle, NO isometric perspective, NO freestanding pillars, NO wide projecting arch monument. Each sprite is a very slender vertical slot, width about one third of height, subtle rough grey masonry jambs only, dark brown heavy plank panels, iron straps, recessed dark interior. Closed door panels cover recess. Open panels retract into the narrow jambs leaving a black vertical passage; NO swinging leaves sticking out into room. Consistent identical outer silhouette and scale across all four states, lower/upper alignments exactly matching. Near-orthographic crisp gothic pixel-art detail, subdued contrast so it blends into existing wall rather than looking pasted on. No floor, no ground patch, no glow, no particles, no text, no labels, no characters. Generous transparent gutters, true alpha background. All four vertical inserts completely visible. The provided room's side boundary is thin, so designs must feel embedded within a wall, not placed on the floor.

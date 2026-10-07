@@ -170,3 +170,11 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - Original calm title/exploration/boss WAV loops remove detuned bass interference, subsonic oscillations and rhythmic pulses. Loop playback has no timer-driven note scheduling or live convolution; delayed loads cannot restart an old mode, and failed files use quiet harmonically aligned fallback tones. Harsh warning/gate sounds and music ducking are softened.
 - Generate the v33 loops with `tools/compose-calm-ambience.py` (Python/numpy). Prop generation prompt and provenance: `assets/art/props-provenance.txt`.
 - Validation: `node tests/polish-regression.cjs` and `node tests/audio-regression.cjs`; real browser checks for numeric selection, scenery states, desktop/mobile display and a single decoded looping music source.
+
+## ABYSSFALL v34 inset side doors, silent gaps and souls
+
+- Side doors now use narrow upright wall-inset artwork instead of diagonal freestanding arches. Closed/open door state and collision rules are preserved. Prompt: `assets/art/side-doors-provenance.txt`.
+- Removed the sustained pad/bass/drone layers completely. New `*-sparse.wav` tracks contain only occasional high bells and 49–59% complete silence; no file-failure drone is synthesized. The original sound effects remain available.
+- XP drops are translucent wisps with trailing smoke and a short absorption motion toward the player's torso. XP values, attraction radius, collection radius and reward progression are preserved; absorption tails expire and clear across room/floor/run transitions.
+- The recovery well renders the same basin sampling rectangle, destination position, width and height before/after use. Only a translucent water overlay changes, eliminating silhouette/placement jumps between separate artwork.
+- Extended regression checks cover exact well geometry, soul attraction/XP gain/absorption cleanup and silent audio failure. Full 12-floor PC/mobile progression checks remain passing.

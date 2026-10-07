@@ -50,6 +50,20 @@ for(const code of ['Digit1','Digit2','Digit3','Numpad1','Numpad2','Numpad3']){
 console.log('PASS rewards: 1/2/3 and numpad match displayed choices, no repeat/double apply or input-field hijack');
 {
  const h=harness(),{A}=h;A.newRun();
+ const pool=Object.values(A.rooms).find(r=>r.type==='recovery');A.current=`${pool.x},${pool.y}`;
+ A.player.x=A.W/2+160;A.player.y=A.arena.y+A.arena.h*.72;pool.used=false;h.draws.length=0;h.frame();
+ const before=h.draws.find(d=>d[0]===h.env.AF_ART.images.props);assert.ok(before);
+ pool.used=true;h.draws.length=0;h.frame();const after=h.draws.find(d=>d[0]===h.env.AF_ART.images.props);
+ assert.deepEqual(after.slice(1),before.slice(1),'used well keeps identical sampling, position, width and height');
+ A.newRun();const p=A.player,startXp=p.xp;
+ A.pickups.push({x:p.x+75,y:p.y,vx:0,vy:0,val:3});h.advance(17);assert.equal(A.pickups[0].attracted,true);
+ for(let i=0;i<30&&A.pickups.length;i++)h.advance(17);
+ assert.equal(A.pickups.length,0);assert.equal(p.xp,startXp+3);assert.ok(A.soulBursts.length>0,'absorbed soul rises toward torso');
+ for(let i=0;i<24;i++)h.advance(17);assert.equal(A.soulBursts.length,0,'short absorption tails expire');
+ console.log('PASS well and souls: exact fixed basin geometry, same XP gain, attraction, absorption and cleanup');
+}
+{
+ const h=harness(),{A}=h;A.newRun();
  const room=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${room.x},${room.y}`;A.update(1);
  for(const d of Object.keys(room.doors))assert.equal(A.isDoorOpen(d),false,'combat closes actual doors');
  A.player.inv=9999;room.enemies.forEach(e=>A.damage(e,e.max));h.advance(17);assert.equal(room.clear,true);

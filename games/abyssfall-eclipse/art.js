@@ -1,12 +1,12 @@
 (() => {
   'use strict';
   const art=window.AF_ART={images:{},loaded:{}};
-  const paths={heroes:'../../assets/art/heroes-v4.webp',actions:'../../assets/art/actions-v4.webp',enemies:'../../assets/art/enemies-v2.webp',rooms:'../../assets/art/rooms-v2.webp',props:'../../assets/art/props-v1.webp'};
+  const paths={heroes:'../../assets/art/heroes-v4.webp',actions:'../../assets/art/actions-v4.webp',enemies:'../../assets/art/enemies-v2.webp',rooms:'../../assets/art/rooms-v2.webp',props:'../../assets/art/props-v1.webp',sideDoors:'../../assets/art/side-doors-v2.webp'};
   art.ready=Promise.all(Object.entries(paths).map(([key,path])=>new Promise(resolve=>{
     const im=new Image();art.images[key]=im;
     im.onload=()=>{art.loaded[key]=true;resolve(true)};
     im.onerror=()=>{art.loaded[key]=false;resolve(false)};
-    im.src=path+'?v=33';
+    im.src=path+'?v=34';
   })));
   // Authored sampling rectangles: the generated sheet does not use uniform rows.
   const heroRows=[0,278,512,773,1024],heroEdges=[0,256,512,768,1024,1280,1536];

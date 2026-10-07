@@ -193,17 +193,28 @@
   };
   function prop(name,x,foot,width,height){
     const art=window.AF_ART;if(!art?.loaded.props)return false;
-    const [sx,sy,sw,sh]=PROP_FRAMES[name],h=height||width*sh/sw;
+    // Keep one physical basin in both states: only its water changes.
+    const pool=name==='poolFull'||name==='poolEmpty';
+    const [sx,sy,sw,sh]=PROP_FRAMES[pool?'poolFull':name],h=height||width*sh/sw;
     ctx.imageSmoothingEnabled=false;
     ctx.drawImage(art.images.props,sx,sy,sw,sh,x-width/2,foot-h,width,h);
+    if(name==='poolEmpty'){
+      ctx.save();ctx.fillStyle='rgba(7,15,19,.68)';
+      ctx.beginPath();ctx.ellipse(x,foot-h+h*.33,width*.32,h*.12,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    }
     return true;
   }
   function door(d,r){
     const open=A.isDoorOpen(d,r),name={N:'north',W:'west',E:'east',S:'south'}[d]+(open?'Open':'Closed');
-    const side=d==='W'||d==='E',x=d==='W'?arena.x+12:d==='E'?arena.x+arena.w-12:W/2;
-    const foot=d==='N'?arena.y+38:d==='S'?arena.y+arena.h+24:arena.y+arena.h/2+52;
-    const width=side?84:118,height=side?126:d==='N'?110:104;
-    if(prop(name,x,foot,width,height))return;
+    const side=d==='W'||d==='E',x=d==='W'?arena.x+4:d==='E'?arena.x+arena.w-4:W/2;
+    const foot=d==='N'?arena.y+38:d==='S'?arena.y+arena.h+24:arena.y+arena.h/2+60;
+    const width=side?42:118,height=side?128:d==='N'?110:104;
+    if(side&&window.AF_ART?.loaded.sideDoors){
+      const sx=open?600:198,sy=d==='W'?38:793;
+      ctx.imageSmoothingEnabled=false;
+      ctx.drawImage(window.AF_ART.images.sideDoors,sx,sy,228,688,x-width/2,foot-height,width,height);return;
+    }
+    if(!side&&prop(name,x,foot,width,height))return;
     // Physical wood/stone fallback remains usable if the atlas cannot load.
     ctx.fillStyle='#59524b';ctx.fillRect(x-width/2,foot-height,width,height);
     ctx.fillStyle='#08090c';ctx.fillRect(x-width/2+8,foot-height+8,width-16,height-10);
@@ -476,7 +487,30 @@
     }
     ctx.restore();
   }
-  function pickup(q){ctx.save();ctx.translate(q.x,q.y);ctx.rotate(performance.now()/600);ctx.fillStyle=A.player?.hero?.color||'#fff';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=9;ctx.fillRect(-4,-4,8,8);ctx.restore()}
+  function soulShape(x,y,phase,alpha=1,size=1){
+    const now=performance.now(),sway=Math.sin(now/580+phase)*3;
+    ctx.save();ctx.translate(x,y);ctx.scale(size,size);ctx.globalAlpha=alpha;
+    // A narrow translucent spirit with a tapering smoke tail, no rotating gem.
+    ctx.fillStyle='rgba(108,152,168,.18)';ctx.beginPath();ctx.moveTo(sway,-19);
+    ctx.bezierCurveTo(-9,-11,-8,3,0,6);ctx.bezierCurveTo(9,2,7,-8,sway,-19);ctx.fill();
+    ctx.fillStyle='rgba(154,193,204,.64)';ctx.beginPath();ctx.moveTo(sway*.5,-13);
+    ctx.bezierCurveTo(-4,-5,-4,2,0,3);ctx.bezierCurveTo(5,1,4,-4,sway*.5,-13);ctx.fill();
+    ctx.fillStyle='#d8e5e2';ctx.beginPath();ctx.ellipse(0,-1,1.5,3.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
+  }
+  function pickup(q){
+    const phase=q.phase??q.x*.017+q.y*.023,bob=Math.sin(performance.now()/620+phase)*2;
+    if(q.attracted){
+      const a=Math.atan2(A.player.y-q.y,A.player.x-q.x);
+      for(let i=3;i>=1;i--)soulShape(q.x-Math.cos(a)*i*5,q.y-8-Math.sin(a)*i*5,phase,.10*(4-i),.6);
+    }
+    soulShape(q.x,q.y-8+bob,phase);
+  }
+  function absorbedSoul(q){
+    const t=1-q.life/q.max,p=A.player,u=t*t*(3-2*t);
+    const x=q.x+(p.x-q.x)*u+Math.sin(t*Math.PI*2+q.phase)*Math.sin(t*Math.PI)*8;
+    const y=q.y+(p.y-34-q.y)*u;
+    soulShape(x,y,q.phase,(1-t)*.8,1-t*.55);
+  }
   function minimap(){
     const vals=Object.values(A.rooms),minX=Math.min(...vals.map(r=>r.x)),maxX=Math.max(...vals.map(r=>r.x)),minY=Math.min(...vals.map(r=>r.y)),maxY=Math.max(...vals.map(r=>r.y));
     const bw=A.mobile?96:136,bh=A.mobile?72:100,bx=A.mobile?(arena.x+arena.w-bw-10):(W-bw-18),by=A.mobile?(arena.y+10):15;
@@ -518,7 +552,7 @@
     ctx.textAlign='left';ctx.restore();
   }
 
-  function draw(){ctx.clearRect(0,0,W,H);backdrop();if(!A.started||!A.player||!A.rooms[A.current])return;arenaDraw();roomFeature(A.cur());A.pickups.forEach(pickup);A.cur().enemies.filter(e=>e.alive||(e.deadAt&&performance.now()-e.deadAt<950)).forEach(enemy);A.projectiles.forEach(projectile);A.shockwaves.forEach(s=>{ctx.save();ctx.globalAlpha=Math.max(0,s.l/28);ctx.strokeStyle=s.color;ctx.lineWidth=5;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke();ctx.restore()});A.slashes.forEach(slash);player();A.particles.forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.l/22);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);ctx.restore()});minimap();bossbar();bossVictory()}
+  function draw(){ctx.clearRect(0,0,W,H);backdrop();if(!A.started||!A.player||!A.rooms[A.current])return;arenaDraw();roomFeature(A.cur());A.pickups.forEach(pickup);A.cur().enemies.filter(e=>e.alive||(e.deadAt&&performance.now()-e.deadAt<950)).forEach(enemy);A.projectiles.forEach(projectile);A.shockwaves.forEach(s=>{ctx.save();ctx.globalAlpha=Math.max(0,s.l/28);ctx.strokeStyle=s.color;ctx.lineWidth=5;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke();ctx.restore()});A.slashes.forEach(slash);player();A.soulBursts.forEach(absorbedSoul);A.particles.forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.l/22);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);ctx.restore()});minimap();bossbar();bossVictory()}
   let last=performance.now(),lastFrameError=0;
   function frame(t){
     const dt=Math.min(2.2,(t-last)/16.67);last=t;

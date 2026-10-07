@@ -1,6 +1,6 @@
 <!doctype html><meta charset="utf-8"><title>Eclipse local verification</title>
 <style>body{margin:0;background:#090a10;color:#eee;font:14px system-ui}nav{height:44px;display:flex;gap:8px;align-items:center;padding:0 10px;overflow-x:auto}button{cursor:pointer;white-space:nowrap;flex-shrink:0}iframe{border:0;width:100%;height:calc(100vh - 44px)}</style>
-<nav><button id="dawn">Dawn</button><button id="night">Night</button><button id="move">Run right for 2 seconds</button><button id="combat">Combat</button><button id="clearRoom">Clear combat</button><button id="chest">Chest</button><button id="pool">Pool</button><button id="altar">Altar</button><button id="stairs">Stairs</button><button id="interact">Interact</button><button id="level">Level up</button><button id="freeze">Freeze / resume</button><button id="floor">Next floor</button><button id="boss">Boss</button><button id="defeat">Defeat boss / descend</button><span id="status">Local test controls</span></nav>
+<nav><button id="dawn">Dawn</button><button id="night">Night</button><button id="move">Run right for 2 seconds</button><button id="combat">Combat</button><button id="clearRoom">Clear combat</button><button id="chest">Chest</button><button id="pool">Pool</button><button id="altar">Altar</button><button id="stairs">Stairs</button><button id="souls">Soul drops</button><button id="interact">Interact</button><button id="level">Level up</button><button id="freeze">Freeze / resume</button><button id="floor">Next floor</button><button id="boss">Boss</button><button id="defeat">Defeat boss / descend</button><span id="status">Local test controls</span></nav>
 <iframe id="game" src="../games/abyssfall-eclipse/"></iframe>
 <script>
 const frame=document.querySelector('iframe'),status=document.getElementById('status');
@@ -18,6 +18,7 @@ for(const [button,type] of [['chest','treasure'],['pool','recovery'],['stairs','
 };
 document.getElementById('interact').onclick=()=>{const a=get();a.player.x=a.W/2;a.player.y=a.arena.y+a.arena.h/2;status.textContent='Approached object'};
 document.getElementById('level').onclick=()=>{const a=get();a.pickups.push({x:a.player.x,y:a.player.y,val:a.player.nextXp});status.textContent='XP pickup for keyboard choice test'};
+document.getElementById('souls').onclick=()=>{const a=get();for(let i=0;i<6;i++)a.pickups.push({x:a.W/2-70+i*28,y:a.arena.y+a.arena.h*.42,vx:0,vy:0,val:3,phase:i*.9});status.textContent='Soul drops for visual inspection'};
 document.getElementById('freeze').onclick=()=>{const a=get();if(a.rewardChoices?.length)return;a.paused=!a.paused;if(a.paused)a.player.inv=0;else a.player.inv=9999;status.textContent=a.paused?'Visual frame frozen':'Simulation resumed'};
 document.getElementById('floor').onclick=()=>{get().nextFloor();status.textContent=`${get().floor}F`};
 document.getElementById('boss').onclick=()=>{const a=get();while(!a.isBossFloor())a.nextFloor();const r=Object.values(a.rooms).find(r=>r.type==='boss');a.current=`${r.x},${r.y}`;a.bossUnlocked=true;a.player.inv=99999;a.player.basic=99999;a.player.x=a.W/2;a.player.y=a.arena.y+a.arena.h*.8;frame.contentWindow.PV_AUDIO.startBoss();status.textContent=`${a.floor}F boss`};

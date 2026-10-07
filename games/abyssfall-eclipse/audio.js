@@ -6,8 +6,8 @@
     ctx:null, master:null, musicGain:null, sfxGain:null,
     unlocked:false, muted:false, mode:null, timers:[], musicNodes:[],
     lastSfx:{},voices:0,noiseBuffers:{},musicSession:0,
-    // Optional original/licensed loop files. Procedural ambience remains the fallback.
-    tracks:{title:'../../assets/audio/title-calm.wav',explore:'../../assets/audio/explore-calm.wav',boss:'../../assets/audio/boss-calm.wav'},trackBuffers:{},trackLoads:{}
+    // Sparse high bells only. File failure leaves music silent; never install a drone.
+    tracks:{title:'../../assets/audio/title-sparse.wav',explore:'../../assets/audio/explore-sparse.wav',boss:'../../assets/audio/boss-sparse.wav'},trackBuffers:{},trackLoads:{}
   };
 
   try { A.muted = localStorage.getItem('playvaultMuted') === '1'; } catch (_) {}
@@ -58,12 +58,6 @@
     src.connect(f);f.connect(g);g.connect(A.sfxGain);src.onended=()=>{src.disconnect();f.disconnect();g.disconnect();A.voices--};src.start(t);
   }
 
-  function drone(freq,vol,type='sine',detune=0){
-    const o=A.ctx.createOscillator(),g=A.ctx.createGain();
-    o.type=type;o.frequency.value=freq;o.detune.value=detune;g.gain.value=vol;
-    o.connect(g);g.connect(A.musicBus||A.musicGain);o.start();A.musicNodes.push(o,g);
-  }
-
   A.unlock=async()=>{
     if(!ensure())return false;
     try{if(A.ctx.state!=='running')await A.ctx.resume();A.unlocked=A.ctx.state==='running';A.updateButton();return A.unlocked}catch(_){return false}
@@ -86,10 +80,7 @@
         bus.gain.setTargetAtTime(1,A.ctx.currentTime,.7);
       }catch(err){
         if(session!==A.musicSession)return;
-        console.warn('[PLAYVAULT] music fallback:',err.message);
-        // Only fall back after a failed load, never play two scores during loading.
-        const root=mode==='boss'?98:110;drone(root,.060);drone(root*2,.012);
-        bus.gain.setTargetAtTime(1,A.ctx.currentTime,.8);
+        console.warn('[PLAYVAULT] music unavailable; background remains silent:',err.message);
       }
     })();
   }

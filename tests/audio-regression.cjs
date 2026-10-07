@@ -22,12 +22,12 @@ vm.runInContext(fs.readFileSync(__dirname+'/../games/abyssfall-eclipse/audio.js'
  resolveLoad({ok:true,arrayBuffer:async()=>new ArrayBuffer(1)});for(let i=0;i<12;i++)await Promise.resolve();
  assert.equal(a.mode,null);assert.equal(a.musicNodes.length,0,'late load cannot restart stopped music');
  env.fetch=async()=>({ok:false,status:404});a.startTitle();for(let i=0;i<12;i++)await Promise.resolve();
- const fallback=a.musicNodes.filter(n=>n.started);assert.equal(fallback.length,2,'failed file installs just two quiet aligned tones');
- assert.equal(fallback[1].frequency.value,fallback[0].frequency.value*2);assert.equal(intervals.size,0,'fallback has no pulse timers');
- a.stopMusic();deferred.splice(0).forEach(fn=>fn());assert.ok(fallback.every(n=>n.stopped),'fallback tones stop on exit');
+ const fallback=a.musicNodes.filter(n=>n.started);assert.equal(fallback.length,0,'failed file remains silent, no fallback drone');
+ assert.equal(intervals.size,0,'failed file has no pulse timers');
+ a.stopMusic();deferred.splice(0).forEach(fn=>fn());
  a.ctx.state='interrupted';assert.equal(await a.unlock(),true,'Android interruption resumes');
  await a.toggle();assert.equal(a.muted,true);await a.toggle();assert.equal(a.muted,false);
  for(let i=0;i<30;i++)a.sfx('special',i%2?'night':'dawn');assert.equal(a.voices,40);a.sfx('bossWarn');assert.equal(a.voices,40);
  nodes.forEach(n=>n.onended?.());assert.equal(a.voices,0);
- console.log('PASS audio: resume, latest-mode file loading, no loading overlap, stopped-load guard, quiet failure fallback, mute persistence, bounded voices');
+ console.log('PASS audio: resume, latest-mode file loading, no loading overlap, stopped-load guard, silent failure, mute persistence, bounded voices');
 })().catch(err=>{console.error(err);process.exitCode=1});
