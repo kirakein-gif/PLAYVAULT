@@ -6,8 +6,9 @@
   const mobile = matchMedia('(max-width:700px), (pointer:coarse)').matches && innerHeight > innerWidth;
   const W = mobile ? 720 : 960, H = mobile ? 900 : 640;
   canvas.width=W; canvas.height=H; ctx.imageSmoothingEnabled=false;
-  const arena = mobile ? {x:36,y:150,w:W-72,h:H-205} : {x:42,y:76,w:876,h:520};
+  const arena = mobile ? {x:44,y:245,w:W-88,h:565} : {x:58,y:150,w:844,h:410};
   Object.assign(AF,{canvas,ctx,W,H,mobile,arena});
+  AF.sideDoorY=()=>arena.y+arena.h*(Math.floor((AF.floor-1)/3)%4===3?.46:.40);
   const sound=()=>window.PV_AUDIO;
 
   const ui=AF.ui={start:$('start'),startBtn:$('startBtn'),levelUp:$('levelUp'),upgradeCards:$('upgradeCards'),gameOver:$('gameOver'),retryBtn:$('retryBtn'),heroName:$('heroName'),floorText:$('floorText'),roomText:$('roomText'),killText:$('killText'),hpText:$('hpText'),levelText:$('levelText'),enemyText:$('enemyText'),hpFill:$('hpFill'),xpFill:$('xpFill'),basicName:$('basicName'),basicIcon:$('basicIcon'),specialName:$('specialName'),specialIcon:$('specialIcon'),specialCdText:$('specialCdText'),specialBtn:$('specialBtn'),specialBtnIcon:$('specialBtnIcon'),resultText:$('resultText'),toast:$('toast'),relicList:$('relicList'),relicButton:$('relicButton'),relicCount:$('relicCount'),relicPanel:$('relicPanel'),relicClose:$('relicClose'),relicFlash:$('relicFlash'),relicFlashIcon:$('relicFlashIcon'),relicFlashName:$('relicFlashName'),clearScreen:$('clearScreen'),clearStats:$('clearStats'),clearRelics:$('clearRelics'),clearRecord:$('clearRecord'),endlessBtn:$('endlessBtn'),clearRestart:$('clearRestart'),clearLobby:$('clearLobby')};
@@ -441,21 +442,22 @@
       {i:'♥',n:'생명 각인',d:'최대 체력 +20, 즉시 회복',f:p=>{p.maxHp+=20;p.hp=Math.min(p.maxHp,p.hp+28)}}
     ],'성물 공명','하나의 힘을 선택하세요.');
   }
+  const relicIcon=id=>window.AF_ART?.relicIcons?.[id]||'../../assets/relics/'+id+'.webp?v=35';
   function treasureReward(){
     const opts=[
-      {id:'relic-blade',i:'⚔',img:'../../assets/relics/relic-blade.webp?v=2',n:'유물의 칼날',d:'공격 +8 · 기본 공격 관통 +1 · 3회마다 공명 참격',rarity:'rare',relic:true,f:p=>p.atk+=8},
-      {id:'dash-sigil',i:'✧',img:'../../assets/relics/dash-sigil.webp?v=2',n:'질주의 문장',d:'이속 +0.22 · 공격 가속 · 이동 중 주기적으로 질주 충격파',rarity:'rare',relic:true,f:p=>{p.speed+=.22;p.rate+=2}},
-      {id:'guardian-seal',i:'◈',img:'../../assets/relics/guardian-seal.webp?v=2',n:'수호자의 인장',d:'최대 HP +28 · 피격 시 보호막과 근접 반격 충격파',rarity:'rare',relic:true,f:p=>{p.maxHp+=28;p.hp=Math.min(p.maxHp,p.hp+35)}},
-      {id:'resonance-core',i:'✹',img:'../../assets/relics/resonance-core.webp?v=2',n:'공명 핵',d:'특수기 쿨 감소 · 범위 증가 · 사용 후 잔향 추가 발동',rarity:'rare',relic:true,f:p=>{p.specialBoost+=42;p.range+=10}},
-      {id:'condensed-crystal',i:'◆',img:'../../assets/relics/condensed-crystal.webp?v=2',n:'응축 수정',d:'공격 +4 · 최대 HP +14 · 일정 시간마다 수정 탄막 자동 발사',rarity:'rare',relic:true,f:p=>{p.atk+=4;p.maxHp+=14;p.hp=Math.min(p.maxHp,p.hp+14)}},
-      {id:'twin-grail',i:'♜',img:'../../assets/relics/twin-grail.webp?v=4',n:'쌍둥이 성배',d:'체력이 낮을수록 모든 피해 증가',rarity:'epic',relic:true,f:p=>{p.hp=Math.min(p.maxHp,p.hp+8)}},
-      {id:'abyss-mirror',i:'◇',img:'../../assets/relics/abyss-mirror.webp?v=4',n:'심연의 거울',d:'적 투사체를 일정 확률로 반사해 되돌려 보냄',rarity:'epic',relic:true,f:p=>{}},
-      {id:'pilgrim-lantern',i:'✦',img:'../../assets/relics/pilgrim-lantern.webp?v=4',n:'순례자의 등불',d:'일반전투·엘리트방 클리어 시 소량 회복',rarity:'rare',relic:true,f:p=>{}},
-      {id:'red-vow',i:'✕',img:'../../assets/relics/red-vow.webp?v=4',n:'붉은 서약',d:'최대 HP 15% 감소 · 공격력 +14',rarity:'epic',relic:true,f:p=>{p.maxHp=Math.max(45,Math.round(p.maxHp*.85));p.hp=Math.min(p.hp,p.maxHp);p.atk+=14}},
-      {id:'time-gear',i:'⌁',img:'../../assets/relics/time-gear.webp?v=4',n:'시간의 톱니',d:'특수기 사용 시 일정 확률로 쿨타임 즉시 초기화',rarity:'legendary',relic:true,f:p=>{}}
+      {id:'relic-blade',i:'⚔',img:relicIcon('relic-blade'),n:'유물의 칼날',d:'공격 +8 · 기본 공격 관통 +1 · 3회마다 공명 참격',rarity:'rare',relic:true,f:p=>p.atk+=8},
+      {id:'dash-sigil',i:'✧',img:relicIcon('dash-sigil'),n:'질주의 문장',d:'이속 +0.22 · 공격 가속 · 이동 중 주기적으로 질주 충격파',rarity:'rare',relic:true,f:p=>{p.speed+=.22;p.rate+=2}},
+      {id:'guardian-seal',i:'◈',img:relicIcon('guardian-seal'),n:'수호자의 인장',d:'최대 HP +28 · 피격 시 보호막과 근접 반격 충격파',rarity:'rare',relic:true,f:p=>{p.maxHp+=28;p.hp=Math.min(p.maxHp,p.hp+35)}},
+      {id:'resonance-core',i:'✹',img:relicIcon('resonance-core'),n:'공명 핵',d:'특수기 쿨 감소 · 범위 증가 · 사용 후 잔향 추가 발동',rarity:'rare',relic:true,f:p=>{p.specialBoost+=42;p.range+=10}},
+      {id:'condensed-crystal',i:'◆',img:relicIcon('condensed-crystal'),n:'응축 수정',d:'공격 +4 · 최대 HP +14 · 일정 시간마다 수정 탄막 자동 발사',rarity:'rare',relic:true,f:p=>{p.atk+=4;p.maxHp+=14;p.hp=Math.min(p.maxHp,p.hp+14)}},
+      {id:'twin-grail',i:'♜',img:relicIcon('twin-grail'),n:'쌍둥이 성배',d:'체력이 낮을수록 모든 피해 증가',rarity:'epic',relic:true,f:p=>{p.hp=Math.min(p.maxHp,p.hp+8)}},
+      {id:'abyss-mirror',i:'◇',img:relicIcon('abyss-mirror'),n:'심연의 거울',d:'적 투사체를 일정 확률로 반사해 되돌려 보냄',rarity:'epic',relic:true,f:p=>{}},
+      {id:'pilgrim-lantern',i:'✦',img:relicIcon('pilgrim-lantern'),n:'순례자의 등불',d:'일반전투·엘리트방 클리어 시 소량 회복',rarity:'rare',relic:true,f:p=>{}},
+      {id:'red-vow',i:'✕',img:relicIcon('red-vow'),n:'붉은 서약',d:'최대 HP 15% 감소 · 공격력 +14',rarity:'epic',relic:true,f:p=>{p.maxHp=Math.max(45,Math.round(p.maxHp*.85));p.hp=Math.min(p.hp,p.maxHp);p.atk+=14}},
+      {id:'time-gear',i:'⌁',img:relicIcon('time-gear'),n:'시간의 톱니',d:'특수기 사용 시 일정 확률로 쿨타임 즉시 초기화',rarity:'legendary',relic:true,f:p=>{}}
     ];
-    if(AF.player.hero.key==='dawn')opts.push({id:'solar-shard',i:'☀',img:'../../assets/relics/solar-shard.webp?v=4',n:'태양의 파편',d:'Dawn 전용 · 추적 룬탄 관통 +1',rarity:'epic',relic:true,f:p=>{}});
-    else opts.push({id:'eclipse-fang',i:'☾',img:'../../assets/relics/eclipse-fang.webp?v=4',n:'월식의 송곳니',d:'Night 전용 · 적 처치 시 추가 월광 칼날 발생',rarity:'epic',relic:true,f:p=>{}});
+    if(AF.player.hero.key==='dawn')opts.push({id:'solar-shard',i:'☀',img:relicIcon('solar-shard'),n:'태양의 파편',d:'Dawn 전용 · 추적 룬탄 관통 +1',rarity:'epic',relic:true,f:p=>{}});
+    else opts.push({id:'eclipse-fang',i:'☾',img:relicIcon('eclipse-fang'),n:'월식의 송곳니',d:'Night 전용 · 적 처치 시 추가 월광 칼날 발생',rarity:'epic',relic:true,f:p=>{}});
     chooseReward(opts,'보물 발견','상자에서 유물 하나를 선택하세요.');
   }
   function roomFeature(r){
@@ -556,14 +558,14 @@
   function clamp(){const p=AF.player;p.x=Math.max(arena.x+p.r,Math.min(arena.x+arena.w-p.r,p.x));p.y=Math.max(arena.y+p.r,Math.min(arena.y+arena.h-p.r,p.y))}
   function enter(nk,from){
     AF.current=nk;const r=AF.cur();r.seen=true;AF.projectiles=[];AF.slashes=[];AF.soulBursts=[];if(!r.clear)spawnRoom(r);
-    const p=AF.player;if(from==='W'){p.x=arena.x+35;p.y=arena.y+arena.h/2}else if(from==='E'){p.x=arena.x+arena.w-35;p.y=arena.y+arena.h/2}else if(from==='N'){p.x=W/2;p.y=arena.y+35}else if(from==='S'){p.x=W/2;p.y=arena.y+arena.h-35}
+    const p=AF.player;if(from==='W'){p.x=arena.x+35;p.y=AF.sideDoorY()}else if(from==='E'){p.x=arena.x+arena.w-35;p.y=AF.sideDoorY()}else if(from==='N'){p.x=W/2;p.y=arena.y+35}else if(from==='S'){p.x=W/2;p.y=arena.y+arena.h-35}
     p.inv=r.type==='boss'?120:35;
     const msg={treasure:'보물방 · 중앙의 상자를 찾아보세요',recovery:'회복방 · 중앙의 샘에 다가가세요',elite:'엘리트방 · 강적이 문을 봉쇄했습니다',exit:'아래로 내려가는 길이 이 방 어딘가에 있다',boss:'거대한 문 너머에서 인기척이 느껴진다',combat:'일반전투방'}[r.type]||'새 방 발견';
     if(r.type==='boss'){sound()?.startBoss();sound()?.sfx('bossIntro')}
     AF.toast(msg);
   }
   function doors(){
-    const p=AF.player,r=AF.cur(),g=58,mx=W/2,my=arena.y+arena.h/2;let d=null;
+    const p=AF.player,r=AF.cur(),g=58,mx=W/2,my=AF.sideDoorY();let d=null;
     if(p.x<=arena.x+p.r+1&&r.clear&&r.doors.W&&Math.abs(p.y-my)<g)d='W';
     else if(p.x>=arena.x+arena.w-p.r-1&&r.clear&&r.doors.E&&Math.abs(p.y-my)<g)d='E';
     else if(p.y<=arena.y+p.r+1&&r.clear&&r.doors.N&&Math.abs(p.x-mx)<g)d='N';

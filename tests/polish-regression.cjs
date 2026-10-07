@@ -7,7 +7,7 @@ function harness(mobile=false,dpr=1){
  function el(id){if(!elements.has(id)){
   const classes=new Set(),e={style:{setProperty(){}},dataset:{},children:[],classList:{add(x){classes.add(x)},remove(x){classes.delete(x)},contains(x){return classes.has(x)},toggle(){}},addEventListener(){},setAttribute(){},appendChild(c){this.children.push(c)},getBoundingClientRect(){return {left:0,top:0,width:112,height:112}},getContext(){return ctx},toDataURL(){return 'data:image/png;base64,'},querySelector(s){return el(id+s)},querySelectorAll(){return []},closest(){return null},textContent:'',innerHTML:''};elements.set(id,e);
  }return elements.get(id)}
- class Image{constructor(){this.complete=true;this.naturalWidth=1536;this.width=1536;this.height=1024}set src(x){this._src=x;this.onload?.()}}
+ class Image{constructor(){this.complete=true;this.naturalWidth=1536;this.width=1536;this.height=1024}set src(x){this._src=x;if(x.includes('room-')&&x.includes('-v5')){this.width=916;this.height=1717}else if(x.includes('relics-v5')){this.width=1448;this.height=1086}this.onload?.()}}
  const env={console,Image,performance:{now:()=>now},innerWidth:mobile?390:1440,innerHeight:mobile?844:960,devicePixelRatio:dpr,matchMedia:()=>({matches:mobile}),localStorage:{getItem(){return null},setItem(){}},document:{getElementById:el,querySelectorAll(){return []},documentElement:el('root'),createElement:()=>el('made'+created++)},addEventListener(type,fn){(listeners[type]??=[]).push(fn)},setTimeout(fn,ms){timers.push({fn,at:now+ms});return timers.length},clearTimeout(){},requestAnimationFrame(fn){raf=fn},fetch:async()=>({ok:false,status:404})};env.window=env;vm.createContext(env);
  for(const file of ['art.js','core.js','render.js'])vm.runInContext(fs.readFileSync(root+'/'+file,'utf8'),env,{filename:file});
  const A=env.AF;
@@ -48,6 +48,26 @@ for(const code of ['Digit1','Digit2','Digit3','Numpad1','Numpad2','Numpad3']){
  assert.ok(Object.keys(before).length);
 }
 console.log('PASS rewards: 1/2/3 and numpad match displayed choices, no repeat/double apply or input-field hijack');
+// The art's side passages and actual crossings use the same ground position.
+for(const mobile of [false,true])for(const d of ['N','S','W','E']){
+ const h=harness(mobile),{A}=h;A.newRun();const [x,y,opp]={N:[0,-1,'S'],S:[0,1,'N'],W:[-1,0,'E'],E:[1,0,'W']}[d],target=`${x},${y}`;
+ const start=A.cur();start.doors={[d]:true};start.clear=true;
+ A.rooms[target]={x,y,type:'empty',doors:{[opp]:true},clear:true,enemies:[],seen:false};
+ A.player.x=d==='W'?A.arena.x+A.player.r:d==='E'?A.arena.x+A.arena.w-A.player.r:A.W/2;
+ A.player.y=d==='N'?A.arena.y+A.player.r:d==='S'?A.arena.y+A.arena.h-A.player.r:A.sideDoorY();
+ A.update(1);assert.equal(A.current,target,'cross '+d);
+ if(d==='W'||d==='E')assert.equal(A.player.y,A.sideDoorY(),'arrival follows physical side passage');
+}
+{
+ const h=harness(),art=h.env.AF_ART;assert.equal(Object.keys(art.relicIcons).length,12);
+ for(const [id,[x,y,w,height]] of Object.entries(art.relicFrames)){assert.ok(x>=0&&y>=0&&x+w<=1448&&y+height<=1086,id+' stays in atlas');assert.ok(Math.max(w,height)>=350,id+' retains native detail')}
+ for(let zone=0;zone<4;zone++)for(const clear of [false,true]){
+  const room={doors:{N:true,S:true,W:true,E:true},clear},scene=art.room(zone,room,()=>clear);
+  assert.equal(scene.width,916);assert.equal(scene.height,572);assert.equal(art.room(zone,room,()=>clear),scene,'reuse composed scene');
+  assert.notEqual(art.room(zone,room,()=>!clear),scene,'door state has distinct scene');
+ }
+}
+console.log('PASS integrated art: four actual crossings on desktop/mobile, all relic bounds, all zones and cached door states');
 {
  const h=harness(),{A}=h;A.newRun();
  const pool=Object.values(A.rooms).find(r=>r.type==='recovery');A.current=`${pool.x},${pool.y}`;

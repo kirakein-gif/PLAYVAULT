@@ -1,80 +1,157 @@
 {
-  "version": 4,
-  "style": "PLAYVAULT pixel relics",
+  "version": 5,
+  "style": "weathered gothic steel, bronze, crystal and parchment",
   "relics": {
     "relic-blade": {
       "name": "유물의 칼날",
       "file": "relic-blade.webp",
       "rarity": "rare",
-      "effect": "공격 +8 · 기본 공격 관통 +1 · 3회마다 공명 참격"
+      "effect": "공격 +8 · 기본 공격 관통 +1 · 3회마다 공명 참격",
+      "frame": [
+        0,
+        0,
+        380,
+        355
+      ]
     },
     "dash-sigil": {
       "name": "질주의 문장",
       "file": "dash-sigil.webp",
       "rarity": "rare",
-      "effect": "이속 +0.22 · 공격 가속 · 이동 중 질주 충격파"
+      "effect": "이속 +0.22 · 공격 가속 · 이동 중 질주 충격파",
+      "frame": [
+        405,
+        10,
+        355,
+        345
+      ]
     },
     "guardian-seal": {
       "name": "수호자의 인장",
       "file": "guardian-seal.webp",
       "rarity": "rare",
-      "effect": "최대 HP +28 · 피격 시 보호막과 근접 반격"
+      "effect": "최대 HP +28 · 피격 시 보호막과 근접 반격",
+      "frame": [
+        780,
+        0,
+        312,
+        355
+      ]
     },
     "resonance-core": {
       "name": "공명 핵",
       "file": "resonance-core.webp",
       "rarity": "rare",
-      "effect": "특수기 쿨/범위 강화 · 사용 후 잔향 추가 발동"
+      "effect": "특수기 쿨/범위 강화 · 사용 후 잔향 추가 발동",
+      "frame": [
+        1140,
+        0,
+        308,
+        352
+      ]
     },
     "condensed-crystal": {
       "name": "응축 수정",
       "file": "condensed-crystal.webp",
       "rarity": "rare",
-      "effect": "공격 +4 · 최대 HP +14 · 주기적 수정 탄막"
+      "effect": "공격 +4 · 최대 HP +14 · 주기적 수정 탄막",
+      "frame": [
+        42,
+        361,
+        310,
+        363
+      ]
     },
     "solar-shard": {
       "name": "태양의 파편",
       "file": "solar-shard.webp",
       "rarity": "epic",
       "hero": "dawn",
-      "effect": "Dawn 전용 · 룬탄 관통 +1"
+      "effect": "Dawn 전용 · 룬탄 관통 +1",
+      "frame": [
+        800,
+        712,
+        265,
+        374
+      ]
     },
     "eclipse-fang": {
       "name": "월식의 송곳니",
       "file": "eclipse-fang.webp",
       "rarity": "epic",
       "hero": "night",
-      "effect": "Night 전용 · 적 처치 시 추가 월광 칼날"
+      "effect": "Night 전용 · 적 처치 시 추가 월광 칼날",
+      "frame": [
+        1080,
+        713,
+        368,
+        373
+      ]
     },
     "twin-grail": {
       "name": "쌍둥이 성배",
       "file": "twin-grail.webp",
       "rarity": "epic",
-      "effect": "체력이 낮을수록 모든 피해 증가"
+      "effect": "체력이 낮을수록 모든 피해 증가",
+      "frame": [
+        370,
+        375,
+        410,
+        320
+      ]
     },
     "abyss-mirror": {
       "name": "심연의 거울",
       "file": "abyss-mirror.webp",
       "rarity": "epic",
-      "effect": "일정 확률로 적 투사체 반사"
+      "effect": "일정 확률로 적 투사체 반사",
+      "frame": [
+        807,
+        355,
+        272,
+        372
+      ]
     },
     "pilgrim-lantern": {
       "name": "순례자의 등불",
       "file": "pilgrim-lantern.webp",
       "rarity": "rare",
-      "effect": "전투방 클리어 시 소량 회복"
+      "effect": "전투방 클리어 시 소량 회복",
+      "frame": [
+        1140,
+        355,
+        308,
+        360
+      ]
     },
     "red-vow": {
       "name": "붉은 서약",
       "file": "red-vow.webp",
       "rarity": "epic",
-      "effect": "최대 HP 감소 대신 공격력 대폭 증가"
+      "effect": "최대 HP 감소 대신 공격력 대폭 증가",
+      "frame": [
+        18,
+        724,
+        354,
+        362
+      ]
     },
     "time-gear": {
       "name": "시간의 톱니",
       "file": "time-gear.webp",
       "rarity": "legendary",
-      "effect": "특수기 사용 시 일정 확률로 쿨타임 즉시 초기화"
+      "effect": "특수기 사용 시 일정 확률로 쿨타임 즉시 초기화",
+      "frame": [
+        382,
+        703,
+        386,
+        383
+      ]
     }
-  }
+  },
+  "atlas": "../art/relics-v5.webp",
+  "atlasResolution": [
+    1448,
+    1086
+  ]
 }

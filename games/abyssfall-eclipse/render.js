@@ -18,37 +18,23 @@
     ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   }
 
-  function perspectiveFloor(t){
-    const g=ctx.createLinearGradient(arena.x,arena.y,arena.x,arena.y+arena.h);
-    g.addColorStop(0,t.floor0);g.addColorStop(1,t.floor1);ctx.fillStyle=g;ctx.fillRect(arena.x,arena.y,arena.w,arena.h);
-    const vpX=W/2,vpY=arena.y-62;
-    ctx.strokeStyle=t.grid;ctx.lineWidth=1;
-    for(let i=0;i<=12;i++){
-      const bx=arena.x+i*arena.w/12,tx=vpX+(bx-vpX)*.56;
-      ctx.beginPath();ctx.moveTo(tx,arena.y);ctx.lineTo(bx,arena.y+arena.h);ctx.stroke();
+  function sceneSlices(scene,foreground=false){
+    const top=A.mobile?130:0,foot=arena.y+arena.h,edges=[0,.28,.82,1],dy=[top,arena.y,foot,H];
+    ctx.imageSmoothingEnabled=true;
+    for(let i=0;i<3;i++){
+      const begin=foreground?Math.max(edges[i],.80):edges[i];if(begin>=edges[i+1])continue;
+      const y=dy[i]+(begin-edges[i])/(edges[i+1]-edges[i])*(dy[i+1]-dy[i]);
+      ctx.drawImage(scene,0,begin*scene.height,scene.width,(edges[i+1]-begin)*scene.height,0,y,W,dy[i+1]-y);
     }
-    for(let i=0;i<=10;i++){
-      const q=i/10,y=arena.y+arena.h*Math.pow(q,1.52),inset=(1-q)*arena.w*.075;
-      ctx.beginPath();ctx.moveTo(arena.x+inset,y);ctx.lineTo(arena.x+arena.w-inset,y);ctx.stroke();
-    }
-    const shade=ctx.createLinearGradient(arena.x,0,arena.x+arena.w,0);
-    shade.addColorStop(0,'rgba(0,0,0,.18)');shade.addColorStop(.14,'rgba(0,0,0,0)');shade.addColorStop(.86,'rgba(0,0,0,0)');shade.addColorStop(1,'rgba(0,0,0,.18)');
-    ctx.fillStyle=shade;ctx.fillRect(arena.x,arena.y,arena.w,arena.h);
-    const art=window.AF_ART;
-    if(art?.loaded.rooms){
-      const idx=zoneIndex(),im=art.images.rooms;
-      ctx.imageSmoothingEnabled=false;
-      const sx=(idx%2)*im.width/2,sy=Math.floor(idx/2)*im.height/2,sw=im.width/2,sh=im.height/2,wall=sh*.32;
-      ctx.drawImage(im,sx,sy,sw,wall,arena.x,arena.y-58,arena.w,58);
-      ctx.drawImage(im,sx,sy+wall,sw,sh-wall,arena.x,arena.y,arena.w,arena.h);
-      // Room-specific wear, cached by deterministic seed rather than frame time.
-      const seed=roomSeed();ctx.fillStyle='rgba(7,8,12,.14)';
-      for(let i=0;i<18;i++){
-        const x=arena.x+hash(seed+i*17)*arena.w,y=arena.y+hash(seed+i*31)*arena.h;
-        ctx.fillRect(x,y,3+hash(seed+i)*14,2);
-      }
-    }
+    ctx.imageSmoothingEnabled=false;
   }
+  let currentScene=null;
+  function perspectiveFloor(t){
+    currentScene=window.AF_ART?.room(zoneIndex(),A.cur(),A.isDoorOpen);
+    if(currentScene){sceneSlices(currentScene);return}
+    ctx.fillStyle=t.floor0;ctx.fillRect(arena.x,arena.y,arena.w,arena.h);
+  }
+  function foregroundWall(){if(currentScene)sceneSlices(currentScene,true)}
 
   function archPath(cx,base,w,h){
     ctx.beginPath();ctx.moveTo(cx-w/2,base);ctx.lineTo(cx-w/2,base-h*.55);ctx.arc(cx,base-h*.55,w/2,Math.PI,0);ctx.lineTo(cx+w/2,base);ctx.closePath();
@@ -118,7 +104,7 @@
   }
 
   function stageDecor(){
-    if(!window.AF_ART?.loaded.rooms){
+    if(!currentScene){
       const idx=zoneIndex();
       if(idx===0)drawCathedral();else if(idx===1)drawGraveyard();else if(idx===2)drawTower();else drawAltar();
     }
@@ -228,17 +214,7 @@
   }
   function arenaDraw(){
     const r=A.cur(),t=theme();perspectiveFloor(t);stageDecor();stageGimmick(r);
-    const gap=58,mx=W/2,my=arena.y+arena.h/2;
-    const seg=(x1,y1,x2,y2)=>{ctx.strokeStyle=t.wall;ctx.lineWidth=6;ctx.lineCap='butt';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()};
-    for(const d of ['N','S']){
-      const y=d==='N'?arena.y:arena.y+arena.h;
-      if(r.doors[d]){seg(arena.x,y,mx-gap,y);seg(mx+gap,y,arena.x+arena.w,y)}else seg(arena.x,y,arena.x+arena.w,y);
-    }
-    for(const d of ['W','E']){
-      const x=d==='W'?arena.x:arena.x+arena.w;
-      if(r.doors[d]){seg(x,arena.y,x,my-gap);seg(x,my+gap,x,arena.y+arena.h)}else seg(x,arena.y,x,arena.y+arena.h);
-    }
-    for(const d of ['N','W','E','S'])if(r.doors[d])door(d,r);
+    if(!currentScene)for(const d of ['N','W','E','S'])if(r.doors[d])door(d,r);
   }
   function roomFeature(r){
     if(!r)return;
@@ -552,7 +528,7 @@
     ctx.textAlign='left';ctx.restore();
   }
 
-  function draw(){ctx.clearRect(0,0,W,H);backdrop();if(!A.started||!A.player||!A.rooms[A.current])return;arenaDraw();roomFeature(A.cur());A.pickups.forEach(pickup);A.cur().enemies.filter(e=>e.alive||(e.deadAt&&performance.now()-e.deadAt<950)).forEach(enemy);A.projectiles.forEach(projectile);A.shockwaves.forEach(s=>{ctx.save();ctx.globalAlpha=Math.max(0,s.l/28);ctx.strokeStyle=s.color;ctx.lineWidth=5;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke();ctx.restore()});A.slashes.forEach(slash);player();A.soulBursts.forEach(absorbedSoul);A.particles.forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.l/22);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);ctx.restore()});minimap();bossbar();bossVictory()}
+  function draw(){ctx.clearRect(0,0,W,H);backdrop();if(!A.started||!A.player||!A.rooms[A.current])return;arenaDraw();roomFeature(A.cur());A.pickups.forEach(pickup);A.cur().enemies.filter(e=>e.alive||(e.deadAt&&performance.now()-e.deadAt<950)).forEach(enemy);A.projectiles.forEach(projectile);A.shockwaves.forEach(s=>{ctx.save();ctx.globalAlpha=Math.max(0,s.l/28);ctx.strokeStyle=s.color;ctx.lineWidth=5;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke();ctx.restore()});A.slashes.forEach(slash);player();A.soulBursts.forEach(absorbedSoul);A.particles.forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.l/22);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);ctx.restore()});foregroundWall();minimap();bossbar();bossVictory()}
   let last=performance.now(),lastFrameError=0;
   function frame(t){
     const dt=Math.min(2.2,(t-last)/16.67);last=t;
