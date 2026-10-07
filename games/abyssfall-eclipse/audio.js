@@ -7,7 +7,7 @@
     unlocked:false, muted:false, mode:null, timers:[], musicNodes:[],
     lastSfx:{},voices:0,noiseBuffers:{},musicSession:0,
     // Optional original/licensed loop files. Procedural ambience remains the fallback.
-    tracks:{title:null,explore:null,boss:null},trackBuffers:{}
+    tracks:{title:'../../assets/audio/title.wav',explore:'../../assets/audio/explore.wav',boss:'../../assets/audio/boss.wav'},trackBuffers:{}
   };
 
   try { A.muted = localStorage.getItem('playvaultMuted') === '1'; } catch (_) {}
@@ -139,6 +139,7 @@
     const now=performance.now(),limits={basic:140,hit:100,enemyDeath:120};
     if(limits[name] && now-(A.lastSfx[name]||0)<limits[name])return;
     A.lastSfx[name]=now;
+    if(['basic','hit','enemyDeath'].includes(name)&&A.voices>=24)return;
     if(['bossWarn','bossIntro','special','hurt','gateOpen'].includes(name)){
       const t=A.ctx.currentTime,g=A.musicGain.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.17,t,.025);g.setTargetAtTime(.36,t+.5,.20);
     }

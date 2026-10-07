@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8"><title>Eclipse local verification</title>
+<style>body{margin:0;background:#090a10;color:#eee;font:14px system-ui}nav{height:44px;display:flex;gap:8px;align-items:center;padding:0 10px}button{cursor:pointer}iframe{border:0;width:100%;height:calc(100vh - 44px)}</style>
+<nav><button id="dawn">Dawn</button><button id="night">Night</button><button id="move">Run right for 2 seconds</button><button id="combat">Combat</button><button id="floor">Next floor</button><button id="boss">Boss</button><button id="defeat">Defeat boss / descend</button><span id="status">Local test controls</span></nav>
+<iframe id="game" src="../games/abyssfall-eclipse/"></iframe>
+<script>
+const frame=document.querySelector('iframe'),status=document.getElementById('status');
+const get=()=>frame.contentWindow.AF;
+for(const key of ['dawn','night'])document.getElementById(key).onclick=()=>{const a=get();a.selected=key;a.newRun();status.textContent=key};
+document.getElementById('move').onclick=()=>{const a=get();a.keys.d=true;setTimeout(()=>a.keys.d=false,2000)};
+document.getElementById('combat').onclick=()=>{const a=get();a.player.inv=9999;const r=Object.values(a.rooms).find(r=>r.type==='combat');a.current=`${r.x},${r.y}`;a.player.x=a.W/2;a.player.y=a.arena.y+a.arena.h*.72;status.textContent='Combat: protection for visual inspection'};
+document.getElementById('floor').onclick=()=>{get().nextFloor();status.textContent=`${get().floor}F`};
+document.getElementById('boss').onclick=()=>{const a=get();while(!a.isBossFloor())a.nextFloor();const r=Object.values(a.rooms).find(r=>r.type==='boss');a.current=`${r.x},${r.y}`;a.bossUnlocked=true;a.player.inv=99999;a.player.x=a.W/2;a.player.y=a.arena.y+a.arena.h*.8;frame.contentWindow.PV_AUDIO.startBoss();status.textContent=`${a.floor}F boss`};
+document.getElementById('defeat').onclick=()=>{const a=get(),e=a.cur().enemies.find(e=>e.type==='boss');e.intro=0;while(e.alive)a.damage(e,e.max);setTimeout(()=>{a.player.x=a.W/2;a.player.y=a.arena.y+a.arena.h/2},850);setTimeout(()=>status.textContent=`${a.floor}F, paused=${a.paused}, transitioning=${a.transitioning}`,2000)};
+</script>

@@ -38,7 +38,9 @@
     if(art?.loaded.rooms){
       const idx=zoneIndex(),im=art.images.rooms;
       ctx.imageSmoothingEnabled=false;
-      ctx.drawImage(im,(idx%2)*im.width/2,Math.floor(idx/2)*im.height/2,im.width/2,im.height/2,arena.x,arena.y-58,arena.w,arena.h+58);
+      const sx=(idx%2)*im.width/2,sy=Math.floor(idx/2)*im.height/2,sw=im.width/2,sh=im.height/2,wall=sh*.32;
+      ctx.drawImage(im,sx,sy,sw,wall,arena.x,arena.y-58,arena.w,58);
+      ctx.drawImage(im,sx,sy+wall,sw,sh-wall,arena.x,arena.y,arena.w,arena.h);
       // Room-specific wear, cached by deterministic seed rather than frame time.
       const seed=roomSeed();ctx.fillStyle='rgba(7,8,12,.14)';
       for(let i=0;i<18;i++){
@@ -126,9 +128,9 @@
       if(r.doors.N){
         // The gate is recessed into the north wall, with a stone lintel and sill.
         ctx.fillStyle=t.wall;ctx.fillRect(cx-66,arena.y-58,132,58);
-        archPath(cx,arena.y,108,62);ctx.fillStyle='#090a10';ctx.fill();
-        ctx.strokeStyle=r.clear?'#9ca68b':t.door;ctx.lineWidth=3;ctx.stroke();
-        ctx.fillStyle='#15151b';ctx.fillRect(cx-54,arena.y-8,108,8);
+        archPath(cx,arena.y,88,24);ctx.fillStyle='#090a10';ctx.fill();
+        ctx.strokeStyle=r.clear?'#9ca68b':t.wall;ctx.lineWidth=3;ctx.stroke();
+        ctx.fillStyle='#15151b';ctx.fillRect(cx-44,arena.y-8,88,8);
       }
     }else if(idx===0)drawCathedral();else if(idx===1)drawGraveyard();else if(idx===2)drawTower();else drawAltar();
     roomMood(A.cur());
@@ -314,7 +316,8 @@
       const frame=atlas.frames[anim][idx]||atlas.frames.idle[0];
       if(window.AF_ART?.loaded.heroes){
         const art=window.AF_ART;
-        art.draw(ctx,'heroes',art.hero(h.key,anim,idx),A.mobile?.57:.46,14);
+        const f=art.hero(h.key,anim,idx);
+        art.draw(ctx,f.image,f,(A.mobile?.57:.46)*f.scale,14);
       }else{
       const sx=frame[0]*atlas.cellW,sy=frame[1]*atlas.cellH;
       const base=h.drawW*(A.mobile?1.52:1.36);
@@ -467,8 +470,8 @@
     }
     ctx.restore();
 
-    if(e.alive&&(boss||e.type!=='crawler'||e.hp<e.max)){
-      const w=boss?120:e.r*2.5,barY=e.y-(boss?78:43);
+    if(e.alive&&!boss&&(e.type!=='crawler'||e.hp<e.max)){
+      const w=e.r*2.5,barY=e.y-({crawler:70,shooter:104,brute:94}[e.type]||70)*(A.mobile?1.15:1);
       ctx.fillStyle='#000b';ctx.fillRect(e.x-w/2,barY,w,5);
       ctx.fillStyle=boss?'#e04f79':e.type==='shooter'?'#ff6b78':'#ff6176';
       ctx.fillRect(e.x-w/2,barY,w*Math.max(0,e.hp/e.max),5);
@@ -518,7 +521,7 @@
   }
   function bossbar(){
     const b=A.cur().enemies.find(e=>e.alive&&e.type==='boss');if(!b)return;
-    const w=Math.min(410,W-170),x=(W-w)/2,y=A.mobile?72:28,phase=(b.bossPhase||0)+1;
+    const w=Math.min(410,W-170),x=(W-w)/2,y=arena.y+32,phase=(b.bossPhase||0)+1;
     ctx.fillStyle='#05060de6';rr(x-2,y-2,w+4,22,9);ctx.fill();
     ctx.fillStyle='#2a1234';ctx.fillRect(x,y,w,16);
     ctx.fillStyle=phase===3?'#ff3f62':phase===2?'#d75ad8':'#c665e6';ctx.fillRect(x,y,w*Math.max(0,b.hp/b.max),16);
