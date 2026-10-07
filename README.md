@@ -146,3 +146,10 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - A clockwise gold radial ring fills as the skill recharges.
 - When ready, the button switches to READY with a gold outline and subtle pulse glow.
 - The desktop ability panel mirrors cooling/ready state visually.
+
+## ABYSSFALL v31 grounded protagonist redesign
+
+- Replaced the cartoon protagonist sprites with new adult proportions, hood shadows, practical armor, weathered cloth, and restrained amber/cyan lantern light matching the gothic enemies and rooms.
+- Reduced displayed protagonist body height by approximately 20 percent; authored frame pivots and foot anchors keep animation grounded.
+- Character selection uses the same idle art as gameplay. Attack and death sprites share the new design and normalized body scale.
+- Gameplay, enemy assets, room assets, and audio are unchanged. Built-in image generation prompts and provenance are recorded in `assets/art/hero-redesign-provenance.txt`.

@@ -21,6 +21,17 @@
   };
   const enemyImgs=AF.enemyImgs={}; Object.entries(ENEMY_SPR).forEach(([k,src])=>{const im=new Image();im.src=src;enemyImgs[k]=im});
   $('dawnPortrait').src=SPR.dawn_idle; $('nightPortrait').src=SPR.night_idle;
+  // Use the same authored idle artwork for character selection and gameplay.
+  window.AF_ART?.ready.then(()=>{
+    const art=window.AF_ART;if(!art.loaded.heroes)return;
+    for(const key of ['dawn','night']){
+      const f=art.hero(key,'idle',0),portrait=document.createElement('canvas');
+      portrait.width=f.w;portrait.height=f.h;
+      const pc=portrait.getContext('2d');pc.imageSmoothingEnabled=false;
+      pc.drawImage(art.images.heroes,f.x,f.y,f.w,f.h,0,0,f.w,f.h);
+      $(key+'Portrait').src=portrait.toDataURL('image/png');
+    }
+  });
 
   AF.heroes={
     dawn:{key:'dawn',name:'Dawn Seeker',ko:'여명의 추적자',color:'#ffd46f',accent:'#66d9ff',maxHp:120,speed:3.15,basicName:'추적 룬탄',basicIcon:'✦',rate:34,damage:17,proj:8.1,specialName:'태양낙인',specialIcon:'☀',specialCd:430,idle:'dawn_idle',run:'dawn_run',attack:'dawn_attack',drawW:mobile?112:98},
