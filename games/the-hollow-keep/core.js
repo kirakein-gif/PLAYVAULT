@@ -29,7 +29,7 @@ const HEROES={
 const state={
   started:false,paused:true,current:'gate',active:'ethan',visited:new Set(),kills:0,startTime:0,
   elevatorOn:false,cellarOpen:false,bossDead:false,bellRung:false,chapterClear:false,
-  checkpoint:{room:'gate',x:120},mapOpen:false,sound:true,swapLock:0,
+  checkpoint:{room:'gate',x:120},mapOpen:false,sound:true,swapLock:0,hitStop:0,shake:0,shakeAmp:0,
   roomState:{},projectiles:[],enemyShots:[],fx:[],keys:{},lastError:0
 };
 const heroes={
@@ -137,7 +137,10 @@ const audio={
     else if(n==='ethan'){this.tone(520,.07,.038,'sine',95)}
     else if(n==='noah'){this.tone(330,.08,.048,'triangle',-110);this.noise(.05,.025,1500)}
     else if(n==='switch'){this.tone(392,.12,.045,'sine',110)}
-    else if(n==='hit'){this.noise(.05,.04,1200);this.tone(120,.05,.025,'triangle',-25)}
+    else if(n==='hit'){this.noise(.05,.032,1200);this.tone(125,.05,.020,'triangle',-18)}
+    else if(n==='hit2'){this.noise(.065,.045,1100);this.tone(108,.07,.033,'triangle',-24)}
+    else if(n==='finisher'){this.noise(.09,.072,850);this.tone(82,.11,.060,'square',-26);this.tone(168,.07,.028,'triangle',-40,.02)}
+    else if(n==='runeHit'){this.noise(.045,.028,1450);this.tone(245,.09,.040,'sine',70);this.tone(118,.06,.022,'triangle',-18)}
     else if(n==='hurt'){this.noise(.10,.07,800);this.tone(100,.12,.055,'sawtooth',-35)}
     else if(n==='clunk'){this.tone(92,.16,.09,'square',-22);this.noise(.12,.07,500)}
     else if(n==='chain'){this.noise(.28,.07,700);this.tone(128,.30,.055,'triangle',-35,.05)}
@@ -175,7 +178,7 @@ function makeEnemy(type,x,y){
 
 function newGame(){
   state.started=true;state.paused=false;state.current='gate';state.active='ethan';state.visited=new Set(['gate']);state.kills=0;state.startTime=performance.now();
-  state.elevatorOn=false;state.cellarOpen=false;state.bossDead=false;state.bellRung=false;state.chapterClear=false;state.swapLock=0;state.checkpoint={room:'gate',x:120};state.roomState={};state.projectiles=[];state.enemyShots=[];state.fx=[];
+  state.elevatorOn=false;state.cellarOpen=false;state.bossDead=false;state.bellRung=false;state.chapterClear=false;state.swapLock=0;state.hitStop=0;state.shake=0;state.shakeAmp=0;state.checkpoint={room:'gate',x:120};state.roomState={};state.projectiles=[];state.enemyShots=[];state.fx=[];
   for(const k of Object.keys(heroes)){const d=HEROES[k];Object.assign(heroes[k],{hp:d.maxHp,alive:true,x:120,y:ROOMS.gate.ground-d.h,vx:0,vy:0,onGround:true,face:1,attack:0,inv:0,anim:0,coyote:d.coyote,jumpBuffer:0,land:0,combo:0,comboWindow:0,finisherLock:0,finisherMax:0,w:d.w,h:d.h})}
   spawnRoom('gate');ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.chapterClear.classList.remove('show');audio.unlock();toast('성의 문이 다시 열렸다.',1700);updateHud();
 }
@@ -231,7 +234,7 @@ function doAttack(){
     if(h.attack>0)return;
     h.attack=d.attackCd;h.attackMax=d.attackCd;h.combo=0;h.comboWindow=0;
     const px=h.x+h.w/2+h.face*27,py=h.y+h.h*.42;
-    state.projectiles.push({x:px,y:py,vx:h.face*9.8,vy:0,r:5,dmg:19,life:100,color:'#e7c66f',knock:2.7,stun:9});
+    state.projectiles.push({x:px,y:py,vx:h.face*9.8,vy:0,r:5,dmg:19,life:100,color:'#e7c66f',knock:3.0,stun:11,hitStop:1.8,shake:1.0,impact:'rune'});
     state.fx.push({type:'muzzle',x:px,y:py,face:h.face,life:8,max:8,color:'#e7c66f'});
     h.vx-=h.face*(h.onGround?.38:.18);audio.sfx('ethan');
   }else{
@@ -242,9 +245,10 @@ function doAttack(){
     h.attack=locks[step-1];h.attackMax=locks[step-1];
     if(step===3){h.finisherLock=46;h.finisherMax=46;}
     h.vx=clamp(h.vx+h.face*(h.onGround?lunges[step-1]:lunges[step-1]*.55),-6.8,6.8);
-    const w=reach[step-1],hit={x:h.face>0?h.x+h.w-2:h.x-w+2,y:h.y+(step===3?1:5),w,h:step===3?52:46,dmg:damages[step-1],life:9,face:h.face,combo:step,knock:step===3?5.2:2.2,stun:step===3?18:9};
+    const hitStops=[.35,.85,4.2],shakes=[.18,.45,2.4],knocks=[1.8,2.9,6.0],stuns=[7,11,20];
+    const w=reach[step-1],hit={x:h.face>0?h.x+h.w-2:h.x-w+2,y:h.y+(step===3?1:5),w,h:step===3?52:46,dmg:damages[step-1],life:9,face:h.face,combo:step,knock:knocks[step-1],stun:stuns[step-1]};
     state.fx.push({type:'slash',...hit,max:9,color:step===3?'#baf6ff':'#72dcef'});
-    hitEnemiesBox(hit,{knock:hit.knock,stun:hit.stun,dir:h.face});
+    hitEnemiesBox(hit,{knock:hit.knock,stun:hit.stun,dir:h.face,hitStop:hitStops[step-1],shake:shakes[step-1],impact:'slash'+step});
     audio.sfx('noah');
   }
   hitSecretWall();
@@ -266,9 +270,16 @@ function damageEnemy(e,n,opts={}){
     e.stun=Math.max(e.stun||0,opts.stun||6);
     e.kbx+=(opts.dir||hero().face)*(opts.knock||1.5);
   }
-  audio.sfx('hit');
-  state.fx.push({type:'spark',x:e.x+e.w/2,y:e.y+e.h/2,life:12,max:12,color:HEROES[state.active].accent});
-  state.fx.push({type:'hitRing',x:e.x+e.w/2,y:e.y+e.h*.48,life:8,max:8,color:HEROES[state.active].accent});
+  const impact=opts.impact||'hit';
+  if(impact==='slash3')audio.sfx('finisher');
+  else if(impact==='slash2')audio.sfx('hit2');
+  else if(impact==='rune')audio.sfx('runeHit');
+  else audio.sfx('hit');
+  state.hitStop=Math.max(state.hitStop,opts.hitStop||0);
+  if((opts.shake||0)>0){state.shake=Math.max(state.shake,8+(opts.shake||0)*3);state.shakeAmp=Math.max(state.shakeAmp,opts.shake||0)}
+  const accent=impact==='rune'?'#f1d983':impact==='slash3'?'#c7f7ff':HEROES[state.active].accent;
+  state.fx.push({type:'spark',x:e.x+e.w/2,y:e.y+e.h/2,life:impact==='slash3'?16:12,max:impact==='slash3'?16:12,color:accent});
+  state.fx.push({type:'hitRing',x:e.x+e.w/2,y:e.y+e.h*.48,life:impact==='slash3'?11:8,max:impact==='slash3'?11:8,color:accent});
   if(e.hp<=0){
     e.hp=0;e.alive=false;e.deadAt=performance.now();state.kills++;
     state.fx.push({type:'enemyBurst',x:e.x+e.w/2,y:e.y+e.h/2,life:16,max:16,color:'#a69cab'});
@@ -389,7 +400,7 @@ function updatePlayer(dt){
 }
 function updateProjectiles(dt){
   for(const q of state.projectiles){q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;
-    for(const e of roomState(state.current).enemies){if(e.alive&&q.life>0&&circleRect(q,e)){damageEnemy(e,q.dmg,{knock:q.knock||1.5,stun:q.stun||6,dir:Math.sign(q.vx)||1});q.life=0;break}}
+    for(const e of roomState(state.current).enemies){if(e.alive&&q.life>0&&circleRect(q,e)){damageEnemy(e,q.dmg,{knock:q.knock||1.5,stun:q.stun||6,dir:Math.sign(q.vx)||1,hitStop:q.hitStop||0,shake:q.shake||0,impact:q.impact||'hit'});q.life=0;break}}
   }
   state.projectiles=state.projectiles.filter(q=>q.life>0&&q.x>-30&&q.x<W+30);
   for(const q of state.enemyShots){q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;const h=hero();if(q.life>0&&circleRect(q,h)){q.life=0;hurt(q.dmg,q.vx>0?1:-1)}}
@@ -501,6 +512,8 @@ function updateFx(dt){
 }
 function update(dt){
   if(!state.started||state.paused)return;
+  if(state.hitStop>0){state.hitStop=Math.max(0,state.hitStop-dt);return}
+  if(state.shake>0){state.shake=Math.max(0,state.shake-dt);if(state.shake<=0)state.shakeAmp=0}
   updatePlayer(dt);updateProjectiles(dt);updateEnemies(dt);updateFx(dt);
   updateHud();
 }
@@ -746,9 +759,16 @@ function drawMap(){
   }
 }
 function draw(){
-  ctx.clearRect(0,0,W,H);const r=activeRoom();drawBackground(r);drawDoors(r);drawObjects(r);
+  ctx.clearRect(0,0,W,H);const r=activeRoom();
+  ctx.save();
+  if(state.shake>0&&state.shakeAmp>0){
+    const t=performance.now()*.045,fade=Math.min(1,state.shake/8),amp=state.shakeAmp*fade;
+    ctx.translate(Math.sin(t)*amp,Math.cos(t*1.37)*amp*.62);
+  }
+  drawBackground(r);drawDoors(r);drawObjects(r);
   drawHero(otherKey(),true);for(const e of roomState(r.id).enemies)drawEnemy(e);drawProjectiles();drawHero(state.active,false);drawFx();drawBossHp();
   if(state.bellRung&&r.id==='central'){ctx.globalAlpha=.16;ctx.fillStyle='#d5b66a';ctx.beginPath();ctx.arc(755,250,110,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}
+  ctx.restore();
   if(state.mapOpen)drawMap();
 }
 function updateHud(){
