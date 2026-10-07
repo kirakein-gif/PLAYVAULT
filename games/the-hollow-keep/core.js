@@ -28,7 +28,7 @@ const HEROES={
 
 const state={
   started:false,paused:true,current:'gate',active:'ethan',visited:new Set(),kills:0,startTime:0,
-  elevatorOn:false,cellarOpen:false,bossDead:false,bellRung:false,chapterClear:false,
+  elevatorOn:false,cellarOpen:false,westLatch:false,bossDead:false,bellRung:false,chapterClear:false,
   checkpoint:{room:'gate',x:120},mapOpen:false,sound:true,swapLock:0,hitStop:0,shake:0,shakeAmp:0,
   roomState:{},projectiles:[],enemyShots:[],fx:[],keys:{},lastError:0
 };
@@ -54,7 +54,7 @@ const ROOMS={
   ],enemy:[],trace:'멈춘 시계의 초침이 12시를 가리키고 있다.'}),
 
   west1:room('west1','서쪽 회랑',-1,0,'chapel',{L:'west2',R:'central',enemy:['guard','crawler']}),
-  west2:room('west2','회랑의 갈림길',-2,0,'chapel',{L:'west3',R:'west1',platforms:[[220,365,150,14],[590,330,140,14]],enemy:['bat','guard']}),
+  west2:room('west2','회랑의 갈림길',-2,0,'chapel',{L:'west3',R:'west1',platforms:[[205,372,130,14],[390,336,120,14],[590,300,140,14]],objects:[{type:'latch',x:655,y:300}],enemy:['bat','guard'],trace:'위쪽 벽에 끊어진 쇠사슬이 매달려 있다.'}),
   west3:room('west3','부서진 회랑',-3,0,'chapel',{L:'chapel1',R:'west2',enemy:['crawler','crawler','priest']}),
   chapel1:room('chapel1','작은 예배당',-4,0,'chapel',{L:'chapel2',R:'west3',objects:[{type:'rest',x:135,y:470}],enemy:['guard','bat'],trace:'첫 번째 종은 울리지 않았다.'}),
   chapel2:room('chapel2','성유물 회랑',-5,0,'chapel',{L:'device',R:'chapel1',platforms:[[335,365,120,14],[610,315,140,14]],enemy:['priest','guard']}),
@@ -102,6 +102,24 @@ function hero(){return syncHeroBody(state.active)}
 function otherKey(){return state.active==='ethan'?'noah':'ethan'}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function activeRoom(){return ROOMS[state.current]}
+function livingEnemies(id=state.current){return roomState(id).enemies.filter(e=>e.alive)}
+function exitBlocked(r,side){
+  if(r.id==='outer'&&side==='R'&&livingEnemies(r.id).length)return true;
+  if(r.id==='central'&&side==='R'&&!state.elevatorOn)return true;
+  if(r.id==='west1'&&side==='L'&&livingEnemies(r.id).length)return true;
+  if(r.id==='west2'&&side==='L'&&!state.westLatch)return true;
+  return false;
+}
+function bumpBlockedExit(r,side){
+  const rs=roomState(r.id),key='bump'+side;
+  audio.sfx('clunk');
+  if(!rs[key]){
+    rs[key]=true;
+    if(r.id==='central'&&side==='R')toast('쇠문 너머는 어둡다.',900);
+    else if(r.id==='west2')toast('위쪽에서 쇠사슬이 이어져 있다.',1000);
+    else toast('철창이 내려와 있다.',800);
+  }
+}
 
 const audio={
   ctx:null,master:null,amb:null,muted:false,nodes:[],
@@ -178,7 +196,7 @@ function makeEnemy(type,x,y){
 
 function newGame(){
   state.started=true;state.paused=false;state.current='gate';state.active='ethan';state.visited=new Set(['gate']);state.kills=0;state.startTime=performance.now();
-  state.elevatorOn=false;state.cellarOpen=false;state.bossDead=false;state.bellRung=false;state.chapterClear=false;state.swapLock=0;state.hitStop=0;state.shake=0;state.shakeAmp=0;state.checkpoint={room:'gate',x:120};state.roomState={};state.projectiles=[];state.enemyShots=[];state.fx=[];
+  state.elevatorOn=false;state.cellarOpen=false;state.westLatch=false;state.bossDead=false;state.bellRung=false;state.chapterClear=false;state.swapLock=0;state.hitStop=0;state.shake=0;state.shakeAmp=0;state.checkpoint={room:'gate',x:120};state.roomState={};state.projectiles=[];state.enemyShots=[];state.fx=[];
   for(const k of Object.keys(heroes)){const d=HEROES[k];Object.assign(heroes[k],{hp:d.maxHp,alive:true,x:120,y:ROOMS.gate.ground-d.h,vx:0,vy:0,onGround:true,face:1,attack:0,inv:0,anim:0,coyote:d.coyote,jumpBuffer:0,land:0,combo:0,comboWindow:0,finisherLock:0,finisherMax:0,w:d.w,h:d.h})}
   spawnRoom('gate');ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.chapterClear.classList.remove('show');audio.unlock();toast('성의 문이 다시 열렸다.',1700);updateHud();
 }
@@ -286,6 +304,13 @@ function damageEnemy(e,n,opts={}){
     e.hp=0;e.alive=false;e.deadAt=performance.now();state.kills++;
     state.fx.push({type:'enemyBurst',x:e.x+e.w/2,y:e.y+e.h/2,life:16,max:16,color:'#a69cab'});
     if(e.type==='gatekeeper')bossDefeated();
+    else{
+      const r=activeRoom(),rs=roomState(r.id);
+      if((r.id==='outer'||r.id==='west1')&&livingEnemies(r.id).length===0&&!rs.clearGateSound){
+        rs.clearGateSound=true;audio.sfx('chain');toast('철이 위로 긁히는 소리가 난다.',950);
+        state.fx.push({type:'gateDust',x:r.id==='outer'?W-30:30,y:r.ground-65,life:20,max:20,color:'#9d927f'});
+      }
+    }
   }
 }
 function bossDefeated(){
@@ -306,6 +331,12 @@ function nearestObject(){
 function interact(){
   if(state.paused)return;const r=activeRoom(),o=nearestObject();
   if(o){
+    if(o.type==='latch'){
+      if(state.westLatch){toast('걸쇠는 이미 내려가 있다.');return}
+      state.westLatch=true;audio.sfx('chain');
+      state.fx.push({type:'gateDust',x:30,y:r.ground-64,life:18,max:18,color:'#9d927f'});
+      toast('아래에서 쇠사슬이 풀리는 소리가 난다.',1200);return;
+    }
     if(o.type==='device'){
       if(state.elevatorOn){toast('장치는 이미 빛을 잃었다.');return}
       if(state.active!=='ethan'){audio.sfx('clunk');toast('문양이 잠깐 흔들리다 사라진다.');return}
@@ -391,10 +422,13 @@ function updatePlayer(dt){
   h.anim+=Math.abs(h.vx)*dt*(state.active==='noah'?.22:.17);
 
   if(h.x<-18){
-    const to=activeRoom().L;if(to)changeRoom(to,W-d.w-48);else h.x=-18;
+    const r=activeRoom(),to=r.L;
+    if(to&&exitBlocked(r,'L')){h.x=-16;h.vx=Math.max(0,h.vx);bumpBlockedExit(r,'L')}
+    else if(to)changeRoom(to,W-d.w-48);else h.x=-18;
   }else if(h.x+h.w>W+18){
     const r=activeRoom(),to=r.R;
-    if(r.id==='boss'&&to==='after'&&!state.bossDead){h.x=W-h.w-18;audio.sfx('clunk')}
+    if(to&&exitBlocked(r,'R')){h.x=W-h.w+16;h.vx=Math.min(0,h.vx);bumpBlockedExit(r,'R')}
+    else if(r.id==='boss'&&to==='after'&&!state.bossDead){h.x=W-h.w-18;audio.sfx('clunk')}
     else if(to)changeRoom(to,44);else h.x=W-h.w+18;
   }
   {const ok=otherKey(),o=syncHeroBody(ok),tx=clamp(h.x-h.face*50,8,W-o.w-8),ty=h.y+h.h-o.h;
@@ -539,12 +573,18 @@ function drawBackground(r){
 }
 function drawDoors(r){
   ctx.save();
-  const arch=(x,open,side)=>{
-    ctx.fillStyle=open?'#090a0d':'#28272b';ctx.strokeStyle='#70685d';ctx.lineWidth=3;
-    if(side==='L'){ctx.fillRect(0,r.ground-112,30,112);ctx.strokeRect(0,r.ground-112,30,112)}
-    else{ctx.fillRect(W-30,r.ground-112,30,112);ctx.strokeRect(W-30,r.ground-112,30,112)}
+  const arch=(side,hasExit)=>{
+    const blocked=hasExit&&exitBlocked(r,side),x=side==='L'?0:W-30;
+    ctx.fillStyle=hasExit?'#090a0d':'#28272b';ctx.strokeStyle='#70685d';ctx.lineWidth=3;
+    ctx.fillRect(x,r.ground-112,30,112);ctx.strokeRect(x,r.ground-112,30,112);
+    if(blocked){
+      ctx.fillStyle='#3c3b3d';ctx.globalAlpha=.92;
+      for(let i=4;i<30;i+=8)ctx.fillRect(x+i,r.ground-108,3,108);
+      ctx.fillRect(x,r.ground-76,30,5);ctx.globalAlpha=1;
+      ctx.fillStyle='#8f816c';ctx.fillRect(side==='L'?22:W-30,r.ground-80,8,8);
+    }
   };
-  arch(0,!!r.L,'L');arch(W,!!r.R,'R');
+  arch('L',!!r.L);arch('R',!!r.R);
   ctx.restore();
 }
 function drawObjects(r){
@@ -552,6 +592,7 @@ function drawObjects(r){
     if(o.type==='rest'){ctx.fillStyle='#58505c';ctx.fillRect(o.x-13,r.ground-43,26,43);ctx.fillStyle='#e6c86f';ctx.beginPath();ctx.arc(o.x,r.ground-50,7,0,Math.PI*2);ctx.fill()}
     else if(o.type==='device'){ctx.strokeStyle=state.elevatorOn?'#8c826b':'#d5bd72';ctx.lineWidth=3;ctx.beginPath();ctx.arc(o.x,r.ground-35,30,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(o.x-18,r.ground-35);ctx.lineTo(o.x,r.ground-55);ctx.lineTo(o.x+18,r.ground-35);ctx.lineTo(o.x,r.ground-15);ctx.closePath();ctx.stroke()}
     else if(o.type==='elevator'||o.type==='elevatorBack'){ctx.fillStyle='#1b1c21';ctx.fillRect(o.x-56,r.ground-16,112,16);ctx.strokeStyle=state.elevatorOn?'#b0945f':'#4b4b50';ctx.strokeRect(o.x-56,r.ground-16,112,16);ctx.beginPath();ctx.moveTo(o.x-48,110);ctx.lineTo(o.x-48,r.ground-16);ctx.moveTo(o.x+48,110);ctx.lineTo(o.x+48,r.ground-16);ctx.stroke()}
+    else if(o.type==='latch'){ctx.strokeStyle=state.westLatch?'#5f625f':'#9c927f';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(o.x,o.y-8);ctx.lineTo(o.x,o.y-52);ctx.stroke();ctx.fillStyle=state.westLatch?'#545754':'#a08d69';ctx.fillRect(o.x-13,o.y-57,26,12);ctx.strokeStyle='#756b5c';ctx.lineWidth=2;for(let yy=o.y-78;yy<o.y-58;yy+=7){ctx.beginPath();ctx.arc(o.x,yy,4,0,Math.PI*2);ctx.stroke()}}
     else if(o.type==='lever'){ctx.strokeStyle=state.cellarOpen?'#6a6b6d':'#a8a0a7';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.lineTo(o.x+(state.cellarOpen?18:-15),o.y-42);ctx.stroke();ctx.fillStyle='#7b667f';ctx.beginPath();ctx.arc(o.x+(state.cellarOpen?18:-15),o.y-45,7,0,Math.PI*2);ctx.fill()}
     else if(o.type==='cellar'||o.type==='north'){ctx.fillStyle=o.type==='north'&&state.bellRung?'#0b0b0d':'#242326';ctx.strokeStyle=o.type==='north'&&state.bellRung?'#a68d61':'#555158';ctx.lineWidth=4;ctx.fillRect(o.x-42,r.ground-108,84,108);ctx.strokeRect(o.x-42,r.ground-108,84,108)}
     else if(o.type==='shortcut'){ctx.fillStyle='#17181d';ctx.fillRect(o.x-46,r.ground-16,92,16);ctx.strokeStyle='#756b5d';ctx.strokeRect(o.x-46,r.ground-16,92,16)}
@@ -743,6 +784,8 @@ function drawFx(){
       ctx.globalAlpha*=.35;ctx.fillStyle=f.color;ctx.beginPath();ctx.arc(f.x,f.y,3+(1-p)*3,0,Math.PI*2);ctx.fill();
     }else if(f.type==='swap'){
       const p=1-f.life/max;ctx.strokeStyle=f.color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(f.x,f.y,14+p*34,0,Math.PI*2);ctx.stroke();ctx.globalAlpha*=.35;ctx.beginPath();ctx.arc(f.x,f.y,7+p*22,0,Math.PI*2);ctx.stroke();
+    }else if(f.type==='gateDust'){
+      ctx.fillStyle=f.color;const p=1-f.life/max;for(let i=0;i<8;i++){const dx=(i-3.5)*5,dy=-p*(10+(i%3)*4);ctx.globalAlpha=a*(.2+.06*i);ctx.fillRect(f.x+dx,f.y+dy,4,3)}
     }else if(f.type==='jumpDust'||f.type==='landDust'){
       ctx.fillStyle=f.color;const spread=f.type==='landDust'?24:16;for(let i=0;i<6;i++){const t=i/5-.5;ctx.globalAlpha=a*(.35+Math.abs(t)*.3);ctx.fillRect(f.x+t*spread-(max-f.life)*t*1.5,f.y-2-Math.abs(t)*4,3,2)}
     }else if(f.type==='spark'){
