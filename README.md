@@ -202,3 +202,9 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - Noah has a direct three-step slash chain with increasing reach, commitment and knockback on the third hit.
 - Early enemies no longer rely on constant contact damage: crawler, guard, bat and priest attacks now use readable wind-up -> attack -> recovery cycles.
 - Added restrained attack telegraphs, enemy hit flash, knockback/stun, impact rings and death bursts while preserving the existing movement values from v4.
+
+### HOLLOW KEEP attack animation pass v6
+
+- Noah's three-hit chain now uses visibly different body/arm/blade poses: horizontal cut, reverse diagonal cut, and an overhead heavy finisher.
+- Ethan's rune shot now has a dedicated casting/recoil pose rather than relying on projectile VFX alone.
+- Attack rendering tracks the actual lock duration of each strike so the character pose progresses through the full swing.
