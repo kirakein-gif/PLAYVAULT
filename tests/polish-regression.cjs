@@ -41,4 +41,3 @@ for(const mobile of [false,true])for(const dpr of [1,2,3]){
  }
  console.log(`PASS ${mobile?'mobile':'desktop'} DPR ${dpr}: 12 floors, seals, boss defeat, stairs, clear, combat rendering, frame bounds`);
 }
-
