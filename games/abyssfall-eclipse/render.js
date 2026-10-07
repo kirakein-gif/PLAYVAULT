@@ -295,7 +295,6 @@
       }
     }
     ctx.restore();
-    if(p.shield>0&&!A.dead){ctx.strokeStyle='rgba(116,226,255,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,32,0,Math.PI*2);ctx.stroke()}
   }
   function attackArt(fx){
     const t=Math.max(0,fx.l/fx.max),a=fx.a||0;

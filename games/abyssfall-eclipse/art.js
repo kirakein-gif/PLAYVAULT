@@ -7,7 +7,7 @@
     const im=new Image();art.images[key]=im;
     im.onload=()=>{art.loaded[key]=true;if(key==='relics')relicIcons(im);resolve(true)};
     im.onerror=()=>{art.loaded[key]=false;resolve(false)};
-    im.src=path+'?v=36';
+    im.src=path+'?v=37';
   })));
   function relicIcons(im){
     art.relicIcons={};
