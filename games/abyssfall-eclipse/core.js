@@ -56,7 +56,7 @@
   } fit();addEventListener('resize',fit);
   AF.snapX=x=>Math.round(x*AF.renderScaleX)/AF.renderScaleX;
   AF.snapY=y=>Math.round(y*AF.renderScaleY)/AF.renderScaleY;
-  document.querySelectorAll('.heroCard').forEach(b=>b.addEventListener('click',()=>{AF.selected=b.dataset.hero;document.querySelectorAll('.heroCard').forEach(x=>x.classList.toggle('selected',x===b))}));
+  document.querySelectorAll('.heroCard').forEach(b=>b.addEventListener('click',()=>{AF.selected=b.dataset.hero;document.querySelectorAll('.heroCard').forEach(x=>x.classList.toggle('selected',x===b));sound()?.unlock().then(ok=>{if(ok&&!AF.started)sound()?.startTitle()})}));
   addEventListener('keydown',e=>{AF.keys[e.key.toLowerCase()]=true;if(e.code==='Space'){e.preventDefault();AF.useSpecial()}}); addEventListener('keyup',e=>AF.keys[e.key.toLowerCase()]=false);
   const joyBase=$('joyBase'),joyKnob=$('joyKnob');
   function resetJoy(){Object.assign(AF.joy,{x:0,y:0,active:false,id:null});joyKnob.style.transform='translate(0,0)'}
@@ -284,6 +284,7 @@
     const h=AF.player.hero;ui.heroName.textContent=`${h.name} · ${h.ko}`;ui.basicName.textContent=h.basicName;ui.basicIcon.textContent=h.basicIcon;ui.specialName.textContent=h.specialName;ui.specialIcon.textContent=h.specialIcon;ui.specialBtnIcon.textContent=h.specialIcon;
     const ring=h.key==='dawn'?'#ffd768':'#73dcff',glow=h.key==='dawn'?'rgba(255,211,104,.34)':'rgba(105,216,255,.34)';
     document.documentElement.style.setProperty('--skill-ring',ring);document.documentElement.style.setProperty('--skill-glow',glow);
+    document.documentElement.dataset.hero=h.key;
     ui.specialBtn.style.setProperty('--skill-ring',ring);ui.specialBtn.style.setProperty('--skill-glow',glow);
   }
   AF.newRun=()=>{sound()?.unlock().then(()=>{sound()?.startExplore();sound()?.sfx('start')});const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.endless=false;AF.cleared=false;AF.transitioning=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name} · ${Object.keys(AF.rooms).length} ROOMS`);setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===1)AF.toast(AF.stageTip())},950)};

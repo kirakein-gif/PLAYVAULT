@@ -106,3 +106,27 @@
   .topActions{margin-left:auto}
   .soundBtn{width:30px;height:30px;font-size:14px}
 }
+/* Eclipse polish: quiet metal, clear controls and space around the HUD. */
+#game{image-rendering:pixelated;will-change:auto}
+#heroName{max-width:215px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px!important}
+.eyebrow,.ability.active .ico{color:var(--skill-ring,var(--gold))}
+[data-hero="night"] .bar.xp i{background:linear-gradient(90deg,#58b6cf,#8e78c1)}
+[data-hero="dawn"] .bar.xp i{background:linear-gradient(90deg,#b49051,#e5c47d)}
+#specialBtn{background:radial-gradient(circle at 38% 30%,#303442,#151923 78%) padding-box,conic-gradient(from -90deg,var(--skill-ring) 0deg var(--cd-angle),rgba(255,255,255,.12) var(--cd-angle) 360deg) border-box}
+#specialBtn.ready{box-shadow:0 0 7px var(--skill-glow),0 8px 20px #0008}
+.ability.skillReady{box-shadow:0 0 5px var(--skill-glow)}
+#toast{top:184px;max-width:calc(100vw - 32px);text-align:center;line-height:1.5}
+.relicFlash{top:auto;bottom:100px}
+@media(max-width:700px),(pointer:coarse){
+ #hud{width:calc(100vw - 20px);padding:9px 12px;border-radius:11px}
+ #heroName{font-size:13px!important;max-width:240px}
+ .eyebrow{font-size:8px;letter-spacing:1.7px}
+ .small{font-size:10px;margin-top:5px}
+ #toast{top:146px;font-size:10px}
+ .hudActionsRelic{bottom:8px}
+ #joyBase{background:radial-gradient(circle,#77778920,#11141b66);border-color:#b8bcc033}
+ #joyKnob{background:radial-gradient(circle at 35% 30%,#b1b5be,#555968 65%,#242833)}
+ .relicFlash{top:auto;bottom:145px;max-width:calc(100vw - 28px)}
+}
+@media(max-height:500px) and (min-width:701px){#hud{padding:8px 12px;top:8px}#toast{top:auto;bottom:88px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}

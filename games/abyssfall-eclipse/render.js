@@ -34,6 +34,18 @@
     const shade=ctx.createLinearGradient(arena.x,0,arena.x+arena.w,0);
     shade.addColorStop(0,'rgba(0,0,0,.18)');shade.addColorStop(.14,'rgba(0,0,0,0)');shade.addColorStop(.86,'rgba(0,0,0,0)');shade.addColorStop(1,'rgba(0,0,0,.18)');
     ctx.fillStyle=shade;ctx.fillRect(arena.x,arena.y,arena.w,arena.h);
+    const art=window.AF_ART;
+    if(art?.loaded.rooms){
+      const idx=zoneIndex(),im=art.images.rooms;
+      ctx.imageSmoothingEnabled=false;
+      ctx.drawImage(im,(idx%2)*im.width/2,Math.floor(idx/2)*im.height/2,im.width/2,im.height/2,arena.x,arena.y-58,arena.w,arena.h+58);
+      // Room-specific wear, cached by deterministic seed rather than frame time.
+      const seed=roomSeed();ctx.fillStyle='rgba(7,8,12,.14)';
+      for(let i=0;i<18;i++){
+        const x=arena.x+hash(seed+i*17)*arena.w,y=arena.y+hash(seed+i*31)*arena.h;
+        ctx.fillRect(x,y,3+hash(seed+i)*14,2);
+      }
+    }
   }
 
   function archPath(cx,base,w,h){
@@ -109,7 +121,16 @@
 
   function stageDecor(){
     const idx=zoneIndex();
-    if(idx===0)drawCathedral();else if(idx===1)drawGraveyard();else if(idx===2)drawTower();else drawAltar();
+    if(window.AF_ART?.loaded.rooms){
+      const r=A.cur(),t=theme(),cx=W/2;
+      if(r.doors.N){
+        // The gate is recessed into the north wall, with a stone lintel and sill.
+        ctx.fillStyle=t.wall;ctx.fillRect(cx-66,arena.y-58,132,58);
+        archPath(cx,arena.y,108,62);ctx.fillStyle='#090a10';ctx.fill();
+        ctx.strokeStyle=r.clear?'#9ca68b':t.door;ctx.lineWidth=3;ctx.stroke();
+        ctx.fillStyle='#15151b';ctx.fillRect(cx-54,arena.y-8,108,8);
+      }
+    }else if(idx===0)drawCathedral();else if(idx===1)drawGraveyard();else if(idx===2)drawTower();else drawAltar();
     roomMood(A.cur());
   }
 
@@ -129,7 +150,12 @@
         g.addColorStop(1,'rgba(73,98,116,0)');
         ctx.fillStyle=g;ctx.fillRect(z.x-z.r,z.y-z.r,z.r*2,z.r*2);
         ctx.globalAlpha=.20;ctx.strokeStyle='rgba(205,230,238,.24)';ctx.lineWidth=1.5;
-        for(let k=0;k<3;k++){const a=now/2200+i*.9+k*2.1;ctx.beginPath();ctx.arc(z.x+Math.cos(a)*z.r*.18,z.y+Math.sin(a)*z.r*.12,z.r*(.30+k*.10),0,Math.PI*2);ctx.stroke()}
+        for(let k=0;k<3;k++){
+          const a=now/3800+i*.9+k*2.1,cx=z.x+Math.cos(a)*z.r*.18,cy=z.y+Math.sin(a)*z.r*.12;
+          const mist=ctx.createRadialGradient(cx,cy,3,cx,cy,z.r*.65);
+          mist.addColorStop(0,'rgba(205,225,228,.24)');mist.addColorStop(1,'rgba(110,150,167,0)');
+          ctx.fillStyle=mist;ctx.beginPath();ctx.ellipse(cx,cy,z.r*.65,z.r*.34,a*.08,0,Math.PI*2);ctx.fill();
+        }
         ctx.globalAlpha=1;
       }
     }else if(idx===2&&(r.windWarn>0||r.windActive>0)){
@@ -286,12 +312,17 @@
         idx=Math.floor(now/220)%4;
       }
       const frame=atlas.frames[anim][idx]||atlas.frames.idle[0];
+      if(window.AF_ART?.loaded.heroes){
+        const art=window.AF_ART;
+        art.draw(ctx,'heroes',art.hero(h.key,anim,idx),A.mobile?.57:.46,14);
+      }else{
       const sx=frame[0]*atlas.cellW,sy=frame[1]*atlas.cellH;
       const base=h.drawW*(A.mobile?1.52:1.36);
       const dh=base*(atlas.cellH/atlas.cellW);
       // Fixed torso pivot and foot baseline, including attack and death frames.
       const baseline=h.key==='night'?(anim==='attack'&&idx<2?47:anim==='hurt'&&idx===1?45:anim==='death'&&idx===1?45:50):50;
       ctx.drawImage(atlasImg,sx,sy,atlas.cellW,atlas.cellH,-base*.5,-baseline*base/atlas.cellW+14,base,dh);
+      }
     }else{
       const k=p.attackPose>0?h.attack:(p.moving?h.run:h.idle),im=imgs[k];
       if(im?.complete){
@@ -369,16 +400,19 @@
     ctx.save();
     if(e.type==='crawler'){
       const a=Math.atan2(e.aimY||0,e.aimX||1);ctx.translate(e.x,e.y);ctx.rotate(a);
-      ctx.strokeStyle=`rgba(255,95,111,${.30+.28*pulse})`;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(12,0);ctx.lineTo(72,-22);ctx.lineTo(72,22);ctx.closePath();ctx.stroke();
-      ctx.fillStyle='rgba(255,74,96,.08)';ctx.fill();
+      ctx.strokeStyle=`rgba(225,115,112,${.36+.22*pulse})`;ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(16,0);ctx.lineTo(72,0);ctx.moveTo(61,-7);ctx.lineTo(72,0);ctx.lineTo(61,7);ctx.stroke();
+      ctx.fillStyle='rgba(168,141,123,.24)';for(let i=0;i<4;i++){ctx.beginPath();ctx.ellipse(-9-i*5,(i%2?1:-1)*8,6,3,0,0,Math.PI*2);ctx.fill()}
     }else if(e.type==='shooter'){
       const a=e.shotAngle||0,len=430;ctx.translate(e.x,e.y);ctx.rotate(a);
       ctx.strokeStyle=`rgba(255,118,154,${.26+.36*pulse})`;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(8,0);ctx.lineTo(len,0);ctx.stroke();
       ctx.fillStyle=`rgba(231,106,255,${.28+.28*pulse})`;ctx.beginPath();ctx.arc(0,0,14+4*pulse,0,Math.PI*2);ctx.fill();
     }else if(e.type==='brute'){
       const a=Math.atan2(e.aimY||0,e.aimX||1);ctx.translate(e.x,e.y);ctx.rotate(a);
-      ctx.strokeStyle=`rgba(255,164,90,${.28+.36*pulse})`;ctx.lineWidth=4;ctx.strokeRect(10,-24,185,48);
-      ctx.fillStyle='rgba(255,92,67,.075)';ctx.fillRect(10,-24,185,48);
+      const g=ctx.createLinearGradient(10,0,195,0);g.addColorStop(0,'rgba(166,77,63,.24)');g.addColorStop(1,'rgba(166,77,63,.04)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(10,-24);ctx.lineTo(195,-16);ctx.lineTo(195,16);ctx.lineTo(10,24);ctx.closePath();ctx.fill();
+      ctx.strokeStyle=`rgba(216,149,105,${.36+.25*pulse})`;ctx.lineWidth=2;
+      for(let i=0;i<3;i++){const x=45+i*53;ctx.beginPath();ctx.moveTo(x,-13);ctx.lineTo(x+12,0);ctx.lineTo(x,13);ctx.stroke()}
     }
     ctx.restore();
   }
@@ -419,7 +453,12 @@
     else if(boss&&e.intro>0)ctx.globalAlpha=.18+.72*(1-e.intro/(e.introMax||1));
     else if(e.flash>0&&Math.floor(e.flash/2)%2===0)ctx.globalAlpha=.55;
 
-    if(im?.complete&&im.naturalWidth){
+    if(window.AF_ART?.loaded.enemies){
+      const art=window.AF_ART;
+      let col=!e.alive?5:e.hurtPose>0?4:e.aiWindup>0||e.bossTelegraph>0?2:e.attackPose>0?3:e.moving?1:0;
+      const scale={crawler:A.mobile?.67:.58,shooter:A.mobile?.56:.48,brute:A.mobile?.74:.64,boss:A.mobile?.68:.58}[e.type];
+      art.draw(ctx,'enemies',art.enemy(e.type,col),scale,boss?23:14);
+    }else if(im?.complete&&im.naturalWidth){
       ctx.drawImage(im,frame*fw,0,fw,fh,-size*.5,-size*.70,size,size);
     }else{
       ctx.fillStyle=boss?'#4d2765':e.type==='shooter'?'#d6d0c9':e.type==='brute'?'#40384f':'#332b46';
