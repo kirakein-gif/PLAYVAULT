@@ -229,7 +229,7 @@ function doAttack(){
 
   if(state.active==='ethan'){
     if(h.attack>0)return;
-    h.attack=d.attackCd;h.combo=0;h.comboWindow=0;
+    h.attack=d.attackCd;h.attackMax=d.attackCd;h.combo=0;h.comboWindow=0;
     const px=h.x+h.w/2+h.face*27,py=h.y+h.h*.42;
     state.projectiles.push({x:px,y:py,vx:h.face*9.8,vy:0,r:5,dmg:19,life:100,color:'#e7c66f',knock:2.7,stun:9});
     state.fx.push({type:'muzzle',x:px,y:py,face:h.face,life:8,max:8,color:'#e7c66f'});
@@ -239,7 +239,7 @@ function doAttack(){
     h.combo=(h.comboWindow>0)?(h.combo%3)+1:1;
     h.comboWindow=27;
     const step=h.combo,damages=[22,25,32],reach=[66,72,82],locks=[14,15,21],lunges=[2.5,3.3,4.4];
-    h.attack=locks[step-1];
+    h.attack=locks[step-1];h.attackMax=locks[step-1];
     h.vx=clamp(h.vx+h.face*(h.onGround?lunges[step-1]:lunges[step-1]*.55),-6.8,6.8);
     const w=reach[step-1],hit={x:h.face>0?h.x+h.w-2:h.x-w+2,y:h.y+(step===3?1:5),w,h:step===3?52:46,dmg:damages[step-1],life:9,face:h.face,combo:step,knock:step===3?5.2:2.2,stun:step===3?18:9};
     state.fx.push({type:'slash',...hit,max:9,color:step===3?'#baf6ff':'#72dcef'});
@@ -545,17 +545,100 @@ function drawHero(k,ghost=false){
   const moving=Math.abs(h.vx)>.35,bob=moving?Math.sin(h.anim)*1.4:0;
   const drawX=Math.round(h.x+h.w/2),drawY=Math.round(h.y+h.h+bob);
   if(!Number.isFinite(drawX)||!Number.isFinite(drawY))return;
-  const land=Math.max(0,h.land||0),attackT=Math.max(0,h.attack||0)/(d.attackCd||1);
+
+  const attacking=!ghost&&h.attack>0;
+  const attackMax=Math.max(1,h.attackMax||d.attackCd);
+  const ap=attacking?Math.max(0,Math.min(1,1-h.attack/attackMax)):0;
+  const ease=t=>t*t*(3-2*t);
+  const swing=ease(ap);
+  const land=Math.max(0,h.land||0);
+
   ctx.save();ctx.translate(drawX,drawY);
   if(!ghost&&land>0)ctx.scale(1+land*.006,1-land*.004);
-  if(!ghost&&attackT>0)ctx.rotate((k==='noah'?-.055:-.025)*(h.face||1)*(1-attackT*.35));
-  if(h.face<0)ctx.scale(-1,1);if(ghost)ctx.globalAlpha=.24;if(h.inv>0&&Math.floor(h.inv/5)%2===0)ctx.globalAlpha*=.5;
-  ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(0,1,d.w*.65,5,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=d.color;ctx.beginPath();ctx.arc(0,-d.h+14,11,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=d.key==='ethan'?'#d8cfb7':'#2b3150';ctx.beginPath();ctx.moveTo(-13,-d.h+25);ctx.lineTo(13,-d.h+25);ctx.lineTo(18,-5);ctx.lineTo(-15,-5);ctx.closePath();ctx.fill();
-  ctx.fillStyle=d.accent;ctx.fillRect(d.key==='ethan'?8:11,-d.h+31,4,27);
-  if(d.key==='ethan'){ctx.strokeStyle='#88dbed';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(9,-32);ctx.lineTo(25,-25);ctx.stroke();ctx.fillStyle='#e7c66f';ctx.beginPath();ctx.arc(27,-24,4,0,Math.PI*2);ctx.fill()}
-  else{ctx.strokeStyle='#72dcef';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(8,-32);ctx.lineTo(29,-18);ctx.stroke()}
+  if(h.face<0)ctx.scale(-1,1);
+  if(ghost)ctx.globalAlpha=.24;
+  if(h.inv>0&&Math.floor(h.inv/5)%2===0)ctx.globalAlpha*=.5;
+
+  // Ground shadow.
+  ctx.fillStyle='rgba(0,0,0,.30)';ctx.beginPath();ctx.ellipse(0,1,d.w*.68,5,0,0,Math.PI*2);ctx.fill();
+
+  let bodyLean=0,bodyDrop=0,headX=0,headY=0;
+  let handX=10,handY=-34,weaponX=29,weaponY=-20,weaponW=4;
+
+  if(k==='ethan'&&attacking){
+    // Raise the casting arm, fire, then recoil the torso before recovering.
+    const recoil=Math.sin(Math.min(1,ap)*Math.PI);
+    bodyLean=-recoil*4.2;headX=-recoil*2.4;
+    handX=10-recoil*2;handY=-37-recoil*2;
+    weaponX=28+recoil*5;weaponY=-27-recoil*2;
+  }
+
+  if(k==='noah'&&attacking){
+    const step=Math.max(1,Math.min(3,h.combo||1));
+    if(step===1){
+      // Fast horizontal cut: low wind-up -> broad forward sweep.
+      const a0=-1.05,a1=.28,ang=a0+(a1-a0)*swing,len=44;
+      bodyLean=3.5*Math.sin(ap*Math.PI);bodyDrop=1.5*Math.sin(ap*Math.PI);
+      handX=8+bodyLean*.4;handY=-31;
+      weaponX=handX+Math.cos(ang)*len;weaponY=handY+Math.sin(ang)*len;
+      weaponW=4.5;
+    }else if(step===2){
+      // Reverse diagonal: begins low/front and cuts upward across the body.
+      const a0=.72,a1=-.82,ang=a0+(a1-a0)*swing,len=47;
+      bodyLean=5*Math.sin(ap*Math.PI);headX=bodyLean*.28;
+      handX=9;handY=-29-bodyLean*.18;
+      weaponX=handX+Math.cos(ang)*len;weaponY=handY+Math.sin(ang)*len;
+      weaponW=5;
+    }else{
+      // Heavy third strike: obvious overhead wind-up followed by a descending cut.
+      const wind=Math.min(1,ap/.34),cut=Math.max(0,(ap-.34)/.66);
+      const ang=ap<.34?(.05+(-1.55-.05)*ease(wind)):(-1.55+(1.02+1.55)*ease(cut));
+      const len=53;
+      bodyDrop=ap<.34?3*wind:7*Math.sin(cut*Math.PI);
+      bodyLean=ap<.34?-4*wind:7*Math.sin(cut*Math.PI);
+      headX=bodyLean*.32;headY=bodyDrop*.22;
+      handX=8+bodyLean*.18;handY=-34-bodyDrop*.1;
+      weaponX=handX+Math.cos(ang)*len;weaponY=handY+Math.sin(ang)*len;
+      weaponW=6;
+    }
+  }
+
+  // Legs give the attack poses a readable stance.
+  ctx.strokeStyle=k==='ethan'?'#7c715d':'#171b31';ctx.lineWidth=6;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(-7,-13+bodyDrop);ctx.lineTo(-10,-1);ctx.moveTo(7,-13+bodyDrop);ctx.lineTo(11,-1);ctx.stroke();
+
+  // Cloak / torso.
+  ctx.save();ctx.translate(bodyLean,bodyDrop);
+  ctx.fillStyle=k==='ethan'?'#d8cfb7':'#2b3150';
+  ctx.beginPath();ctx.moveTo(-13,-d.h+25);ctx.lineTo(13,-d.h+25);ctx.lineTo(18,-5);ctx.lineTo(-15,-5);ctx.closePath();ctx.fill();
+
+  // Shoulder/chest accent.
+  ctx.fillStyle=k==='ethan'?'#a58b56':'#514274';
+  ctx.fillRect(-9,-d.h+27,18,5);
+  ctx.restore();
+
+  // Head follows the body slightly but stays readable.
+  ctx.fillStyle=d.color;ctx.beginPath();ctx.arc(headX,-d.h+14+headY,11,0,Math.PI*2);ctx.fill();
+
+  // Back arm / attacking arm.
+  ctx.strokeStyle=k==='ethan'?'#c6b98f':'#465076';ctx.lineWidth=5;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(3+bodyLean*.3,-d.h+31+bodyDrop*.25);ctx.lineTo(handX,handY);ctx.stroke();
+
+  if(k==='ethan'){
+    // Rune focus / short staff.
+    ctx.strokeStyle='#88dbed';ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(handX,handY);ctx.lineTo(weaponX,weaponY);ctx.stroke();
+    ctx.fillStyle='#e7c66f';ctx.shadowColor='#e7c66f';ctx.shadowBlur=attacking?10:4;ctx.beginPath();ctx.arc(weaponX+2,weaponY,attacking?5:4,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+    if(attacking&&ap>.18&&ap<.55){
+      ctx.globalAlpha*=.55;ctx.strokeStyle='#f7df8f';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(weaponX+4,weaponY);ctx.lineTo(weaponX+20,weaponY);ctx.stroke();
+    }
+  }else{
+    // Noah's actual blade moves differently for each combo step.
+    ctx.strokeStyle='#72dcef';ctx.shadowColor='#72dcef';ctx.shadowBlur=attacking?8:2;ctx.lineWidth=weaponW;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(handX,handY);ctx.lineTo(weaponX,weaponY);ctx.stroke();ctx.shadowBlur=0;
+    ctx.fillStyle='#c8f6ff';ctx.beginPath();ctx.arc(handX,handY,2.5,0,Math.PI*2);ctx.fill();
+  }
+
   ctx.restore();
 }
 function drawEnemy(e){
