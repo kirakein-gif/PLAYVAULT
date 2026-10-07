@@ -185,8 +185,13 @@ function retry(){
   ui.gameOver.classList.remove('show');state.visited.add(state.current);spawnRoom(state.current);toast('불이 아직 꺼지지 않았다.');updateHud();
 }
 function switchHero(){
+  if(state.paused||state.swapLock>0)return;
   const next=otherKey();if(!heroes[next].alive){toast('대답이 없다.');return}
-  const a=hero(),b=syncHeroBody(next);b.x=a.x;b.y=a.y+a.h-b.h;b.vx=a.vx*.75;b.vy=a.vy;b.face=a.face;b.inv=Math.max(b.inv,20);state.active=next;audio.sfx('switch');updateHud();
+  const a=hero(),b=syncHeroBody(next),cx=a.x+a.w/2,cy=a.y+a.h*.55;
+  b.x=a.x;b.y=a.y+a.h-b.h;b.vx=a.vx*.82;b.vy=a.vy;b.face=a.face;b.inv=Math.max(b.inv,18);
+  b.coyote=Math.max(b.coyote||0,a.coyote||0);b.jumpBuffer=0;state.swapLock=11;state.active=next;
+  state.fx.push({type:'swap',x:cx,y:cy,life:18,max:18,color:HEROES[next].accent});
+  audio.sfx('switch');updateHud();
 }
 function changeRoom(id,spawnX=null){
   if(!ROOMS[id])return;
@@ -208,17 +213,29 @@ function hurt(n,dir){
 }
 
 function doJump(){
-  if(state.paused)return;const h=hero(),d=HEROES[state.active];if(h.onGround){h.vy=-d.jump;h.onGround=false;audio.sfx('jump')}
+  if(state.paused)return;const h=hero(),d=HEROES[state.active];h.jumpBuffer=d.jumpBuffer;
+}
+function releaseJump(){
+  if(state.paused)return;const h=hero();if(h.vy<-3.2)h.vy*=.58;
+}
+function consumeBufferedJump(h,d){
+  if((h.jumpBuffer||0)<=0||!(h.onGround||(h.coyote||0)>0))return false;
+  h.jumpBuffer=0;h.coyote=0;h.onGround=false;h.vy=-d.jump;
+  state.fx.push({type:'jumpDust',x:h.x+h.w/2,y:h.y+h.h,life:12,max:12,color:d.accent});
+  audio.sfx('jump');return true;
 }
 function doAttack(){
   if(state.paused)return;const h=hero(),d=HEROES[state.active];if(h.attack>0||!h.alive)return;
   h.attack=d.attackCd;
   if(state.active==='ethan'){
-    state.projectiles.push({x:h.x+h.w/2+h.face*24,y:h.y+23,vx:h.face*9.5,vy:0,r:5,dmg:19,life:100,color:'#e7c66f'});
-    audio.sfx('ethan');
+    const px=h.x+h.w/2+h.face*27,py=h.y+h.h*.42;
+    state.projectiles.push({x:px,y:py,vx:h.face*9.8,vy:0,r:5,dmg:19,life:100,color:'#e7c66f'});
+    state.fx.push({type:'muzzle',x:px,y:py,face:h.face,life:8,max:8,color:'#e7c66f'});
+    h.vx-=h.face*(h.onGround?.38:.18);audio.sfx('ethan');
   }else{
-    const hit={x:h.face>0?h.x+h.w-2:h.x-64,y:h.y+6,w:66,h:44,dmg:25,life:8,face:h.face};
-    state.fx.push({type:'slash',...hit,color:'#72dcef'});hitEnemiesBox(hit);audio.sfx('noah');
+    h.vx=clamp(h.vx+h.face*(h.onGround?3.2:1.6),-6.2,6.2);
+    const hit={x:h.face>0?h.x+h.w-2:h.x-68,y:h.y+5,w:70,h:46,dmg:25,life:9,face:h.face};
+    state.fx.push({type:'slash',...hit,max:9,color:'#72dcef'});hitEnemiesBox(hit);audio.sfx('noah');
   }
   hitSecretWall();
 }
@@ -300,8 +317,8 @@ function finishChapter(){
 
 function rects(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
 function platformPhysics(h,d,r,dt){
-  const prevY=h.y;
-  h.vy+=.62*dt;h.vy=Math.min(h.vy,14);
+  const prevY=h.y,wasGround=h.onGround,fallSpeed=h.vy;
+  h.vy+=d.gravity*dt;h.vy=Math.min(h.vy,d.maxFall);
   h.x+=h.vx*dt;h.y+=h.vy*dt;
   h.onGround=false;
   if(h.y+h.h>=r.ground){h.y=r.ground-h.h;h.vy=0;h.onGround=true}
@@ -310,18 +327,26 @@ function platformPhysics(h,d,r,dt){
     const wasBottom=prevY+h.h,nowBottom=h.y+h.h;
     if(h.vy>=0&&h.x+h.w>px&&h.x<px+pw&&wasBottom<=py+3&&nowBottom>=py){h.y=py-h.h;h.vy=0;h.onGround=true}
   }
+  if(!wasGround&&h.onGround&&fallSpeed>3.8){
+    h.land=Math.min(9,3+fallSpeed*.42);
+    state.fx.push({type:'landDust',x:h.x+h.w/2,y:h.y+h.h,life:14,max:14,color:d.accent});
+    if(fallSpeed>6)audio.sfx('land');
+  }
   h.x=clamp(h.x,-28,W-h.w+28);
 }
 
 function updatePlayer(dt){
   const h=hero(),d=HEROES[state.active],k=state.keys;
-  if(h.attack>0)h.attack-=dt;if(h.inv>0)h.inv-=dt;
+  if(state.swapLock>0)state.swapLock-=dt;if(h.attack>0)h.attack-=dt;if(h.inv>0)h.inv-=dt;if(h.land>0)h.land-=dt;
+  if(h.onGround)h.coyote=d.coyote;else h.coyote=Math.max(0,(h.coyote||0)-dt);
+  if(h.jumpBuffer>0)h.jumpBuffer-=dt;
+  consumeBufferedJump(h,d);
   let dir=(k.left?-1:0)+(k.right?1:0);
-  const accel=h.onGround?.62:.34,target=dir*d.speed;
-  h.vx+=(target-h.vx)*accel*dt;
-  if(!dir)h.vx*=Math.pow(.74,dt);else h.face=dir>0?1:-1;
+  const accel=h.onGround?d.accelGround:d.accelAir,target=dir*d.speed,blend=Math.min(1,accel*dt);
+  h.vx+=(target-h.vx)*blend;
+  if(!dir)h.vx*=Math.pow(d.friction,dt);else h.face=dir>0?1:-1;
   platformPhysics(h,d,activeRoom(),dt);
-  h.anim+=Math.abs(h.vx)*dt*.18;
+  h.anim+=Math.abs(h.vx)*dt*(state.active==='noah'?.22:.17);
 
   if(h.x<-18){
     const to=activeRoom().L;if(to)changeRoom(to,W-d.w-48);else h.x=-18;
@@ -330,7 +355,8 @@ function updatePlayer(dt){
     if(r.id==='boss'&&to==='after'&&!state.bossDead){h.x=W-h.w-18;audio.sfx('clunk')}
     else if(to)changeRoom(to,44);else h.x=W-h.w+18;
   }
-  {const ok=otherKey(),o=syncHeroBody(ok);o.x=clamp(h.x-h.face*46,8,W-o.w-8);o.y=h.y+h.h-o.h;o.face=h.face;}
+  {const ok=otherKey(),o=syncHeroBody(ok),tx=clamp(h.x-h.face*50,8,W-o.w-8),ty=h.y+h.h-o.h;
+   const follow=Math.min(1,.18*dt);o.x+=(tx-o.x)*follow;o.y+=(ty-o.y)*Math.min(1,.24*dt);o.face=h.face;}
 }
 function updateProjectiles(dt){
   for(const q of state.projectiles){q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;
