@@ -127,9 +127,11 @@
       const r=A.cur(),t=theme(),cx=W/2;
       if(r.doors.N){
         // The gate is recessed into the north wall, with a stone lintel and sill.
-        ctx.fillStyle=t.wall;ctx.fillRect(cx-66,arena.y-58,132,58);
+        ctx.fillStyle='#36312f';ctx.fillRect(cx-66,arena.y-58,132,58);
+        ctx.strokeStyle='#514b44';ctx.lineWidth=1;
+        for(let y=arena.y-46;y<arena.y;y+=12){ctx.beginPath();ctx.moveTo(cx-66,y);ctx.lineTo(cx+66,y);ctx.stroke()}
         archPath(cx,arena.y,88,24);ctx.fillStyle='#090a10';ctx.fill();
-        ctx.strokeStyle=r.clear?'#9ca68b':t.wall;ctx.lineWidth=3;ctx.stroke();
+        ctx.strokeStyle=r.clear?'#829085':'#756f66';ctx.lineWidth=3;ctx.stroke();
         ctx.fillStyle='#15151b';ctx.fillRect(cx-44,arena.y-8,88,8);
       }
     }else if(idx===0)drawCathedral();else if(idx===1)drawGraveyard();else if(idx===2)drawTower();else drawAltar();

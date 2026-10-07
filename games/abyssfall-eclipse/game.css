@@ -144,3 +144,5 @@
  [data-controls="touch"] #joyKnob{left:25px;top:25px}
  [data-controls="touch"] #specialBtn{width:72px;height:72px;bottom:12px}
 }
+#hud .eyebrow{font-size:8px;letter-spacing:1.1px;white-space:nowrap}
+#hud #heroName{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.25;font-size:12px!important}
