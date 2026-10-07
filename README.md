@@ -195,3 +195,10 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - Added coyote time, jump buffering and variable jump height for more forgiving keyboard/mobile platforming.
 - Character swapping has a short cooldown, a restrained color-ring transition, and preserves movement without teleport-like snapping.
 - Ethan's rune shot now has a small muzzle flash/recoil; Noah's slash has stronger forward commitment. Landing and takeoff dust remain subtle.
+
+### HOLLOW KEEP combat pass v5
+
+- Ethan rune shots now stagger and push ordinary enemies with a clearer muzzle/hit response.
+- Noah has a direct three-step slash chain with increasing reach, commitment and knockback on the third hit.
+- Early enemies no longer rely on constant contact damage: crawler, guard, bat and priest attacks now use readable wind-up -> attack -> recovery cycles.
+- Added restrained attack telegraphs, enemy hit flash, knockback/stun, impact rings and death bursts while preserving the existing movement values from v4.
