@@ -22,19 +22,19 @@ function fit(){
 fit();addEventListener('resize',fit);
 
 const HEROES={
-  ethan:{key:'ethan',name:'Ethan',ko:'에단',maxHp:120,speed:3.0,jump:11.4,w:42,h:68,attackCd:24,color:'#e2d7b9',accent:'#e7c66f',detail:'#74d8ef'},
-  noah:{key:'noah',name:'Noah',ko:'노아',maxHp:95,speed:3.6,jump:13.6,w:39,h:64,attackCd:18,color:'#252943',accent:'#72dcef',detail:'#8f70c7'}
+  ethan:{key:'ethan',name:'Ethan',ko:'에단',maxHp:120,speed:2.95,jump:10.9,w:42,h:68,attackCd:24,gravity:.70,maxFall:13.5,accelGround:.42,accelAir:.22,friction:.82,coyote:6,jumpBuffer:7,color:'#e2d7b9',accent:'#e7c66f',detail:'#74d8ef'},
+  noah:{key:'noah',name:'Noah',ko:'노아',maxHp:95,speed:3.85,jump:13.1,w:39,h:64,attackCd:18,gravity:.57,maxFall:13.8,accelGround:.68,accelAir:.40,friction:.60,coyote:8,jumpBuffer:8,color:'#252943',accent:'#72dcef',detail:'#8f70c7'}
 };
 
 const state={
   started:false,paused:true,current:'gate',active:'ethan',visited:new Set(),kills:0,startTime:0,
   elevatorOn:false,cellarOpen:false,bossDead:false,bellRung:false,chapterClear:false,
-  checkpoint:{room:'gate',x:120},mapOpen:false,sound:true,
+  checkpoint:{room:'gate',x:120},mapOpen:false,sound:true,swapLock:0,
   roomState:{},projectiles:[],enemyShots:[],fx:[],keys:{},lastError:0
 };
 const heroes={
-  ethan:{hp:120,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,w:HEROES.ethan.w,h:HEROES.ethan.h},
-  noah:{hp:95,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,w:HEROES.noah.w,h:HEROES.noah.h}
+  ethan:{hp:120,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,coyote:0,jumpBuffer:0,land:0,w:HEROES.ethan.w,h:HEROES.ethan.h},
+  noah:{hp:95,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,coyote:0,jumpBuffer:0,land:0,w:HEROES.noah.w,h:HEROES.noah.h}
 };
 function syncHeroBody(k){
   const h=heroes[k],d=HEROES[k];
@@ -133,6 +133,7 @@ const audio={
   },
   sfx(n){
     if(n==='jump'){this.tone(240,.08,.045,'triangle',65)}
+    else if(n==='land'){this.noise(.055,.028,520);this.tone(90,.055,.018,'triangle',-18)}
     else if(n==='ethan'){this.tone(520,.07,.038,'sine',95)}
     else if(n==='noah'){this.tone(330,.08,.048,'triangle',-110);this.noise(.05,.025,1500)}
     else if(n==='switch'){this.tone(392,.12,.045,'sine',110)}
@@ -174,13 +175,13 @@ function makeEnemy(type,x,y){
 
 function newGame(){
   state.started=true;state.paused=false;state.current='gate';state.active='ethan';state.visited=new Set(['gate']);state.kills=0;state.startTime=performance.now();
-  state.elevatorOn=false;state.cellarOpen=false;state.bossDead=false;state.bellRung=false;state.chapterClear=false;state.checkpoint={room:'gate',x:120};state.roomState={};state.projectiles=[];state.enemyShots=[];state.fx=[];
-  for(const k of Object.keys(heroes)){const d=HEROES[k];Object.assign(heroes[k],{hp:d.maxHp,alive:true,x:120,y:ROOMS.gate.ground-d.h,vx:0,vy:0,onGround:true,face:1,attack:0,inv:0,anim:0,w:d.w,h:d.h})}
+  state.elevatorOn=false;state.cellarOpen=false;state.bossDead=false;state.bellRung=false;state.chapterClear=false;state.swapLock=0;state.checkpoint={room:'gate',x:120};state.roomState={};state.projectiles=[];state.enemyShots=[];state.fx=[];
+  for(const k of Object.keys(heroes)){const d=HEROES[k];Object.assign(heroes[k],{hp:d.maxHp,alive:true,x:120,y:ROOMS.gate.ground-d.h,vx:0,vy:0,onGround:true,face:1,attack:0,inv:0,anim:0,coyote:d.coyote,jumpBuffer:0,land:0,w:d.w,h:d.h})}
   spawnRoom('gate');ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.chapterClear.classList.remove('show');audio.unlock();toast('성의 문이 다시 열렸다.',1700);updateHud();
 }
 function retry(){
   state.paused=false;state.current=state.checkpoint.room;state.active='ethan';state.projectiles=[];state.enemyShots=[];state.fx=[];
-  for(const k of Object.keys(heroes)){const h=heroes[k],d=HEROES[k];Object.assign(h,{hp:d.maxHp,alive:true,x:state.checkpoint.x,y:activeRoom().ground-d.h,vx:0,vy:0,onGround:true,inv:80,w:d.w,h:d.h})}
+  for(const k of Object.keys(heroes)){const h=heroes[k],d=HEROES[k];Object.assign(h,{hp:d.maxHp,alive:true,x:state.checkpoint.x,y:activeRoom().ground-d.h,vx:0,vy:0,onGround:true,inv:80,coyote:d.coyote,jumpBuffer:0,land:0,w:d.w,h:d.h})}
   ui.gameOver.classList.remove('show');state.visited.add(state.current);spawnRoom(state.current);toast('불이 아직 꺼지지 않았다.');updateHud();
 }
 function switchHero(){
