@@ -33,8 +33,8 @@ const state={
   roomState:{},projectiles:[],enemyShots:[],fx:[],keys:{},lastError:0
 };
 const heroes={
-  ethan:{hp:120,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,coyote:0,jumpBuffer:0,land:0,w:HEROES.ethan.w,h:HEROES.ethan.h},
-  noah:{hp:95,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,coyote:0,jumpBuffer:0,land:0,w:HEROES.noah.w,h:HEROES.noah.h}
+  ethan:{hp:120,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,coyote:0,jumpBuffer:0,land:0,combo:0,comboWindow:0,w:HEROES.ethan.w,h:HEROES.ethan.h},
+  noah:{hp:95,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,coyote:0,jumpBuffer:0,land:0,combo:0,comboWindow:0,w:HEROES.noah.w,h:HEROES.noah.h}
 };
 function syncHeroBody(k){
   const h=heroes[k],d=HEROES[k];
@@ -170,18 +170,18 @@ function enemyDef(type){
 }
 function makeEnemy(type,x,y){
   const d=enemyDef(type);
-  return {type,x,y,w:d.w,h:d.h,hp:d.hp,maxHp:d.hp,s:d.s,d:d.d,alive:true,face:-1,cd:45+Math.random()*60,shot:50+Math.random()*70,phase:Math.random()*6.28,wind:0,inv:0,deadAt:0};
+  return {type,x,y,w:d.w,h:d.h,hp:d.hp,maxHp:d.hp,s:d.s,d:d.d,alive:true,face:-1,cd:45+Math.random()*60,shot:50+Math.random()*70,phase:Math.random()*6.28,wind:0,inv:0,deadAt:0,stun:0,kbx:0,hitFlash:0,attackWind:0,attackRecover:0,dash:0,aimX:0,aimY:0,attackKind:''};
 }
 
 function newGame(){
   state.started=true;state.paused=false;state.current='gate';state.active='ethan';state.visited=new Set(['gate']);state.kills=0;state.startTime=performance.now();
   state.elevatorOn=false;state.cellarOpen=false;state.bossDead=false;state.bellRung=false;state.chapterClear=false;state.swapLock=0;state.checkpoint={room:'gate',x:120};state.roomState={};state.projectiles=[];state.enemyShots=[];state.fx=[];
-  for(const k of Object.keys(heroes)){const d=HEROES[k];Object.assign(heroes[k],{hp:d.maxHp,alive:true,x:120,y:ROOMS.gate.ground-d.h,vx:0,vy:0,onGround:true,face:1,attack:0,inv:0,anim:0,coyote:d.coyote,jumpBuffer:0,land:0,w:d.w,h:d.h})}
+  for(const k of Object.keys(heroes)){const d=HEROES[k];Object.assign(heroes[k],{hp:d.maxHp,alive:true,x:120,y:ROOMS.gate.ground-d.h,vx:0,vy:0,onGround:true,face:1,attack:0,inv:0,anim:0,coyote:d.coyote,jumpBuffer:0,land:0,combo:0,comboWindow:0,w:d.w,h:d.h})}
   spawnRoom('gate');ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.chapterClear.classList.remove('show');audio.unlock();toast('성의 문이 다시 열렸다.',1700);updateHud();
 }
 function retry(){
   state.paused=false;state.current=state.checkpoint.room;state.active='ethan';state.projectiles=[];state.enemyShots=[];state.fx=[];
-  for(const k of Object.keys(heroes)){const h=heroes[k],d=HEROES[k];Object.assign(h,{hp:d.maxHp,alive:true,x:state.checkpoint.x,y:activeRoom().ground-d.h,vx:0,vy:0,onGround:true,inv:80,coyote:d.coyote,jumpBuffer:0,land:0,w:d.w,h:d.h})}
+  for(const k of Object.keys(heroes)){const h=heroes[k],d=HEROES[k];Object.assign(h,{hp:d.maxHp,alive:true,x:state.checkpoint.x,y:activeRoom().ground-d.h,vx:0,vy:0,onGround:true,inv:80,coyote:d.coyote,jumpBuffer:0,land:0,combo:0,comboWindow:0,w:d.w,h:d.h})}
   ui.gameOver.classList.remove('show');state.visited.add(state.current);spawnRoom(state.current);toast('불이 아직 꺼지지 않았다.');updateHud();
 }
 function switchHero(){
@@ -225,17 +225,26 @@ function consumeBufferedJump(h,d){
   audio.sfx('jump');return true;
 }
 function doAttack(){
-  if(state.paused)return;const h=hero(),d=HEROES[state.active];if(h.attack>0||!h.alive)return;
-  h.attack=d.attackCd;
+  if(state.paused)return;const h=hero(),d=HEROES[state.active];if(!h.alive)return;
+
   if(state.active==='ethan'){
+    if(h.attack>0)return;
+    h.attack=d.attackCd;h.combo=0;h.comboWindow=0;
     const px=h.x+h.w/2+h.face*27,py=h.y+h.h*.42;
-    state.projectiles.push({x:px,y:py,vx:h.face*9.8,vy:0,r:5,dmg:19,life:100,color:'#e7c66f'});
+    state.projectiles.push({x:px,y:py,vx:h.face*9.8,vy:0,r:5,dmg:19,life:100,color:'#e7c66f',knock:2.7,stun:9});
     state.fx.push({type:'muzzle',x:px,y:py,face:h.face,life:8,max:8,color:'#e7c66f'});
     h.vx-=h.face*(h.onGround?.38:.18);audio.sfx('ethan');
   }else{
-    h.vx=clamp(h.vx+h.face*(h.onGround?3.2:1.6),-6.2,6.2);
-    const hit={x:h.face>0?h.x+h.w-2:h.x-68,y:h.y+5,w:70,h:46,dmg:25,life:9,face:h.face};
-    state.fx.push({type:'slash',...hit,max:9,color:'#72dcef'});hitEnemiesBox(hit);audio.sfx('noah');
+    if(h.attack>0)return;
+    h.combo=(h.comboWindow>0)?(h.combo%3)+1:1;
+    h.comboWindow=27;
+    const step=h.combo,damages=[22,25,32],reach=[66,72,82],locks=[14,15,21],lunges=[2.5,3.3,4.4];
+    h.attack=locks[step-1];
+    h.vx=clamp(h.vx+h.face*(h.onGround?lunges[step-1]:lunges[step-1]*.55),-6.8,6.8);
+    const w=reach[step-1],hit={x:h.face>0?h.x+h.w-2:h.x-w+2,y:h.y+(step===3?1:5),w,h:step===3?52:46,dmg:damages[step-1],life:9,face:h.face,combo:step,knock:step===3?5.2:2.2,stun:step===3?18:9};
+    state.fx.push({type:'slash',...hit,max:9,color:step===3?'#baf6ff':'#72dcef'});
+    hitEnemiesBox(hit,{knock:hit.knock,stun:hit.stun,dir:h.face});
+    audio.sfx('noah');
   }
   hitSecretWall();
 }
@@ -246,12 +255,24 @@ function hitSecretWall(){
     if(rs.secretHp<=0){rs.secretOpen=true;toast('벽 뒤에서 차가운 공기가 새어 나온다.');}
   }
 }
-function hitEnemiesBox(box){
-  for(const e of roomState(state.current).enemies){if(!e.alive||e.inv>0)continue;if(rects(box,e)){damageEnemy(e,box.dmg)}}
+function hitEnemiesBox(box,opts={}){
+  for(const e of roomState(state.current).enemies){if(!e.alive||e.inv>0)continue;if(rects(box,e)){damageEnemy(e,box.dmg,{...opts,dir:opts.dir??box.face})}}
 }
-function damageEnemy(e,n){
-  if(!e.alive||e.inv>0)return;e.hp-=n;e.inv=5;audio.sfx('hit');state.fx.push({type:'spark',x:e.x+e.w/2,y:e.y+e.h/2,life:12,color:HEROES[state.active].accent});
-  if(e.hp<=0){e.hp=0;e.alive=false;e.deadAt=performance.now();state.kills++;if(e.type==='gatekeeper')bossDefeated()}
+function damageEnemy(e,n,opts={}){
+  if(!e.alive||e.inv>0)return;
+  e.hp-=n;e.inv=4;e.hitFlash=7;
+  if(e.type!=='gatekeeper'){
+    e.stun=Math.max(e.stun||0,opts.stun||6);
+    e.kbx+=(opts.dir||hero().face)*(opts.knock||1.5);
+  }
+  audio.sfx('hit');
+  state.fx.push({type:'spark',x:e.x+e.w/2,y:e.y+e.h/2,life:12,max:12,color:HEROES[state.active].accent});
+  state.fx.push({type:'hitRing',x:e.x+e.w/2,y:e.y+e.h*.48,life:8,max:8,color:HEROES[state.active].accent});
+  if(e.hp<=0){
+    e.hp=0;e.alive=false;e.deadAt=performance.now();state.kills++;
+    state.fx.push({type:'enemyBurst',x:e.x+e.w/2,y:e.y+e.h/2,life:16,max:16,color:'#a69cab'});
+    if(e.type==='gatekeeper')bossDefeated();
+  }
 }
 function bossDefeated(){
   state.bossDead=true;state.bellRung=true;audio.sfx('bell');toast('어딘가에서 종이 한 번 울렸다.',2200);
@@ -337,7 +358,7 @@ function platformPhysics(h,d,r,dt){
 
 function updatePlayer(dt){
   const h=hero(),d=HEROES[state.active],k=state.keys;
-  if(state.swapLock>0)state.swapLock-=dt;if(h.attack>0)h.attack-=dt;if(h.inv>0)h.inv-=dt;if(h.land>0)h.land-=dt;
+  if(state.swapLock>0)state.swapLock-=dt;if(h.attack>0)h.attack-=dt;if(h.inv>0)h.inv-=dt;if(h.land>0)h.land-=dt;if(h.comboWindow>0)h.comboWindow-=dt;else h.combo=0;
   if(h.onGround)h.coyote=d.coyote;else h.coyote=Math.max(0,(h.coyote||0)-dt);
   if(h.jumpBuffer>0)h.jumpBuffer-=dt;
   consumeBufferedJump(h,d);
@@ -360,7 +381,7 @@ function updatePlayer(dt){
 }
 function updateProjectiles(dt){
   for(const q of state.projectiles){q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;
-    for(const e of roomState(state.current).enemies){if(e.alive&&q.life>0&&circleRect(q,e)){damageEnemy(e,q.dmg);q.life=0;break}}
+    for(const e of roomState(state.current).enemies){if(e.alive&&q.life>0&&circleRect(q,e)){damageEnemy(e,q.dmg,{knock:q.knock||1.5,stun:q.stun||6,dir:Math.sign(q.vx)||1});q.life=0;break}}
   }
   state.projectiles=state.projectiles.filter(q=>q.life>0&&q.x>-30&&q.x<W+30);
   for(const q of state.enemyShots){q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;const h=hero();if(q.life>0&&circleRect(q,h)){q.life=0;hurt(q.dmg,q.vx>0?1:-1)}}
