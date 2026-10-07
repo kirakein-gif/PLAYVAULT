@@ -208,3 +208,9 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - Noah's three-hit chain now uses visibly different body/arm/blade poses: horizontal cut, reverse diagonal cut, and an overhead heavy finisher.
 - Ethan's rune shot now has a dedicated casting/recoil pose rather than relying on projectile VFX alone.
 - Attack rendering tracks the actual lock duration of each strike so the character pose progresses through the full swing.
+
+### HOLLOW KEEP finisher rhythm v7
+
+- Noah's third slash now clearly ends the chain instead of flowing directly into another first hit.
+- The finisher has a short post-swing recovery window; attacks are locked briefly and movement is reduced rather than fully frozen.
+- A low blade-recovery pose remains visible after the third strike so the combo has a readable ending beat.
