@@ -33,8 +33,8 @@ const state={
   roomState:{},projectiles:[],enemyShots:[],fx:[],keys:{},lastError:0
 };
 const heroes={
-  ethan:{hp:120,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,coyote:0,jumpBuffer:0,land:0,combo:0,comboWindow:0,w:HEROES.ethan.w,h:HEROES.ethan.h},
-  noah:{hp:95,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,coyote:0,jumpBuffer:0,land:0,combo:0,comboWindow:0,w:HEROES.noah.w,h:HEROES.noah.h}
+  ethan:{hp:120,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,coyote:0,jumpBuffer:0,land:0,combo:0,comboWindow:0,finisherLock:0,finisherMax:0,w:HEROES.ethan.w,h:HEROES.ethan.h},
+  noah:{hp:95,alive:true,x:120,y:0,vx:0,vy:0,onGround:false,face:1,attack:0,inv:0,anim:0,coyote:0,jumpBuffer:0,land:0,combo:0,comboWindow:0,finisherLock:0,finisherMax:0,w:HEROES.noah.w,h:HEROES.noah.h}
 };
 function syncHeroBody(k){
   const h=heroes[k],d=HEROES[k];
@@ -176,12 +176,12 @@ function makeEnemy(type,x,y){
 function newGame(){
   state.started=true;state.paused=false;state.current='gate';state.active='ethan';state.visited=new Set(['gate']);state.kills=0;state.startTime=performance.now();
   state.elevatorOn=false;state.cellarOpen=false;state.bossDead=false;state.bellRung=false;state.chapterClear=false;state.swapLock=0;state.checkpoint={room:'gate',x:120};state.roomState={};state.projectiles=[];state.enemyShots=[];state.fx=[];
-  for(const k of Object.keys(heroes)){const d=HEROES[k];Object.assign(heroes[k],{hp:d.maxHp,alive:true,x:120,y:ROOMS.gate.ground-d.h,vx:0,vy:0,onGround:true,face:1,attack:0,inv:0,anim:0,coyote:d.coyote,jumpBuffer:0,land:0,combo:0,comboWindow:0,w:d.w,h:d.h})}
+  for(const k of Object.keys(heroes)){const d=HEROES[k];Object.assign(heroes[k],{hp:d.maxHp,alive:true,x:120,y:ROOMS.gate.ground-d.h,vx:0,vy:0,onGround:true,face:1,attack:0,inv:0,anim:0,coyote:d.coyote,jumpBuffer:0,land:0,combo:0,comboWindow:0,finisherLock:0,finisherMax:0,w:d.w,h:d.h})}
   spawnRoom('gate');ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.chapterClear.classList.remove('show');audio.unlock();toast('성의 문이 다시 열렸다.',1700);updateHud();
 }
 function retry(){
   state.paused=false;state.current=state.checkpoint.room;state.active='ethan';state.projectiles=[];state.enemyShots=[];state.fx=[];
-  for(const k of Object.keys(heroes)){const h=heroes[k],d=HEROES[k];Object.assign(h,{hp:d.maxHp,alive:true,x:state.checkpoint.x,y:activeRoom().ground-d.h,vx:0,vy:0,onGround:true,inv:80,coyote:d.coyote,jumpBuffer:0,land:0,combo:0,comboWindow:0,w:d.w,h:d.h})}
+  for(const k of Object.keys(heroes)){const h=heroes[k],d=HEROES[k];Object.assign(h,{hp:d.maxHp,alive:true,x:state.checkpoint.x,y:activeRoom().ground-d.h,vx:0,vy:0,onGround:true,inv:80,coyote:d.coyote,jumpBuffer:0,land:0,combo:0,comboWindow:0,finisherLock:0,finisherMax:0,w:d.w,h:d.h})}
   ui.gameOver.classList.remove('show');state.visited.add(state.current);spawnRoom(state.current);toast('불이 아직 꺼지지 않았다.');updateHud();
 }
 function switchHero(){
@@ -235,11 +235,12 @@ function doAttack(){
     state.fx.push({type:'muzzle',x:px,y:py,face:h.face,life:8,max:8,color:'#e7c66f'});
     h.vx-=h.face*(h.onGround?.38:.18);audio.sfx('ethan');
   }else{
-    if(h.attack>0)return;
-    h.combo=(h.comboWindow>0)?(h.combo%3)+1:1;
-    h.comboWindow=27;
+    if(h.attack>0||h.finisherLock>0)return;
+    h.combo=(h.comboWindow>0&&h.combo<3)?h.combo+1:1;
     const step=h.combo,damages=[22,25,32],reach=[66,72,82],locks=[14,15,21],lunges=[2.5,3.3,4.4];
+    h.comboWindow=step===3?0:28;
     h.attack=locks[step-1];h.attackMax=locks[step-1];
+    if(step===3){h.finisherLock=46;h.finisherMax=46;}
     h.vx=clamp(h.vx+h.face*(h.onGround?lunges[step-1]:lunges[step-1]*.55),-6.8,6.8);
     const w=reach[step-1],hit={x:h.face>0?h.x+h.w-2:h.x-w+2,y:h.y+(step===3?1:5),w,h:step===3?52:46,dmg:damages[step-1],life:9,face:h.face,combo:step,knock:step===3?5.2:2.2,stun:step===3?18:9};
     state.fx.push({type:'slash',...hit,max:9,color:step===3?'#baf6ff':'#72dcef'});
@@ -358,14 +359,21 @@ function platformPhysics(h,d,r,dt){
 
 function updatePlayer(dt){
   const h=hero(),d=HEROES[state.active],k=state.keys;
-  if(state.swapLock>0)state.swapLock-=dt;if(h.attack>0)h.attack-=dt;if(h.inv>0)h.inv-=dt;if(h.land>0)h.land-=dt;if(h.comboWindow>0)h.comboWindow-=dt;else h.combo=0;
+  if(state.swapLock>0)state.swapLock-=dt;
+  if(h.attack>0)h.attack-=dt;if(h.inv>0)h.inv-=dt;if(h.land>0)h.land-=dt;
+  if(h.comboWindow>0)h.comboWindow-=dt;
+  if(h.finisherLock>0)h.finisherLock-=dt;
+  if(h.comboWindow<=0&&h.finisherLock<=0&&h.attack<=0)h.combo=0;
   if(h.onGround)h.coyote=d.coyote;else h.coyote=Math.max(0,(h.coyote||0)-dt);
   if(h.jumpBuffer>0)h.jumpBuffer-=dt;
   consumeBufferedJump(h,d);
   let dir=(k.left?-1:0)+(k.right?1:0);
-  const accel=h.onGround?d.accelGround:d.accelAir,target=dir*d.speed,blend=Math.min(1,accel*dt);
+  const accel=h.onGround?d.accelGround:d.accelAir;
+  const recovering=state.active==='noah'&&h.finisherLock>0&&h.attack<=0;
+  const target=dir*d.speed*(recovering?.48:1),blend=Math.min(1,accel*dt);
   h.vx+=(target-h.vx)*blend;
   if(!dir)h.vx*=Math.pow(d.friction,dt);else h.face=dir>0?1:-1;
+  if(recovering)h.vx*=Math.pow(.92,dt);
   platformPhysics(h,d,activeRoom(),dt);
   h.anim+=Math.abs(h.vx)*dt*(state.active==='noah'?.22:.17);
 
@@ -547,6 +555,7 @@ function drawHero(k,ghost=false){
   if(!Number.isFinite(drawX)||!Number.isFinite(drawY))return;
 
   const attacking=!ghost&&h.attack>0;
+  const recovering=!ghost&&k==='noah'&&h.finisherLock>0&&h.attack<=0&&h.combo===3;
   const attackMax=Math.max(1,h.attackMax||d.attackCd);
   const ap=attacking?Math.max(0,Math.min(1,1-h.attack/attackMax)):0;
   const ease=t=>t*t*(3-2*t);
@@ -573,7 +582,11 @@ function drawHero(k,ghost=false){
     weaponX=28+recoil*5;weaponY=-27-recoil*2;
   }
 
-  if(k==='noah'&&attacking){
+  if(k==='noah'&&recovering){
+    const rp=1-Math.max(0,h.finisherLock)/(h.finisherMax||46);
+    bodyDrop=5*(1-rp*.55);bodyLean=5*(1-rp*.5);headX=1.5;headY=1.2;
+    handX=11;handY=-25+rp*2;weaponX=31+rp*2;weaponY=-2-rp*5;weaponW=5.5;
+  }else if(k==='noah'&&attacking){
     const step=Math.max(1,Math.min(3,h.combo||1));
     if(step===1){
       // Fast horizontal cut: low wind-up -> broad forward sweep.
