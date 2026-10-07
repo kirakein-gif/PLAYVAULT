@@ -153,3 +153,10 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - Reduced displayed protagonist body height by approximately 20 percent; authored frame pivots and foot anchors keep animation grounded.
 - Character selection uses the same idle art as gameplay. Attack and death sprites share the new design and normalized body scale.
 - Gameplay, enemy assets, room assets, and audio are unchanged. Built-in image generation prompts and provenance are recorded in `assets/art/hero-redesign-provenance.txt`.
+
+## ABYSSFALL v32 distinct protagonist identities
+
+- Dawn now has broader shoulders, heavier armor and boots, visible short blond hair, and an angular human face.
+- Night now has narrower shoulders, lighter fitted practical armor, long visible violet hair, a softer human face, and tapered cloak panels.
+- Idle, run, hurt, attack, death, and selection artwork share the distinct designs. Authored anchors and per-character normalization preserve the smaller v31 display size.
+- Full built-in image generation prompts are recorded in `assets/art/hero-identity-provenance.txt`.
