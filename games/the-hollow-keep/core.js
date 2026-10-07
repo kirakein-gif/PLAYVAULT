@@ -10,7 +10,7 @@ const ui={
   roomTitle:$('roomTitle'),roomHint:$('roomHint'),heroHint:$('heroHint'),
   ethanHud:$('ethanHud'),noahHud:$('noahHud'),ethanHp:$('ethanHp'),noahHp:$('noahHp'),
   ethanHpText:$('ethanHpText'),noahHpText:$('noahHpText'),toast:$('toast'),
-  mapPanel:$('mapPanel'),soundBtn:$('soundBtn'),
+  mapPanel:$('mapPanel'),mapBtn:$('mapBtn'),soundBtn:$('soundBtn'),
   jumpBtn:$('jumpBtn'),attackBtn:$('attackBtn'),swapBtn:$('swapBtn'),useBtn:$('useBtn')
 };
 
@@ -186,7 +186,7 @@ function changeRoom(id,spawnX=null){
   const h=hero(),r=ROOMS[id],d=HEROES[state.active];
   h.x=spawnX??(ROOMS[from]?.R===id?44:ROOMS[from]?.L===id?W-d.w-44:110);
   h.y=r.ground-d.h;h.vx=0;h.vy=0;h.onGround=true;h.inv=Math.max(h.inv,35);
-  heroes[otherKey()].x=h.x;heroes[otherKey()].y=h.y;
+  heroes[otherKey()].x=clamp(h.x-h.face*40,8,W-HEROES[otherKey()].w-8);heroes[otherKey()].y=h.y;
   toast(r.name,700);updateHud();
 }
 function killHero(){
@@ -281,7 +281,7 @@ function interact(){
     }
     if(o.type==='secret'||o.type==='secretBack'){audio.sfx('stone');changeRoom(o.to, o.x<400?W-110:110);return}
   }
-  if(r.trace&&!roomState(r.id).traceSeen){roomState(r.id).traceSeen=true;toast(r.trace,1900);return}
+  if(r.trace&&!roomState(r.id).traceSeen){const h=hero();if(Math.abs((h.x+h.w/2)-(W-88))<92){roomState(r.id).traceSeen=true;toast(r.trace,1900);return}}
 }
 function finishChapter(){
   if(state.chapterClear)return;state.chapterClear=true;state.paused=true;
@@ -502,6 +502,7 @@ ui.jumpBtn.addEventListener('pointerdown',e=>{e.preventDefault();doJump()});
 ui.attackBtn.addEventListener('pointerdown',e=>{e.preventDefault();doAttack()});
 ui.swapBtn.addEventListener('pointerdown',e=>{e.preventDefault();switchHero()});
 ui.useBtn.addEventListener('pointerdown',e=>{e.preventDefault();interact()});
+ui.mapBtn.addEventListener('click',toggleMap);
 ui.soundBtn.addEventListener('click',()=>{state.sound=!state.sound;ui.soundBtn.textContent=state.sound?'🔊':'🔇';if(audio.master&&audio.ctx)audio.master.gain.setTargetAtTime(state.sound?.72:0,audio.ctx.currentTime,.03)});
 ui.startBtn.addEventListener('click',newGame);ui.retryBtn.addEventListener('click',retry);ui.clearAgain.addEventListener('click',newGame);
 
