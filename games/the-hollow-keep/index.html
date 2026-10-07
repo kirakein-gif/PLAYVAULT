@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#090a10">
+  <title>THE HOLLOW KEEP · PLAYVAULT</title>
+  <link rel="stylesheet" href="game.css?v=1">
+</head>
+<body>
+<main id="shell">
+  <canvas id="game" width="960" height="540" aria-label="THE HOLLOW KEEP 게임 화면"></canvas>
+
+  <section id="hud" class="glass">
+    <div class="hudTop">
+      <div>
+        <div class="eyebrow">PLAYVAULT ORIGINAL · PROTOTYPE</div>
+        <b id="roomTitle">성문 앞</b>
+      </div>
+      <div class="topActions">
+        <button id="soundBtn" type="button" aria-label="소리 끄기">🔊</button>
+        <a href="../../index.html">PLAYVAULT</a>
+      </div>
+    </div>
+    <div class="heroBars">
+      <div id="ethanHud" class="heroHud active ethan">
+        <span>ETHAN</span><i><b id="ethanHp"></b></i><small id="ethanHpText">120</small>
+      </div>
+      <div id="noahHud" class="heroHud noah">
+        <span>NOAH</span><i><b id="noahHp"></b></i><small id="noahHpText">95</small>
+      </div>
+    </div>
+    <div class="hintline"><span id="heroHint">에단 · 원거리 룬탄</span><span id="roomHint">방문 1</span></div>
+  </section>
+
+  <section id="start" class="overlay show">
+    <div class="startCard">
+      <div class="eyebrow big">PLAYVAULT · SECOND GAME PROTOTYPE</div>
+      <h1>THE HOLLOW KEEP</h1>
+      <p class="lead">성의 문이 다시 열렸다.</p>
+      <div class="duo">
+        <div class="heroSketch ethan"><span class="head"></span><span class="cloak"></span><b>ETHAN</b><small>에단 · 빛 / 원거리 / 오래된 장치</small></div>
+        <div class="heroSketch noah"><span class="head"></span><span class="cloak"></span><b>NOAH</b><small>노아 · 그림자 / 근접 / 기동</small></div>
+      </div>
+      <p class="controls">이동 A/D · 점프 SPACE · 공격 J · 교대 Q/TAB · 조사/장치 E · 지도 M<br>모바일은 화면 버튼 사용</p>
+      <button id="startBtn" class="primary" type="button">성 안으로</button>
+    </div>
+  </section>
+
+  <section id="gameOver" class="overlay">
+    <div class="overCard">
+      <div class="eyebrow big">THE KEEP REMAINS</div>
+      <h2>두 사람의 발소리가 멎었다.</h2>
+      <p class="lead">마지막으로 불이 켜져 있던 곳에서 다시 시작합니다.</p>
+      <button id="retryBtn" class="primary" type="button">다시 들어가기</button>
+    </div>
+  </section>
+
+  <section id="chapterClear" class="overlay">
+    <div class="overCard">
+      <div class="eyebrow big">CHAPTER I</div>
+      <h2>종이 한 번 울렸다.</h2>
+      <p class="lead">멈춰 있던 시계가 다시 움직이기 시작했다.</p>
+      <div id="clearStats" class="clearStats"></div>
+      <button id="clearAgain" class="primary" type="button">처음부터 다시</button>
+      <a class="backLink" href="../../index.html">PLAYVAULT로</a>
+    </div>
+  </section>
+
+  <section id="mapPanel" class="mapPanel" aria-hidden="true">
+    <div class="mapHead"><b>성의 기억</b><small>가본 곳만 남는다</small></div>
+    <canvas id="mapCanvas" width="420" height="230"></canvas>
+  </section>
+
+  <div id="toast" aria-live="polite"></div>
+
+  <section id="mobileControls" aria-label="모바일 조작">
+    <div class="movePad">
+      <button data-hold="left" type="button">◀</button>
+      <button data-hold="right" type="button">▶</button>
+    </div>
+    <div class="actionPad">
+      <button id="jumpBtn" type="button"><b>↑</b><small>점프</small></button>
+      <button id="attackBtn" class="attack" type="button"><b>✦</b><small>공격</small></button>
+      <button id="swapBtn" type="button"><b>⇄</b><small>교대</small></button>
+      <button id="useBtn" type="button"><b>◇</b><small>조사</small></button>
+    </div>
+  </section>
+</main>
+<script src="core.js?v=1"></script>
+</body>
+</html>
