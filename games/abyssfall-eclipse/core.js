@@ -44,7 +44,18 @@
     ['여기까지 온 것은 처음이 아니다.','문은 바깥을 막기 위해 세운 것이 아니다.','…그것은 아직 위를 보고 있다.']
   ];
 
-  function fit(){const s=Math.min(innerWidth/W,innerHeight/H);canvas.style.width=`${Math.floor(W*s)}px`;canvas.style.height=`${Math.floor(H*s)}px`} fit();addEventListener('resize',fit);
+  // Keep gameplay coordinates fixed; resize only the presentation surface.
+  function fit(){
+    const s=Math.min(innerWidth/W,innerHeight/H),dpr=Math.min(devicePixelRatio||1,2);
+    const width=Math.max(1,Math.round(W*s)),height=Math.max(1,Math.round(H*s));
+    canvas.style.width=`${width}px`;canvas.style.height=`${height}px`;
+    canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
+    AF.renderScaleX=canvas.width/W;AF.renderScaleY=canvas.height/H;
+    ctx.setTransform(AF.renderScaleX,0,0,AF.renderScaleY,0,0);
+    ctx.imageSmoothingEnabled=false;
+  } fit();addEventListener('resize',fit);
+  AF.snapX=x=>Math.round(x*AF.renderScaleX)/AF.renderScaleX;
+  AF.snapY=y=>Math.round(y*AF.renderScaleY)/AF.renderScaleY;
   document.querySelectorAll('.heroCard').forEach(b=>b.addEventListener('click',()=>{AF.selected=b.dataset.hero;document.querySelectorAll('.heroCard').forEach(x=>x.classList.toggle('selected',x===b))}));
   addEventListener('keydown',e=>{AF.keys[e.key.toLowerCase()]=true;if(e.code==='Space'){e.preventDefault();AF.useSpecial()}}); addEventListener('keyup',e=>AF.keys[e.key.toLowerCase()]=false);
   const joyBase=$('joyBase'),joyKnob=$('joyKnob');

@@ -262,9 +262,8 @@
   function player(){
     const p=A.player,h=p.hero,atlas=window.AF_ATLAS,now=performance.now();
     const atlasImg=atlas?.loaded?.[h.key]?atlas.images[h.key]:null;
-    let bob=p.moving&&!A.dead?Math.sin(p.step*1.8)*2.5:Math.sin(now/420)*1.2;
     ctx.save();
-    ctx.translate(p.x,p.y+bob);
+    ctx.translate(A.snapX(p.x),A.snapY(p.y));
     if(p.faceX<0)ctx.scale(-1,1);
     if(!A.dead&&p.inv>0&&Math.floor(p.inv/4)%2===0)ctx.globalAlpha=.5;
 
@@ -273,7 +272,6 @@
       if(A.dead&&p.deathAt){
         anim='death';
         idx=Math.min(3,Math.floor((now-p.deathAt)/190));
-        bob=0;
       }else if(p.hurtPose>0){
         anim='hurt';
         idx=Math.min(1,Math.floor((18-p.hurtPose)/5)%2);
@@ -289,13 +287,15 @@
       }
       const frame=atlas.frames[anim][idx]||atlas.frames.idle[0];
       const sx=frame[0]*atlas.cellW,sy=frame[1]*atlas.cellH;
-      const base=h.drawW*(A.mobile?1.34:1.28)*(anim==='attack'?1.08:1);
+      const base=h.drawW*(A.mobile?1.52:1.36);
       const dh=base*(atlas.cellH/atlas.cellW);
-      ctx.drawImage(atlasImg,sx,sy,atlas.cellW,atlas.cellH,-base*.5,-dh*.76,base,dh);
+      // Fixed torso pivot and foot baseline, including attack and death frames.
+      const baseline=h.key==='night'?(anim==='attack'&&idx<2?47:anim==='hurt'&&idx===1?45:anim==='death'&&idx===1?45:50):50;
+      ctx.drawImage(atlasImg,sx,sy,atlas.cellW,atlas.cellH,-base*.5,-baseline*base/atlas.cellW+14,base,dh);
     }else{
       const k=p.attackPose>0?h.attack:(p.moving?h.run:h.idle),im=imgs[k];
       if(im?.complete){
-        const base=h.drawW*(p.attackPose>0?1.06:1),ratio=im.height/im.width;
+        const base=h.drawW,ratio=im.height/im.width;
         ctx.drawImage(im,-base*.5,-base*ratio*.72,base,base*ratio);
       }
     }
@@ -400,10 +400,9 @@
       boss:A.mobile?192:166
     };
     const size=sizes[e.type]||96;
-    const bob=e.alive?Math.sin(now/210+e.phase)*1.6:0;
 
     ctx.save();
-    ctx.translate(e.x,e.y+bob);
+    ctx.translate(A.snapX(e.x),A.snapY(e.y));
     if(e.stun>0&&e.alive){ctx.globalAlpha=.7;ctx.strokeStyle='#ffd27a';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-size*.42,10+3*Math.sin(now/80),0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1}
     if(e.summoned&&e.alive){
       const pulse=.35+.25*Math.sin(now/150+e.phase);ctx.globalAlpha=.5;ctx.strokeStyle=`rgba(196,103,255,${pulse})`;ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,size*.34,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;
