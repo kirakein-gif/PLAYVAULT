@@ -22,7 +22,8 @@ The first suite exercises 12 floors, hidden-altars, boss defeat/stairs/clear, co
 
 ## Games
 
-- **ABYSSFALL: ECLIPSE** — Dawn Seeker / Night Veil 듀얼 주인공 룸 서바이버
+- **ABYSSFALL: ECLIPSE** — Ethan / Noah 듀얼 주인공 룸 서바이버
+- **THE HOLLOW KEEP** — Ethan / Noah 듀얼 주인공 횡스크롤 미궁 액션 어드벤처 (Chapter I prototype)
 
 ## Shared protagonists
 
@@ -178,3 +179,11 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - XP drops are translucent wisps with trailing smoke and a short absorption motion toward the player's torso. XP values, attraction radius, collection radius and reward progression are preserved; absorption tails expire and clear across room/floor/run transitions.
 - The recovery well renders the same basin sampling rectangle, destination position, width and height before/after use. Only a translucent water overlay changes, eliminating silhouette/placement jumps between separate artwork.
 - Extended regression checks cover exact well geometry, soul attraction/XP gain/absorption cleanup and silent audio failure. Full 12-floor PC/mobile progression checks remain passing.
+
+## THE HOLLOW KEEP prototype
+
+- Fixed interconnected 30-room castle layout rather than a procedural dungeon.
+- Direct side-scrolling combat with separate Ethan/Noah HP, jump/attack/swap/interact controls, and mobile touch buttons.
+- Ethan activates an old light mechanism; Noah operates a high lever. Those changes alter the central hall without quest markers.
+- Includes an elevator route, underground crypt, hidden breakable walls, rest/checkpoint statues, visited-room map, first Gate Keeper boss, bell event, shortcut, and Chapter I return-to-hub ending.
+- Environmental text is sparse and optional; progression is communicated through sound and changes in the castle rather than explicit objectives.
