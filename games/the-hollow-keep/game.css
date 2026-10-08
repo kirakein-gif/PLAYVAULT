@@ -15,3 +15,35 @@ body{background:radial-gradient(circle at 50% 10%,#272435,#08090f 52%,#040508)}
 .clearStats{display:flex;justify-content:center;gap:18px;margin:20px 0;color:#b9bdc8}.backLink{display:block;margin-top:14px;color:#8f96a8;font-size:11px}
 #mobileControls{display:none;position:fixed;inset:0;z-index:20;pointer-events:none}.movePad,.actionPad{position:absolute;bottom:max(20px,env(safe-area-inset-bottom));display:flex;align-items:flex-end;gap:8px}.movePad{left:max(16px,env(safe-area-inset-left))}.actionPad{right:max(14px,env(safe-area-inset-right));display:grid;grid-template-columns:repeat(2,54px);grid-template-rows:repeat(2,54px)}#mobileControls button{pointer-events:auto;touch-action:none;border:1px solid #ffffff19;background:rgba(17,19,29,.84);color:#e9ebf1;border-radius:50%;width:58px;height:58px;font-weight:900;box-shadow:0 6px 18px #0006}#mobileControls button b{display:block;font-size:18px}#mobileControls button small{display:block;font-size:7px;color:#9ca3b5}.movePad button{width:64px;height:64px;font-size:20px}.actionPad .attack{border-color:#d6bb7455;background:rgba(54,46,30,.88)}
 @media(max-width:760px),(pointer:coarse){#hud{top:max(8px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));width:min(360px,calc(100vw - 16px));padding:8px 10px}.topActions a{display:none}.heroBars{gap:4px}.heroHud{grid-template-columns:40px 1fr 24px;padding:3px 4px}.heroHud span{font-size:8px}.hintline{font-size:7px}#mobileControls{display:block}#toast{bottom:100px}.duo{gap:8px}.heroSketch{width:46%;height:190px;padding-top:142px}.heroSketch .head{left:calc(50% - 22px);top:28px}.heroSketch .cloak{left:calc(50% - 47px);width:94px;height:100px;top:68px}.controls{font-size:9px}.mapPanel{top:88px}}
+
+#rotateNotice{display:none;position:fixed;inset:0;z-index:80;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 50% 38%,#242434,#08090f 72%);text-align:center}
+.rotateCard{width:min(360px,92vw);padding:26px 22px;border:1px solid #ffffff14;border-radius:20px;background:#10121bdd;box-shadow:0 24px 70px #0009}
+.rotateCard b{display:block;font-size:18px;margin:8px 0}.rotateCard p{margin:0 0 16px;color:#9da4b4;font-size:12px;line-height:1.6}
+.phoneTurn{display:inline-grid;place-items:center;width:56px;height:88px;margin:2px auto 8px;border:3px solid #d6bb74;border-radius:10px;color:#d6bb74;font-size:32px;transform:rotate(90deg);animation:turnHint 1.8s ease-in-out infinite}
+@keyframes turnHint{0%,100%{transform:rotate(78deg)}50%{transform:rotate(102deg)}}
+
+@media (pointer:coarse) and (orientation:portrait){
+  #rotateNotice{display:flex}
+  #mobileControls{display:none!important}
+  #hud{display:none}
+}
+
+@media (pointer:coarse) and (orientation:landscape){
+  #mobileControls{display:block}
+  #hud{top:max(6px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));width:min(365px,46vw);padding:7px 9px;border-radius:11px}
+  .hudTop>b{font-size:12px}.eyebrow{font-size:7px}.heroBars{margin-top:5px;gap:4px}.heroHud{grid-template-columns:38px 1fr 22px;padding:2px 4px}.heroHud span{font-size:7px}.heroHud small{font-size:7px}.hintline{margin-top:3px;font-size:7px}
+  .topActions a{display:none}
+  .movePad{left:max(18px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom));gap:10px}
+  .actionPad{right:max(18px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));grid-template-columns:repeat(2,52px);grid-template-rows:repeat(2,52px);gap:7px}
+  #mobileControls button{width:52px;height:52px;background:rgba(11,13,20,.72);border-color:#ffffff20;box-shadow:0 5px 14px #0008}
+  .movePad button{width:60px;height:60px}
+  #mobileControls button b{font-size:17px}#mobileControls button small{font-size:7px}
+  #toast{bottom:max(82px,calc(env(safe-area-inset-bottom) + 70px))}
+  .mapPanel{top:max(62px,calc(env(safe-area-inset-top) + 54px));right:max(10px,env(safe-area-inset-right));width:min(390px,46vw)}
+  .overlay{padding:max(10px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left))}
+  .startCard{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"head duo" "lead duo" "controls duo" "button duo";column-gap:22px;align-items:center;width:min(820px,94vw)}
+  .startCard>.eyebrow,.startCard>h1{grid-area:head}.startCard>.eyebrow{align-self:start}.startCard>h1{align-self:end;margin-top:22px;font-size:clamp(34px,7vw,58px)}
+  .startCard>.lead{grid-area:lead;margin:2px 0}.startCard>.controls{grid-area:controls;margin:4px 0}.startCard>.primary{grid-area:button;justify-self:center}
+  .startCard>.duo{grid-area:duo;margin:0;width:100%;gap:8px}
+  .heroSketch{height:min(190px,48vh);padding-top:min(138px,35vh)}
+}
