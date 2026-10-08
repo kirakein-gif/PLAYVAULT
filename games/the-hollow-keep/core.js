@@ -14,6 +14,7 @@ const ui={
   ethanHud:$('ethanHud'),noahHud:$('noahHud'),ethanHp:$('ethanHp'),noahHp:$('noahHp'),
   ethanHpText:$('ethanHpText'),noahHpText:$('noahHpText'),toast:$('toast'),
   mapPanel:$('mapPanel'),mapBtn:$('mapBtn'),soundBtn:$('soundBtn'),
+  rotateNotice:$('rotateNotice'),landscapeBtn:$('landscapeBtn'),
   jumpBtn:$('jumpBtn'),attackBtn:$('attackBtn'),swapBtn:$('swapBtn'),useBtn:$('useBtn')
 };
 
@@ -23,6 +24,20 @@ function fit(){
   canvas.style.height=Math.round(H*s)+'px';
 }
 fit();addEventListener('resize',fit);
+addEventListener('orientationchange',()=>setTimeout(fit,120));
+
+const isCoarseMobile=()=>matchMedia('(pointer:coarse)').matches;
+async function requestLandscapeMode(){
+  if(!isCoarseMobile())return;
+  try{
+    const target=document.documentElement;
+    if(!document.fullscreenElement&&target.requestFullscreen)await target.requestFullscreen({navigationUI:'hide'});
+  }catch(err){console.debug('[HOLLOW KEEP] fullscreen unavailable',err)}
+  try{
+    if(screen.orientation?.lock)await screen.orientation.lock('landscape');
+  }catch(err){console.debug('[HOLLOW KEEP] orientation lock unavailable',err)}
+  setTimeout(fit,120);
+}
 
 const HEROES={
   ethan:{key:'ethan',name:'Ethan',ko:'에단',maxHp:120,speed:2.95,jump:10.9,w:42,h:68,attackCd:29,gravity:.70,maxFall:13.5,accelGround:.42,accelAir:.22,friction:.82,coyote:6,jumpBuffer:7,color:'#e2d7b9',accent:'#e7c66f',detail:'#74d8ef'},
@@ -883,7 +898,9 @@ ui.swapBtn.addEventListener('pointerdown',e=>{e.preventDefault();switchHero()});
 ui.useBtn.addEventListener('pointerdown',e=>{e.preventDefault();interact()});
 ui.mapBtn.addEventListener('click',toggleMap);
 ui.soundBtn.addEventListener('click',()=>{state.sound=!state.sound;ui.soundBtn.textContent=state.sound?'🔊':'🔇';if(audio.master&&audio.ctx)audio.master.gain.setTargetAtTime(state.sound?.72:0,audio.ctx.currentTime,.03)});
-ui.startBtn.addEventListener('click',newGame);ui.retryBtn.addEventListener('click',retry);ui.clearAgain.addEventListener('click',newGame);
+ui.startBtn.addEventListener('click',()=>{requestLandscapeMode();newGame()});
+ui.landscapeBtn?.addEventListener('click',()=>{requestLandscapeMode();if(!state.started)newGame()});
+ui.retryBtn.addEventListener('click',retry);ui.clearAgain.addEventListener('click',newGame);
 
 let last=performance.now();
 function frame(t){
