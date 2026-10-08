@@ -150,3 +150,7 @@
 .upgrade{position:relative}
 .choiceKey{position:absolute;top:10px;right:12px;padding:3px 8px;border:1px solid #9b8b73;border-radius:4px;color:#ddd2ba;background:#171820;font:700 14px monospace}
 @media(pointer:coarse){.choiceKey{display:none}}
+
+/* Stage prose reads like a quiet inscription, separate from action notices. */
+#toast.atmospheric{font-family:"Batang","바탕","AppleMyungjo","Noto Serif KR",serif;font-size:clamp(20px,2.1vw,28px);font-weight:400;letter-spacing:.055em;line-height:1.7;color:#e9ddc3;padding:12px 28px;border:0;border-radius:0;background:linear-gradient(90deg,transparent,rgba(12,12,15,.74) 18%,rgba(12,12,15,.74) 82%,transparent);text-shadow:0 2px 5px #000,0 0 15px rgba(221,200,159,.15);width:max-content;max-width:min(760px,calc(100vw - 36px));transition:opacity .65s,transform .65s}
+@media(max-width:700px),(pointer:coarse){#toast.atmospheric{font-size:20px;padding:10px 18px;max-width:calc(100vw - 28px)}}

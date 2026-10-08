@@ -101,9 +101,7 @@
   function roomMood(r){
     if(!r)return;const cx=W/2,cy=arena.y+arena.h/2,now=performance.now();
     ctx.save();
-    if(r.type==='elite'){
-      ctx.globalAlpha=.22;ctx.strokeStyle='#ff536d';ctx.lineWidth=3;for(const [x,y] of [[arena.x,arena.y],[arena.x+arena.w,arena.y],[arena.x,arena.y+arena.h],[arena.x+arena.w,arena.y+arena.h]]){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(cx,cy);ctx.stroke()}
-    }else if(r.type==='boss'){
+    if(r.type==='boss'){
       ctx.globalAlpha=.23;ctx.fillStyle='#3b203f';ctx.fillRect(arena.x+54,arena.y+30,32,arena.h-60);ctx.fillRect(arena.x+arena.w-86,arena.y+30,32,arena.h-60);
     }
     ctx.restore();
@@ -327,8 +325,7 @@
       }
       if(r.sealAltar)sealStone(cx,cy-39,r);
       if(label){ctx.font='600 11px sans-serif';ctx.textAlign='center';ctx.fillStyle='#cec5b6';ctx.fillText(label,cx,cy+55)}
-    }else if(r.type==='elite'){
-      ctx.globalAlpha=.3;ctx.fillStyle='#d69b9b';ctx.font='700 11px sans-serif';ctx.textAlign='center';ctx.fillText('ELITE',cx,cy-112);
+
     }
     ctx.restore();ctx.textAlign='left';
   }

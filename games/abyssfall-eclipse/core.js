@@ -378,7 +378,7 @@
     document.documentElement.dataset.hero=h.key;
     ui.specialBtn.style.setProperty('--skill-ring',ring);ui.specialBtn.style.setProperty('--skill-glow',glow);
   }
-  AF.newRun=()=>{AF.pendingFloor=null;AF.pendingFinish=false;AF.rewardChoices=[];sound()?.unlock().then(()=>{sound()?.startExplore();sound()?.sfx('start')});const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.testRun=false;AF.endless=false;AF.cleared=false;AF.transitioning=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,specialPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.soulBursts=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name} · ${Object.keys(AF.rooms).length} ROOMS`);setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===1)AF.toast(AF.stageTip())},950)};
+  AF.newRun=()=>{AF.pendingFloor=null;AF.pendingFinish=false;AF.rewardChoices=[];sound()?.unlock().then(()=>{sound()?.startExplore();sound()?.sfx('start')});const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.testRun=false;AF.endless=false;AF.cleared=false;AF.transitioning=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,specialPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.soulBursts=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name} · ${Object.keys(AF.rooms).length} ROOMS`);setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===1)AF.toast(AF.stageTip(),true)},950)};
   ui.startBtn.addEventListener('click',AF.newRun);ui.retryBtn.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearRestart?.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearLobby?.addEventListener('click',()=>{sound()?.stopMusic();AF.clearScreen?.classList.remove('show');AF.started=false;AF.paused=true;ui.start.classList.add('show')});
@@ -634,7 +634,7 @@
     AF.player.hp=Math.min(AF.player.maxHp,AF.player.hp+Math.max(10,Math.round(AF.player.maxHp*healRate)));
     AF.player.inv=45;AF.projectiles=[];AF.pickups=[];AF.slashes=[];AF.soulBursts=[];
     AF.toast(`지하 ${AF.floor}층 · ${AF.stageName()} · ${Object.keys(AF.rooms).length} ROOMS`);
-    AF.hud();if((AF.floor-1)%3===0)setTimeout(()=>{if(AF.started&&!AF.dead)AF.toast(AF.stageTip())},950)
+    AF.hud();const enteredFloor=AF.floor;setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===enteredFloor)AF.toast(AF.stageTip(),true)},950)
   };
   // Temporary local test shortcut. The physical key below Escape advances one floor.
   AF.skipFloor=()=>{
@@ -661,9 +661,7 @@
     const p=AF.player;if(from==='W'){p.x=arena.x+35;p.y=AF.sideDoorY()}else if(from==='E'){p.x=arena.x+arena.w-35;p.y=AF.sideDoorY()}else if(from==='N'){p.x=W/2;p.y=arena.y+35}else if(from==='S'){p.x=W/2;p.y=arena.y+arena.h-35}
     p.inv=r.type==='boss'?120:35;
     if(!r.clear)spawnRoom(r);
-    const msg={treasure:'보물방 · 중앙의 상자를 찾아보세요',recovery:'회복방 · 중앙의 샘에 다가가세요',elite:'엘리트방 · 강적이 문을 봉쇄했습니다',exit:'아래로 내려가는 길이 이 방 어딘가에 있다',boss:'거대한 문 너머에서 인기척이 느껴진다',combat:'일반전투방'}[r.type]||'새 방 발견';
     if(r.type==='boss'){sound()?.startBoss();sound()?.sfx('bossIntro')}
-    AF.toast(msg);
   }
   function doors(){
     const p=AF.player,r=AF.cur(),g=58,mx=W/2,my=AF.sideDoorY();let d=null;
@@ -890,5 +888,5 @@
     ui.specialBtn.style.setProperty('--cd-angle',(progress*360).toFixed(1)+'deg');
     const ability=ui.specialCdText.closest('.ability');if(ability){ability.classList.toggle('skillReady',ready);ability.classList.toggle('skillCooling',!ready)}
   };
-  let toastTimer;AF.toast=t=>{ui.toast.textContent=t;ui.toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>ui.toast.classList.remove('show'),1100)};
+  let toastTimer;AF.toast=(t,atmospheric=false)=>{ui.toast.textContent=t;ui.toast.classList.toggle('atmospheric',atmospheric);ui.toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>ui.toast.classList.remove('show'),atmospheric?3600:1100)};
 })();
