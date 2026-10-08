@@ -825,7 +825,12 @@
         }
       }
       const hitWall=e.x<arena.x+e.r||e.x>arena.x+arena.w-e.r||e.y<arena.y+e.r||e.y>arena.y+arena.h-e.r;if(hitWall&&e.type==='brute'&&e.charge>0){e.charge=0;e.stun=30;AF.shockwaves.push({x:e.x,y:e.y,r:8,max:64,l:18,color:'#ff9b63'})}e.x=Math.max(arena.x+e.r,Math.min(arena.x+arena.w-e.r,e.x));e.y=Math.max(arena.y+e.r,Math.min(arena.y+arena.h-e.r,e.y));
-      if(e.type!=='boss'||e.bossTelegraph<=0)e.moving=Math.hypot(e.x-ox,e.y-oy)>.08;
+      const walked=Math.hypot(e.x-ox,e.y-oy);
+      e.moving=walked>.08;
+      // Advance the six-pose gait by distance, never by rendering time.
+      // A planted foot stays planted while stopped or winding up an attack.
+      const stride=e.type==='boss'?72:['frostWolf','plagueVermin'].includes(e.variant)?48:e.type==='brute'?60:44;
+      if(e.moving)e.walkCycle=((e.walkCycle||0)+walked/stride)%1;
       const cdx=p.x-e.x,cdy=p.y-e.y,cdist=Math.hypot(cdx,cdy)||1;if(cdist<p.r+e.r&&p.inv<=0&&!(e.type==='boss'&&e.intro>0)){e.attackPose=e.type==='boss'?22:14;const mult=e.type==='brute'&&e.charge>0?1.45:e.type==='crawler'&&e.dash>0?1.18:1;hurt(e.d*mult,cdx/cdist,cdy/cdist);if(e.type==='brute'&&e.charge>0){e.charge=0;e.stun=24;AF.shockwaves.push({x:e.x,y:e.y,r:8,max:58,l:18,color:'#ff9b63'})}}
     }
     for(let i=AF.projectiles.length-1;i>=0;i--){

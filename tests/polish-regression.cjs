@@ -267,3 +267,15 @@ console.log('PASS v44: no floor-one prose; atmosphere only on floors 4, 7, 10, 1
  assert.equal(names.size,8);assert.equal(A.enemyVariant(4,'crawler'),'frostWolf');assert.equal(A.enemyVariant(4,'brute'),'frostKnight');assert.equal(A.enemyVariant(7,'shooter'),'voidKnight');
 }
 console.log('PASS v46: eight boss identities, increasing HP/armor, all phase attacks, rush finish and regional roster');
+// Walking comes from real distance; repeated drawing and stopped AI cannot animate feet.
+for(const floor of [1,4,7,10,13,16,19,22]){
+ const h=harness(),{A}=h;A.newRun();while(A.floor<floor)A.nextFloor();
+ const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.player.inv=99999;A.player.basic=99999;A.update(1);
+ const e=r.enemies.find(e=>e.type==='crawler');r.enemies=[e];e.aiCd=99999;e.aiWindup=0;e.attackPose=0;e.x=A.W/2-250;e.y=A.arena.y+A.arena.h*.5;A.player.x=A.W/2+250;A.player.y=e.y;
+ const seen=new Set(),start=e.x;for(let i=0;i<100;i++){A.update(1);const f=h.env.AF_ART.enemyWalk(e);assert.ok(f,'walking sprite on floor '+floor);seen.add(f.x);h.frame()}
+ assert.equal(seen.size,6,'all six foot poses appear through genuine AI movement');assert.ok(Math.abs(e.x-start-100*e.s)<.001,'walking does not change chase speed');
+ const phase=e.walkCycle;for(let i=0;i<12;i++)h.frame();assert.equal(e.walkCycle,phase,'rendering never advances footsteps');
+ e.s=0;A.update(1);assert.equal(e.walkCycle,phase);assert.equal(h.env.AF_ART.enemyWalk(e),null,'stopped enemy uses stationary art');
+ e.moving=true;e.aiWindup=12;assert.equal(h.env.AF_ART.enemyWalk(e),null,'attack windup has priority over walk');
+}
+console.log('PASS v47: six distinct walking poses per region, distance cadence, unchanged speed, stopped feet and attack priority');

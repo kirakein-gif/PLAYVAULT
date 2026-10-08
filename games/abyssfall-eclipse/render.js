@@ -503,7 +503,10 @@
 
     const regional=window.AF_ART?.regionalEnemy?.(e,!e.alive?0:e.hurtPose>0?0:e.aiWindup>0||e.bossTelegraph>0?2:e.attackPose>0?3:e.moving?1:0);
     if(!regional&&e.tier>=4)ctx.filter=['hue-rotate(-35deg) saturate(.60) brightness(1.25)','sepia(.42) hue-rotate(325deg) saturate(1.4)','hue-rotate(180deg) saturate(.85)','hue-rotate(18deg) saturate(1.3) brightness(1.08)'][e.tier-4];
-    if(regional){
+    const walk=window.AF_ART?.enemyWalk?.(e);
+    if(walk){
+      window.AF_ART.draw(ctx,walk.image,walk,walk.scale*(A.mobile?1.18:1),boss?23:14);
+    }else if(regional){
       const scale=(boss?(A.mobile?.46:.39):(e.type==='brute'?.30:e.type==='shooter'?.25:.23))*512/regional.w;
       window.AF_ART.draw(ctx,regional.image,regional,scale,boss?23:14);
     }else if(window.AF_ART?.loaded.enemies){
