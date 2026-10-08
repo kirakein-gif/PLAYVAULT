@@ -117,44 +117,86 @@
     roomMood(A.cur());
   }
 
+  // Small cached mineral stains preserve stone detail instead of painted UI circles.
+  const mineralStains=new Map();
+  let moltenMaterial=null;
+  function moltenTexture(im){
+    if(moltenMaterial)return moltenMaterial;
+    const c=document.createElement('canvas');c.width=256;c.height=100;const cc=c.getContext('2d');
+    cc.drawImage(im,35,36,im.width-70,im.height-72,0,0,256,100);
+    cc.globalCompositeOperation='destination-in';
+    const g=cc.createRadialGradient(128,50,12,128,50,128);
+    g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(.5,'rgba(0,0,0,.85)');g.addColorStop(1,'rgba(0,0,0,0)');
+    cc.fillStyle=g;cc.fillRect(0,0,256,100);moltenMaterial=c;return c;
+  }
+  function mineralStain(kind,seed){
+    const key=kind+':'+seed;if(mineralStains.has(key))return mineralStains.get(key);
+    const c=document.createElement('canvas');c.width=256;c.height=170;const cc=c.getContext('2d');
+    for(let i=0;i<220;i++){
+      const a=hash(i*7+seed)*Math.PI*2,t=Math.sqrt(hash(i*13+seed)),x=128+Math.cos(a)*t*116,y=85+Math.sin(a)*t*73;
+      const size=7+hash(i*19+seed)*17,g=cc.createRadialGradient(x,y,0,x,y,size);
+      const alpha=(1-t*t)*(kind==='poison'?.15:.045);
+      g.addColorStop(0,kind==='poison'?`rgba(${48+i%24},${57+i%31},${25+i%15},${alpha})`:`rgba(239,211,153,${alpha})`);
+      g.addColorStop(1,'rgba(0,0,0,0)');cc.fillStyle=g;cc.fillRect(x-size,y-size,size*2,size*2);
+    }
+    mineralStains.set(key,c);if(mineralStains.size>48)mineralStains.delete(mineralStains.keys().next().value);return c;
+  }
+
   function stageGimmick(r){
     if(!r)return;const idx=zoneIndex(),now=performance.now();
-    ctx.save();
+    ctx.save();ctx.beginPath();ctx.rect(arena.x,arena.y,arena.w,arena.h);ctx.clip();
     if(idx>=4){
       for(const h of A.fieldPatches(r)){
         if(idx===4)continue;
         const state=A.fieldState(r,h),active=state==='active',warn=state==='warning';
         if(state==='inactive')continue;
         if(h.kind==='lava'){
-          const line=()=>{ctx.beginPath();h.points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y))};
-          ctx.save();ctx.beginPath();
-          h.banks.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();
-          const bed=ctx.createLinearGradient(h.x,h.y-h.r,h.x,h.y+h.r);bed.addColorStop(0,'#151313');bed.addColorStop(.5,active?'#5d3423':warn?'#402c21':'#211d1d');bed.addColorStop(1,'#171616');ctx.fillStyle=bed;ctx.fill();ctx.clip();
+          const trace=()=>{ctx.beginPath();h.banks.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath()};
+          // Charred lips sit on the stone; molten material is inset beneath them.
+          ctx.save();trace();ctx.clip();
           const texture=window.AF_ART;
           if(texture?.loaded.lavaFlow){
-            ctx.filter=active?'brightness(.85) saturate(.80)':warn?'brightness(.42) saturate(.65)':'brightness(.19) saturate(.3)';
-            const im=texture.images.lavaFlow,drift=Math.sin(now/1600+h.phase)*7;
-            ctx.drawImage(im,35+drift,36,im.width-70,im.height-72,h.x-82,h.y-h.r*1.7,164,h.r*3.4);ctx.filter='none';
+            ctx.globalAlpha=active?.76:warn?.42:.20;
+            ctx.filter=active?'brightness(.68) saturate(.65)':warn?'brightness(.42) saturate(.5)':'brightness(.22) saturate(.3)';
+            ctx.drawImage(moltenTexture(texture.images.lavaFlow),h.x-82,h.y-h.r*1.7,164,h.r*3.4);ctx.filter='none';ctx.globalAlpha=1;
           }
-          // Overhanging ash and rock fragments keep the fissure flush with the floor.
-          for(let j=0;j<32;j++){
-            const x=h.x+(hash(j*7+h.phase)-.5)*136,y=h.y+(hash(j*11+h.phase)-.5)*h.r*3,size=1+hash(j+13)*4;
-            ctx.fillStyle=j%3?'#29221c':'#413326';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+size,y-2);ctx.lineTo(x+size*.7,y+size*.6);ctx.lineTo(x-1,y+size*.35);ctx.closePath();ctx.fill();
+          trace();ctx.strokeStyle='rgba(31,27,23,.30)';ctx.lineWidth=5;ctx.stroke();
+          for(let j=0;j<48;j++){
+            const x=h.x+(hash(j*7+h.phase)-.5)*160,y=h.y+(hash(j*11+h.phase)-.5)*h.r*3,size=1+hash(j+13)*5;
+            ctx.fillStyle=j%3?'rgba(36,31,25,.8)':'rgba(73,61,43,.65)';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+size,y-2);ctx.lineTo(x+size*.7,y+size*.6);ctx.lineTo(x-1,y+size*.35);ctx.closePath();ctx.fill();
           }
           ctx.restore();
+          if(active){const glow=ctx.createRadialGradient(h.x,h.y,2,h.x,h.y,95);glow.addColorStop(0,'rgba(185,74,23,.055)');glow.addColorStop(1,'rgba(185,74,23,0)');ctx.fillStyle=glow;ctx.fillRect(h.x-95,h.y-50,190,100)}
         }else{
-          ctx.save();ctx.translate(h.x,h.y);ctx.scale(1,.66);
-          const g=ctx.createRadialGradient(0,0,5,0,0,h.r);g.addColorStop(0,h.kind==='ice'?'rgba(139,203,220,.42)':active?'rgba(77,104,39,.64)':'rgba(82,100,55,.24)');g.addColorStop(1,h.kind==='ice'?'rgba(139,203,220,.02)':'rgba(32,43,22,.08)');
-          ctx.beginPath();ctx.arc(0,0,h.r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.strokeStyle=h.kind==='ice'?'rgba(182,221,226,.27)':warn?'rgba(193,166,76,.52)':'rgba(131,153,69,.32)';ctx.lineWidth=1.5;ctx.stroke();
-          for(let j=0;j<7;j++){const x=Math.sin(j*2.4+h.phase)*h.r*.7,y=Math.cos(j*1.4)*h.r*.65;if(h.kind==='ice'){ctx.strokeStyle='rgba(213,234,237,.25)';ctx.beginPath();ctx.moveTo(x-12,y-6);ctx.lineTo(x+8,y+5);ctx.lineTo(x+17,y+3);ctx.stroke()}else{ctx.beginPath();ctx.arc(x,y,2+Math.sin(now/350+j)**2*3,0,Math.PI*2);ctx.stroke()}}
-          ctx.restore();
+          if(h.kind==='poison'){
+            ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=active?.85:.45;
+            ctx.drawImage(mineralStain('poison',h.phase),h.x-h.r*1.12,h.y-h.r*.74,h.r*2.24,h.r*1.48);ctx.restore();
+            // Sparse wet highlights and low vapour, without a circular outline.
+            for(let j=0;j<11;j++){
+              const a=hash(j*9+h.phase)*6.28,t=Math.sqrt(hash(j*13+h.phase))*.85,x=h.x+Math.cos(a)*t*h.r,y=h.y+Math.sin(a)*t*h.r*.66;
+              ctx.strokeStyle=warn?'rgba(171,151,84,.19)':'rgba(141,150,102,.17)';ctx.lineWidth=.7;
+              ctx.beginPath();ctx.ellipse(x,y,1.5+hash(j)*3,.65,0,0,Math.PI*2);ctx.stroke();
+              const g=ctx.createRadialGradient(x,y-6-Math.sin(now/2200+j)*3,0,x,y-8,13);g.addColorStop(0,active?'rgba(139,150,96,.065)':'rgba(139,150,96,.025)');g.addColorStop(1,'rgba(139,150,96,0)');ctx.fillStyle=g;ctx.fillRect(x-13,y-24,26,30);
+            }
+          }else{
+            ctx.save();ctx.translate(h.x,h.y);ctx.scale(1,.66);
+            const g=ctx.createRadialGradient(0,0,5,0,0,h.r);g.addColorStop(0,'rgba(139,203,220,.24)');g.addColorStop(1,'rgba(139,203,220,0)');ctx.fillStyle=g;ctx.fillRect(-h.r,-h.r,h.r*2,h.r*2);ctx.restore();
+          }
         }
       }
     }
     if(idx===0&&!r.clear&&A.stageZone){
-      const z=A.stageZone(r,'holy'),pulse=.5+.5*Math.sin(now/330),g=ctx.createRadialGradient(z.x,z.y,8,z.x,z.y,z.r);
-      g.addColorStop(0,`rgba(255,236,164,${.10+.08*pulse})`);g.addColorStop(1,'rgba(255,236,164,0)');ctx.fillStyle=g;ctx.fillRect(z.x-z.r,z.y-z.r,z.r*2,z.r*2);
-      ctx.strokeStyle=`rgba(255,226,139,${.25+.20*pulse})`;ctx.lineWidth=2;ctx.beginPath();ctx.arc(z.x,z.y,z.r*.72,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(z.x,z.y,z.r*.46,0,Math.PI*2);ctx.stroke();
+      const z=A.stageZone(r,'holy'),pulse=.5+.5*Math.sin(now/1800);
+      ctx.save();ctx.globalCompositeOperation='soft-light';ctx.globalAlpha=.65+.12*pulse;
+      ctx.drawImage(mineralStain('holy',Math.floor(z.x)),z.x-z.r,z.y-z.r*.64,z.r*2,z.r*1.28);ctx.restore();
+      // Window light falls diagonally across the masonry and fades at the edges.
+      ctx.save();ctx.translate(z.x,z.y);ctx.rotate(-.42);ctx.scale(1,.55);
+      for(let i=-1;i<=1;i++){
+        const x=i*z.r*.32,g=ctx.createLinearGradient(x-z.r*.10,0,x+z.r*.10,0);
+        g.addColorStop(0,'rgba(255,222,154,0)');g.addColorStop(.5,`rgba(255,227,175,${.035+.018*pulse})`);g.addColorStop(1,'rgba(255,222,154,0)');
+        ctx.fillStyle=g;ctx.fillRect(x-z.r*.10,-z.r*.72,z.r*.20,z.r*1.44);
+      }
+      ctx.restore();
     }else if(idx===1&&A.stageZone){
       const count=A.fogCount?A.fogCount(r):2;
       for(let i=0;i<count;i++){
