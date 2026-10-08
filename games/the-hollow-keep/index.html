@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="theme-color" content="#090a10">
   <title>THE HOLLOW KEEP · PLAYVAULT</title>
-  <link rel="stylesheet" href="game.css?v=13">
+  <link rel="stylesheet" href="game.css?v=14">
 </head>
 <body>
 <main id="shell">
@@ -38,9 +38,9 @@
       <div class="eyebrow big">PLAYVAULT · SECOND GAME PROTOTYPE</div>
       <h1>THE HOLLOW KEEP</h1>
       <p class="lead">성의 문이 다시 열렸다.</p>
-      <div class="duo">
-        <div class="heroSketch ethan"><span class="head"></span><span class="cloak"></span><b>ETHAN</b><small>에단 · 빛 / 원거리 / 오래된 장치</small></div>
-        <div class="heroSketch noah"><span class="head"></span><span class="cloak"></span><b>NOAH</b><small>노아 · 그림자 / 근접 / 기동</small></div>
+      <div class="duo titleDuo" aria-label="주인공">
+        <div class="titleHero ethan"><canvas id="titleEthan" width="192" height="156" aria-hidden="true"></canvas><b>ETHAN</b><small>에단 · 빛 / 원거리 / 오래된 장치</small></div>
+        <div class="titleHero noah"><canvas id="titleNoah" width="192" height="156" aria-hidden="true"></canvas><b>NOAH</b><small>노아 · 그림자 / 근접 / 기동</small></div>
       </div>
       <p class="controls">이동 A/D · 점프 SPACE · 공격 J · 교대 Q/TAB · 조사/장치 E · 지도 M<br>모바일은 화면 버튼 사용</p>
       <button id="startBtn" class="primary" type="button">성 안으로</button>
@@ -97,7 +97,7 @@
     </div>
   </section>
 </main>
-<script src="art.js?v=12"></script>
+<script src="art.js?v=13"></script>
 <script src="core.js?v=12"></script>
 </body>
 </html>
