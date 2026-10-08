@@ -25,16 +25,6 @@ async function loadHero(key){
 A.ready=Promise.all([loadHero('ethan'),loadHero('noah')]);
 A.has=key=>!!(A.loaded[key]&&A.images[key]);
 
-// The title uses the same atlases as play, so the two silhouettes are never
-// mistaken for generic concept-art characters.
-function drawTitleHero(key,id){
-  const canvas=document.getElementById(id);if(!canvas||!A.has(key))return;
-  const c=canvas.getContext('2d'),f=A.frame(key,'idle',key==='noah'?1:0),w=canvas.width,h=canvas.height;
-  c.clearRect(0,0,w,h);c.imageSmoothingEnabled=false;
-  for(const [ox,oy] of [[-3,0],[3,0],[0,-3],[0,3]])c.drawImage(A.outlines[key],f.x,f.y,f.w,f.h,ox,oy,w,h);
-  c.drawImage(A.images[key],f.x,f.y,f.w,f.h,0,0,w,h);
-}
-A.ready.then(()=>{drawTitleHero('ethan','titleEthan');drawTitleHero('noah','titleNoah')});
 
 A.frame=(key,anim,index,combo=0)=>{
   if(rows[anim]===undefined)anim='idle';
