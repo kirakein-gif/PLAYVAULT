@@ -7,6 +7,7 @@ const frame=document.querySelector('iframe'),status=document.getElementById('sta
 if(new URLSearchParams(location.search).has('mobile39')){frame.style.width='390px';frame.style.height='844px';frame.style.margin='0 auto';document.body.style.overflow='auto'}
 const get=()=>frame.contentWindow.AF;
 for(const [id,label,fn] of [
+ ...[3,6,9,12,15,18,21,24].map(floor=>['boss'+floor,'Boss '+floor,()=>{const a=get();a.newRun();while(a.floor<floor)a.nextFloor();const r=Object.values(a.rooms).find(r=>r.type==='boss');a.current=`${r.x},${r.y}`;a.bossUnlocked=true;a.player.inv=99999;a.player.basic=99999;a.player.x=a.W/2-140;a.player.y=a.arena.y+a.arena.h*.8;a.update(1);r.enemies[0].intro=0;r.enemies[0].bossAction="추적 중";a.ui.toast.classList.remove("show");a.paused=true;a.hud()}]),
  ['crackPreview','Cracks 10',()=>{const a=get();a.newRun();while(a.floor<10)a.nextFloor();const r=Object.values(a.rooms).find(r=>r.type==='combat');a.current=`${r.x},${r.y}`;r.spawned=true;r.hazards=[{x:a.W*.35,y:a.arena.y+a.arena.h*.45,r:70,t:15,max:80,hit:false},{x:a.W*.65,y:a.arena.y+a.arena.h*.6,r:88,t:0,max:80,hit:true,life:30}];a.paused=true;a.hud()}],
  ['stageProse','Stage prose',()=>get().toast(get().stageTip(),true)],
  ['elitePreview','Elite room',()=>{const a=get();a.newRun();while(!Object.values(a.rooms).some(r=>r.type==='elite'))a.nextFloor();const r=Object.values(a.rooms).find(r=>r.type==='elite');a.current=`${r.x},${r.y}`;a.player.inv=99999;a.player.basic=99999;a.update(1);a.paused=true}],

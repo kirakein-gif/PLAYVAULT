@@ -328,6 +328,20 @@
     const tips=['바닥 어딘가에 희미한 빛이 남아 있다.','안개가 짙다.','바람 소리가 가까워졌다.','바닥 아래에서 불길한 진동이 느껴진다.','얼음 위에서는 멈춰도 몸이 미끄러진다.','균열이 붉게 달아오르면 발을 떼어야 한다.','고인 독물이 발걸음을 붙잡는다.','얼음과 독물 사이로 균열이 솟구친다.'];
     return tips[AF.zoneIndex()];
   };
+  AF.bossRoster=[
+    {name:'성당 기사',weapon:'greatsword',color:'#c8b99c',armor:.08,patterns:[3,4],reach:138},
+    {name:'묘지 사신',weapon:'scythe',color:'#b1c1a4',armor:.10,patterns:[5,2,1],reach:162},
+    {name:'폭풍 기사',weapon:'spellblade',color:'#96c6dd',armor:.13,patterns:[4,0,3],reach:148},
+    {name:'처형 기사',weapon:'greatsword',color:'#c08173',armor:.16,patterns:[3,6,4],reach:157},
+    {name:'빙갑 군주',weapon:'greatsword',color:'#b1dbe2',armor:.20,patterns:[3,0,6],reach:168},
+    {name:'용광로 거인',weapon:'greatsword',color:'#db9e65',armor:.23,patterns:[6,4,3],reach:175},
+    {name:'역병 사신',weapon:'scythe',color:'#b8c78b',armor:.25,patterns:[5,1,2,6],reach:185},
+    {name:'심연 군주',weapon:'spellblade',color:'#beaedc',armor:.28,patterns:[3,4,0,5,6,1,2],reach:192}
+  ];
+  AF.enemyVariant=(tier,type)=>{
+    const rows=[{}, {crawler:'skeleton'}, {brute:'gargoyle'}, {crawler:'skeleton',brute:'gargoyle'}, {crawler:'frostWolf',brute:'frostKnight'}, {crawler:'emberImp',brute:'slagGuard'}, {crawler:'plagueVermin',brute:'slagGuard'}, {crawler:'voidKnight',shooter:'voidKnight',brute:'slagGuard'}];
+    return rows[Math.min(7,tier)]?.[type]||null;
+  };
   function enemy(x,y,type){
     const f=Math.max(0,AF.floor-1);
     const deep=Math.max(0,AF.floor-12),pressure=1+deep*.035;
@@ -335,7 +349,9 @@
     const bossHp=1+f*.35+f*f*.020,bossDmg=1+f*.10+f*f*.006;
     const defs={crawler:{r:17,hp:42,s:1.25,d:9},shooter:{r:16,hp:36,s:.88,d:8},brute:{r:24,hp:92,s:.64,d:15},boss:{r:39,hp:1100,s:.78,d:18}},q=defs[type];
     const hpScale=type==='boss'?bossHp:normalHp,dmgScale=type==='boss'?bossDmg:normalDmg;
-    return{x,y,type,r:q.r,hp:q.hp*hpScale,max:q.hp*hpScale,s:q.s*pressure,d:q.d*dmgScale,pressure,tier:AF.zoneIndex(),fire:(40+Math.random()*80)/pressure,alive:true,flash:0,phase:Math.random()*6.28,attackPose:0,hurtPose:0,deadAt:0,moving:false,faceX:-1,aiCd:45+Math.random()*55,aiWindup:0,dash:0,charge:0,stun:0,aimX:0,aimY:0,shotAngle:0,bossCd:85,bossTelegraph:0,bossTelegraphMax:0,bossPattern:-1,bossAim:0,bossPhase:0,phaseAnnounced:0,bossAction:'추적 중',intro:0,introMax:0}
+    const profile=type==='boss'?AF.bossRoster[AF.zoneIndex()]:null,variant=AF.enemyVariant(AF.zoneIndex(),type);
+    const heavy=['frostKnight','slagGuard','voidKnight'].includes(variant),fleet=['frostWolf','emberImp'].includes(variant),health=heavy?1.18:1;
+    return{profile,variant,bossName:profile?.name,armor:profile?.armor||(heavy?.10:0),x,y,type,r:q.r,hp:q.hp*hpScale*health,max:q.hp*hpScale*health,s:q.s*pressure*(fleet?1.12:1),d:q.d*dmgScale,pressure,tier:AF.zoneIndex(),fire:(40+Math.random()*80)/pressure,alive:true,flash:0,phase:Math.random()*6.28,attackPose:0,hurtPose:0,deadAt:0,moving:false,faceX:-1,aiCd:45+Math.random()*55,aiWindup:0,dash:0,charge:0,stun:0,aimX:0,aimY:0,shotAngle:0,bossCd:85,bossTelegraph:0,bossTelegraphMax:0,bossPattern:-1,bossAim:0,bossPhase:0,phaseAnnounced:0,bossAction:'추적 중',intro:0,introMax:0}
   }
   function spawnRoom(r){
     if(r.spawned||r.clear)return;
@@ -394,7 +410,7 @@
     if(e.type==='boss'&&e.intro>0)return;
     const p=AF.player,grail=relicCount('twin-grail');
     if(grail){const missing=1-Math.max(0,p.hp)/p.maxHp;n*=1+missing*(.55+.18*(grail-1))}
-    if(e.type==='boss')n=Math.min(n,e.max*.10);
+    n*=1-(e.armor||0);if(e.type==='boss')n=Math.min(n,e.max*.10);
     e.hp-=n;e.flash=7;e.hurtPose=11;sound()?.sfx('hit');
     for(let i=0;i<6;i++)AF.particles.push({x:e.x,y:e.y,vx:(Math.random()-.5)*3.5,vy:(Math.random()-.5)*3.5,l:18,color:p.hero.color});
     if(e.hp<=0){
@@ -415,7 +431,7 @@
         p.inv=Math.max(p.inv,150);p.basic=Math.max(p.basic,28);
         AF.bossClearUntil=now+720;e.bossAction='격파';
         sound()?.stopMusic();setTimeout(()=>{sound()?.sfx('stairsOpen');sound()?.startExplore()},430);
-        AF.toast('심연의 감시자를 물리쳤습니다')
+        AF.toast((e.bossName||'심연의 감시자')+' 격파')
       }
     }
   }
@@ -670,28 +686,35 @@
   const bossPhase=e=>e.hp/e.max<.34?2:e.hp/e.max<.67?1:0;
   function startBossPattern(e,p){
     const phase=bossPhase(e),alive=AF.cur().enemies.filter(x=>x.alive&&x!==e).length;
-    let pool=phase===0?[0,1]:phase===1?[0,1,2]:[0,0,1,2];
+    let pool=e.profile?[...e.profile.patterns]:phase===0?[0,1]:phase===1?[0,1,2]:[0,0,1,2];
     if(alive>5)pool=pool.filter(v=>v!==2);
     const pattern=pool[Math.random()*pool.length|0];
     e.bossPhase=phase;e.bossPattern=pattern;e.bossAim=Math.atan2(p.y-e.y,p.x-e.x);e.attackPose=28;
-    const tele=pattern===0?46:pattern===1?58:52;
+    const tele=pattern>=3?Math.max(30,58-phase*6-e.tier):pattern===0?46:pattern===1?58:52;
     e.bossTelegraph=e.bossTelegraphMax=tele;
-    e.bossAction=pattern===0?'핏빛 창':pattern===1?'심연의 고리':'그림자 소환';sound()?.sfx('bossWarn');
+    e.bossAction=['마력 칼날','마력 방출','하수인 소환','대검 횡베기','갑주 돌진','낫 휩쓸기','지면 강타'][pattern];sound()?.sfx('bossWarn');
+  }
+  function bossStrike(e,wide=false,slam=false){
+    const p=AF.player,reach=(e.profile?.reach||140)+(e.bossPhase||0)*12;
+    const a=e.bossAim,delta=Math.atan2(Math.sin(Math.atan2(p.y-e.y,p.x-e.x)-a),Math.cos(Math.atan2(p.y-e.y,p.x-e.x)-a));
+    e.attackPose=24;
+    AF.slashes.push({bossWeapon:true,x:e.x,y:e.y,a,r:reach,wide,slam,color:e.profile?.color||'#c5b4a0',l:24,max:24});
+    if(p.inv<=0&&Math.hypot(p.x-e.x,p.y-e.y)<reach+p.r&&(slam||Math.abs(delta)<(wide?2.3:1.2))){const d=Math.hypot(p.x-e.x,p.y-e.y)||1;hurt(e.d*(slam?1.25:wide?.95:1.12),(p.x-e.x)/d,(p.y-e.y)/d)}
   }
   function resolveBossPattern(e){
     if(!e.alive)return;sound()?.sfx('bossCast');
     const phase=e.bossPhase||0,pattern=e.bossPattern;
-    if(pattern===0){
+    if(pattern===3||pattern===5||pattern===6){bossStrike(e,pattern===5,pattern===6)}else if(pattern===4){e.bossRush=18+(e.bossPhase||0)*3;e.attackPose=24}else if(pattern===0){
       const shots=3+phase*2,spread=.13,speed=5.2+phase*.45,dmg=e.d*(.56+phase*.06);
       for(let i=0;i<shots;i++){
         const o=(i-(shots-1)/2)*spread,a=e.bossAim+o;
-        launch({team:'e',kind:'bossLance',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:7,dmg,life:155,color:'#ff365f'},e,AF.player);
+        launch({team:'e',kind:'bossLance',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:7,dmg,life:155,color:e.profile?.color||'#ff365f'},e,AF.player);
       }
     }else if(pattern===1){
       const n=10+phase*4,speed=3.2+phase*.32,dmg=e.d*(.48+phase*.05),off=Math.random()*Math.PI;
       for(let i=0;i<n;i++){
         const a=off+i*Math.PI*2/n;
-        launch({team:'e',kind:'bossOrb',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:7,dmg,life:190,color:'#d858ff'},e,AF.player);
+        launch({team:'e',kind:'bossOrb',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:7,dmg,life:190,color:e.profile?.color||'#d858ff'},e,AF.player);
       }
     }else{
       const n=2+phase;
@@ -741,10 +764,13 @@
         e.bossPhase=phase;
         if(e.intro>0){
           e.intro-=dt;e.moving=false;e.bossAction='출현 중';
-          if(e.intro<=0){e.intro=0;e.bossAction='추적 중';e.bossCd=48;AF.toast('심연의 감시자 · 전투 시작')}
+          if(e.intro<=0){e.intro=0;e.bossAction='추적 중';e.bossCd=48;AF.toast((e.bossName||'심연의 감시자')+' · 전투 시작')}
         }else{
-          if(phase>e.phaseAnnounced){e.phaseAnnounced=phase;AF.toast(phase===1?'심연의 감시자 · PHASE II':'심연의 감시자 · PHASE III')}
-          if(e.bossTelegraph>0){
+          if(phase>e.phaseAnnounced){e.phaseAnnounced=phase;AF.toast((e.bossName||'심연의 감시자')+(phase===1?' · 2단계':' · 3단계'))}
+          if(e.bossRush>0){
+            e.bossRush-=dt;e.x+=Math.cos(e.bossAim)*e.s*5.2*dt;e.y+=Math.sin(e.bossAim)*e.s*5.2*dt;e.attackPose=20;
+            if(e.bossRush<=0){bossStrike(e);e.bossCd=55}
+          }else if(e.bossTelegraph>0){
             e.bossTelegraph-=dt;e.moving=false;
             if(e.bossTelegraph<=0)resolveBossPattern(e);
           }else{

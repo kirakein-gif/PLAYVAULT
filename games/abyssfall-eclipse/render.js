@@ -435,7 +435,11 @@
     }else{ctx.globalAlpha=t;ctx.strokeStyle=s.color;ctx.lineWidth=3;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke()}
     ctx.restore();
   }
-  function slash(fx){if(fx.art)return attackArt(fx);const t=fx.l/fx.max;ctx.save();ctx.globalAlpha=t;ctx.strokeStyle=fx.color||A.player.hero.accent;ctx.lineWidth=5;ctx.beginPath();ctx.arc(fx.x,fx.y,fx.r,fx.a-.8,fx.a+.8);ctx.stroke();ctx.restore()}
+  function slash(fx){if(fx.bossWeapon){
+    const t=1-fx.l/fx.max;ctx.save();ctx.translate(fx.x,fx.y-38);ctx.rotate(fx.a);ctx.scale(1,.68);ctx.globalAlpha=Math.sin(Math.PI*t)*.7;
+    ctx.strokeStyle=fx.color;ctx.lineWidth=fx.slam?9:12;ctx.beginPath();ctx.arc(0,0,fx.r*(.82+t*.18),fx.slam?0:fx.wide?-2.3:-1.2,fx.slam?Math.PI*2:fx.wide?2.3:1.2);ctx.stroke();
+    ctx.lineWidth=1.5;ctx.strokeStyle='#e5dfd2';ctx.stroke();ctx.restore();return;
+  }if(fx.art)return attackArt(fx);const t=fx.l/fx.max;ctx.save();ctx.globalAlpha=t;ctx.strokeStyle=fx.color||A.player.hero.accent;ctx.lineWidth=5;ctx.beginPath();ctx.arc(fx.x,fx.y,fx.r,fx.a-.8,fx.a+.8);ctx.stroke();ctx.restore()}
   function bossEntrance(e){
     if(e.type!=='boss'||e.intro<=0)return;
     const max=e.introMax||1,progress=1-e.intro/max,now=performance.now();
@@ -491,13 +495,18 @@
       ctx.globalAlpha=1;
     }
     ctx.beginPath();ctx.ellipse(0,boss?23:14,boss?42:e.r*1.15,boss?10:6,0,0,Math.PI*2);ctx.fillStyle='#0008';ctx.fill();
-    if(e.faceX<0&&!boss)ctx.scale(-1,1);
+    const facing=boss&&e.profile&&(e.bossTelegraph>0||e.bossRush>0)?Math.cos(e.bossAim):e.faceX;
+    if(facing<0&&(!boss||e.profile))ctx.scale(-1,1);
     if(!e.alive&&e.deadAt)ctx.globalAlpha=Math.max(.18,1-(now-e.deadAt)/900);
     else if(boss&&e.intro>0)ctx.globalAlpha=.18+.72*(1-e.intro/(e.introMax||1));
     else if(e.flash>0&&Math.floor(e.flash/2)%2===0)ctx.globalAlpha=.55;
 
-    if(e.tier>=4)ctx.filter=['hue-rotate(-35deg) saturate(.60) brightness(1.25)','sepia(.42) hue-rotate(325deg) saturate(1.4)','hue-rotate(180deg) saturate(.85)','hue-rotate(18deg) saturate(1.3) brightness(1.08)'][e.tier-4];
-    if(window.AF_ART?.loaded.enemies){
+    const regional=window.AF_ART?.regionalEnemy?.(e,!e.alive?0:e.hurtPose>0?0:e.aiWindup>0||e.bossTelegraph>0?2:e.attackPose>0?3:e.moving?1:0);
+    if(!regional&&e.tier>=4)ctx.filter=['hue-rotate(-35deg) saturate(.60) brightness(1.25)','sepia(.42) hue-rotate(325deg) saturate(1.4)','hue-rotate(180deg) saturate(.85)','hue-rotate(18deg) saturate(1.3) brightness(1.08)'][e.tier-4];
+    if(regional){
+      const scale=(boss?(A.mobile?.46:.39):(e.type==='brute'?.30:e.type==='shooter'?.25:.23))*512/regional.w;
+      window.AF_ART.draw(ctx,regional.image,regional,scale,boss?23:14);
+    }else if(window.AF_ART?.loaded.enemies){
       const art=window.AF_ART;
       let col=!e.alive?5:e.hurtPose>0?4:e.aiWindup>0||e.bossTelegraph>0?2:e.attackPose>0?3:e.moving?1:0;
       const scale={crawler:A.mobile?.67:.58,shooter:A.mobile?.56:.48,brute:A.mobile?.74:.64,boss:A.mobile?.68:.58}[e.type];
@@ -599,7 +608,7 @@
     ctx.fillStyle='#2a1234';ctx.fillRect(x,y,w,16);
     ctx.fillStyle=phase===3?'#ff3f62':phase===2?'#d75ad8':'#c665e6';ctx.fillRect(x,y,w*Math.max(0,b.hp/b.max),16);
     ctx.fillStyle='#f4dcff';ctx.font='700 10px sans-serif';ctx.textAlign='center';
-    ctx.fillText(`심연의 감시자 · ${phase}단계 · ${b.bossAction||'추적 중'}`,x+w/2,y-5,w);
+    ctx.fillText(`${b.bossName||'심연의 감시자'} · ${phase}단계 · ${b.bossAction||'추적 중'}`,x+w/2,y-5,w);
     ctx.textAlign='left'
   }
   function bossVictory(){
@@ -609,7 +618,7 @@
     ctx.fillStyle='rgba(5,6,12,.32)';ctx.fillRect(arena.x,arena.y,arena.w,arena.h);
     ctx.textAlign='center';
     ctx.fillStyle='#ffe5a6';ctx.font=`900 ${A.mobile?24:28}px sans-serif`;ctx.fillText('BOSS DEFEATED',W/2,arena.y+arena.h*.45);
-    ctx.fillStyle='#e9d6ff';ctx.font=`700 ${A.mobile?14:16}px sans-serif`;ctx.fillText('심연의 감시자를 물리쳤습니다',W/2,arena.y+arena.h*.45+30);
+    ctx.fillStyle='#e9d6ff';ctx.font=`700 ${A.mobile?14:16}px sans-serif`;ctx.fillText((A.cur().enemies.find(e=>e.type==='boss')?.bossName||'보스')+' 격파',W/2,arena.y+arena.h*.45+30);
     ctx.fillStyle='rgba(255,255,255,.68)';ctx.font='600 11px sans-serif';
     ctx.fillText('바닥 아래에서 돌이 움직이는 소리가 난다',W/2,arena.y+arena.h*.45+52);
     ctx.textAlign='left';ctx.restore();

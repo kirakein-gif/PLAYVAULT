@@ -2,13 +2,14 @@
   'use strict';
   const art=window.AF_ART={images:{},loaded:{}};
   const paths={heroes:'../../assets/art/heroes-v4.webp',actions:'../../assets/art/actions-v4.webp',enemies:'../../assets/art/enemies-v2.webp',props:'../../assets/art/props-v1.webp',relics:'../../assets/art/relics-v5.webp',lavaFlow:'../../assets/art/lava-flow-v39.webp'};
+  Object.assign(paths,{bossA:'../../assets/art/boss-a-v46.webp',bossB:'../../assets/art/boss-b-v46.webp',mobA:'../../assets/art/mob-a-v46.webp',mobB:'../../assets/art/mob-b-v46.webp'});
   for(const zone of ['cathedral','graveyard','tower','abyss'])paths[zone]='../../assets/art/room-'+zone+'-v5.webp';
   for(const zone of ['ice','lava','sewer','rift'])paths[zone]='../../assets/art/floor-'+zone+'-v39.webp';
   art.ready=Promise.all(Object.entries(paths).map(([key,path])=>new Promise(resolve=>{
     const im=new Image();art.images[key]=im;
     im.onload=()=>{art.loaded[key]=true;if(key==='relics')relicIcons(im);resolve(true)};
     im.onerror=()=>{art.loaded[key]=false;resolve(false)};
-    im.src=path+'?v=45';
+    im.src=path+'?v=46';
   })));
   function relicIcons(im){
     art.relicIcons={};
@@ -152,6 +153,17 @@
   art.enemy=(type,col)=>{
     const row={crawler:0,shooter:1,brute:2,boss:3}[type];
     return {x:col*256,y:enemyRows[row],w:256,h:enemyRows[row+1]-enemyRows[row],pivot:128,foot:enemyFeet[row][col]};
+  };
+  art.regionalEnemy=(e,col)=>{
+    const ids={skeleton:['mobA',0],gargoyle:['mobA',1],frostWolf:['mobA',2],frostKnight:['mobA',3],emberImp:['mobB',0],slagGuard:['mobB',1],plagueVermin:['mobB',2],voidKnight:['mobB',3]};
+    const spec=e.type==='boss'?[e.tier<4?'bossA':'bossB',e.tier%4]:ids[e.variant];
+    if(!spec||!art.loaded[spec[0]])return null;
+    // Sample authored row boundaries so neighboring helmets never appear at the feet.
+    const rows={bossA:[0,303,633,915,1254],bossB:[0,290,600,905,1254],mobA:[0,320,640,890,1254],mobB:[0,295,640,880,1254]};
+    const feet={bossA:[298,326,279,305],bossB:[284,308,298,315],mobA:[309,301,244,330],mobB:[290,329,234,342]};
+    const im=art.images[spec[0]],w=im.width/4,c=Math.min(3,col),row=spec[1],unit=im.height/1254;
+    const y=rows[spec[0]][row]*unit,h=(rows[spec[0]][row+1]-rows[spec[0]][row])*unit;
+    return {image:spec[0],x:c*w,y,w,h,pivot:w/2,foot:feet[spec[0]][row]*unit};
   };
   art.draw=(ctx,key,f,scale,ground)=>ctx.drawImage(art.images[key],f.x,f.y,f.w,f.h,-f.pivot*scale,ground-f.foot*scale,f.w*scale,f.h*scale);
 })();

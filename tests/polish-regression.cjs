@@ -252,3 +252,18 @@ console.log('PASS v40: reward/descent race, queued upgrades, local cheat guards,
  }
 }
 console.log('PASS v44: no floor-one prose; atmosphere only on floors 4, 7, 10, 13, 16, 19 and 22');
+{
+ const h=harness(),{A}=h;A.newRun();let previousHp=0,previousArmor=0;const names=new Set();
+ for(let zone=0;zone<8;zone++){
+  while(A.floor<(zone+1)*3)A.nextFloor();const r=Object.values(A.rooms).find(r=>r.type==='boss');A.current=`${r.x},${r.y}`;A.player.inv=99999;A.update(1);const b=r.enemies[0];
+  names.add(b.bossName);assert.ok(b.max>previousHp&&b.armor>previousArmor);previousHp=b.max;previousArmor=b.armor;b.intro=0;
+  for(const phase of [0,1,2])for(const pattern of b.profile.patterns){
+   b.hp=b.max*(phase===0?.9:phase===1?.5:.2);b.bossPattern=pattern;b.bossPhase=phase;b.bossAim=0;b.bossTelegraph=1;b.bossRush=0;A.update(1);h.frame();
+   assert.equal(b.bossPattern,-1);assert.ok(Number.isFinite(b.x)&&Number.isFinite(b.y));
+   if(pattern===4){assert.ok(b.bossRush>0);for(let i=0;i<30;i++)A.update(1);assert.ok(A.slashes.some(f=>f.bossWeapon),'rush ends with real melee swing')}
+   if([3,5,6].includes(pattern))assert.ok(A.slashes.some(f=>f.bossWeapon));
+  }
+ }
+ assert.equal(names.size,8);assert.equal(A.enemyVariant(4,'crawler'),'frostWolf');assert.equal(A.enemyVariant(4,'brute'),'frostKnight');assert.equal(A.enemyVariant(7,'shooter'),'voidKnight');
+}
+console.log('PASS v46: eight boss identities, increasing HP/armor, all phase attacks, rush finish and regional roster');
