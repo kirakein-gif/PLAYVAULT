@@ -315,7 +315,7 @@
         if(!h.hit){
           h.t-=dt;
           if(h.t<=0){
-            h.hit=true;h.life=22+Math.random()*12;AF.shockwaves.push({x:h.x,y:h.y,r:10,max:h.r,l:22,color:'#ff4867'});
+            h.hit=true;h.life=22+Math.random()*12;
             const d=Math.hypot(p.x-h.x,p.y-h.y);
             if(d<h.r&&p.inv<=0)hurt((8+AF.floor*1.15)*(0.82+h.r/130),(p.x-h.x)/(d||1),(p.y-h.y)/(d||1));
           }
