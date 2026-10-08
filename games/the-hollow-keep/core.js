@@ -112,8 +112,8 @@ const ROOMS={
   cryptj:room('cryptj','지하 갈림길',6,1,'crypt',{L:'hiddenchapel',R:'ante',enemy:['crawler','guard','bat']}),
   ante:room('ante','문지기의 전실',7,1,'crypt',{L:'cryptj',R:'gatehall',enemy:['guard','priest','guard'],trace:'문은 바깥을 막기 위해 세운 것이 아니다.'}),
   gatehall:room('gatehall','검은 철문',8,1,'boss',{L:'ante',R:'boss',enemy:[]}),
-  boss:room('boss','종지기의 방',-4,0,'boss',{L:'chapel1',boss:true,enemy:[]}),
-  after:room('after','종 아래의 방',10,1,'boss',{L:'boss',objects:[{type:'shortcut',x:770,y:470}],enemy:[],trace:'종줄은 끊겨 있는데 종은 흔들리고 있다.'}),
+  boss:room('boss','종지기의 방',-4,0,'boss',{L:'chapel1',R:'after',boss:true,enemy:[]}),
+  after:room('after','종 아래의 승강기',-3,-1,'boss',{L:'boss',R:'central',objects:[{type:'shortcut',x:760,y:470}],enemy:[],trace:'종의 진동이 위를 향한다.'}),
 
   secret1:room('secret1','벽 뒤의 작은 방',-1,2,'secret',{objects:[{type:'secretBack',x:790,y:470,to:'outer'}],enemy:[],trace:'여기에도 문이 있었다.'}),
   secret2:room('secret2','찢긴 기록실',3,-2,'secret',{objects:[{type:'secretBack',x:155,y:470,to:'archive'}],enemy:[],trace:'기록은 마지막 장에서 거꾸로 시작한다.'}),
@@ -144,6 +144,7 @@ function exitBlocked(r,side){
   if(r.id==='central'&&side==='R'&&!state.bellRung)return true;
   if(r.id==='west1'&&side==='L'&&livingEnemies(r.id).length)return true;
   if(r.id==='west2'&&side==='L'&&!state.westLatch)return true;
+  if(r.id==='boss'&&side==='R'&&!state.bossDead)return true;
   return false;
 }
 function bumpBlockedExit(r,side){
@@ -153,6 +154,7 @@ function bumpBlockedExit(r,side){
     rs[key]=true;
     if(r.id==='central'&&side==='R')toast('쇠문은 아직 열리지 않는다.',900);
     else if(r.id==='west2')toast('위쪽에서 쇠사슬이 이어져 있다.',1000);
+    else if(r.id==='boss')toast('종지기의 갑옷이 길을 막고 있다.',800);
     else toast('철창이 내려와 있다.',800);
   }
 }
