@@ -8,7 +8,7 @@
     const im=new Image();art.images[key]=im;
     im.onload=()=>{art.loaded[key]=true;if(key==='relics')relicIcons(im);resolve(true)};
     im.onerror=()=>{art.loaded[key]=false;resolve(false)};
-    im.src=path+'?v=39';
+    im.src=path+'?v=40';
   })));
   function relicIcons(im){
     art.relicIcons={};
@@ -117,8 +117,8 @@
         // Texture rows widen toward the camera. Fixed across every door configuration.
         const im=art.images[texture],height=.54*c.height;
         for(let row=0;row<Math.ceil(height);row++){
-          const t=row/height,zoom=.72+t*.28,sw=im.width*zoom;
-          cc.drawImage(im,(im.width-sw)/2,t*im.height,sw,im.height/height, .10*c.width,.28*c.height+row,.80*c.width,1.2);
+          const t=row/height,zoom=1-t*.38,sw=im.width*zoom,sy=(t-.19*t*t)/.81*im.height,sh=Math.min(im.height-sy,zoom/.81*im.height/height);
+          cc.drawImage(im,(im.width-sw)/2,sy,sw,sh, .10*c.width,.28*c.height+row,.80*c.width,1.2);
         }
         const shade=cc.createLinearGradient(0,.28*c.height,0,.82*c.height);shade.addColorStop(0,'rgba(4,8,12,.48)');shade.addColorStop(.35,'rgba(4,8,12,.04)');shade.addColorStop(1,'rgba(4,8,12,.24)');cc.fillStyle=shade;cc.fillRect(.10*c.width,.28*c.height,.80*c.width,height);cc.restore();
       }

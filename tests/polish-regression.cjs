@@ -8,7 +8,7 @@ function harness(mobile=false,dpr=1){
   const classes=new Set(),e={style:{setProperty(){}},dataset:{},children:[],classList:{add(x){classes.add(x)},remove(x){classes.delete(x)},contains(x){return classes.has(x)},toggle(){}},addEventListener(){},setAttribute(){},appendChild(c){this.children.push(c)},getBoundingClientRect(){return {left:0,top:0,width:112,height:112}},getContext(){return ctx},toDataURL(){return 'data:image/png;base64,'},querySelector(s){return el(id+s)},querySelectorAll(){return []},closest(){return null},textContent:'',innerHTML:''};elements.set(id,e);
  }return elements.get(id)}
  class Image{constructor(){this.complete=true;this.naturalWidth=1536;this.width=1536;this.height=1024}set src(x){this._src=x;if(x.includes('room-')&&x.includes('-v5')){this.width=916;this.height=1717}else if(x.includes('relics-v5')){this.width=1448;this.height=1086}this.onload?.()}}
- const env={console,Image,performance:{now:()=>now},innerWidth:mobile?390:1440,innerHeight:mobile?844:960,devicePixelRatio:dpr,matchMedia:()=>({matches:mobile}),localStorage:{getItem(){return null},setItem(){}},document:{getElementById:el,querySelectorAll(){return []},documentElement:el('root'),createElement:()=>el('made'+created++)},addEventListener(type,fn){(listeners[type]??=[]).push(fn)},setTimeout(fn,ms){timers.push({fn,at:now+ms});return timers.length},clearTimeout(){},requestAnimationFrame(fn){raf=fn},fetch:async()=>({ok:false,status:404})};env.window=env;vm.createContext(env);
+ const env={console,Image,location:{hostname:'127.0.0.1'},performance:{now:()=>now},innerWidth:mobile?390:1440,innerHeight:mobile?844:960,devicePixelRatio:dpr,matchMedia:()=>({matches:mobile}),localStorage:{getItem(){return null},setItem(){}},document:{getElementById:el,querySelectorAll(){return []},documentElement:el('root'),createElement:()=>el('made'+created++)},addEventListener(type,fn){(listeners[type]??=[]).push(fn)},setTimeout(fn,ms){timers.push({fn,at:now+ms});return timers.length},clearTimeout(){},requestAnimationFrame(fn){raf=fn},fetch:async()=>({ok:false,status:404})};env.window=env;vm.createContext(env);
  for(const file of ['art.js','core.js','render.js'])vm.runInContext(fs.readFileSync(root+'/'+file,'utf8'),env,{filename:file});
  const A=env.AF;
  function advance(ms){now+=ms;for(let i=timers.length-1;i>=0;i--)if(timers[i].at<=now){const {fn}=timers.splice(i,1)[0];fn()}if(A.started&&!A.dead&&!A.paused)A.update(1)}
@@ -167,10 +167,10 @@ for(const mobile of [false,true]){
  A.keys.d=true;for(let i=0;i<12;i++)A.update(1);A.keys.d=false;const before=p.x;
  A.update(1);assert.ok(p.x>before+1,'released movement retains ice momentum');
  const speed=p.slideX;A.keys.a=true;A.update(1);assert.ok(p.slideX<speed,'counter-steering brakes');A.keys.a=false;
- p.x=A.W/2;p.y=A.arena.y+20;A.update(1);assert.equal(p.slideX,0,'dry stone stops inertia');
+ p.x=A.W/2;p.y=A.arena.y+20;p.slideX=2;A.update(1);assert.ok(p.slideX>1,'whole ice room retains inertia outside old patches');r.clear=true;A.update(1);assert.ok(p.slideX>1,'cleared ice remains slippery');
  p.slideX=3;A.nextFloor();assert.equal(p.slideX,0,'floor transfer resets velocity');
 }
-console.log('PASS ice: real inertia, counter-steering, dry braking and floor reset on desktop/touch layouts');
+console.log('PASS ice: real inertia, counter-steering, whole-room/cleared ice and floor reset on desktop/touch layouts');
 // Shared contact geometry, warning periods, pulse cooldown and repeated damage.
 for(const floor of [16,19,22])for(const mobile of [false,true]){
  const h=harness(mobile),{A}=h;A.newRun();while(A.floor<floor)A.nextFloor();
@@ -210,3 +210,36 @@ for(const mobile of [false,true])for(const d of ['N','S','E','W']){
  assert.ok(A.cur().enemies.every(e=>Math.hypot(e.x-A.player.x,e.y-A.player.y)>=150),'deep crowds spawn away from the actual doorway arrival');
 }
 console.log('PASS deep arrivals: full-size enemy groups remain outside entry safety distance on all four sides and both layouts');
+
+// Reproduce the frozen reward screen: stairs scheduled first, then an XP choice.
+{
+ const h=harness(),{A}=h;A.newRun();while(A.floor<13)A.nextFloor();
+ const r=Object.values(A.rooms).find(r=>r.type==='exit');A.current=`${r.x},${r.y}`;r.clear=true;r.spawned=true;r.enemies=[];
+ A.player.x=A.W/2;A.player.y=A.arena.y+A.arena.h/2;A.pickups.push({x:A.player.x,y:A.player.y,val:A.player.nextXp});A.update(1);
+ assert.equal(A.paused,true);assert.equal(A.rewardChoices.length,3);h.advance(1000);
+ assert.equal(A.floor,13,'stairs wait while a choice is open');assert.equal(A.paused,true);
+ h.key('Digit1','1');assert.equal(A.floor,14);assert.equal(A.paused,false);assert.equal(A.rewardChoices.length,0);assert.equal(h.elements.get('levelUp').classList.contains('show'),false);
+}
+// Multiple XP thresholds are presented in order rather than replacing a choice.
+{
+ const h=harness(),{A}=h;A.newRun();const p=A.player;p.nextXp=18;
+ A.pickups.push({x:p.x,y:p.y,val:80});A.update(1);const level=p.level;
+ A.nextFloor();assert.equal(A.floor,1);let picks=0;
+ while(A.rewardChoices.length){h.key('Digit1','1');picks++;assert.ok(picks<10)}
+ assert.equal(p.level-level,picks-1);assert.equal(A.floor,2);assert.equal(A.paused,false);
+}
+// Local-only temporary key: no held-key repeats, editable-field interception or stale dialog.
+{
+ const h=harness(),{A}=h;h.key('Backquote','`');assert.equal(A.floor,1);A.newRun();
+ A.pickups.push({x:A.player.x,y:A.player.y,val:18});A.update(1);h.key('Backquote','`',true);assert.equal(A.floor,1);
+ h.key('Backquote','`',false,{tagName:'INPUT'});assert.equal(A.floor,1);
+ h.key('Backquote','`');assert.equal(A.floor,2);assert.equal(A.rewardChoices.length,0);assert.equal(A.paused,false);assert.equal(A.testRun,true);
+ h.env.location.hostname='kirakein-gif.github.io';h.key('Backquote','`');assert.equal(A.floor,2,'test key is disabled on public site');
+ assert.match(h.elements.get('floorText').textContent,/지하 2층/);
+}
+{
+ const h=harness(),{A}=h;A.newRun();while(A.floor<4)A.nextFloor();const r=A.cur();r.clear=true;
+ const z=A.stageZone(r,'fog',0);A.player.x=z.x;A.player.y=z.y;A.keys.d=true;const x=A.player.x;A.update(1);
+ assert.ok(A.player.x-x<A.player.speed,'fog slows movement after combat');assert.ok(A.fogCount(r)>=7);h.frame();
+}
+console.log('PASS v40: reward/descent race, queued upgrades, local cheat guards, underground labels and persistent dense fog');

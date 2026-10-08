@@ -72,6 +72,7 @@
   document.querySelectorAll('.heroCard').forEach(b=>b.addEventListener('click',()=>{AF.selected=b.dataset.hero;document.querySelectorAll('.heroCard').forEach(x=>x.classList.toggle('selected',x===b));sound()?.unlock().then(ok=>{if(ok&&!AF.started)sound()?.startTitle()})}));
   addEventListener('keydown',e=>{
     if(e.target?.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName||''))return;
+    if(e.code==='Backquote'||e.key==='`'){e.preventDefault();if(!e.repeat)AF.skipFloor();return}
     const choice=/^(?:Digit|Numpad)([123])$/.exec(e.code);
     if(choice&&AF.rewardChoices?.length){e.preventDefault();if(!e.repeat)AF.chooseReward(Number(choice[1])-1);return}
     AF.keys[e.key.toLowerCase()]=true;
@@ -210,7 +211,7 @@
     }
     return{x:W/2,y:arena.y+arena.h/2,r:70};
   };
-  AF.fogCount=r=>Math.max(1,Math.min(4,r?.fogCount||2));
+  AF.fogCount=r=>Math.max(7,Math.min(10,(r?.fogCount||2)+6));
   const activeStageRoom=r=>r&&!r.clear&&!(AF.bossClearUntil&&performance.now()<AF.bossClearUntil)&&(r.type==='combat'||r.type==='elite'||r.type==='exit'||r.type==='boss');
   // One geometry source drives both painted terrain and floor contact.
   AF.activeStageRoom=activeStageRoom;
@@ -244,14 +245,15 @@
     return inside;
   };
   AF.fieldState=(r,h)=>{
+    if(h.kind==='ice')return 'active';
     if(!activeStageRoom(r))return 'inactive';
-    const age=r.fieldAge||0;if(h.kind==='ice')return 'active';
+    const age=r.fieldAge||0;
     if(age<90)return 'warning';
     if(h.kind==='poison')return 'active';
     const t=(age-90+h.phase)%300;return t<95?'cool':t<155?'warning':'active';
   };
   function fieldMovement(r,p,vx,vy,m,dt){
-    const patches=activeStageRoom(r)?AF.fieldPatches(r):[],ice=patches.some(h=>h.kind==='ice'&&AF.fieldContact(h,p));
+    const patches=r?AF.fieldPatches(r):[],ice=!!r&&(AF.zoneIndex()===4||patches.some(h=>h.kind==='ice'&&AF.fieldContact(h,p)));
     const slow=patches.some(h=>h.kind==='poison'&&AF.fieldState(r,h)==='active'&&AF.fieldContact(h,p))?.78:1;
     const speed=p.speed*stageMoveScale(r,p)*slow;
     if(m){vx/=m;vy/=m;if(Math.abs(vx)>.15)p.faceX=vx;p.faceY=vy}
@@ -265,7 +267,7 @@
     if(p.moving)p.step+=dt*.13*(Math.hypot(p.slideX,p.slideY)/3.15);
   }
   function stageMoveScale(r,p){
-    if(!activeStageRoom(r)||AF.zoneIndex()!==1)return 1;
+    if(!r||AF.zoneIndex()!==1)return 1;
     let scale=1;
     for(let i=0;i<AF.fogCount(r);i++){
       const z=AF.stageZone(r,'fog',i);
@@ -376,7 +378,7 @@
     document.documentElement.dataset.hero=h.key;
     ui.specialBtn.style.setProperty('--skill-ring',ring);ui.specialBtn.style.setProperty('--skill-glow',glow);
   }
-  AF.newRun=()=>{AF.rewardChoices=[];sound()?.unlock().then(()=>{sound()?.startExplore();sound()?.sfx('start')});const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.endless=false;AF.cleared=false;AF.transitioning=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,specialPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.soulBursts=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name} · ${Object.keys(AF.rooms).length} ROOMS`);setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===1)AF.toast(AF.stageTip())},950)};
+  AF.newRun=()=>{AF.pendingFloor=null;AF.pendingFinish=false;AF.rewardChoices=[];sound()?.unlock().then(()=>{sound()?.startExplore();sound()?.sfx('start')});const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.testRun=false;AF.endless=false;AF.cleared=false;AF.transitioning=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,specialPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.soulBursts=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();AF.toast(`${h.ko} · ${h.name} · ${Object.keys(AF.rooms).length} ROOMS`);setTimeout(()=>{if(AF.started&&!AF.dead&&AF.floor===1)AF.toast(AF.stageTip())},950)};
   ui.startBtn.addEventListener('click',AF.newRun);ui.retryBtn.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearRestart?.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearLobby?.addEventListener('click',()=>{sound()?.stopMusic();AF.clearScreen?.classList.remove('show');AF.started=false;AF.paused=true;ui.start.classList.add('show')});
@@ -493,7 +495,7 @@
   };
   const seg=(x1,y1,x2,y2,cx,cy,r)=>{const dx=x2-x1,dy=y2-y1,l=dx*dx+dy*dy;if(!l)return Math.hypot(cx-x1,cy-y1)<r;let t=((cx-x1)*dx+(cy-y1)*dy)/l;t=Math.max(0,Math.min(1,t));return Math.hypot(cx-(x1+t*dx),cy-(y1+t*dy))<r};
 
-  function gainXp(n){const p=AF.player;p.xp+=n;if(p.xp>=p.nextXp){p.xp-=p.nextXp;p.level++;p.nextXp=Math.floor(p.nextXp*(p.level<=12?1.32:1.14));upgrade()}}
+  function gainXp(n){const p=AF.player;p.xp+=n;if(!AF.rewardChoices?.length&&p.xp>=p.nextXp){p.xp-=p.nextXp;p.level++;p.nextXp=Math.floor(p.nextXp*(p.level<=12?1.32:1.14));upgrade()}}
   function chooseReward(opts,title,lead){
     AF.paused=true;
     const titleEl=ui.levelUp.querySelector('h2'),leadEl=ui.levelUp.querySelector('.lead');
@@ -511,9 +513,14 @@
     ui.levelUp.classList.add('show');
   }
   AF.chooseReward=index=>{
-    const o=AF.rewardChoices?.[index];if(!o||!AF.paused)return;
+    const o=AF.rewardChoices?.[index];if(!o||AF.dead)return;
     AF.rewardChoices=[];o.f(AF.player);if(o.relic)AF.addRelic(o);
     ui.levelUp.classList.remove('show');AF.paused=false;AF.hud();
+    gainXp(0);
+    if(AF.rewardChoices?.length)return;
+    if(AF.pendingFinish){AF.pendingFinish=false;AF.finishRun();return}
+    const pending=AF.pendingFloor;AF.pendingFloor=null;
+    if(pending&&AF.cur()===pending.room)AF.nextFloor(pending.source);
   };
   function upgrade(){
     chooseReward([
@@ -605,8 +612,9 @@
     return rec;
   }
   AF.finishRun=()=>{
+    if(AF.rewardChoices?.length){AF.pendingFinish=true;return}
     if(AF.cleared)return;AF.cleared=true;AF.transitioning=false;AF.paused=true;AF.bossClearUntil=0;sound()?.stopMusic();sound()?.sfx('clear');
-    const elapsed=performance.now()-AF.runStart,rec=saveClearRecord(elapsed),p=AF.player;
+    const elapsed=performance.now()-AF.runStart,rec=AF.testRun?null:saveClearRecord(elapsed),p=AF.player;
     if(ui.clearStats)ui.clearStats.innerHTML=[
       ['캐릭터',p.hero.ko],['플레이 시간',formatRunTime(elapsed)],['총 처치',AF.kills+''],['최종 레벨','Lv '+p.level]
     ].map(([a,b])=>'<div class="clearStat"><small>'+a+'</small><b>'+b+'</b></div>').join('');
@@ -614,18 +622,28 @@
       const relics=Object.values(AF.relics);
       ui.clearRelics.innerHTML=relics.length?relics.map(r=>'<div class="clearRelic">'+(r.img?'<img src="'+r.img+'" alt="">':'')+'<span>'+r.name+'</span>'+(r.count>1?'<b>×'+r.count+'</b>':'')+'</div>').join(''):'<span class="relicEmpty">획득한 유물이 없습니다.</span>';
     }
-    if(ui.clearRecord)ui.clearRecord.textContent=p.hero.ko+' 클리어 '+rec.clears+'회 · 최고 처치 '+rec.maxKills+' · 최고 Lv '+rec.bestLevel+' · 최고 기록 '+formatRunTime(rec.bestTime);
+    if(ui.clearRecord)ui.clearRecord.textContent=AF.testRun?'층 이동 테스트 · 클리어 기록 제외':p.hero.ko+' 클리어 '+rec.clears+'회 · 최고 처치 '+rec.maxKills+' · 최고 Lv '+rec.bestLevel+' · 최고 기록 '+formatRunTime(rec.bestTime);
     ui.clearScreen?.classList.add('show');
   };
   AF.nextFloor=(source='exit')=>{
+    if(AF.rewardChoices?.length){AF.pendingFloor={source,room:AF.cur()};return}
     AF.paused=false;sound()?.startExplore();AF.transitioning=false;AF.bossClearUntil=0;AF.floor++;
     AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();
     const healRate=source==='boss'?(AF.floor>12?.22:.30):source==='endless'?.30:AF.floor>12?.10:.16;
     AF.player.slideX=AF.player.slideY=0;AF.player.x=W/2;AF.player.y=arena.y+arena.h/2;
     AF.player.hp=Math.min(AF.player.maxHp,AF.player.hp+Math.max(10,Math.round(AF.player.maxHp*healRate)));
     AF.player.inv=45;AF.projectiles=[];AF.pickups=[];AF.slashes=[];AF.soulBursts=[];
-    AF.toast(`FLOOR ${AF.floor} · ${AF.stageName()} · ${Object.keys(AF.rooms).length} ROOMS`);
+    AF.toast(`지하 ${AF.floor}층 · ${AF.stageName()} · ${Object.keys(AF.rooms).length} ROOMS`);
     AF.hud();if((AF.floor-1)%3===0)setTimeout(()=>{if(AF.started&&!AF.dead)AF.toast(AF.stageTip())},950)
+  };
+  // Temporary local test shortcut. The physical key below Escape advances one floor.
+  AF.skipFloor=()=>{
+    if(location.hostname!=='127.0.0.1'&&location.hostname!=='localhost')return;
+    if(!AF.started||AF.dead||(AF.cleared&&!AF.endless))return;
+    AF.testRun=true;AF.rewardChoices=[];AF.pendingFloor=null;AF.pendingFinish=false;
+    ui.levelUp.classList.remove('show');AF.keys={};Object.assign(AF.joy,{x:0,y:0,active:false,id:null});
+    if(AF.floor>=24)AF.endless=true;
+    AF.nextFloor('test');
   };
   function hurt(n,nx,ny){const p=AF.player;if(p.shield>0){const b=Math.min(p.shield,n);p.shield-=b;n-=b;if(n<=0){p.inv=18;return}}p.hp-=Math.round(n);sound()?.sfx('hurt');p.inv=48;p.hurtPose=18;p.x+=nx*18;p.y+=ny*18;
     const seal=relicCount('guardian-seal');
@@ -636,7 +654,7 @@
       AF.shockwaves.push({x:p.x,y:p.y,r:12,max:rad,l:24,color:'#6fe6c4'});
       AF.cur().enemies.forEach(e=>{if(e.alive&&Math.hypot(e.x-p.x,e.y-p.y)<rad)damage(e,13+seal*7+p.atk*.15)});
       AF.toast('수호자의 인장 · 반격 보호막');
-    }for(let i=0;i<10;i++)AF.particles.push({x:p.x,y:p.y,vx:(Math.random()-.5)*4,vy:(Math.random()-.5)*4,l:22,color:'#ff6478'});if(p.hp<=0&&!AF.dead){p.hp=0;AF.dead=true;AF.paused=true;sound()?.stopMusic();sound()?.sfx('gameOver');p.deathAt=performance.now();ui.resultText.textContent=`${p.hero.ko} · FLOOR ${AF.floor} · Lv ${p.level} · 처치 ${AF.kills}`;setTimeout(()=>{if(AF.dead)ui.gameOver.classList.add('show')},900)}}
+    }for(let i=0;i<10;i++)AF.particles.push({x:p.x,y:p.y,vx:(Math.random()-.5)*4,vy:(Math.random()-.5)*4,l:22,color:'#ff6478'});if(p.hp<=0&&!AF.dead){p.hp=0;AF.dead=true;AF.paused=true;sound()?.stopMusic();sound()?.sfx('gameOver');p.deathAt=performance.now();ui.resultText.textContent=`${p.hero.ko} · 지하 ${AF.floor}층 · Lv ${p.level} · 처치 ${AF.kills}`;setTimeout(()=>{if(AF.dead)ui.gameOver.classList.add('show')},900)}}
   function clamp(){const p=AF.player;p.x=Math.max(arena.x+p.r,Math.min(arena.x+arena.w-p.r,p.x));p.y=Math.max(arena.y+p.r,Math.min(arena.y+arena.h-p.r,p.y))}
   function enter(nk,from){
     AF.player.slideX=AF.player.slideY=0;AF.current=nk;const r=AF.cur();r.seen=true;AF.projectiles=[];AF.slashes=[];AF.soulBursts=[];
@@ -865,7 +883,7 @@
     relics.forEach(r=>{const chip=document.createElement('div');chip.className='relicChip';chip.title=r.name+' · '+(r.effect||'');chip.innerHTML=(r.img?'<img class="relicImage" src="'+r.img+'" alt="">':'<span class="relicIcon">'+r.icon+'</span>')+'<span class="relicInfo"><span class="relicName">'+r.name+'</span><small>'+(r.effect||'')+'</small></span>'+(r.count>1?'<b>×'+r.count+'</b>':'');ui.relicList.appendChild(chip)});
   };
 
-  AF.hud=()=>{const p=AF.player;if(!p)return;const r=AF.cur();ui.floorText.textContent=`${AF.floor}F · ${AF.stageName()}`;ui.roomText.textContent=`ROOM ${AF.current} · ${AF.roomLabel(r)}`;ui.killText.textContent=AF.kills;ui.hpText.textContent=Math.max(0,Math.round(p.hp));ui.levelText.textContent=p.level;ui.enemyText.textContent=r.enemies.filter(e=>e.alive).length;ui.hpFill.style.width=`${Math.max(0,p.hp/p.maxHp*100)}%`;ui.xpFill.style.width=`${Math.max(0,p.xp/p.nextXp*100)}%`;
+  AF.hud=()=>{const p=AF.player;if(!p)return;const r=AF.cur();ui.floorText.textContent=`지하 ${AF.floor}층 · ${AF.stageName()}`;ui.roomText.textContent=`ROOM ${AF.current} · ${AF.roomLabel(r)}`;ui.killText.textContent=AF.kills;ui.hpText.textContent=Math.max(0,Math.round(p.hp));ui.levelText.textContent=p.level;ui.enemyText.textContent=r.enemies.filter(e=>e.alive).length;ui.hpFill.style.width=`${Math.max(0,p.hp/p.maxHp*100)}%`;ui.xpFill.style.width=`${Math.max(0,p.xp/p.nextXp*100)}%`;
     const total=Math.max(150,p.hero.specialCd-p.specialBoost),remain=Math.max(0,p.special),seconds=remain/60,ready=remain<=0,progress=ready?1:Math.max(0,Math.min(1,1-remain/total));
     ui.specialCdText.textContent=ready?'READY':seconds<10?seconds.toFixed(1)+'s':Math.ceil(seconds)+'s';
     ui.specialBtn.classList.toggle('cooling',!ready);ui.specialBtn.classList.toggle('ready',ready);

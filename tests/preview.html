@@ -7,6 +7,7 @@ const frame=document.querySelector('iframe'),status=document.getElementById('sta
 if(new URLSearchParams(location.search).has('mobile39')){frame.style.width='390px';frame.style.height='844px';frame.style.margin='0 auto';document.body.style.overflow='auto'}
 const get=()=>frame.contentWindow.AF;
 for(const [id,label,fn] of [
+ ['fogPreview','Fog 4 cleared',()=>{const a=get();a.newRun();while(a.floor<4)a.nextFloor();const r=Object.values(a.rooms).find(r=>r.type==='combat');a.current=`${r.x},${r.y}`;r.clear=true;r.spawned=true;r.enemies=[];a.player.x=a.W/2;a.player.y=a.arena.y+a.arena.h*.75;a.paused=true}],
  ...[['icePreview','Ice 13',13],['lavaPreview','Lava 16',16],['poisonPreview','Poison 19',19],['riftPreview','Rift 22',22]].map(([id,label,floor])=>[id,label,()=>{const a=get();a.newRun();while(a.floor<floor)a.nextFloor();const r=Object.values(a.rooms).find(r=>r.type==='combat');a.current=`${r.x},${r.y}`;a.player.inv=99999;a.player.basic=99999;a.update(1);r.fieldAge=230;a.player.x=a.W/2;a.player.y=a.arena.y+a.arena.h*.75;a.paused=true}]),
  ['specialPreview','Special effect',()=>{const a=get();a.player.special=0;a.paused=false;a.useSpecial();for(const fx of a.slashes)fx.l=fx.max*.55;for(const fx of a.shockwaves){fx.l=16;fx.r=fx.max*.8}a.paused=true}],
  ['windPreview','Tower wind',()=>{const a=get();while(a.floor<7)a.nextFloor();const r=Object.values(a.rooms).find(r=>r.type==='combat');a.current=`${r.x},${r.y}`;r.spawned=true;r.windActive=100;r.windX=.9;r.windY=.35;r.windStrength=1.8;a.paused=true}],
