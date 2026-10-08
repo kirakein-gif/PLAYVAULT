@@ -105,6 +105,24 @@
 
   A.stopMusic=()=>clearMusic();
 
+  // One soft, filtered air loop per gust; never restart noise on every frame.
+  A.setWind=(strength=0)=>{
+    strength=A.unlocked&&!A.muted&&A.ctx?.state==='running'?Math.max(0,strength):0;
+    if(!strength){
+      if(A.wind){const old=A.wind;A.wind=null;old.gain.gain.setTargetAtTime(0,A.ctx.currentTime,.06);old.src.stop(A.ctx.currentTime+.3)}
+      return;
+    }
+    if(!A.wind){
+      const c=A.ctx;
+      if(!A.windBuffer){const b=c.createBuffer(1,c.sampleRate*2,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(.75+.25*Math.sin(i/d.length*Math.PI*2));A.windBuffer=b}
+      const src=c.createBufferSource(),high=c.createBiquadFilter(),low=c.createBiquadFilter(),gain=c.createGain();
+      src.buffer=A.windBuffer;src.loop=true;high.type='highpass';high.frequency.value=420;low.type='lowpass';low.frequency.value=1900;gain.gain.value=0;
+      src.connect(high);high.connect(low);low.connect(gain);gain.connect(A.sfxGain);
+      src.onended=()=>[src,high,low,gain].forEach(n=>n.disconnect());src.start();A.wind={src,gain,strength:-1};
+    }
+    if(Math.abs(A.wind.strength-strength)>.05){A.wind.strength=strength;A.wind.gain.gain.setTargetAtTime(Math.min(.16,.065+strength*.03),A.ctx.currentTime,.14)}
+  };
+
   A.sfx=(name,variant='')=>{
     if(!ensure()||!A.unlocked||A.muted)return;
     const now=performance.now(),limits={basic:140,hit:100,enemyDeath:120};

@@ -243,3 +243,12 @@ console.log('PASS deep arrivals: full-size enemy groups remain outside entry saf
  assert.ok(A.player.x-x<A.player.speed,'fog slows movement after combat');assert.ok(A.fogCount(r)>=7);h.frame();
 }
 console.log('PASS v40: reward/descent race, queued upgrades, local cheat guards, underground labels and persistent dense fog');
+{
+ const h=harness(),{A}=h;A.newRun();h.advance(1000);
+ assert.equal(A.ui.toast.classList.contains('show'),false,'no opening prose on floor one');
+ for(let floor=2;floor<=24;floor++){
+  A.nextFloor();const arrival=A.ui.toast.textContent;h.advance(1000);
+  assert.equal(A.ui.toast.textContent,(floor-1)%3===0?A.stageTip():arrival,'prose only at biome boundaries: floor '+floor);
+ }
+}
+console.log('PASS v44: no floor-one prose; atmosphere only on floors 4, 7, 10, 13, 16, 19 and 22');
