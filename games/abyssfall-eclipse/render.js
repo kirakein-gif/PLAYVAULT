@@ -435,10 +435,33 @@
     }else{ctx.globalAlpha=t;ctx.strokeStyle=s.color;ctx.lineWidth=3;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke()}
     ctx.restore();
   }
-  function slash(fx){if(fx.bossWeapon){
-    const t=1-fx.l/fx.max;ctx.save();ctx.translate(fx.x,fx.y-38);ctx.rotate(fx.a);ctx.scale(1,.68);ctx.globalAlpha=Math.sin(Math.PI*t)*.7;
-    ctx.strokeStyle=fx.color;ctx.lineWidth=fx.slam?9:12;ctx.beginPath();ctx.arc(0,0,fx.r*(.82+t*.18),fx.slam?0:fx.wide?-2.3:-1.2,fx.slam?Math.PI*2:fx.wide?2.3:1.2);ctx.stroke();
-    ctx.lineWidth=1.5;ctx.strokeStyle='#e5dfd2';ctx.stroke();ctx.restore();return;
+  function bossImpact(fx){
+    const t=Math.max(0,Math.min(1,1-fx.l/fx.max)),fade=Math.pow(1-t,1.35),color=fx.color||'#beaedc';
+    ctx.save();ctx.translate(fx.x,fx.y+(fx.slam||fx.bossCast?14:-38));ctx.rotate(fx.slam||fx.bossCast?0:fx.a||0);ctx.scale(1,fx.slam||fx.bossCast?.42:.68);
+    if(fx.slam){
+      const radius=fx.r*(.25+Math.sqrt(t)*.75),glow=ctx.createRadialGradient(0,0,radius*.6,0,0,radius+22);
+      glow.addColorStop(0,'rgba(0,0,0,0)');glow.addColorStop(.8,color+'65');glow.addColorStop(1,'rgba(0,0,0,0)');ctx.globalAlpha=fade;ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,radius+22,0,Math.PI*2);ctx.fill();
+      for(let i=0;i<13;i++){const a=i*2.399,b=a+.15*hash(i+fx.tier),len=fx.r*(.38+hash(i)*.5)*Math.min(1,t*5);ctx.strokeStyle=i%3?color:'#e6d8b5';ctx.lineWidth=i%3?2.5:1;ctx.beginPath();ctx.moveTo(Math.cos(a)*12,Math.sin(a)*12);ctx.lineTo(Math.cos(b)*len*.55,Math.sin(b)*len*.55);ctx.lineTo(Math.cos(a-.12)*len,Math.sin(a-.12)*len);ctx.stroke();
+        const x=Math.cos(a)*radius,y=Math.sin(a)*radius;ctx.fillStyle=i%2?'#504b43':color;ctx.beginPath();ctx.moveTo(x,y-10*fade);ctx.lineTo(x+4,y-24*fade);ctx.lineTo(x+8,y-8*fade);ctx.closePath();ctx.fill();}
+      ctx.globalAlpha=fade*.14;ctx.fillStyle='#b5a18b';for(let i=0;i<8;i++){const a=i*.785;ctx.beginPath();ctx.ellipse(Math.cos(a)*radius*.6,Math.sin(a)*radius*.6,20+t*26,12+t*14,a,0,Math.PI*2);ctx.fill()}
+    }else if(fx.bossCast){
+      const radius=fx.r*(.65+t*.35);ctx.globalAlpha=fade*.65;ctx.strokeStyle=color;ctx.lineWidth=1.5;
+      for(let ring=0;ring<3;ring++){ctx.beginPath();ctx.arc(0,0,radius*(.55+ring*.18),0,Math.PI*2);ctx.stroke()}
+      for(let i=0;i<8;i++){const a=i*Math.PI/4+t*.3,x=Math.cos(a)*radius*.75,y=Math.sin(a)*radius*.75;ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.beginPath();ctx.moveTo(-6,0);ctx.lineTo(0,-9);ctx.lineTo(6,0);ctx.lineTo(0,9);ctx.closePath();ctx.stroke();ctx.restore()}
+      ctx.globalAlpha=fade*.8;for(let i=0;i<10;i++){const a=i*2.399,x=Math.cos(a)*radius*.55,y=Math.sin(a)*radius*.55-t*95;ctx.fillStyle=i%3?color:'#ece6d8';ctx.beginPath();ctx.moveTo(x,y-8);ctx.lineTo(x+3,y);ctx.lineTo(x,y+9);ctx.lineTo(x-3,y);ctx.closePath();ctx.fill()}
+    }else{
+      const span=fx.wide?4.6:2.4,head=-span/2+Math.min(1,t*2.6)*span,tail=Math.max(-span/2,head-(fx.wide?2.5:1.45)),radius=fx.r*(.87+t*.13);
+      ctx.globalAlpha=fade*.8;ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=10;
+      ctx.beginPath();for(let i=0;i<=24;i++){const u=i/24,a=tail+(head-tail)*u,r=radius*(.94+.09*u);if(i===0)ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r);else ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}
+      for(let i=24;i>=0;i--){const u=i/24,a=tail+(head-tail)*u,r=radius*(.94-.18*Math.sin(u*Math.PI));ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}ctx.closePath();ctx.fill();ctx.shadowBlur=0;
+      for(let j=0;j<3;j++){ctx.globalAlpha=fade*(.65-j*.16);ctx.strokeStyle=j?'#b7a99b':'#fff2dc';ctx.lineWidth=j?1:2;ctx.beginPath();ctx.arc(0,0,radius*(1-j*.09),tail+.08,head);ctx.stroke()}
+      // Steel fragments trail the actual strike, never its preparation.
+      for(let i=0;i<16;i++){const a=tail+(head-tail)*hash(i+3),r=radius+hash(i+19)*t*45,x=Math.cos(a)*r,y=Math.sin(a)*r;ctx.globalAlpha=fade*(.35+hash(i)*.5);ctx.strokeStyle=i%3?color:'#fff1ca';ctx.lineWidth=1+i%2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-Math.cos(a+.6)*(3+t*12),y-Math.sin(a+.6)*(3+t*12));ctx.stroke()}
+    }
+    ctx.restore();
+  }
+  function slash(fx){if(fx.bossWeapon||fx.bossCast){
+    bossImpact(fx);return;
   }if(fx.art)return attackArt(fx);const t=fx.l/fx.max;ctx.save();ctx.globalAlpha=t;ctx.strokeStyle=fx.color||A.player.hero.accent;ctx.lineWidth=5;ctx.beginPath();ctx.arc(fx.x,fx.y,fx.r,fx.a-.8,fx.a+.8);ctx.stroke();ctx.restore()}
   function bossEntrance(e){
     if(e.type!=='boss'||e.intro<=0)return;

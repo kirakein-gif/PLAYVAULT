@@ -698,12 +698,13 @@
     const p=AF.player,reach=(e.profile?.reach||140)+(e.bossPhase||0)*12;
     const a=e.bossAim,delta=Math.atan2(Math.sin(Math.atan2(p.y-e.y,p.x-e.x)-a),Math.cos(Math.atan2(p.y-e.y,p.x-e.x)-a));
     e.attackPose=24;
-    AF.slashes.push({bossWeapon:true,x:e.x,y:e.y,a,r:reach,wide,slam,color:e.profile?.color||'#c5b4a0',l:24,max:24});
+    AF.slashes.push({bossWeapon:true,x:e.x,y:e.y,a,r:reach,wide,slam,weapon:e.profile?.weapon||'greatsword',tier:e.tier,color:e.profile?.color||'#c5b4a0',l:30,max:30});
     if(p.inv<=0&&Math.hypot(p.x-e.x,p.y-e.y)<reach+p.r&&(slam||Math.abs(delta)<(wide?2.3:1.2))){const d=Math.hypot(p.x-e.x,p.y-e.y)||1;hurt(e.d*(slam?1.25:wide?.95:1.12),(p.x-e.x)/d,(p.y-e.y)/d)}
   }
   function resolveBossPattern(e){
     if(!e.alive)return;sound()?.sfx('bossCast');
     const phase=e.bossPhase||0,pattern=e.bossPattern;
+    if(pattern<3)AF.slashes.push({bossCast:true,kind:pattern,x:e.x,y:e.y,a:e.bossAim,r:90+phase*12,color:e.profile?.color||'#beaedc',tier:e.tier,l:34,max:34});
     if(pattern===3||pattern===5||pattern===6){bossStrike(e,pattern===5,pattern===6)}else if(pattern===4){e.bossRush=18+(e.bossPhase||0)*3;e.attackPose=24}else if(pattern===0){
       const shots=3+phase*2,spread=.13,speed=5.2+phase*.45,dmg=e.d*(.56+phase*.06);
       for(let i=0;i<shots;i++){

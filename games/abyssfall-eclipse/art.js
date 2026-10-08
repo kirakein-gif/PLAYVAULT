@@ -10,7 +10,7 @@
     const im=new Image();art.images[key]=im;
     im.onload=()=>{art.loaded[key]=true;if(key==='relics')relicIcons(im);resolve(true)};
     im.onerror=()=>{art.loaded[key]=false;resolve(false)};
-    im.src=path+'?v=47';
+    im.src=path+'?v=48';
   })));
   function relicIcons(im){
     art.relicIcons={};
@@ -174,5 +174,26 @@
     if(!spec||!art.loaded[spec[0]])return null;
     return walkFrames[spec[0]][spec[1]][Math.floor((e.walkCycle||0)*6)%6];
   };
-  art.draw=(ctx,key,f,scale,ground)=>ctx.drawImage(art.images[key],f.x,f.y,f.w,f.h,-f.pivot*scale,ground-f.foot*scale,f.w*scale,f.h*scale);
+  function isolateWalk(f){
+    const c=document.createElement('canvas');c.width=f.w;c.height=f.h;const cc=c.getContext('2d');
+    cc.drawImage(art.images[f.image],f.x,f.y,f.w,f.h,0,0,f.w,f.h);
+    const pixels=cc.getImageData?.(0,0,c.width,c.height);if(!pixels?.data)return;
+    const data=pixels.data,w=c.width,h=c.height,n=w*h,labels=new Int32Array(n),queue=new Int32Array(n),sizes=[0];let label=0;
+    // Connected silhouettes separate an actor from a neighboring weapon tip or cloak.
+    for(let i=0;i<n;i++)if(!labels[i]&&data[i*4+3]>80){
+      label++;let head=0,tail=1;queue[0]=i;labels[i]=label;
+      while(head<tail){const p=queue[head++],x=p%w,y=(p/w)|0;
+        for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const xx=x+dx,yy=y+dy,q=yy*w+xx;if(xx>=0&&xx<w&&yy>=0&&yy<h&&!labels[q]&&data[q*4+3]>80){labels[q]=label;queue[tail++]=q}}
+      }sizes[label]=tail;
+    }
+    let main=1;for(let i=2;i<sizes.length;i++)if(sizes[i]>sizes[main])main=i;
+    const keep=new Uint8Array(n),horizontal=new Uint8Array(n);
+    // Two sliding windows preserve soft edges without a costly per-pixel square scan.
+    for(let y=0;y<h;y++){let count=0;for(let x=-3;x<w;x++){if(x+3<w&&labels[y*w+x+3]===main)count++;if(x-4>=0&&labels[y*w+x-4]===main)count--;if(x>=0)horizontal[y*w+x]=count>0?1:0}}
+    for(let x=0;x<w;x++){let count=0;for(let y=-3;y<h;y++){if(y+3<h)count+=horizontal[(y+3)*w+x];if(y-4>=0)count-=horizontal[(y-4)*w+x];if(y>=0)keep[y*w+x]=count>0?1:0}}
+    for(let i=0;i<n;i++){if(!keep[i])data[i*4+3]=0;else {const edge=Math.min(i%w,w-1-i%w);data[i*4+3]*=Math.min(1,edge/4)}}
+    cc.putImageData(pixels,0,0);f.surface=c;
+  }
+  art.ready.then(()=>{for(const rows of Object.values(walkFrames))for(const poses of rows)for(const f of poses)if(art.loaded[f.image])isolateWalk(f)});
+  art.draw=(ctx,key,f,scale,ground)=>ctx.drawImage(f.surface||art.images[key],f.surface?0:f.x,f.surface?0:f.y,f.w,f.h,-f.pivot*scale,ground-f.foot*scale,f.w*scale,f.h*scale);
 })();
