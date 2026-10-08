@@ -22,7 +22,8 @@ The first suite exercises 12 floors, hidden-altars, boss defeat/stairs/clear, co
 
 ## Games
 
-- **ABYSSFALL: ECLIPSE** — Dawn Seeker / Night Veil 듀얼 주인공 룸 서바이버
+- **ABYSSFALL: ECLIPSE** — Ethan / Noah 듀얼 주인공 룸 서바이버
+- **THE HOLLOW KEEP** — Ethan / Noah 듀얼 주인공 횡스크롤 미궁 액션 어드벤처 (Chapter I prototype)
 
 ## Shared protagonists
 
@@ -178,3 +179,38 @@ ABYSSFALL: ECLIPSE의 각 층은 다음 방 유형을 사용합니다.
 - XP drops are translucent wisps with trailing smoke and a short absorption motion toward the player's torso. XP values, attraction radius, collection radius and reward progression are preserved; absorption tails expire and clear across room/floor/run transitions.
 - The recovery well renders the same basin sampling rectangle, destination position, width and height before/after use. Only a translucent water overlay changes, eliminating silhouette/placement jumps between separate artwork.
 - Extended regression checks cover exact well geometry, soul attraction/XP gain/absorption cleanup and silent audio failure. Full 12-floor PC/mobile progression checks remain passing.
+
+## THE HOLLOW KEEP prototype
+
+- Fixed interconnected 30-room castle layout rather than a procedural dungeon.
+- Direct side-scrolling combat with separate Ethan/Noah HP, jump/attack/swap/interact controls, and mobile touch buttons.
+- Ethan activates an old light mechanism; Noah operates a high lever. Those changes alter the central hall without quest markers.
+- Includes an elevator route, underground crypt, hidden breakable walls, rest/checkpoint statues, visited-room map, first Gate Keeper boss, bell event, shortcut, and Chapter I return-to-hub ending.
+- Environmental text is sparse and optional; progression is communicated through sound and changes in the castle rather than explicit objectives.
+
+### HOLLOW KEEP movement pass v4
+
+- Ethan now accelerates more deliberately, jumps lower, carries slightly more momentum, and has a heavier landing response.
+- Noah accelerates faster, jumps higher, stops more sharply, and gains a short forward lunge on her slash.
+- Added coyote time, jump buffering and variable jump height for more forgiving keyboard/mobile platforming.
+- Character swapping has a short cooldown, a restrained color-ring transition, and preserves movement without teleport-like snapping.
+- Ethan's rune shot now has a small muzzle flash/recoil; Noah's slash has stronger forward commitment. Landing and takeoff dust remain subtle.
+
+### HOLLOW KEEP combat pass v5
+
+- Ethan rune shots now stagger and push ordinary enemies with a clearer muzzle/hit response.
+- Noah has a direct three-step slash chain with increasing reach, commitment and knockback on the third hit.
+- Early enemies no longer rely on constant contact damage: crawler, guard, bat and priest attacks now use readable wind-up -> attack -> recovery cycles.
+- Added restrained attack telegraphs, enemy hit flash, knockback/stun, impact rings and death bursts while preserving the existing movement values from v4.
+
+### HOLLOW KEEP attack animation pass v6
+
+- Noah's three-hit chain now uses visibly different body/arm/blade poses: horizontal cut, reverse diagonal cut, and an overhead heavy finisher.
+- Ethan's rune shot now has a dedicated casting/recoil pose rather than relying on projectile VFX alone.
+- Attack rendering tracks the actual lock duration of each strike so the character pose progresses through the full swing.
+
+### HOLLOW KEEP finisher rhythm v7
+
+- Noah's third slash now clearly ends the chain instead of flowing directly into another first hit.
+- The finisher has a short post-swing recovery window; attacks are locked briefly and movement is reduced rather than fully frozen.
+- A low blade-recovery pose remains visible after the third strike so the combo has a readable ending beat.
