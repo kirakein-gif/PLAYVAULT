@@ -47,3 +47,15 @@ body{background:radial-gradient(circle at 50% 10%,#272435,#08090f 52%,#040508)}
   .startCard>.duo{grid-area:duo;margin:0;width:100%;gap:8px}
   .heroSketch{height:min(190px,48vh);padding-top:min(138px,35vh)}
 }
+
+@media (pointer:coarse) and (orientation:portrait){
+  #rotateNotice{display:flex!important;z-index:9999;background:#07080d}
+  #game{visibility:hidden}
+  #mobileControls,#hud,.mapPanel,#toast{visibility:hidden!important;pointer-events:none!important}
+  .overlay:not(#rotateNotice){visibility:hidden!important;pointer-events:none!important}
+}
+@media (pointer:coarse) and (orientation:landscape){
+  #rotateNotice{display:none!important}
+  #game{visibility:visible}
+  #mobileControls,#hud,#toast{visibility:visible}
+}
