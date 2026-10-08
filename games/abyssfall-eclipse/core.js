@@ -42,7 +42,7 @@
   AF.keys={}; AF.joy={x:0,y:0,active:false,id:null};
   const dirs={N:[0,-1],S:[0,1],E:[1,0],W:[-1,0]}, opp={N:'S',S:'N',E:'W',W:'E'}, key=(x,y)=>`${x},${y}`;
   AF.dirs=dirs;
-  AF.stageNames=['버려진 성당','침묵의 묘지','무너진 탑','심연의 제단'];
+  AF.stageNames=['버려진 성당','침묵의 묘지','무너진 탑','심연의 제단','얼어붙은 회랑','지하 용광로','부패한 저수로','심층 균열'];
   AF.zoneIndex=(floor=AF.floor)=>Math.floor((floor-1)/3)%AF.stageNames.length;
   AF.stageName=()=>AF.stageNames[AF.zoneIndex()];
   AF.isBossFloor=(floor=AF.floor)=>floor%3===0;
@@ -138,7 +138,7 @@
     const treasureCount=AF.floor>=8?2:1,recoveryCount=AF.floor>=10?2:1;
     for(let i=0;i<treasureCount&&entries[pos];i++,pos++){const r=entries[pos][1];r.type='treasure';r.clear=true;r.spawned=true}
     for(let i=0;i<recoveryCount&&entries[pos];i++,pos++){const r=entries[pos][1];r.type='recovery';r.clear=true;r.spawned=true}
-    const eliteGoal=AF.floor<=3?1:AF.floor<=6?2:AF.floor<=9?3:4;
+    const eliteGoal=AF.floor<=3?1:AF.floor<=6?2:AF.floor<=9?3:Math.min(7,4+Math.floor((AF.floor-10)/4));
     const eliteCount=Math.min(eliteGoal,Math.max(0,entries.length-pos));
     for(let i=0;i<eliteCount;i++,pos++){const r=entries[pos]?.[1];if(r)r.type='elite'}
   }
@@ -151,7 +151,7 @@
     AF.objectiveRoom=best;AF.objectiveDistance=D[best]||0;AF.bossUnlocked=!boss;AF.lockedDoorAt=0;
 
     if(boss){
-      const need=AF.floor===3?2:AF.floor===6?3:AF.floor===9?3:4;
+      const need=AF.floor===3?2:AF.floor===6?3:AF.floor===9?3:AF.floor>=21?5:4;
       const candidates=Object.entries(AF.rooms)
         .filter(([k,r])=>k!=='0,0'&&k!==best&&(r.type==='combat'||r.type==='elite'))
         .sort((a,b)=>(D[b[0]]||0)-(D[a[0]]||0));
@@ -212,6 +212,58 @@
   };
   AF.fogCount=r=>Math.max(1,Math.min(4,r?.fogCount||2));
   const activeStageRoom=r=>r&&!r.clear&&!(AF.bossClearUntil&&performance.now()<AF.bossClearUntil)&&(r.type==='combat'||r.type==='elite'||r.type==='exit'||r.type==='boss');
+  // One geometry source drives both painted terrain and floor contact.
+  AF.activeStageRoom=activeStageRoom;
+  AF.fieldPatches=r=>{
+    if(!r||AF.zoneIndex()<4)return [];
+    if(r.fieldPatches)return r.fieldPatches;
+    const zone=AF.zoneIndex(),kinds=zone===4?['ice','ice','ice']:zone===5?['lava','lava','lava']:zone===6?['poison','poison','poison']:['ice','lava','poison','lava'];
+    return r.fieldPatches=kinds.map((kind,i)=>{
+      const x=arena.x+arena.w*(.24+(i%2)*.48)+(roomRand(r,130+i)-.5)*arena.w*.13;
+      const y=arena.y+arena.h*(.30+Math.floor(i/2)*.38)+(roomRand(r,140+i)-.5)*arena.h*.08;
+      const radius=(kind==='ice'?77:kind==='poison'?60:13)+(roomRand(r,150+i)*(kind==='lava'?9:14));
+      const points=Array.from({length:7},(_,j)=>({x:x+(j-3)*24,y:y+Math.sin(j*.8+i)*8}));
+      const banks=[];
+      if(kind==='lava')for(const side of [-1,1]){
+        const edge=side<0?points:[...points].reverse();
+        for(let j=0;j<edge.length-1;j++)for(let k=0;k<=4;k++){
+          const p=edge[j],q=edge[j+1],t=k/4,width=radius*(.95+roomRand(r,180+i*60+j*5+k+side)*.18);
+          banks.push({x:p.x+(q.x-p.x)*t,y:p.y+(q.y-p.y)*t+side*width});
+        }
+      }
+      return{kind,x,y,r:radius,points,banks,phase:i*67};
+    });
+  };
+  AF.fieldContact=(h,p)=>{
+    if(h.kind!=='lava')return Math.hypot((p.x-h.x)/h.r,(p.y-h.y)/(h.r*.66))<1;
+    let inside=false;
+    for(let i=0,j=h.banks.length-1;i<h.banks.length;j=i++){
+      const a=h.banks[i],b=h.banks[j];
+      if((a.y>p.y)!==(b.y>p.y)&&p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)inside=!inside;
+    }
+    return inside;
+  };
+  AF.fieldState=(r,h)=>{
+    if(!activeStageRoom(r))return 'inactive';
+    const age=r.fieldAge||0;if(h.kind==='ice')return 'active';
+    if(age<90)return 'warning';
+    if(h.kind==='poison')return 'active';
+    const t=(age-90+h.phase)%300;return t<95?'cool':t<155?'warning':'active';
+  };
+  function fieldMovement(r,p,vx,vy,m,dt){
+    const patches=activeStageRoom(r)?AF.fieldPatches(r):[],ice=patches.some(h=>h.kind==='ice'&&AF.fieldContact(h,p));
+    const slow=patches.some(h=>h.kind==='poison'&&AF.fieldState(r,h)==='active'&&AF.fieldContact(h,p))?.78:1;
+    const speed=p.speed*stageMoveScale(r,p)*slow;
+    if(m){vx/=m;vy/=m;if(Math.abs(vx)>.15)p.faceX=vx;p.faceY=vy}
+    if(ice){
+      const blend=1-Math.exp(-(m?.095:.027)*dt);
+      p.slideX=(p.slideX||0)+(vx*speed-(p.slideX||0))*blend;
+      p.slideY=(p.slideY||0)+(vy*speed-(p.slideY||0))*blend;
+    }else{p.slideX=m?vx*speed:0;p.slideY=m?vy*speed:0}
+    p.x+=p.slideX*dt;p.y+=p.slideY*dt;
+    p.moving=Math.hypot(p.slideX,p.slideY)>.12;
+    if(p.moving)p.step+=dt*.13*(Math.hypot(p.slideX,p.slideY)/3.15);
+  }
   function stageMoveScale(r,p){
     if(!activeStageRoom(r)||AF.zoneIndex()!==1)return 1;
     let scale=1;
@@ -225,6 +277,11 @@
     if(!r)return;
     const idx=AF.zoneIndex(),p=AF.player;
     if(!activeStageRoom(r)){r.windWarn=0;r.windActive=0;return}
+    if(idx>=4){
+      r.fieldAge=(r.fieldAge||0)+dt;
+      const danger=AF.fieldPatches(r).find(h=>h.kind!=='ice'&&AF.fieldState(r,h)==='active'&&AF.fieldContact(h,p));
+      if(danger&&p.inv<=0)hurt((danger.kind==='lava'?10:6)+Math.max(0,AF.floor-12)*.65,0,0);
+    }
     if(idx===0){
       const z=AF.stageZone(r,'holy');
       if(Math.hypot(p.x-z.x,p.y-z.y)<z.r){
@@ -252,7 +309,7 @@
           r.gimmickTimer=85+Math.random()*210-(r.type==='boss'?25:0);
         }
       }
-    }else if(idx===3){
+    }else if(idx===3||idx===7){
       r.gimmickTimer-=dt;
       if(r.gimmickTimer<=0){
         const count=1+(Math.random()<(r.type==='boss'?.78:.42)?1:0)+(r.type==='boss'&&Math.random()<.42?1:0);
@@ -279,27 +336,34 @@
     }
   }
   AF.stageTip=()=>{
-    const tips=['바닥 어딘가에 희미한 빛이 남아 있다.','안개가 짙다.','바람 소리가 가까워졌다.','바닥 아래에서 불길한 진동이 느껴진다.'];
+    const tips=['바닥 어딘가에 희미한 빛이 남아 있다.','안개가 짙다.','바람 소리가 가까워졌다.','바닥 아래에서 불길한 진동이 느껴진다.','얼음 위에서는 멈춰도 몸이 미끄러진다.','균열이 붉게 달아오르면 발을 떼어야 한다.','고인 독물이 발걸음을 붙잡는다.','얼음과 독물 사이로 균열이 솟구친다.'];
     return tips[AF.zoneIndex()];
   };
   function enemy(x,y,type){
     const f=Math.max(0,AF.floor-1);
-    const normalHp=1+f*.32+f*f*.018,normalDmg=1+f*.12+f*f*.005;
+    const deep=Math.max(0,AF.floor-12),pressure=1+deep*.035;
+    const normalHp=(1+f*.32+f*f*.018)*(1+deep*.025),normalDmg=(1+f*.12+f*f*.005)*(1+deep*.018);
     const bossHp=1+f*.35+f*f*.020,bossDmg=1+f*.10+f*f*.006;
     const defs={crawler:{r:17,hp:42,s:1.25,d:9},shooter:{r:16,hp:36,s:.88,d:8},brute:{r:24,hp:92,s:.64,d:15},boss:{r:39,hp:1100,s:.78,d:18}},q=defs[type];
     const hpScale=type==='boss'?bossHp:normalHp,dmgScale=type==='boss'?bossDmg:normalDmg;
-    return{x,y,type,r:q.r,hp:q.hp*hpScale,max:q.hp*hpScale,s:q.s,d:q.d*dmgScale,fire:40+Math.random()*80,alive:true,flash:0,phase:Math.random()*6.28,attackPose:0,hurtPose:0,deadAt:0,moving:false,faceX:-1,aiCd:45+Math.random()*55,aiWindup:0,dash:0,charge:0,stun:0,aimX:0,aimY:0,shotAngle:0,bossCd:85,bossTelegraph:0,bossTelegraphMax:0,bossPattern:-1,bossAim:0,bossPhase:0,phaseAnnounced:0,bossAction:'추적 중',intro:0,introMax:0}
+    return{x,y,type,r:q.r,hp:q.hp*hpScale,max:q.hp*hpScale,s:q.s*pressure,d:q.d*dmgScale,pressure,tier:AF.zoneIndex(),fire:(40+Math.random()*80)/pressure,alive:true,flash:0,phase:Math.random()*6.28,attackPose:0,hurtPose:0,deadAt:0,moving:false,faceX:-1,aiCd:45+Math.random()*55,aiWindup:0,dash:0,charge:0,stun:0,aimX:0,aimY:0,shotAngle:0,bossCd:85,bossTelegraph:0,bossTelegraphMax:0,bossPattern:-1,bossAim:0,bossPhase:0,phaseAnnounced:0,bossAction:'추적 중',intro:0,introMax:0}
   }
   function spawnRoom(r){
     if(r.spawned||r.clear)return;
     r.spawned=true;
     if(r.type==='boss'||r.boss){const b=enemy(W/2,arena.y+155,'boss');b.intro=b.introMax=118;b.bossCd=48;b.bossAction='출현 중';r.enemies=[b];return}
     const elite=r.type==='elite';
-    const n=(elite?3:3+(Math.random()*3|0))+Math.min(elite?2:3,(AF.floor-1)/2|0);
+    const n=Math.min(12,Math.floor(Math.max(0,AF.floor-12)/3)+(elite?3:3+(Math.random()*3|0))+Math.min(elite?2:3,(AF.floor-1)/2|0));
     for(let i=0;i<n;i++){
-      const z=Math.random(),type=elite?(z<.28?'shooter':z<.68?'brute':'crawler'):(z<.18?'shooter':z<.34?'brute':'crawler');
+      const z=Math.random(),type=elite?(z<.28?'shooter':z<.68?'brute':'crawler'):(z<.18+Math.min(.12,Math.max(0,AF.floor-12)*.01)?'shooter':z<.34+Math.min(.20,Math.max(0,AF.floor-12)*.017)?'brute':'crawler');
       let x=arena.x+80+Math.random()*(arena.w-160),y=arena.y+75+Math.random()*(arena.h-150);
-      if(Math.hypot(x-AF.player.x,y-AF.player.y)<150){x=arena.x+80;y=arena.y+80}
+      for(let retry=0;retry<18&&(Math.hypot(x-AF.player.x,y-AF.player.y)<150||r.enemies.some(e=>Math.hypot(e.x-x,e.y-y)<44));retry++){
+        x=arena.x+60+Math.random()*(arena.w-120);y=arena.y+60+Math.random()*(arena.h-120);
+      }
+      if(Math.hypot(x-AF.player.x,y-AF.player.y)<150){
+        const spots=[[.18,.20],[.82,.20],[.18,.80],[.82,.80]].map(([xx,yy])=>({x:arena.x+arena.w*xx,y:arena.y+arena.h*yy}));
+        spots.sort((a,b)=>Math.hypot(b.x-AF.player.x,b.y-AF.player.y)-Math.hypot(a.x-AF.player.x,a.y-AF.player.y));({x,y}=spots[0]);
+      }
       const e=enemy(x,y,type);
       if(elite){e.elite=true;const z=2.0+Math.min(.48,AF.floor*.04);e.hp*=z;e.max=e.hp;e.d*=1.42+Math.min(.20,AF.floor*.015);e.s*=1.08;e.r*=1.10}
       r.enemies.push(e);
@@ -346,7 +410,7 @@
     for(let i=0;i<6;i++)AF.particles.push({x:e.x,y:e.y,vx:(Math.random()-.5)*3.5,vy:(Math.random()-.5)*3.5,l:18,color:p.hero.color});
     if(e.hp<=0){
       e.hp=0;e.alive=false;e.deadAt=performance.now();AF.kills++;sound()?.sfx(e.type==='boss'?'bossDefeat':'enemyDeath');
-      AF.pickups.push({x:e.x,y:e.y,vx:(Math.random()-.5)*1.8,vy:(Math.random()-.5)*1.8,val:e.type==='boss'?20:e.type==='brute'?5:3});
+      AF.pickups.push({x:e.x,y:e.y,vx:(Math.random()-.5)*1.8,vy:(Math.random()-.5)*1.8,val:Math.round((e.type==='boss'?20:e.type==='brute'?5:3)*(1+Math.max(0,AF.floor-12)*.10))});
       const fang=p.hero.key==='night'?relicCount('eclipse-fang'):0;
       if(fang){
         const targets=AF.cur().enemies.filter(x=>x.alive&&x!==e).sort((a,b)=>Math.hypot(a.x-e.x,a.y-e.y)-Math.hypot(b.x-e.x,b.y-e.y));
@@ -429,7 +493,7 @@
   };
   const seg=(x1,y1,x2,y2,cx,cy,r)=>{const dx=x2-x1,dy=y2-y1,l=dx*dx+dy*dy;if(!l)return Math.hypot(cx-x1,cy-y1)<r;let t=((cx-x1)*dx+(cy-y1)*dy)/l;t=Math.max(0,Math.min(1,t));return Math.hypot(cx-(x1+t*dx),cy-(y1+t*dy))<r};
 
-  function gainXp(n){const p=AF.player;p.xp+=n;if(p.xp>=p.nextXp){p.xp-=p.nextXp;p.level++;p.nextXp=Math.floor(p.nextXp*1.32);upgrade()}}
+  function gainXp(n){const p=AF.player;p.xp+=n;if(p.xp>=p.nextXp){p.xp-=p.nextXp;p.level++;p.nextXp=Math.floor(p.nextXp*(p.level<=12?1.32:1.14));upgrade()}}
   function chooseReward(opts,title,lead){
     AF.paused=true;
     const titleEl=ui.levelUp.querySelector('h2'),leadEl=ui.levelUp.querySelector('.lead');
@@ -510,7 +574,7 @@
     }else if(r.type==='boss'&&r.bossDefeated&&performance.now()>=(r.portalUnlockAt||0)&&!AF.transitioning){
       r.used=true;AF.transitioning=true;p.inv=Math.max(p.inv,110);sound()?.sfx('stairsDown');
       AF.toast('아래로 이어지는 계단을 내려간다...');
-      if(AF.floor===12&&!AF.endless){
+      if(AF.floor===24&&!AF.endless){
         setTimeout(()=>{
           if(AF.started&&!AF.dead&&AF.cur()===r)AF.finishRun();
           AF.transitioning=false;
@@ -528,7 +592,7 @@
     return m+':'+String(s).padStart(2,'0');
   }
   function saveClearRecord(timeMs){
-    const key='abyssfallRecordsV2',hero=AF.player.hero.key;
+    const key='abyssfallRecords24V1',hero=AF.player.hero.key;
     let all={};try{all=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(_){}
     const prev=all[hero]||{clears:0,bestTime:0,maxKills:0,bestLevel:0};
     const rec={
@@ -556,8 +620,8 @@
   AF.nextFloor=(source='exit')=>{
     AF.paused=false;sound()?.startExplore();AF.transitioning=false;AF.bossClearUntil=0;AF.floor++;
     AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();
-    const healRate=source==='boss'?.30:source==='endless'?.38:.16;
-    AF.player.x=W/2;AF.player.y=arena.y+arena.h/2;
+    const healRate=source==='boss'?(AF.floor>12?.22:.30):source==='endless'?.30:AF.floor>12?.10:.16;
+    AF.player.slideX=AF.player.slideY=0;AF.player.x=W/2;AF.player.y=arena.y+arena.h/2;
     AF.player.hp=Math.min(AF.player.maxHp,AF.player.hp+Math.max(10,Math.round(AF.player.maxHp*healRate)));
     AF.player.inv=45;AF.projectiles=[];AF.pickups=[];AF.slashes=[];AF.soulBursts=[];
     AF.toast(`FLOOR ${AF.floor} · ${AF.stageName()} · ${Object.keys(AF.rooms).length} ROOMS`);
@@ -575,9 +639,10 @@
     }for(let i=0;i<10;i++)AF.particles.push({x:p.x,y:p.y,vx:(Math.random()-.5)*4,vy:(Math.random()-.5)*4,l:22,color:'#ff6478'});if(p.hp<=0&&!AF.dead){p.hp=0;AF.dead=true;AF.paused=true;sound()?.stopMusic();sound()?.sfx('gameOver');p.deathAt=performance.now();ui.resultText.textContent=`${p.hero.ko} · FLOOR ${AF.floor} · Lv ${p.level} · 처치 ${AF.kills}`;setTimeout(()=>{if(AF.dead)ui.gameOver.classList.add('show')},900)}}
   function clamp(){const p=AF.player;p.x=Math.max(arena.x+p.r,Math.min(arena.x+arena.w-p.r,p.x));p.y=Math.max(arena.y+p.r,Math.min(arena.y+arena.h-p.r,p.y))}
   function enter(nk,from){
-    AF.current=nk;const r=AF.cur();r.seen=true;AF.projectiles=[];AF.slashes=[];AF.soulBursts=[];if(!r.clear)spawnRoom(r);
+    AF.player.slideX=AF.player.slideY=0;AF.current=nk;const r=AF.cur();r.seen=true;AF.projectiles=[];AF.slashes=[];AF.soulBursts=[];
     const p=AF.player;if(from==='W'){p.x=arena.x+35;p.y=AF.sideDoorY()}else if(from==='E'){p.x=arena.x+arena.w-35;p.y=AF.sideDoorY()}else if(from==='N'){p.x=W/2;p.y=arena.y+35}else if(from==='S'){p.x=W/2;p.y=arena.y+arena.h-35}
     p.inv=r.type==='boss'?120:35;
+    if(!r.clear)spawnRoom(r);
     const msg={treasure:'보물방 · 중앙의 상자를 찾아보세요',recovery:'회복방 · 중앙의 샘에 다가가세요',elite:'엘리트방 · 강적이 문을 봉쇄했습니다',exit:'아래로 내려가는 길이 이 방 어딘가에 있다',boss:'거대한 문 너머에서 인기척이 느껴진다',combat:'일반전투방'}[r.type]||'새 방 발견';
     if(r.type==='boss'){sound()?.startBoss();sound()?.sfx('bossIntro')}
     AF.toast(msg);
@@ -635,10 +700,10 @@
       }
     }
     e.bossPattern=-1;e.bossTelegraph=0;e.bossAction='추적 중';
-    e.bossCd=Math.max(54,118-phase*16-Math.min(18,(AF.floor-1)*2));
+    e.bossCd=Math.max(44,118-phase*16-Math.min(34,(AF.floor-1)*2));
   }
 
-  AF.update=dt=>{const p=AF.player;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.specialPose>0)p.specialPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}const moveScale=stageMoveScale(AF.cur(),p);let m=Math.hypot(vx,vy);p.moving=m>.04;if(m){vx/=m;vy/=m;p.x+=vx*p.speed*moveScale*dt;p.y+=vy*p.speed*moveScale*dt;if(Math.abs(vx)>.15)p.faceX=vx;p.faceY=vy;p.step+=dt*.13*moveScale*(p.speed/3.15)}
+  AF.update=dt=>{const p=AF.player;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.specialPose>0)p.specialPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}let m=Math.hypot(vx,vy);fieldMovement(AF.cur(),p,vx,vy,m,dt);
     const sigil=relicCount('dash-sigil');
     if(m&&sigil){
       p.sigilCharge=(p.sigilCharge||0)+dt;
@@ -697,7 +762,7 @@
           if(e.aiWindup<=0){e.aiWindup=0;e.dash=11;e.attackPose=18}
         }else{
           e.aiCd-=dt;
-          if(e.aiCd<=0&&dist<225){e.aimX=dx/dist;e.aimY=dy/dist;e.aiWindup=17;e.aiCd=82+Math.random()*34}
+          if(e.aiCd<=0&&dist<225){e.aimX=dx/dist;e.aimY=dy/dist;e.aiWindup=17;e.aiCd=(82+Math.random()*34)/(e.pressure||1)}
           else{e.x+=dx/dist*e.s*dt;e.y+=dy/dist*e.s*dt}
         }
       }else if(e.type==='shooter'){
@@ -706,10 +771,10 @@
           e.aiWindup-=dt;e.moving=false;
           if(e.aiWindup<=0){
             e.aiWindup=0;e.attackPose=18;
-            const a=e.shotAngle,speed=4.15+Math.min(.75,(AF.floor-1)*.08);
+            const a=e.shotAngle,speed=4.15+Math.min(1.65,(AF.floor-1)*.072);
             launch({team:'e',kind:'priestBolt',x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:6,dmg:e.d,life:155,color:'#ff6285'},e,p);
-            if(AF.floor>=3){for(const o of [-.13,.13])launch({team:'e',kind:'priestBolt',x:e.x,y:e.y,vx:Math.cos(a+o)*(speed*.93),vy:Math.sin(a+o)*(speed*.93),r:5,dmg:e.d*.72,life:150,color:'#e86bff'},e,p)}
-            e.fire=88+Math.random()*34;
+            if(AF.floor>=3){for(const o of (AF.floor>=19?[-.28,-.14,.14,.28]:[-.13,.13]))launch({team:'e',kind:'priestBolt',x:e.x,y:e.y,vx:Math.cos(a+o)*(speed*.93),vy:Math.sin(a+o)*(speed*.93),r:5,dmg:e.d*.72,life:150,color:'#e86bff'},e,p)}
+            e.fire=(88+Math.random()*34)/(e.pressure||1);
           }
         }else{
           if(dist>225){e.x+=dx/dist*e.s*dt;e.y+=dy/dist*e.s*dt}else if(dist<155){e.x-=dx/dist*e.s*dt;e.y-=dy/dist*e.s*dt}
@@ -726,7 +791,7 @@
           if(e.aiWindup<=0){e.aiWindup=0;e.charge=19;e.attackPose=22}
         }else{
           e.aiCd-=dt;
-          if(e.aiCd<=0&&dist<345&&dist>72){e.aimX=dx/dist;e.aimY=dy/dist;e.aiWindup=35;e.aiCd=128+Math.random()*46}
+          if(e.aiCd<=0&&dist<345&&dist>72){e.aimX=dx/dist;e.aimY=dy/dist;e.aiWindup=35;e.aiCd=(128+Math.random()*46)/(e.pressure||1)}
           else{e.x+=dx/dist*e.s*.88*dt;e.y+=dy/dist*e.s*.88*dt}
         }
       }

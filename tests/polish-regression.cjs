@@ -61,7 +61,7 @@ for(const mobile of [false,true])for(const d of ['N','S','W','E']){
 {
  const h=harness(),art=h.env.AF_ART;assert.equal(Object.keys(art.relicIcons).length,12);
  for(const [id,[x,y,w,height]] of Object.entries(art.relicFrames)){assert.ok(x>=0&&y>=0&&x+w<=1448&&y+height<=1086,id+' stays in atlas');assert.ok(Math.max(w,height)>=350,id+' retains native detail')}
- for(let zone=0;zone<4;zone++)for(const clear of [false,true]){
+ for(let zone=0;zone<8;zone++)for(const clear of [false,true]){
   const room={doors:{N:true,S:true,W:true,E:true},clear},scene=art.room(zone,room,()=>clear);
   assert.equal(scene.width,916);assert.equal(scene.height,572);assert.equal(art.room(zone,room,()=>clear),scene,'reuse composed scene');
   assert.notEqual(art.room(zone,room,()=>!clear),scene,'door state has distinct scene');
@@ -134,11 +134,11 @@ for(const mobile of [false,true])for(const dpr of [1,2,3]){
  assert.equal(A.W,mobile?720:960);assert.equal(A.H,mobile?900:640);
  assert.equal(A.renderScaleX,A.canvas.width/A.W);assert.ok(A.canvas.width<=Math.round((mobile?390:1440)*2));
  assert.equal(A.ctx.imageSmoothingEnabled,false);
- for(let floor=1;floor<=12;floor++){
+ for(let floor=1;floor<=24;floor++){
   assert.equal(A.floor,floor);assert.equal(A.isBossFloor(),floor%3===0);
   const rooms=Object.values(A.rooms);assert.equal(rooms.length,A.roomTarget());
   if(floor%3===0){
-   assert.equal(rooms.filter(r=>r.sealAltar).length,{3:2,6:3,9:3,12:4}[floor]);
+   assert.equal(rooms.filter(r=>r.sealAltar).length,{3:2,6:3,9:3,12:4,15:4,18:4,21:5,24:5}[floor]);
    const boss=rooms.find(r=>r.type==='boss');assert.ok(boss);
    A.current=`${boss.x},${boss.y}`;A.bossUnlocked=true;A.player.x=A.W/2;A.player.y=A.arena.y+A.arena.h-80;A.player.inv=9999;A.update(1);
    const e=boss.enemies.find(e=>e.type==='boss');assert.ok(e);e.intro=0;
@@ -146,7 +146,7 @@ for(const mobile of [false,true])for(const dpr of [1,2,3]){
    assert.equal(e.alive,false);assert.equal(boss.bossDefeated,true);assert.equal(A.paused,false);assert.equal(A.transitioning,false);
    A.player.x=A.W/2;A.player.y=A.arena.y+A.arena.h/2;
    h.advance(730);assert.equal(A.transitioning,true,'stairs trigger after unlock');h.advance(1000);
-   if(floor===12){assert.equal(A.cleared,true);assert.equal(A.paused,true)}else assert.equal(A.floor,floor+1);
+   if(floor===24){assert.equal(A.cleared,true);assert.equal(A.paused,true)}else assert.equal(A.floor,floor+1);
   }else A.nextFloor();
  }
  A.newRun();A.player.inv=9999;
@@ -156,5 +156,57 @@ for(const mobile of [false,true])for(const dpr of [1,2,3]){
  for(const hero of ['dawn','night'])for(const [anim,count] of [['idle',4],['run',6],['attack',4],['hurt',2],['death',4]])for(let i=0;i<count;i++){
   const f=h.env.AF_ART.hero(hero,anim,i),width=f.image==='actions'?1254:1536,height=f.image==='actions'?1254:1024;assert.ok(f.x>=0&&f.y>=0&&f.x+f.w<=width&&f.y+f.h<=height);assert.ok(f.foot<=f.h);
  }
- console.log(`PASS ${mobile?'mobile':'desktop'} DPR ${dpr}: 12 floors, seals, boss defeat, stairs, clear, combat rendering, frame bounds`);
+ console.log(`PASS ${mobile?'mobile':'desktop'} DPR ${dpr}: 24 floors, seals, boss defeat, stairs, clear, combat rendering, frame bounds`);
 }
+
+// Actual movement simulation: inertia on ice, braking on stone and room resets.
+for(const mobile of [false,true]){
+ const h=harness(mobile),{A}=h;A.newRun();while(A.floor<13)A.nextFloor();
+ const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);r.enemies.forEach(e=>{e.s=0;e.stun=999999;e.x=A.arena.x+30;e.y=A.arena.y+30});
+ const ice=A.fieldPatches(r)[0],p=A.player;p.basic=9999;p.x=ice.x-35;p.y=ice.y;p.inv=9999;
+ A.keys.d=true;for(let i=0;i<12;i++)A.update(1);A.keys.d=false;const before=p.x;
+ A.update(1);assert.ok(p.x>before+1,'released movement retains ice momentum');
+ const speed=p.slideX;A.keys.a=true;A.update(1);assert.ok(p.slideX<speed,'counter-steering brakes');A.keys.a=false;
+ p.x=A.W/2;p.y=A.arena.y+20;A.update(1);assert.equal(p.slideX,0,'dry stone stops inertia');
+ p.slideX=3;A.nextFloor();assert.equal(p.slideX,0,'floor transfer resets velocity');
+}
+console.log('PASS ice: real inertia, counter-steering, dry braking and floor reset on desktop/touch layouts');
+// Shared contact geometry, warning periods, pulse cooldown and repeated damage.
+for(const floor of [16,19,22])for(const mobile of [false,true]){
+ const h=harness(mobile),{A}=h;A.newRun();while(A.floor<floor)A.nextFloor();
+ const room=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${room.x},${room.y}`;A.update(0);room.enemies.forEach(e=>{e.s=0;e.stun=999999;e.x=A.arena.x+30;e.y=A.arena.y+30});
+ const hazard=A.fieldPatches(room).find(x=>x.kind==='lava'||x.kind==='poison'),p=A.player;
+ p.basic=9999;p.hp=p.maxHp=1000;p.inv=0;p.x=hazard.x;p.y=hazard.y;
+ assert.equal(A.fieldState(room,hazard),'warning');const hp=p.hp;A.update(1);assert.equal(p.hp,hp,'initial warning never damages');
+ room.fieldAge=hazard.kind==='lava'?260-hazard.phase:100;A.update(1);assert.ok(p.hp<hp,'standing on active terrain damages');
+ const once=p.hp;for(let i=0;i<10;i++)A.update(1);assert.equal(p.hp,once,'invulnerability prevents frame-rate multiplied damage');
+ room.fieldAge=hazard.kind==='lava'?260-hazard.phase:100;p.inv=0;A.update(1);assert.ok(p.hp<once,'continued contact causes another tick');
+ room.clear=true;p.inv=0;const cleared=p.hp;A.update(1);assert.equal(p.hp,cleared,'cleared room is safe');
+ room.clear=false;p.x=A.W/2;p.y=A.arena.y+20;p.inv=0;const outside=p.hp;A.update(1);assert.equal(p.hp,outside,'door corridor is safe');
+ h.frame();assert.ok(h.draws.length>0,'new regional terrain renders');
+}
+console.log('PASS fields: visible terrain contact, entry warning, damage ticks, cleared-room and passage safety for all new danger zones');
+// Inspect actual spawned populations and live shooter cycles at fixed randomness.
+const samples=[];
+for(const floor of [12,15,18,21,24]){
+ const h=harness(),{A}=h;A.newRun();while(A.floor<floor)A.nextFloor();vm.runInContext('Math.random=()=>.1',h.env);
+ const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.player.inv=99999;A.player.basic=99999;A.update(1);
+ const e=r.enemies.find(e=>e.type==='shooter');assert.ok(e);e.x=A.W/2+190;e.y=A.player.y;e.aiWindup=1;e.shotAngle=0;A.update(1);
+ samples.push({floor,hp:Math.round(e.max),damage:+e.d.toFixed(1),speed:+e.s.toFixed(2),cooldown:+e.fire.toFixed(1),count:r.enemies.length,bolts:A.projectiles.filter(p=>p.team==='e').length});
+}
+for(let i=1;i<samples.length;i++){const a=samples[i-1],b=samples[i];assert.ok(b.hp>a.hp&&b.damage>a.damage&&b.speed>a.speed&&b.cooldown<a.cooldown&&b.count>a.count,'deeper rooms are tougher across several independent axes')}
+assert.equal(samples.at(-1).bolts,5,'deep priest spread expands');console.table(samples);
+{
+ const h=harness(),{A}=h;A.newRun();while(A.floor<24)A.nextFloor();A.endless=true;A.nextFloor('endless');assert.equal(A.floor,25);assert.equal(A.cleared,false);assert.equal(A.zoneIndex(),0);
+}
+console.log('PASS depth: stronger, faster, more frequent and more numerous enemies; expanded spread; endless starts at 25');
+for(const mobile of [false,true])for(const d of ['N','S','E','W']){
+ const h=harness(mobile),{A}=h;A.newRun();while(A.floor<24)A.nextFloor();
+ const [dx,dy]=A.dirs[d],target=`${dx},${dy}`,r=A.cur();r.clear=true;r.doors={[d]:true};
+ A.rooms[target]={x:dx,y:dy,type:'combat',doors:{},clear:false,spawned:false,enemies:[],hazards:[],gimmickTimer:999};
+ A.player.x=d==='W'?A.arena.x+A.player.r:d==='E'?A.arena.x+A.arena.w-A.player.r:A.W/2;
+ A.player.y=d==='N'?A.arena.y+A.player.r:d==='S'?A.arena.y+A.arena.h-A.player.r:A.sideDoorY();
+ A.player.inv=9999;A.update(0);assert.equal(A.current,target);assert.ok(A.cur().enemies.length>=10);
+ assert.ok(A.cur().enemies.every(e=>Math.hypot(e.x-A.player.x,e.y-A.player.y)>=150),'deep crowds spawn away from the actual doorway arrival');
+}
+console.log('PASS deep arrivals: full-size enemy groups remain outside entry safety distance on all four sides and both layouts');

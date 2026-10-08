@@ -1,11 +1,11 @@
 <!doctype html><meta charset="utf-8"><title>Door masonry regression</title>
 <style>body{background:#101116;color:#ddd;font:16px system-ui;margin:24px}section{margin:16px 0}canvas{width:min(45vw,458px);height:auto;margin:8px}b{display:block;color:#a8dbc0}</style>
 <h1>측면 문틀 고정 검증</h1><p id="result">그림을 불러오는 중</p><div id="cases"></div>
-<script src="../games/abyssfall-eclipse/art.js?v=38"></script>
+<script src="../games/abyssfall-eclipse/art.js?v=39"></script>
 <script>
 AF_ART.ready.then(()=>{
  let failures=0;
- for(let zone=0;zone<4;zone++){
+ for(let zone=0;zone<8;zone++){
   const room={doors:{N:false,S:false,W:true,E:true}},open=AF_ART.room(zone,room,()=>true),closed=AF_ART.room(zone,room,()=>false);
   if(!open||!closed){failures++;continue}
   const a=open.getContext('2d').getImageData(0,0,916,572).data,b=closed.getContext('2d').getImageData(0,0,916,572).data;
@@ -16,10 +16,10 @@ AF_ART.ready.then(()=>{
   }
   if(outside||!changed)failures++;
   const section=document.createElement('section'),status=document.createElement('b');
-  status.textContent=(outside===0&&changed?'PASS':'FAIL')+' · '+['성당','묘지','탑','심연'][zone]+' · 문짝 바깥 변경 픽셀 '+outside+' · 문짝 변경 픽셀 '+changed;
+  status.textContent=(outside===0&&changed?'PASS':'FAIL')+' · '+['성당','묘지','탑','심연','얼음','용광로','저수로','균열'][zone]+' · 문짝 바깥 변경 픽셀 '+outside+' · 문짝 변경 픽셀 '+changed;
   section.append(status,closed,open);document.getElementById('cases').append(section);
  }
- for(let zone=0;zone<4;zone++){
+ for(let zone=0;zone<8;zone++){
   let reference=null;
   for(let mask=0;mask<16;mask++){
    const doors=Object.fromEntries(['N','W','E','S'].map((d,i)=>[d,!!(mask&(1<<i))]));
@@ -31,6 +31,6 @@ AF_ART.ready.then(()=>{
   const south=[0,1,2].map(state=>AF_ART.room(zone,{doors:{S:state>0}},()=>state===1).getContext('2d').getImageData(407,475,102,97).data);
   for(const [a,b] of [[0,1],[1,2],[0,2]])if(!south[a].some((v,i)=>v!==south[b][i]))failures++;
  }
- document.getElementById('result').textContent=failures?'FAIL: '+failures+' cases':'PASS: 4개 구역의 16개 통로 배치에서 바닥이 고정되며, 아래 통로의 없음·열림·닫힘이 서로 구분됩니다. 측면 문틀 고정 검사도 통과했습니다.';
+ document.getElementById('result').textContent=failures?'FAIL: '+failures+' cases':'PASS: 8개 구역의 16개 통로 배치에서 바닥이 고정되며, 아래 통로의 없음·열림·닫힘이 서로 구분됩니다. 측면 문틀 고정 검사도 통과했습니다.';
 });
 </script>

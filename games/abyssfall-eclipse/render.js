@@ -7,7 +7,13 @@
     {name:'무너진 탑',outer0:'#1d2240',outer1:'#070812',floor0:'#1a1d31',floor1:'#0d0f19',wall:'#6b657e',door:'#79c7ff',accent:'#a58aff',grid:'rgba(180,180,255,.038)'},
     {name:'심연의 제단',outer0:'#31151d',outer1:'#080609',floor0:'#241218',floor1:'#10090d',wall:'#765960',door:'#e2556f',accent:'#ff536d',grid:'rgba(255,120,140,.035)'}
   ];
-  const zoneIndex=()=>Math.floor((A.floor-1)/3)%THEMES.length;
+  THEMES.push(
+    {...THEMES[0],name:'얼어붙은 회랑',outer0:'#132933',accent:'#9fcfdf'},
+    {...THEMES[1],name:'지하 용광로',outer0:'#30170e',accent:'#eb995a'},
+    {...THEMES[2],name:'부패한 저수로',outer0:'#14251c',accent:'#9cae6e'},
+    {...THEMES[3],name:'심층 균열',outer0:'#23132e',accent:'#b7a1d2'}
+  );
+  const zoneIndex=()=>A.zoneIndex();
   const theme=()=>THEMES[zoneIndex()];
   function hash(n){const x=Math.sin(n*12.9898+78.233)*43758.5453;return x-Math.floor(x)}
   function roomSeed(){const r=A.cur();return (r?.x||0)*97+(r?.y||0)*193+A.floor*389}
@@ -114,6 +120,35 @@
   function stageGimmick(r){
     if(!r||r.clear)return;const idx=zoneIndex(),now=performance.now();
     ctx.save();
+    if(idx>=4&&A.activeStageRoom(r)){
+      for(const h of A.fieldPatches(r)){
+        const state=A.fieldState(r,h),active=state==='active',warn=state==='warning';
+        if(h.kind==='lava'){
+          const line=()=>{ctx.beginPath();h.points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y))};
+          ctx.save();ctx.beginPath();
+          h.banks.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();
+          const bed=ctx.createLinearGradient(h.x,h.y-h.r,h.x,h.y+h.r);bed.addColorStop(0,'#151313');bed.addColorStop(.5,active?'#5d3423':warn?'#402c21':'#211d1d');bed.addColorStop(1,'#171616');ctx.fillStyle=bed;ctx.fill();ctx.clip();
+          const texture=window.AF_ART;
+          if(texture?.loaded.lavaFlow){
+            ctx.filter=active?'brightness(.85) saturate(.80)':warn?'brightness(.42) saturate(.65)':'brightness(.19) saturate(.3)';
+            const im=texture.images.lavaFlow,drift=Math.sin(now/1600+h.phase)*7;
+            ctx.drawImage(im,35+drift,36,im.width-70,im.height-72,h.x-82,h.y-h.r*1.7,164,h.r*3.4);ctx.filter='none';
+          }
+          // Overhanging ash and rock fragments keep the fissure flush with the floor.
+          for(let j=0;j<32;j++){
+            const x=h.x+(hash(j*7+h.phase)-.5)*136,y=h.y+(hash(j*11+h.phase)-.5)*h.r*3,size=1+hash(j+13)*4;
+            ctx.fillStyle=j%3?'#29221c':'#413326';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+size,y-2);ctx.lineTo(x+size*.7,y+size*.6);ctx.lineTo(x-1,y+size*.35);ctx.closePath();ctx.fill();
+          }
+          ctx.restore();
+        }else{
+          ctx.save();ctx.translate(h.x,h.y);ctx.scale(1,.66);
+          const g=ctx.createRadialGradient(0,0,5,0,0,h.r);g.addColorStop(0,h.kind==='ice'?'rgba(139,203,220,.42)':active?'rgba(77,104,39,.64)':'rgba(82,100,55,.24)');g.addColorStop(1,h.kind==='ice'?'rgba(139,203,220,.02)':'rgba(32,43,22,.08)');
+          ctx.beginPath();ctx.arc(0,0,h.r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.strokeStyle=h.kind==='ice'?'rgba(182,221,226,.27)':warn?'rgba(193,166,76,.52)':'rgba(131,153,69,.32)';ctx.lineWidth=1.5;ctx.stroke();
+          for(let j=0;j<7;j++){const x=Math.sin(j*2.4+h.phase)*h.r*.7,y=Math.cos(j*1.4)*h.r*.65;if(h.kind==='ice'){ctx.strokeStyle='rgba(213,234,237,.25)';ctx.beginPath();ctx.moveTo(x-12,y-6);ctx.lineTo(x+8,y+5);ctx.lineTo(x+17,y+3);ctx.stroke()}else{ctx.beginPath();ctx.arc(x,y,2+Math.sin(now/350+j)**2*3,0,Math.PI*2);ctx.stroke()}}
+          ctx.restore();
+        }
+      }
+    }
     if(idx===0&&A.stageZone){
       const z=A.stageZone(r,'holy'),pulse=.5+.5*Math.sin(now/330),g=ctx.createRadialGradient(z.x,z.y,8,z.x,z.y,z.r);
       g.addColorStop(0,`rgba(255,236,164,${.10+.08*pulse})`);g.addColorStop(1,'rgba(255,236,164,0)');ctx.fillStyle=g;ctx.fillRect(z.x-z.r,z.y-z.r,z.r*2,z.r*2);
@@ -152,7 +187,7 @@
         if(active&&i%2===0){ctx.save();ctx.translate(cx+dx*len*.75,cy+dy*len*.75);ctx.rotate(now/950+i);ctx.fillStyle=`rgba(139,129,107,${.25+seed*.25})`;ctx.beginPath();ctx.moveTo(-3,-1);ctx.lineTo(2,-2);ctx.lineTo(3,1);ctx.lineTo(-1,2);ctx.closePath();ctx.fill();ctx.restore()}
       }
       ctx.restore();
-    }else if(idx===3&&r.hazards){
+    }else if((idx===3||idx===7)&&r.hazards){
       for(const h of r.hazards){
         const rad=h.r||68;
         if(!h.hit){
@@ -452,6 +487,7 @@
     else if(boss&&e.intro>0)ctx.globalAlpha=.18+.72*(1-e.intro/(e.introMax||1));
     else if(e.flash>0&&Math.floor(e.flash/2)%2===0)ctx.globalAlpha=.55;
 
+    if(e.tier>=4)ctx.filter=['hue-rotate(-35deg) saturate(.60) brightness(1.25)','sepia(.42) hue-rotate(325deg) saturate(1.4)','hue-rotate(180deg) saturate(.85)','hue-rotate(18deg) saturate(1.3) brightness(1.08)'][e.tier-4];
     if(window.AF_ART?.loaded.enemies){
       const art=window.AF_ART;
       let col=!e.alive?5:e.hurtPose>0?4:e.aiWindup>0||e.bossTelegraph>0?2:e.attackPose>0?3:e.moving?1:0;

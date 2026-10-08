@@ -1,0 +1,27 @@
+[
+  {
+    "asset": "assets/art/floor-ice-v39.webp",
+    "tool": "built-in imagegen",
+    "prompt": "Use case: stylized-concept. Asset: game floor texture for ABYSSFALL, ice deep dungeon. Reference image is ONLY material/detail/style reference; do not reproduce its room walls or sheet layout. Create ONE rectangular seamless overhead floor surface, edge-to-edge frost-covered dark medieval flagstones, pale blue ice glazed across seams, intricate frozen mineral veins. Dark realistic hand-painted pixel-art compatible with the reference's detailed gothic masonry, muted colors, readable understated pattern. Flat orthographic top-down view, evenly sized square slabs, no horizon, no perspective, no walls, doors, creatures, text, logos, props or large bright effects. Actual active hazards will be rendered separately in game. Entire image is usable floor texture. Landscape 3:2."
+  },
+  {
+    "asset": "assets/art/floor-lava-v39.webp",
+    "tool": "built-in imagegen",
+    "prompt": "Use case: stylized-concept. Asset: game floor texture for ABYSSFALL, lava deep dungeon. Reference image is ONLY material/detail/style reference; do not reproduce its room walls or sheet layout. Create ONE rectangular seamless overhead floor surface, edge-to-edge charcoal basalt flagstones, scorched stone, fine dim ember-red cracks, cooled volcanic mineral deposits. Dark realistic hand-painted pixel-art compatible with the reference's detailed gothic masonry, muted colors, readable understated pattern. Flat orthographic top-down view, evenly sized square slabs, no horizon, no perspective, no walls, doors, creatures, text, logos, props or large bright effects. Actual active hazards will be rendered separately in game. Entire image is usable floor texture. Landscape 3:2."
+  },
+  {
+    "asset": "assets/art/floor-sewer-v39.webp",
+    "tool": "built-in imagegen",
+    "prompt": "Use case: stylized-concept. Asset: game floor texture for ABYSSFALL, sewer deep dungeon. Reference image is ONLY material/detail/style reference; do not reproduce its room walls or sheet layout. Create ONE rectangular seamless overhead floor surface, edge-to-edge aged wet slate medieval flagstones, green-black algae seams, tarnished moss and water stains. Dark realistic hand-painted pixel-art compatible with the reference's detailed gothic masonry, muted colors, readable understated pattern. Flat orthographic top-down view, evenly sized square slabs, no horizon, no perspective, no walls, doors, creatures, text, logos, props or large bright effects. Actual active hazards will be rendered separately in game. Entire image is usable floor texture. Landscape 3:2."
+  },
+  {
+    "asset": "assets/art/floor-rift-v39.webp",
+    "tool": "built-in imagegen",
+    "prompt": "Use case: stylized-concept. Asset: game floor texture for ABYSSFALL, rift deep dungeon. Reference image is ONLY material/detail/style reference; do not reproduce its room walls or sheet layout. Create ONE rectangular seamless overhead floor surface, edge-to-edge fractured near-black obsidian medieval flagstones, tiny violet mineral veins, ancient eroded geometric stone inlays. Dark realistic hand-painted pixel-art compatible with the reference's detailed gothic masonry, muted colors, readable understated pattern. Flat orthographic top-down view, evenly sized square slabs, no horizon, no perspective, no walls, doors, creatures, text, logos, props or large bright effects. Actual active hazards will be rendered separately in game. Entire image is usable floor texture. Landscape 3:2."
+  },
+  {
+    "asset": "assets/art/lava-flow-v39.webp",
+    "tool": "built-in imagegen",
+    "prompt": "Use case: stylized-concept. Asset: seamless molten lava SURFACE material for a dark gothic dungeon game, flat orthographic overhead texture filling the whole image. Dense real-looking dark cooling basalt crust plates interlocking with meandering branching orange-red molten rock flowing between them, scattered subtle pale amber hotspots, detailed irregular craggy edges and fine ash. Muted charcoal and rusty orange, dark medieval painterly pixel-art-compatible material, high detail. No room, walls, creatures, perspective, horizon, text, symbols, outlines or stylized zigzag lines. Not a diagram. Entire rectangular image is usable molten rock texture with natural irregular organic channels. Landscape 3:2."
+  }
+]

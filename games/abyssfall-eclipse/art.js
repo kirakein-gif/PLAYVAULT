@@ -1,13 +1,14 @@
 (() => {
   'use strict';
   const art=window.AF_ART={images:{},loaded:{}};
-  const paths={heroes:'../../assets/art/heroes-v4.webp',actions:'../../assets/art/actions-v4.webp',enemies:'../../assets/art/enemies-v2.webp',props:'../../assets/art/props-v1.webp',relics:'../../assets/art/relics-v5.webp'};
+  const paths={heroes:'../../assets/art/heroes-v4.webp',actions:'../../assets/art/actions-v4.webp',enemies:'../../assets/art/enemies-v2.webp',props:'../../assets/art/props-v1.webp',relics:'../../assets/art/relics-v5.webp',lavaFlow:'../../assets/art/lava-flow-v39.webp'};
   for(const zone of ['cathedral','graveyard','tower','abyss'])paths[zone]='../../assets/art/room-'+zone+'-v5.webp';
+  for(const zone of ['ice','lava','sewer','rift'])paths[zone]='../../assets/art/floor-'+zone+'-v39.webp';
   art.ready=Promise.all(Object.entries(paths).map(([key,path])=>new Promise(resolve=>{
     const im=new Image();art.images[key]=im;
     im.onload=()=>{art.loaded[key]=true;if(key==='relics')relicIcons(im);resolve(true)};
     im.onerror=()=>{art.loaded[key]=false;resolve(false)};
-    im.src=path+'?v=38';
+    im.src=path+'?v=39';
   })));
   function relicIcons(im){
     art.relicIcons={};
@@ -27,8 +28,10 @@
   }
   // Cache complete rooms. Door patches share the background's camera and stonework.
   const rows=[[0,544,1115,1717],[0,572,1144,1717],[0,530,1070,1642],[0,572,1144,1717]],scenes=new Map(),panels=new Map();
+  art.ready.then(()=>scenes.clear());
   const floorEdges=[[[.28,.82],[.32,.82],[.32,.79]],[[.32,.79],[.32,.79],[.32,.79]],[[.25,.80],[.29,.81],[.28,.77]],[[.28,.74],[.28,.76],[.28,.75]]];
   const zones=['cathedral','graveyard','tower','abyss'];
+  art.baseZone=zone=>zone<4?zone:[0,0,0,3][zone-4];
   const patches={N:[.39,0,.22,.28],W:[0,.24,.10,.43],E:[.90,.24,.10,.43],S:[.40,.82,.20,.18]};
   function alignedPanel(zone,panel){
     const key=zone+':'+panel;if(panels.has(key))return panels.get(key);
@@ -45,6 +48,7 @@
     return 572*(u<start?u/start*.28:u<end?.28+(u-start)/(end-start)*.54:.82+(u-end)/(1-end)*.18);
   }
   art.sideAperture=(zone,d)=>{
+    zone=art.baseZone(zone);
     const [x,y,w,h]=sideApertures[zone][d];return{x,y:panelY(zone,y),w,h:panelY(zone,y+h)-panelY(zone,y)};
   };
   function sideLeaf(cc,zone,d){
@@ -73,8 +77,8 @@
     cc.restore();
   }
   art.room=(zone,room,isOpen)=>{
-    const key=zones[zone];if(!art.loaded[key])return null;
-    const states=['N','W','E','S'].map(d=>!room.doors[d]?0:isOpen(d,room)?1:2),cache=zone+':'+states.join('');
+    const region=zone;zone=art.baseZone(zone);const key=zones[zone];if(!art.loaded[key])return null;
+    const states=['N','W','E','S'].map(d=>!room.doors[d]?0:isOpen(d,room)?1:2),cache=region+':'+states.join('');
     if(scenes.has(cache))return scenes.get(cache);
     const c=document.createElement('canvas');c.width=916;c.height=572;
     const cc=c.getContext('2d');cc.drawImage(alignedPanel(zone,1),0,0);
@@ -102,7 +106,24 @@
       // Repeat neighboring intact masonry instead of the atlas's ambiguous central steps.
       cc.drawImage(alignedPanel(zone,0),250,469,122,103,397,469,122,103);
     }else if(states[3]===1)southPassage(cc,zone);
-    if(scenes.size>=12)scenes.delete(scenes.keys().next().value);
+    if(region>=4){
+      // Tint the entire fixed masonry, so door leaves and jambs retain one palette.
+      const filters=['saturate(.65) hue-rotate(165deg) brightness(.87)','sepia(.28) saturate(1.15) brightness(.81)','saturate(.65) hue-rotate(60deg) brightness(.80)','saturate(.65) hue-rotate(250deg) brightness(.74)'];
+      const copy=document.createElement('canvas');copy.width=c.width;copy.height=c.height;copy.getContext('2d').drawImage(c,0,0);
+      cc.filter=filters[region-4];cc.drawImage(copy,0,0);cc.filter='none';
+      const texture=['ice','lava','sewer','rift'][region-4];
+      if(art.loaded[texture]){
+        cc.save();cc.beginPath();cc.rect(.10*c.width,.28*c.height,.80*c.width,.54*c.height);cc.clip();
+        // Texture rows widen toward the camera. Fixed across every door configuration.
+        const im=art.images[texture],height=.54*c.height;
+        for(let row=0;row<Math.ceil(height);row++){
+          const t=row/height,zoom=.72+t*.28,sw=im.width*zoom;
+          cc.drawImage(im,(im.width-sw)/2,t*im.height,sw,im.height/height, .10*c.width,.28*c.height+row,.80*c.width,1.2);
+        }
+        const shade=cc.createLinearGradient(0,.28*c.height,0,.82*c.height);shade.addColorStop(0,'rgba(4,8,12,.48)');shade.addColorStop(.35,'rgba(4,8,12,.04)');shade.addColorStop(1,'rgba(4,8,12,.24)');cc.fillStyle=shade;cc.fillRect(.10*c.width,.28*c.height,.80*c.width,height);cc.restore();
+      }
+    }
+    if(scenes.size>=24)scenes.delete(scenes.keys().next().value);
     scenes.set(cache,c);return c;
   };
   // Authored sampling rectangles: the generated sheet does not use uniform rows.
