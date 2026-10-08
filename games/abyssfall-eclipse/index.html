@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#090b14"><title>ABYSSFALL: ECLIPSE · PLAYVAULT</title><link rel="stylesheet" href="game.css?v=42"></head><body>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#090b14"><title>ABYSSFALL: ECLIPSE · PLAYVAULT</title><link rel="stylesheet" href="game.css?v=43"></head><body>
 <main id="shell">
     <canvas id="game" aria-label="ABYSSFALL ECLIPSE 게임 화면"></canvas>
 
@@ -34,11 +34,11 @@
         <p class="lead">빛과 그림자. 같은 심연을 향하는 두 명의 유물 사냥꾼.</p>
         <div class="heroChoices">
           <button class="heroCard dawn selected" data-hero="dawn" type="button">
-            <div class="portrait"><img id="dawnPortrait" alt="Ethan"></div>
+            <div class="portrait"><img id="dawnPortrait" src="../../assets/art/portrait-ethan-v43.webp" alt="Ethan" width="256" height="278" fetchpriority="high"></div>
             <div class="heroCopy"><span>ETHAN</span><b>에단</b><p>강한 원거리 룬탄과 넓은 성광 폭발. 안정적인 생존형.</p></div>
           </button>
           <button class="heroCard night" data-hero="night" type="button">
-            <div class="portrait"><img id="nightPortrait" alt="Noah"></div>
+            <div class="portrait"><img id="nightPortrait" src="../../assets/art/portrait-noah-v43.webp" alt="Noah" width="256" height="261" fetchpriority="high"></div>
             <div class="heroCopy"><span>NOAH</span><b>노아</b><p>빠른 월광 칼날과 그림자 질주. 공격적인 기동형.</p></div>
           </button>
         </div>
@@ -84,9 +84,9 @@
     <div id="relicPanel" class="relicPanel" aria-hidden="true"><div class="relicPanelHead"><b>보유 유물</b><button id="relicClose" type="button">×</button></div><div id="relicList" class="relicList"><span class="relicEmpty">아직 획득한 유물이 없습니다.</span></div></div><div id="toast" aria-live="polite"></div>
     <div id="relicFlash" class="relicFlash" aria-live="polite"><img id="relicFlashIcon" alt=""><b id="relicFlashName">유물 획득</b></div>
   </main>
-<script src="audio.js?v=42"></script>
-<script src="atlas.js?v=42"></script>
-<script src="art.js?v=42"></script>
-<script src="core.js?v=42"></script>
-<script src="render.js?v=42"></script>
+<script src="audio.js?v=43"></script>
+<script src="atlas.js?v=43"></script>
+<script src="art.js?v=43"></script>
+<script src="core.js?v=43"></script>
+<script src="render.js?v=43"></script>
 </body></html>
