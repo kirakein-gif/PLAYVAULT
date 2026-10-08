@@ -12,7 +12,7 @@ function harness(mobile=false,dpr=1){
  for(const file of ['art.js','core.js','render.js'])vm.runInContext(fs.readFileSync(root+'/'+file,'utf8'),env,{filename:file});
  const A=env.AF;
  function advance(ms){now+=ms;for(let i=timers.length-1;i>=0;i--)if(timers[i].at<=now){const {fn}=timers.splice(i,1)[0];fn()}if(A.started&&!A.dead&&!A.paused)A.update(1)}
- return {env,A,draws,frame(){raf(now)},advance,elements,key(code,key,repeat=false,target={}){const event={code,key,repeat,target,preventDefault(){this.prevented=true}};for(const fn of listeners.keydown||[])fn(event);return event}};
+ return {env,A,ctx,draws,frame(){raf(now)},advance,elements,key(code,key,repeat=false,target={}){const event={code,key,repeat,target,preventDefault(){this.prevented=true}};for(const fn of listeners.keydown||[])fn(event);return event}};
 }
 
 // Player cadence and auto-targeting must not override a moving character's gait.
@@ -279,3 +279,19 @@ for(const floor of [1,4,7,10,13,16,19,22]){
  e.moving=true;e.aiWindup=12;assert.equal(h.env.AF_ART.enemyWalk(e),null,'attack windup has priority over walk');
 }
 console.log('PASS v47: six distinct walking poses per region, distance cadence, unchanged speed, stopped feet and attack priority');
+{
+ const h=harness();let cleaned=0;
+ h.ctx.getImageData=(x,y,w,height)=>{
+  const data=new Uint8ClampedArray(w*height*4);
+  for(let yy=30;yy<Math.min(130,height);yy++)for(let xx=50;xx<140;xx++)data[(yy*w+xx)*4+3]=255;
+  for(let yy=40;yy<50;yy++)for(let xx=190;xx<200;xx++)data[(yy*w+xx)*4+3]=255;
+  data[(35*w+49)*4+3]=40;
+  return {data,width:w,height};
+ };
+ h.ctx.putImageData=p=>{
+  assert.equal(p.data[(50*p.width+80)*4+3],255,'main silhouette remains intact');
+  assert.equal(p.data[(45*p.width+195)*4+3],0,'foreign weapon fragment is fully transparent');
+  assert.equal(p.data[(35*p.width+49)*4+3],40,'soft actor edge remains intact');cleaned++;
+ };
+ h.env.AF_ART.ready.then(()=>{assert.equal(cleaned,114,'all 19 enemies × six walk poses isolated');console.log('PASS v48: foreign fragments removed from all walk frames; actor silhouette and soft alpha edges preserved')}).catch(err=>{console.error(err);process.exitCode=1});
+}

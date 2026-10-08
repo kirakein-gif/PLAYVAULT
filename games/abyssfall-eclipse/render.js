@@ -451,7 +451,8 @@
       ctx.globalAlpha=fade*.8;for(let i=0;i<10;i++){const a=i*2.399,x=Math.cos(a)*radius*.55,y=Math.sin(a)*radius*.55-t*95;ctx.fillStyle=i%3?color:'#ece6d8';ctx.beginPath();ctx.moveTo(x,y-8);ctx.lineTo(x+3,y);ctx.lineTo(x,y+9);ctx.lineTo(x-3,y);ctx.closePath();ctx.fill()}
     }else{
       const span=fx.wide?4.6:2.4,head=-span/2+Math.min(1,t*2.6)*span,tail=Math.max(-span/2,head-(fx.wide?2.5:1.45)),radius=fx.r*(.87+t*.13);
-      ctx.globalAlpha=fade*.8;ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=10;
+      const steel=ctx.createRadialGradient(0,0,radius*.65,0,0,radius*1.04);steel.addColorStop(0,color+'00');steel.addColorStop(.72,color+'45');steel.addColorStop(1,color+'bb');
+      ctx.globalAlpha=fade*.8;ctx.fillStyle=steel;ctx.shadowColor=color;ctx.shadowBlur=8;
       ctx.beginPath();for(let i=0;i<=24;i++){const u=i/24,a=tail+(head-tail)*u,r=radius*(.94+.09*u);if(i===0)ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r);else ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}
       for(let i=24;i>=0;i--){const u=i/24,a=tail+(head-tail)*u,r=radius*(.94-.18*Math.sin(u*Math.PI));ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}ctx.closePath();ctx.fill();ctx.shadowBlur=0;
       for(let j=0;j<3;j++){ctx.globalAlpha=fade*(.65-j*.16);ctx.strokeStyle=j?'#b7a99b':'#fff2dc';ctx.lineWidth=j?1:2;ctx.beginPath();ctx.arc(0,0,radius*(1-j*.09),tail+.08,head);ctx.stroke()}
