@@ -4,6 +4,9 @@
 const $=id=>document.getElementById(id);
 const canvas=$('game'),ctx=canvas.getContext('2d'),W=960,H=540;
 const mapCanvas=$('mapCanvas'),mctx=mapCanvas.getContext('2d');
+ctx.imageSmoothingEnabled=false;
+ctx.imageSmoothingQuality='low';
+mctx.imageSmoothingEnabled=false;
 const ui={
   start:$('start'),startBtn:$('startBtn'),gameOver:$('gameOver'),retryBtn:$('retryBtn'),
   chapterClear:$('chapterClear'),clearAgain:$('clearAgain'),clearStats:$('clearStats'),
@@ -16,8 +19,8 @@ const ui={
 
 function fit(){
   const s=Math.min(innerWidth/W,innerHeight/H);
-  canvas.style.width=Math.floor(W*s)+'px';
-  canvas.style.height=Math.floor(H*s)+'px';
+  canvas.style.width=Math.round(W*s)+'px';
+  canvas.style.height=Math.round(H*s)+'px';
 }
 fit();addEventListener('resize',fit);
 
@@ -602,7 +605,7 @@ function drawObjects(r){
 }
 function drawHero(k,ghost=false){
   const h=syncHeroBody(k),d=HEROES[k];if(!h.alive)return;
-  const moving=Math.abs(h.vx)>.35,bob=moving?Math.sin(h.anim)*1.4:0;
+  const moving=Math.abs(h.vx)>.35,bob=moving?Math.round(Math.sin(h.anim)*1.4):0;
   const drawX=Math.round(h.x+h.w/2),drawY=Math.round(h.y+h.h+bob);
   if(!Number.isFinite(drawX)||!Number.isFinite(drawY))return;
 
@@ -618,9 +621,9 @@ function drawHero(k,ghost=false){
     let anim='idle',frame=0,scale=1,offsetX=0,offsetY=0;
     if(attacking){
       anim='attack';frame=Math.min(3,Math.floor(ap*4));
-      if(k==='noah'&&h.combo===3){scale=1.06;offsetX=5*Math.sin(ap*Math.PI)}
+      if(k==='noah'&&h.combo===3){offsetX=Math.round(5*Math.sin(ap*Math.PI))}
     }else if(recovering){
-      anim='attack';frame=3;scale=.98;offsetY=3;
+      anim='attack';frame=3;offsetY=3;
     }else if(!h.onGround){
       anim='run';frame=h.vy<0?2:4;
     }else if(moving){
@@ -839,7 +842,7 @@ function draw(){
   ctx.save();
   if(state.shake>0&&state.shakeAmp>0){
     const t=performance.now()*.045,fade=Math.min(1,state.shake/8),amp=state.shakeAmp*fade;
-    ctx.translate(Math.sin(t)*amp,Math.cos(t*1.37)*amp*.62);
+    ctx.translate(Math.round(Math.sin(t)*amp),Math.round(Math.cos(t*1.37)*amp*.62));
   }
   drawBackground(r);drawDoors(r);drawObjects(r);
   drawHero(otherKey(),true);for(const e of roomState(r.id).enemies)drawEnemy(e);drawProjectiles();drawHero(state.active,false);drawFx();drawBossHp();
