@@ -39,6 +39,21 @@ async function requestLandscapeMode(){
   setTimeout(fit,120);
 }
 
+function isPortraitBlocked(){
+  return isCoarseMobile()&&matchMedia('(orientation:portrait)').matches;
+}
+function enforceLandscapeGate(){
+  const blocked=isPortraitBlocked();
+  document.body.classList.toggle('portrait-blocked',blocked);
+  if(blocked){
+    state.keys.left=false;state.keys.right=false;
+  }
+  fit();
+  return blocked;
+}
+addEventListener('resize',enforceLandscapeGate);
+addEventListener('orientationchange',()=>setTimeout(enforceLandscapeGate,80));
+
 const HEROES={
   ethan:{key:'ethan',name:'Ethan',ko:'에단',maxHp:120,speed:2.95,jump:10.9,w:42,h:68,attackCd:29,gravity:.70,maxFall:13.5,accelGround:.42,accelAir:.22,friction:.82,coyote:6,jumpBuffer:7,color:'#e2d7b9',accent:'#e7c66f',detail:'#74d8ef'},
   noah:{key:'noah',name:'Noah',ko:'노아',maxHp:95,speed:3.85,jump:13.1,w:39,h:64,attackCd:18,gravity:.57,maxFall:13.8,accelGround:.68,accelAir:.40,friction:.60,coyote:8,jumpBuffer:8,color:'#252943',accent:'#72dcef',detail:'#8f70c7'}
@@ -224,7 +239,7 @@ function retry(){
   ui.gameOver.classList.remove('show');state.visited.add(state.current);spawnRoom(state.current);toast('불이 아직 꺼지지 않았다.');updateHud();
 }
 function switchHero(){
-  if(state.paused||state.swapLock>0)return;
+  if(isPortraitBlocked()||state.paused||state.swapLock>0)return;
   const next=otherKey();if(!heroes[next].alive){toast('대답이 없다.');return}
   const a=hero(),b=syncHeroBody(next),cx=a.x+a.w/2,cy=a.y+a.h*.55;
   b.x=a.x;b.y=a.y+a.h-b.h;b.vx=a.vx*.82;b.vy=a.vy;b.face=a.face;b.inv=Math.max(b.inv,18);
@@ -252,7 +267,7 @@ function hurt(n,dir){
 }
 
 function doJump(){
-  if(state.paused)return;const h=hero(),d=HEROES[state.active];h.jumpBuffer=d.jumpBuffer;
+  if(isPortraitBlocked()||state.paused)return;const h=hero(),d=HEROES[state.active];h.jumpBuffer=d.jumpBuffer;
 }
 function releaseJump(){
   if(state.paused)return;const h=hero();if(h.vy<-3.2)h.vy*=.58;
@@ -264,7 +279,7 @@ function consumeBufferedJump(h,d){
   audio.sfx('jump');return true;
 }
 function doAttack(){
-  if(state.paused)return;const h=hero(),d=HEROES[state.active];if(!h.alive)return;
+  if(isPortraitBlocked()||state.paused)return;const h=hero(),d=HEROES[state.active];if(!h.alive)return;
 
   if(state.active==='ethan'){
     if(h.attack>0)return;
@@ -347,7 +362,7 @@ function nearestObject(){
   return bd<92?best:null;
 }
 function interact(){
-  if(state.paused)return;const r=activeRoom(),o=nearestObject();
+  if(isPortraitBlocked()||state.paused)return;const r=activeRoom(),o=nearestObject();
   if(o){
     if(o.type==='latch'){
       if(state.westLatch){toast('걸쇠는 이미 내려가 있다.');return}
@@ -567,6 +582,7 @@ function updateFx(dt){
   for(const f of state.fx)f.life-=dt;state.fx=state.fx.filter(f=>f.life>0);
 }
 function update(dt){
+  if(isPortraitBlocked())return;
   if(!state.started||state.paused)return;
   if(state.hitStop>0){state.hitStop=Math.max(0,state.hitStop-dt);return}
   if(state.shake>0){state.shake=Math.max(0,state.shake-dt);if(state.shake<=0)state.shakeAmp=0}
@@ -871,7 +887,7 @@ function updateHud(){
   ui.roomTitle.textContent=activeRoom().name;ui.heroHint.textContent=state.active==='ethan'?'에단 · 룬탄 / 장치':'노아 · 참격 / 기동';ui.roomHint.textContent='방문 '+state.visited.size;
 }
 
-function toggleMap(){state.mapOpen=!state.mapOpen;ui.mapPanel.classList.toggle('show',state.mapOpen);ui.mapPanel.setAttribute('aria-hidden',state.mapOpen?'false':'true');if(state.mapOpen)drawMap()}
+function toggleMap(){if(isPortraitBlocked())return;state.mapOpen=!state.mapOpen;ui.mapPanel.classList.toggle('show',state.mapOpen);ui.mapPanel.setAttribute('aria-hidden',state.mapOpen?'false':'true');if(state.mapOpen)drawMap()}
 function setKey(name,v){state.keys[name]=v}
 addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();if([' ','arrowleft','arrowright','tab'].includes(k)||e.code==='Space')e.preventDefault();
@@ -898,8 +914,18 @@ ui.swapBtn.addEventListener('pointerdown',e=>{e.preventDefault();switchHero()});
 ui.useBtn.addEventListener('pointerdown',e=>{e.preventDefault();interact()});
 ui.mapBtn.addEventListener('click',toggleMap);
 ui.soundBtn.addEventListener('click',()=>{state.sound=!state.sound;ui.soundBtn.textContent=state.sound?'🔊':'🔇';if(audio.master&&audio.ctx)audio.master.gain.setTargetAtTime(state.sound?.72:0,audio.ctx.currentTime,.03)});
-ui.startBtn.addEventListener('click',()=>{requestLandscapeMode();newGame()});
-ui.landscapeBtn?.addEventListener('click',()=>{requestLandscapeMode();if(!state.started)newGame()});
+ui.startBtn.addEventListener('click',async()=>{
+  if(isCoarseMobile()){
+    await requestLandscapeMode();
+    if(isPortraitBlocked())return;
+  }
+  newGame();
+});
+ui.landscapeBtn?.addEventListener('click',async()=>{
+  await requestLandscapeMode();
+  enforceLandscapeGate();
+  if(!isPortraitBlocked()&&!state.started)newGame();
+});
 ui.retryBtn.addEventListener('click',retry);ui.clearAgain.addEventListener('click',newGame);
 
 let last=performance.now();
@@ -908,5 +934,5 @@ function frame(t){
   try{update(dt);draw()}catch(err){console.error('HOLLOW KEEP frame recovered',err);if(t-state.lastError>1200){state.lastError=t;toast('화면을 복구했습니다.',700)}}
   requestAnimationFrame(frame);
 }
-spawnRoom('gate');updateHud();requestAnimationFrame(frame);
+spawnRoom('gate');updateHud();enforceLandscapeGate();requestAnimationFrame(frame);
 })();
