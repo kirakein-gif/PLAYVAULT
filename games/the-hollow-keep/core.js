@@ -812,16 +812,24 @@ function drawEnemy(e){
   if(recover>0&&e.alive)ctx.globalAlpha*=.82;
   if(e.type==='crawler'){
     const crouch=wind>0?5:0;
-    ctx.fillStyle=wind>0?'#66506e':'#4c4057';ctx.beginPath();ctx.ellipse(0,-12+crouch,wind>0?20:18,wind>0?9:12,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle=wind>0?'#ffb1b1':'#c27787';ctx.fillRect(7,-16+crouch,wind>0?6:4,wind>0?4:3);
+    // Hunched stone-crawler: plated back, hooked limbs and a single red eye.
+    ctx.fillStyle='#15131c';ctx.beginPath();ctx.ellipse(0,-11+crouch,wind>0?22:20,wind>0?11:14,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=wind>0?'#70506d':'#493b52';ctx.beginPath();ctx.ellipse(0,-13+crouch,wind>0?19:17,wind>0?9:12,0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#9b7d91';ctx.globalAlpha=.56;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-13,-18+crouch);ctx.lineTo(-5,-7+crouch);ctx.moveTo(-2,-22+crouch);ctx.lineTo(3,-5+crouch);ctx.moveTo(10,-17+crouch);ctx.lineTo(8,-6+crouch);ctx.stroke();ctx.globalAlpha=1;
+    ctx.strokeStyle='#251f2d';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-12,-5+crouch);ctx.lineTo(-23,2);ctx.moveTo(12,-5+crouch);ctx.lineTo(24,2);ctx.stroke();
+    ctx.fillStyle=wind>0?'#ffc2c2':'#e88b96';ctx.shadowColor='#b64962';ctx.shadowBlur=wind>0?8:3;ctx.fillRect(8,-17+crouch,wind>0?6:4,wind>0?4:3);ctx.shadowBlur=0;
     if(wind>0){ctx.globalAlpha*=.50;ctx.strokeStyle='#b98b7d';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-18,-2);ctx.lineTo(-34,2);ctx.moveTo(18,-2);ctx.lineTo(34,2);ctx.stroke();ctx.globalAlpha*=.55;ctx.beginPath();ctx.moveTo(22,-1);ctx.lineTo(50,-1);ctx.stroke()}
   }else if(e.type==='bat'){
     const fold=wind>0?9:0;
-    ctx.fillStyle=wind>0?'#6a5979':'#4e4861';ctx.beginPath();ctx.moveTo(0,-12);ctx.lineTo(-20+fold,-26);ctx.lineTo(-13+fold*.5,-6);ctx.lineTo(0,-16);ctx.lineTo(13-fold*.5,-6);ctx.lineTo(20-fold,-26);ctx.closePath();ctx.fill();
-    ctx.fillStyle=wind>0?'#df8cff':'#a477c2';ctx.fillRect(4,-16,wind>0?5:3,wind>0?4:3);
+    ctx.fillStyle='#171522';ctx.beginPath();ctx.moveTo(0,-12);ctx.lineTo(-22+fold,-29);ctx.lineTo(-14+fold*.5,-5);ctx.lineTo(0,-18);ctx.lineTo(14-fold*.5,-5);ctx.lineTo(22-fold,-29);ctx.closePath();ctx.fill();
+    ctx.fillStyle=wind>0?'#725779':'#48445f';ctx.beginPath();ctx.moveTo(0,-14);ctx.lineTo(-20+fold,-27);ctx.lineTo(-13+fold*.5,-8);ctx.lineTo(0,-19);ctx.lineTo(13-fold*.5,-8);ctx.lineTo(20-fold,-27);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#977da8';ctx.globalAlpha=.44;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-18+fold,-25);ctx.lineTo(-5,-12);ctx.moveTo(18-fold,-25);ctx.lineTo(5,-12);ctx.stroke();ctx.globalAlpha=1;
+    ctx.fillStyle=wind>0?'#f2a5ff':'#c88dde';ctx.shadowColor='#a85bc1';ctx.shadowBlur=wind>0?8:3;ctx.fillRect(4,-17,wind>0?5:3,wind>0?4:3);ctx.shadowBlur=0;
   }else if(e.type==='priest'){
-    ctx.fillStyle='#403c4b';ctx.fillRect(-12,-48,24,45);ctx.fillStyle='#746989';ctx.beginPath();ctx.arc(0,-48,10,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle=wind>0?'#c6a6ec':'#9b82c0';ctx.lineWidth=wind>0?3:1.5;ctx.beginPath();ctx.moveTo(10,-35);ctx.lineTo(22,-8);ctx.stroke();
+    ctx.fillStyle='#17151f';ctx.beginPath();ctx.moveTo(-15,-4);ctx.lineTo(-12,-46);ctx.lineTo(0,-58);ctx.lineTo(12,-46);ctx.lineTo(16,-4);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#3e374b';ctx.beginPath();ctx.moveTo(-12,-5);ctx.lineTo(-10,-45);ctx.lineTo(0,-53);ctx.lineTo(10,-45);ctx.lineTo(13,-5);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#111019';ctx.beginPath();ctx.arc(0,-45,8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#c7a5df';ctx.fillRect(2,-47,3,3);
+    ctx.strokeStyle=wind>0?'#d5b3f0':'#9b82c0';ctx.lineWidth=wind>0?3:2;ctx.beginPath();ctx.moveTo(9,-36);ctx.lineTo(23,-7);ctx.stroke();ctx.fillStyle='#9c80c2';ctx.beginPath();ctx.arc(23,-7,4,0,Math.PI*2);ctx.fill();
     if(wind>0){
       const pulse=.45+.3*Math.sin(performance.now()/70);ctx.globalAlpha*=.75;ctx.fillStyle=`rgba(190,150,240,${pulse})`;ctx.beginPath();ctx.arc(21,-34,5+Math.max(0,28-wind)*.10,0,Math.PI*2);ctx.fill();
       ctx.globalAlpha*=.32;ctx.strokeStyle='#c3a8e6';ctx.beginPath();ctx.moveTo(21,-34);ctx.lineTo(72,-34);ctx.stroke();
@@ -832,14 +840,21 @@ function drawEnemy(e){
     if(e.wind>0){ctx.strokeStyle='#d1b16d';ctx.lineWidth=3;ctx.globalAlpha=.45+.35*(e.wind/30);ctx.beginPath();ctx.arc(10,-40,66,-1.2,.9);ctx.stroke()}
   }else if(e.type==='bellwarden'){
     const wind=e.attackWind>0,kind=e.attackKind||'sweep';
-    ctx.fillStyle=wind?'#353139':'#292a31';ctx.fillRect(-27,-86,54,80);
-    ctx.fillStyle='#67636a';ctx.beginPath();ctx.arc(0,-86,27,Math.PI,0);ctx.fill();ctx.fillStyle='#111218';ctx.fillRect(-16,-80,32,9);
-    ctx.fillStyle='#4a4042';ctx.fillRect(-20,-51,40,17);
-    const weaponWind=wind&&kind==='sweep';ctx.strokeStyle=weaponWind?'#d4b177':'#8d7968';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(22,-58);ctx.lineTo(weaponWind?43:37,weaponWind?-87:-7);ctx.stroke();
-    ctx.fillStyle='#92765d';ctx.beginPath();ctx.arc(weaponWind?45:38,weaponWind?-89:-8,11,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#d1b16d';ctx.lineWidth=2;ctx.stroke();
+    const painted=window.HK_ART&&HK_ART.drawBellWarden&&HK_ART.drawBellWarden(ctx,{wind,kind});
+    if(!painted){
+      ctx.fillStyle=wind?'#353139':'#292a31';ctx.fillRect(-27,-86,54,80);
+      ctx.fillStyle='#67636a';ctx.beginPath();ctx.arc(0,-86,27,Math.PI,0);ctx.fill();ctx.fillStyle='#111218';ctx.fillRect(-16,-80,32,9);
+      ctx.fillStyle='#4a4042';ctx.fillRect(-20,-51,40,17);
+      const weaponWind=wind&&kind==='sweep';ctx.strokeStyle=weaponWind?'#d4b177':'#8d7968';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(22,-58);ctx.lineTo(weaponWind?43:37,weaponWind?-87:-7);ctx.stroke();
+      ctx.fillStyle='#92765d';ctx.beginPath();ctx.arc(weaponWind?45:38,weaponWind?-89:-8,11,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#d1b16d';ctx.lineWidth=2;ctx.stroke();
+    }
     if(wind){ctx.globalAlpha=.48;ctx.strokeStyle=kind==='wave'?'#d8b083':'#cdb179';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(4,-40,kind==='wave'?46:66,-1.18,.88);ctx.stroke();}
   }else{
-    ctx.fillStyle=wind>0?'#4d494f':'#3b3b41';ctx.fillRect(-14,-50,28,47);ctx.fillStyle='#55535b';ctx.beginPath();ctx.arc(0,-50,12,0,Math.PI*2);ctx.fill();
+    // Armoured guard: dark tabard, plated shoulders and a narrow helmet visor.
+    ctx.fillStyle='#17181d';ctx.beginPath();ctx.moveTo(-17,-4);ctx.lineTo(-14,-48);ctx.lineTo(0,-58);ctx.lineTo(14,-48);ctx.lineTo(18,-4);ctx.closePath();ctx.fill();
+    ctx.fillStyle=wind>0?'#514b55':'#35363e';ctx.beginPath();ctx.moveTo(-14,-4);ctx.lineTo(-12,-46);ctx.lineTo(0,-53);ctx.lineTo(12,-46);ctx.lineTo(15,-4);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#727078';ctx.beginPath();ctx.arc(0,-49,12,Math.PI,0);ctx.fill();ctx.fillStyle='#14151b';ctx.fillRect(-8,-48,17,4);ctx.fillStyle='#a08a67';ctx.fillRect(4,-47,2,2);
+    ctx.fillStyle='#27262f';ctx.fillRect(-17,-39,7,15);ctx.fillRect(10,-39,7,15);
     if(e.type==='guard'){
       ctx.strokeStyle=wind>0?'#d1b18d':'#7c6c60';ctx.lineWidth=5;ctx.beginPath();
       if(wind>0){ctx.moveTo(9,-37);ctx.lineTo(25,-63)}else{ctx.moveTo(13,-38);ctx.lineTo(16,-3)}ctx.stroke();
