@@ -398,18 +398,16 @@
       AF.cur().enemies.forEach(e=>{if(e.alive&&Math.hypot(e.x-p.x,e.y-p.y)<rad)damage(e,(42+p.atk*1.8)*power)});
       AF.toast('공명 핵 · 잔향 폭발');
     }else{
-      let dx=p.faceX,dy=p.faceY,l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;
-      const sx=p.x-dx*22,sy=p.y-dy*22,ex=p.x+dx*(135+p.range*.35+count*8),ey=p.y+dy*(135+p.range*.35+count*8);
-      AF.slashes.push({x:(sx+ex)/2,y:(sy+ey)/2,a:Math.atan2(dy,dx),l:19,max:19,r:112+count*7,color:'#c084ff',art:false});
-      AF.cur().enemies.forEach(e=>{if(e.alive&&seg(sx,sy,ex,ey,e.x,e.y,e.r+42))damage(e,(50+p.atk*1.8)*power)});
-      AF.toast('공명 핵 · 월영 잔향');
+      p.inv=Math.max(p.inv,8+count*2);p.rollBoost=Math.max(p.rollBoost||0,.30+.08*count);p.basic=Math.min(p.basic,6);
+      AF.slashes.push({art:true,kind:'rollTrail',x:p.x,y:p.y,a:Math.atan2(p.faceY,p.faceX),l:18,max:18});
+      AF.toast('공명 핵 · 회피 보호와 강화 사격');
     }
   }
   function damage(e,n){
     if(!e.alive)return;
     if(e.type==='boss'&&e.intro>0)return;
     const p=AF.player,grail=relicCount('twin-grail');
-    if(grail){const missing=1-Math.max(0,p.hp)/p.maxHp;n*=1+missing*(.55+.18*(grail-1))}
+    if(grail){const missing=1-Math.max(0,p.hp)/p.maxHp;n*=1+(p.hero.key==='dawn'?missing*(.55+.18*(grail-1)):(1-missing)*(.18+.04*(grail-1)))}
     n*=1-(e.armor||0);if(e.type==='boss')n=Math.min(n,e.max*.10);
     e.hp-=n;e.flash=7;e.hurtPose=11;sound()?.sfx('hit');
     for(let i=0;i<6;i++)AF.particles.push({x:e.x,y:e.y,vx:(Math.random()-.5)*3.5,vy:(Math.random()-.5)*3.5,l:18,color:p.hero.color});
@@ -476,14 +474,14 @@
       p.attackPose=0;p.specialPose=0;p.inv=Math.max(p.inv,m.time+2);p.meleeAim=Math.atan2(m.dy,m.dx);
       for(const e of AF.cur().enemies)if(e.alive&&!m.hits.has(e)&&seg(sx,sy,p.x,p.y,e.x,e.y,e.r+32)){
         const ix=(p.x+e.x)/2,iy=(p.y+e.y)/2;
-        m.hits.add(e);damage(e,62+p.atk*2.2);pushEnemy(e,m.dx,m.dy,65);
+        m.hits.add(e);damage(e,(62+p.atk*2.2)*(1+.12*relicCount('red-vow')));pushEnemy(e,m.dx,m.dy,65+15*relicCount('dash-sigil'));p.bodyFlash=6;
         AF.slashes.push({art:true,kind:'chargeImpact',x:ix,y:iy,a:p.meleeAim,r:46,l:22,max:22});
         for(let i=0;i<14;i++){const a=i*Math.PI*2/14,speed=1.8+Math.random()*2.8;AF.particles.push({x:ix,y:iy-24,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed-1,l:18,color:i%3?'#bca779':'#fff1cf'})}
 
       }
     }
     AF.slashes.push({art:true,kind:m.kind==='roll'?'rollTrail':'chargeTrail',x:sx,y:sy,a:Math.atan2(m.dy,m.dx),l:10,max:10});
-    m.time-=step;if(m.time<=0||Math.hypot(p.x-sx,p.y-sy)<.01){p.mobility=null;p.slideX=p.slideY=0;p.specialPose=0;if(m.kind==='charge'){p.chargeRecover=10;p.basic=Math.max(p.basic,12)}}
+    m.time-=step;if(m.time<=0||Math.hypot(p.x-sx,p.y-sy)<.01){p.mobility=null;p.slideX=p.slideY=0;p.specialPose=0;if(m.kind==='roll'&&relicCount('dash-sigil'))p.rollBoost=Math.max(p.rollBoost||0,.25*relicCount('dash-sigil'));if(m.kind==='charge'){p.chargeRecover=10;p.basic=Math.max(p.basic,12)}}
   }
   function resolveSword(swing){
     const p=AF.player,a=swing.a;
@@ -501,10 +499,10 @@
     const burst=blade>0&&p.bladeShots%3===0;
     if(h.key==='dawn'){
       p.meleeAim=a;
-      p.swordSwing={time:6,a,reach:meleeReach,power:(h.damage+p.atk)*(burst?1.3+.08*blade:1)*(1+.08*solar)};
+      p.swordSwing={time:6,a,reach:meleeReach+(burst?14+blade*5:0),power:(h.damage+p.atk)*(burst?1.3+.08*blade:1)*(1+.08*solar)};
     }else{
-      launch({team:'p',kind:'crescent',x:p.x,y:p.y,vx:Math.cos(a)*h.proj,vy:Math.sin(a)*h.proj,r:9,dmg:h.damage+p.atk,pierce:1+(p.level/6|0)+blade,life:85,color:'#9c7cff'},p,e);
-      AF.slashes.push({x:p.x,y:p.y,a,l:14,max:14,r:36});
+      launch({team:'p',kind:'crescent',x:p.x,y:p.y,vx:Math.cos(a)*h.proj,vy:Math.sin(a)*h.proj,r:9,dmg:(h.damage+p.atk)*(1+(p.rollBoost||0)),pierce:1+(p.level/6|0)+blade,life:85,color:'#9c7cff'},p,e);
+      p.rollBoost=0;AF.slashes.push({x:p.x,y:p.y,a,l:14,max:14,r:36});
     }
     if(burst&&h.key==='night'){
       for(const o of [-.20,.20])launch({team:'p',kind:'relicBlade',x:p.x,y:p.y,vx:Math.cos(a+o)*(h.proj*.92),vy:Math.sin(a+o)*(h.proj*.92),r:6,dmg:(h.damage+p.atk)*(.48+.08*blade),pierce:0,life:82,color:'#ffd36b'},p,e);
@@ -519,7 +517,7 @@
     if(h.key==='dawn'){
       p.mobility={kind:'charge',dx:direction.x,dy:direction.y,time:12,max:12,speed:9+Math.min(1,p.range*.01),hits:new Set()};
       AF.slashes=AF.slashes.filter(fx=>fx.kind!=='ethanSword');p.swordSwing=null;
-      p.attackPose=0;p.specialPose=0;p.chargeRecover=0;p.shield=Math.min(40,p.shield+10);p.inv=Math.max(p.inv,14);
+      p.attackPose=0;p.specialPose=0;p.chargeRecover=0;p.bodyFlash=0;p.shield=Math.min(40,p.shield+10+4*relicCount('solar-shard'));p.inv=Math.max(p.inv,14);
       AF.toast('몸통 돌진');
     }else{
       p.mobility={kind:'roll',dx:direction.x,dy:direction.y,time:16,max:16,speed:9+Math.min(2,p.range*.02)};
@@ -527,7 +525,8 @@
       AF.toast('회피 구르기');
     }
     const gear=relicCount('time-gear');
-    if(gear&&Math.random()<Math.min(.62,.22+.10*(gear-1))){
+    if(gear&&h.key==='night'){p.special*=Math.max(.35,.65-.05*(gear-1));AF.toast('시간의 톱니 · 회피 재준비')}
+    if(gear&&h.key==='dawn'&&Math.random()<Math.min(.62,.22+.10*(gear-1))){
       p.special=0;
       for(let i=0;i<10;i++)AF.particles.push({x:p.x,y:p.y,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3,l:22,color:'#6adfff'});
       setTimeout(()=>AF.toast('시간의 톱니 · 특수기 재충전'),90);
@@ -566,29 +565,30 @@
     chooseReward([
       {i:'✦',n:'성물 증폭',d:'기본 공격 피해 +5',f:p=>p.atk+=5},
       {i:'⟲',n:'공명 가속',d:'자동 공격 간격 감소',f:p=>p.rate+=3},
-      {i:'◎',n:'공간 확장',d:'검 공격 범위·특수기 이동거리 증가',f:p=>p.range+=16},
+      {i:'◎',n:'공간 확장',d:AF.player.hero.key==='dawn'?'검 공격 범위·돌진 이동거리 증가':'구르기 이동거리 증가',f:p=>p.range+=16},
       {i:'✹',n:'특수 공명',d:'특수기 재사용 대기시간 감소',f:p=>p.specialBoost+=28},
       {i:'♥',n:'생명 각인',d:'최대 체력 +20, 즉시 회복',f:p=>{p.maxHp+=20;p.hp=Math.min(p.maxHp,p.hp+28)}}
     ],'성물 공명','하나의 힘을 선택하세요.');
   }
   const relicIcon=id=>window.AF_ART?.relicIcons?.[id]||'../../assets/relics/'+id+'.webp?v=35';
-  function treasureReward(){
+  AF.relicOptions=(key=AF.player.hero.key)=>{
+    const role=key==='dawn'?0:1,heal=(p,n)=>p.hp=Math.min(p.maxHp,p.hp+n);
     const opts=[
-      {id:'relic-blade',i:'⚔',img:relicIcon('relic-blade'),n:'유물의 칼날',d:'공격 +8 · 기본 공격 관통 +1 · 3회마다 공명 참격',rarity:'rare',relic:true,f:p=>p.atk+=8},
-      {id:'dash-sigil',i:'✧',img:relicIcon('dash-sigil'),n:'질주의 문장',d:'이속 +0.22 · 공격 가속 · 이동 중 주기적으로 질주 충격파',rarity:'rare',relic:true,f:p=>{p.speed+=.22;p.rate+=2}},
-      {id:'guardian-seal',i:'◈',img:relicIcon('guardian-seal'),n:'수호자의 인장',d:'최대 HP +28 · 피격 시 보호막과 근접 반격 충격파',rarity:'rare',relic:true,f:p=>{p.maxHp+=28;p.hp=Math.min(p.maxHp,p.hp+35)}},
-      {id:'resonance-core',i:'✹',img:relicIcon('resonance-core'),n:'공명 핵',d:'특수기 쿨 감소 · 범위 증가 · 사용 후 잔향 추가 발동',rarity:'rare',relic:true,f:p=>{p.specialBoost+=42;p.range+=10}},
-      {id:'condensed-crystal',i:'◆',img:relicIcon('condensed-crystal'),n:'응축 수정',d:'공격 +4 · 최대 HP +14 · 일정 시간마다 수정 탄막 자동 발사',rarity:'rare',relic:true,f:p=>{p.atk+=4;p.maxHp+=14;p.hp=Math.min(p.maxHp,p.hp+14)}},
-      {id:'twin-grail',i:'♜',img:relicIcon('twin-grail'),n:'쌍둥이 성배',d:'체력이 낮을수록 모든 피해 증가',rarity:'epic',relic:true,f:p=>{p.hp=Math.min(p.maxHp,p.hp+8)}},
-      {id:'abyss-mirror',i:'◇',img:relicIcon('abyss-mirror'),n:'심연의 거울',d:'적 투사체를 일정 확률로 반사해 되돌려 보냄',rarity:'epic',relic:true,f:p=>{}},
-      {id:'pilgrim-lantern',i:'✦',img:relicIcon('pilgrim-lantern'),n:'순례자의 등불',d:'일반전투·엘리트방 클리어 시 소량 회복',rarity:'rare',relic:true,f:p=>{}},
-      {id:'red-vow',i:'✕',img:relicIcon('red-vow'),n:'붉은 서약',d:'최대 HP 15% 감소 · 공격력 +14',rarity:'epic',relic:true,f:p=>{p.maxHp=Math.max(45,Math.round(p.maxHp*.85));p.hp=Math.min(p.hp,p.maxHp);p.atk+=14}},
-      {id:'time-gear',i:'⌁',img:relicIcon('time-gear'),n:'시간의 톱니',d:'특수기 사용 시 일정 확률로 쿨타임 즉시 초기화',rarity:'legendary',relic:true,f:p=>{}}
+      {id:'relic-blade',i:'⚔',n:'유물의 칼날',rarity:'rare',d:['공격 +8 · 3회마다 더 넓고 강한 검 베기','공격 +6 · 사격 관통 +1 · 3회마다 부채꼴 추가 사격'],f:[p=>p.atk+=8,p=>p.atk+=6]},
+      {id:'dash-sigil',i:'✧',n:'질주의 문장',rarity:'rare',d:['이속 +0.12 · 돌진 쿨 감소 · 밀치기 강화 · 이동 중 근접 충격','이속 +0.30 · 공격 가속 · 구르기 후 다음 사격 피해 +25%'],f:[p=>{p.speed+=.12;p.specialBoost+=18},p=>{p.speed+=.30;p.rate+=2}]},
+      {id:'guardian-seal',i:'◈',n:'수호자의 인장',rarity:'rare',d:['최대 HP +28 · 피격 시 보호막과 근접 반격','최대 HP +16 · 피격 시 보호막 · 구르기 대기시간 감소'],f:[p=>{p.maxHp+=28;heal(p,35)},p=>{p.maxHp+=16;heal(p,20)}]},
+      {id:'resonance-core',i:'✹',n:'공명 핵',rarity:'rare',d:['돌진 쿨 감소 · 사용 후 주변 적에게 충격 잔향','구르기 쿨 감소 · 짧은 추가 보호 · 다음 사격 강화'],f:[p=>{p.specialBoost+=42;p.range+=10},p=>{p.specialBoost+=32;p.range+=6}]},
+      {id:'condensed-crystal',i:'◆',n:'응축 수정',rarity:'rare',d:['공격 +4 · 최대 HP +14 · 주기적으로 주변 적에게 수정 파편 피해','공격 +4 · 공격 가속 · 주기적으로 원거리 수정 탄막'],f:[p=>{p.atk+=4;p.maxHp+=14;heal(p,14)},p=>{p.atk+=4;p.rate+=1}]},
+      {id:'twin-grail',i:'♜',n:'쌍둥이 성배',rarity:'epic',d:['체력이 낮을수록 가하는 피해 증가','체력을 높게 유지할수록 가하는 피해 증가'],f:[p=>heal(p,8),p=>heal(p,8)]},
+      {id:'abyss-mirror',i:'◇',n:'심연의 거울',rarity:'epic',d:['적 투사체를 확률적으로 반사','적 투사체를 확률적으로 무효화 · 구르기 대기시간 감소'],f:[p=>{},p=>{}]},
+      {id:'pilgrim-lantern',i:'✦',n:'순례자의 등불',rarity:'rare',d:['전투방 클리어 시 체력 회복','전투방 클리어 시 소량 회복 · 구르기 대기시간 90 감소'],f:[p=>{},p=>{}]},
+      {id:'red-vow',i:'✕',n:'붉은 서약',rarity:'epic',d:['최대 HP 15% 감소 · 공격 +14 · 돌진 피해 +12%','최대 HP 10% 감소 · 공격 +10 · 이속 +0.12'],f:[p=>{p.maxHp=Math.max(45,Math.round(p.maxHp*.85));p.hp=Math.min(p.hp,p.maxHp);p.atk+=14},p=>{p.maxHp=Math.max(45,Math.round(p.maxHp*.90));p.hp=Math.min(p.hp,p.maxHp);p.atk+=10;p.speed+=.12}]},
+      {id:'time-gear',i:'⌁',n:'시간의 톱니',rarity:'legendary',d:['돌진 사용 시 확률적으로 대기시간 즉시 초기화','구르기 쿨 35% 감소 · 중첩마다 +5% (최대 65%)'],f:[p=>{},p=>{}]}
     ];
-    if(AF.player.hero.key==='dawn')opts.push({id:'solar-shard',i:'☀',img:relicIcon('solar-shard'),n:'태양의 파편',d:'에단 전용 · 검 공격 피해 +8%',rarity:'epic',relic:true,f:p=>{}});
-    else opts.push({id:'eclipse-fang',i:'☾',img:relicIcon('eclipse-fang'),n:'월식의 송곳니',d:'Night 전용 · 적 처치 시 추가 월광 칼날 발생',rarity:'epic',relic:true,f:p=>{}});
-    chooseReward(opts,'보물 발견','상자에서 유물 하나를 선택하세요.');
-  }
+    opts.push(role===0?{id:'solar-shard',i:'☀',n:'태양의 파편',rarity:'epic',d:['검 피해 +8% · 돌진 보호막 강화',''],f:[p=>{},p=>{}]}:{id:'eclipse-fang',i:'☾',n:'월식의 송곳니',rarity:'epic',d:['','적 처치 시 추가 월광 사격 발생'],f:[p=>{},p=>{}]});
+    return opts.map(o=>({...o,d:(role===0?'에단':'노아')+' · '+o.d[role],f:o.f[role],img:relicIcon(o.id),relic:true}));
+  };
+  function treasureReward(){chooseReward(AF.relicOptions(),'보물 발견','상자에서 유물 하나를 선택하세요.');}
   function roomFeature(r){
     if(!r||r.used)return;
     const p=AF.player,cx=W/2,cy=arena.y+arena.h/2,d=Math.hypot(p.x-cx,p.y-cy);
@@ -608,7 +608,7 @@
     if(r.type==='treasure'){
       r.used=true;sound()?.sfx('chest');AF.toast('보물상자를 열었습니다');treasureReward();
     }else if(r.type==='recovery'){
-      r.used=true;sound()?.sfx('heal');const heal=Math.max(30,Math.round(p.maxHp*.45));p.hp=Math.min(p.maxHp,p.hp+heal);p.shield=Math.min(40,p.shield+10);
+      r.used=true;sound()?.sfx('heal');const heal=Math.max(30,Math.round(p.maxHp*.45));p.hp=Math.min(p.maxHp,p.hp+heal);p.bodyFlash=0;p.shield=Math.min(40,p.shield+10+4*relicCount('solar-shard'));
       for(let i=0;i<18;i++)AF.particles.push({x:cx+(Math.random()-.5)*50,y:cy+(Math.random()-.5)*50,vx:(Math.random()-.5)*1.4,vy:-1-Math.random()*1.4,l:30,color:'#69e5b6'});
       AF.toast(`회복의 샘 · HP +${heal}`);
     }else if(r.type==='exit'&&r.clear&&!AF.transitioning){
@@ -689,10 +689,11 @@
     const seal=relicCount('guardian-seal');
     if(seal&&n>0&&(p.guardianCd||0)<=0){
       p.guardianCd=Math.max(170,310-(seal-1)*30);
-      p.shield=Math.min(60,p.shield+8+seal*6);
+      p.shield=Math.min(60,p.shield+(p.hero.key==='dawn'?8+seal*6:6+seal*4));
+      if(p.hero.key==='night')p.special=Math.max(0,p.special-30-seal*15);
       const rad=88+seal*10;
       AF.shockwaves.push({x:p.x,y:p.y,r:12,max:rad,l:24,color:'#6fe6c4'});
-      AF.cur().enemies.forEach(e=>{if(e.alive&&Math.hypot(e.x-p.x,e.y-p.y)<rad)damage(e,13+seal*7+p.atk*.15)});
+      if(p.hero.key==='dawn')AF.cur().enemies.forEach(e=>{if(e.alive&&Math.hypot(e.x-p.x,e.y-p.y)<rad)damage(e,13+seal*7+p.atk*.15)});
       AF.toast('수호자의 인장 · 반격 보호막');
     }for(let i=0;i<10;i++)AF.particles.push({x:p.x,y:p.y,vx:(Math.random()-.5)*4,vy:(Math.random()-.5)*4,l:22,color:'#ff6478'});if(p.hp<=0&&!AF.dead){p.hp=0;AF.dead=true;AF.paused=true;sound()?.stopMusic();sound()?.sfx('gameOver');p.deathAt=performance.now();ui.resultText.textContent=`${p.hero.ko} · 지하 ${AF.floor}층 · Lv ${p.level} · 처치 ${AF.kills}`;setTimeout(()=>{if(AF.dead)ui.gameOver.classList.add('show')},900)}}
   function clamp(){const p=AF.player;p.x=Math.max(arena.x+p.r,Math.min(arena.x+arena.w-p.r,p.x));p.y=Math.max(arena.y+p.r,Math.min(arena.y+arena.h-p.r,p.y))}
@@ -768,9 +769,9 @@
     e.bossCd=Math.max(44,118-phase*16-Math.min(34,(AF.floor-1)*2));
   }
 
-  AF.update=dt=>{const p=AF.player;if(p.chargeRecover>0)p.chargeRecover-=dt;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.specialPose>0)p.specialPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}let m=Math.hypot(vx,vy);if(p.mobility)updateMobility(dt);else fieldMovement(AF.cur(),p,vx,vy,m,dt);
+  AF.update=dt=>{const p=AF.player;if(p.bodyFlash>0)p.bodyFlash-=dt;if(p.chargeRecover>0)p.chargeRecover-=dt;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.specialPose>0)p.specialPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}let m=Math.hypot(vx,vy);if(p.mobility)updateMobility(dt);else fieldMovement(AF.cur(),p,vx,vy,m,dt);
     const sigil=relicCount('dash-sigil');
-    if(m&&sigil){
+    if(m&&sigil&&p.hero.key==='dawn'){
       p.sigilCharge=(p.sigilCharge||0)+dt;
       const threshold=Math.max(38,72-(sigil-1)*7);
       if(p.sigilCharge>=threshold){
@@ -789,7 +790,8 @@
         const target=nearest();
         if(target){
           const a=Math.atan2(target.y-p.y,target.x-p.x),dmg=8+crystal*4+p.atk*.16;
-          for(const o of [-.16,0,.16])launch({team:'p',kind:'crystal',x:p.x,y:p.y,vx:Math.cos(a+o)*7.4,vy:Math.sin(a+o)*7.4,r:6,dmg,pierce:0,life:105,color:'#8cecff'},p,target);
+          if(p.hero.key==='dawn'){const rad=78+crystal*8;AF.slashes.push({art:true,kind:'ethanSword',x:p.x,y:p.y,a,l:12,max:12,r:rad});for(const e of r.enemies)if(e.alive&&Math.hypot(e.x-p.x,e.y-p.y)<rad+e.r)damage(e,dmg*1.5)}
+          else for(const o of [-.16,0,.16])launch({team:'p',kind:'crystal',x:p.x,y:p.y,vx:Math.cos(a+o)*7.4,vy:Math.sin(a+o)*7.4,r:6,dmg,pierce:0,life:105,color:'#8cecff'},p,target);
         }
       }
     }
@@ -881,7 +883,9 @@
         if(e){(q.hitEnemies??=new Set()).add(e);damage(e,q.dmg);if(q.pierce>0)q.pierce--;else AF.projectiles.splice(i,1)}
       }else if(p.inv<=0&&Math.hypot(p.x-q.x,p.y-q.y)<p.r+q.r){
         const mirror=relicCount('abyss-mirror'),chance=Math.min(.55,.18+.07*Math.max(0,mirror-1));
-        if(mirror&&Math.random()<chance){
+        const mirrorProc=mirror&&Math.random()<chance;
+        if(mirrorProc&&p.hero.key==='night'){p.inv=12;p.special=Math.max(0,p.special-24);AF.projectiles.splice(i,1);AF.slashes.push({art:true,kind:'rollTrail',x:p.x,y:p.y,a:0,l:12,max:12})}
+        else if(mirrorProc){
           q.team='p';q.kind='reflected';q.vx*=-1.22;q.vy*=-1.22;q.dmg=q.dmg*1.25+p.atk*.22;q.pierce=0;q.life=Math.min(q.life,92);
           q.x=p.x+q.vx*2;q.y=p.y+q.vy*2;presentProjectile(q,p,nearest());p.inv=7;
           for(let k=0;k<7;k++)AF.particles.push({x:p.x,y:p.y,vx:(Math.random()-.5)*3.4,vy:(Math.random()-.5)*3.4,l:18,color:'#9fdcff'});
@@ -904,8 +908,8 @@
       if(!wasClear){
         const lantern=relicCount('pilgrim-lantern');
         if(lantern&&(r.type==='combat'||r.type==='elite')){
-          const before=p.hp,heal=Math.max(4,Math.round(p.maxHp*(.045+.02*(lantern-1))));
-          p.hp=Math.min(p.maxHp,p.hp+heal);
+          const before=p.hp,heal=p.hero.key==='dawn'?Math.max(4,Math.round(p.maxHp*(.045+.02*(lantern-1)))):Math.max(3,Math.round(p.maxHp*(.025+.005*(lantern-1))));
+          p.hp=Math.min(p.maxHp,p.hp+heal);if(p.hero.key==='night')p.special=Math.max(0,p.special-90);
           if(p.hp>before)AF.toast('순례자의 등불 · HP +'+Math.round(p.hp-before));
         }
       }

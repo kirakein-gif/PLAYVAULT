@@ -10,7 +10,7 @@
     const im=new Image();art.images[key]=im;
     im.onload=()=>{art.loaded[key]=true;if(key==='relics')relicIcons(im);resolve(true)};
     im.onerror=()=>{art.loaded[key]=false;resolve(false)};
-    im.src=path+'?v=50';
+    im.src=path+'?v=51';
   })));
   function relicIcons(im){
     art.relicIcons={};
@@ -135,7 +135,9 @@
   const ethanFrames=[];
   function ethanCombat(row,col){
     if(!ethanFrames.length){const im=art.images.ethanCombat,ux=im.width/1774,uy=im.height/887,xs=[0,430,927,1410,1774],ys=[0,480,887],pivots=[[200,670,1150,1570],[211,690,1140,1600]],feet=[[450,451,453,453],[380,381,380,381]];
-      for(let r=0;r<2;r++)ethanFrames.push(Array.from({length:4},(_,c)=>({image:'ethanCombat',x:xs[c]*ux,y:ys[r]*uy,w:(xs[c+1]-xs[c])*ux,h:(ys[r+1]-ys[r])*uy,pivot:(pivots[r][c]-xs[c])*ux,foot:feet[r][c]*uy,scale:.65/uy})));
+      // Match the standing body (236 px × .78) to the new standing pose (342 px).
+      // Keep one anatomical scale across every pose; crouching must not enlarge the head.
+      for(let r=0;r<2;r++)ethanFrames.push(Array.from({length:4},(_,c)=>({image:'ethanCombat',x:xs[c]*ux,y:ys[r]*uy,w:(xs[c+1]-xs[c])*ux,h:(ys[r+1]-ys[r])*uy,pivot:(pivots[r][c]-xs[c])*ux,foot:feet[r][c]*uy,scale:(236*.78/342)/uy})));
     }return ethanFrames[row][Math.min(3,col)];
   }
   art.hero=(key,anim,index)=>{
@@ -203,4 +205,8 @@
   }
   art.ready.then(()=>{for(const rows of Object.values(walkFrames))for(const poses of rows)for(const f of poses)if(art.loaded[f.image])isolateWalk(f);if(art.loaded.ethanCombat){for(let row=0;row<2;row++)for(let col=0;col<4;col++)isolateWalk(ethanCombat(row,col))}});
   art.draw=(ctx,key,f,scale,ground)=>ctx.drawImage(f.surface||art.images[key],f.surface?0:f.x,f.surface?0:f.y,f.w,f.h,-f.pivot*scale,ground-f.foot*scale,f.w*scale,f.h*scale);
+  art.drawWard=(ctx,f,scale,ground)=>{
+    if(!f.ward){const c=document.createElement('canvas');c.width=Math.ceil(f.w);c.height=Math.ceil(f.h);const cc=c.getContext('2d');cc.drawImage(f.surface||art.images[f.image],f.surface?0:f.x,f.surface?0:f.y,f.w,f.h,0,0,f.w,f.h);cc.globalCompositeOperation='source-in';cc.fillStyle='#ffdc73';cc.fillRect(0,0,c.width,c.height);f.ward=c}
+    ctx.drawImage(f.ward,0,0,f.w,f.h,-f.pivot*scale,ground-f.foot*scale,f.w*scale,f.h*scale);
+  };
 })();

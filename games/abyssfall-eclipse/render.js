@@ -389,7 +389,15 @@
       if(window.AF_ART?.loaded.heroes){
         const art=window.AF_ART;
         const f=art.hero(h.key,anim,idx);
-        art.draw(ctx,f.image,f,(A.mobile?.57:.46)*f.scale,14);
+        const scale=(A.mobile?.57:.46)*f.scale,charge=p.mobility?.kind==='charge';
+        if(charge){
+          const dx=p.mobility.dx*(p.faceX<0?-1:1),dy=p.mobility.dy;
+          for(let i=2;i>=1;i--){ctx.save();ctx.translate(-dx*i*11,-dy*i*11);ctx.globalAlpha=.10/i;art.drawWard(ctx,f,scale,14);ctx.restore()}
+          ctx.save();ctx.shadowColor='#ffe29a';ctx.shadowBlur=7;ctx.globalAlpha=.78;
+          for(const [x,y] of [[-1.5,0],[1.5,0],[0,-1.5],[0,1.5]]){ctx.save();ctx.translate(x,y);art.drawWard(ctx,f,scale,14);ctx.restore()}ctx.restore();
+        }
+        art.draw(ctx,f.image,f,scale,14);
+        if(h.key==='dawn'&&p.bodyFlash>0){ctx.save();ctx.globalAlpha=Math.min(.65,p.bodyFlash*.1);art.drawWard(ctx,f,scale,14);ctx.restore()}
       }else{
       const sx=frame[0]*atlas.cellW,sy=frame[1]*atlas.cellH;
       const base=h.drawW*(A.mobile?1.52:1.36);

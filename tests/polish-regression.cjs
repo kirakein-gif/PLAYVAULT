@@ -294,6 +294,39 @@ for(const mobile of [false,true]){
  n.special=0;A.useSpecial();A.nextFloor();assert.equal(n.mobility,null,'movement cannot carry into another floor');
 }
 console.log('PASS v49: Ethan directional melee and one-hit knockback charge; Noah ranged fire and timed invulnerable roll on desktop/mobile');
+// Calibrate anatomy, not the sheet cell or the sword's extended silhouette.
+for(const mobile of [false,true]){
+ const h=harness(mobile),art=h.env.AF_ART,uy=art.images.ethanCombat.height/887,reference=236*art.hero('dawn','idle',0).scale;
+ for(const anim of ['attack','charge'])for(let frame=0;frame<4;frame++)assert.ok(Math.abs(342*uy*art.hero('dawn',anim,frame).scale-reference)<.00001,'one anatomical scale through every combat pose');
+ const optionsE=h.A.relicOptions('dawn'),optionsN=h.A.relicOptions('night');assert.equal(optionsE.length,11);assert.equal(optionsN.length,11);
+ for(const o of optionsE.filter(o=>o.id!=='solar-shard'))assert.notEqual(o.d,optionsN.find(n=>n.id===o.id).d,'role-specific description: '+o.id);
+ assert.ok(optionsE.some(o=>o.id==='solar-shard')&&!optionsE.some(o=>o.id==='eclipse-fang'));assert.ok(optionsN.some(o=>o.id==='eclipse-fang')&&!optionsN.some(o=>o.id==='solar-shard'));
+}
+for(const key of ['dawn','night']){
+ const h=harness(),{A}=h;A.selected=key;A.newRun();const options=A.relicOptions(),pick=id=>{const o=options.find(o=>o.id===id);o.f(A.player);A.addRelic(o)};
+ const p=A.player,room=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${room.x},${room.y}`;p.inv=9999;p.basic=9999;A.update(0);
+ const target=room.enemies[0];room.enemies=[target];target.hp=target.max=1000;target.armor=0;target.s=0;target.stun=99999;target.x=p.x+60;target.y=p.y;
+ pick('condensed-crystal');p.crystalTimer=0;A.update(1);
+ if(key==='dawn'){assert.ok(target.hp<1000,'Ethan crystal strikes close enemies');assert.ok(!A.projectiles.some(q=>q.kind==='crystal'),'Ethan crystal never becomes ranged fire')}
+ else assert.equal(A.projectiles.filter(q=>q.kind==='crystal').length,3,'Noah crystal is ranged fan fire');
+ pick('dash-sigil');A.projectiles=[];p.basic=9999;p.special=0;A.keys.d=true;A.useSpecial();for(let i=0;i<18;i++)A.update(1);
+ if(key==='night'){assert.equal(p.rollBoost,.25,'Noah sigil primes boosted ranged shot after rolling');target.x=p.x+180;target.y=p.y;p.basic=0;A.update(1);assert.ok(A.projectiles.some(q=>q.kind==='crescent'&&q.dmg>(p.hero.damage+p.atk)));assert.equal(p.rollBoost,0,'enhanced shot is consumed once')}
+ else assert.ok(p.specialBoost>=18,'Ethan sigil improves charge cooldown');
+ pick('time-gear');p.special=0;A.keys.d=false;A.useSpecial();if(key==='night')assert.ok(Math.abs(p.special-Math.max(90,p.hero.specialCd-p.specialBoost)*.65)<.001,'Noah gear guarantees cooldown reduction');
+}
+console.log('PASS v51: consistent Ethan body scale, distinct relic cards and exclusive pools, melee/ranged crystal effects, one-use roll shot and Noah gear');
+for(const key of ['dawn','night']){
+ const h=harness(),{A}=h;A.selected=key;A.newRun();const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.player.basic=9999;A.update(0);const p=A.player,e=r.enemies[0];r.enemies=[e];Object.assign(e,{hp:1000,max:1000,armor:0,s:0,stun:99999,x:p.x+60,y:p.y});
+ const take=id=>{const o=A.relicOptions().find(o=>o.id===id);o.f(p);A.addRelic(o)};
+ take('twin-grail');p.hp=p.maxHp;const before=e.hp;A.damage(e,10);const full=before-e.hp;p.hp=p.maxHp/2;const halfBefore=e.hp;A.damage(e,10);const half=halfBefore-e.hp;
+ assert.ok(key==='dawn'?half>full:full>half,'grail rewards the selected role health curve');
+ A.relics={};take('abyss-mirror');p.hp=p.maxHp;p.inv=0;p.special=100;vm.runInContext('Math.random=()=>0',h.env);A.projectiles=[{team:'e',kind:'priestBolt',x:p.x-1,y:p.y,vx:1,vy:0,r:7,dmg:20,life:100}];const hp=p.hp;A.update(1);assert.equal(p.hp,hp);
+ if(key==='dawn')assert.ok(A.projectiles.some(q=>q.team==='p'&&q.kind==='reflected'),'Ethan mirror reflects');else{assert.equal(A.projectiles.length,0,'Noah mirror nullifies');assert.equal(p.special,75,'Noah mirror also refunds roll cooldown')}
+ A.relics={};A.projectiles=[];take('guardian-seal');p.inv=0;p.special=200;p.guardianCd=0;e.x=p.x;e.y=p.y;const enemyHp=e.hp;A.update(1);assert.ok(p.shield>0);
+ if(key==='dawn')assert.ok(e.hp<enemyHp,'Ethan guardian retaliates');else{assert.equal(e.hp,enemyHp,'Noah guardian avoids melee retaliation');assert.equal(p.special,154,'Noah guardian accelerates roll recovery')}
+ A.relics={};take('pilgrim-lantern');p.hp=p.maxHp-20;p.special=100;p.inv=9999;A.damage(e,e.max);A.update(1);assert.ok(p.hp>p.maxHp-20);assert.equal(p.special,key==='night'?9:99,'lantern cooldown differs by role');
+}
+console.log('PASS v51 relic triggers: opposite grail curves, reflection versus avoidance, counterattack versus cooldown, and role-specific room recovery');
 {
  const h=harness();let cleaned=0;
  h.ctx.getImageData=(x,y,w,height)=>{
