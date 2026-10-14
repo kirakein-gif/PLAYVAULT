@@ -8,7 +8,7 @@ function harness(mobile=false,dpr=1){
   const classes=new Set(),e={style:{setProperty(){}},dataset:{},children:[],classList:{add(x){classes.add(x)},remove(x){classes.delete(x)},contains(x){return classes.has(x)},toggle(){}},addEventListener(){},setAttribute(){},appendChild(c){this.children.push(c)},getBoundingClientRect(){return {left:0,top:0,width:112,height:112}},getContext(){return ctx},toDataURL(){return 'data:image/png;base64,'},querySelector(s){return el(id+s)},querySelectorAll(){return []},closest(){return null},textContent:'',innerHTML:''};elements.set(id,e);
  }return elements.get(id)}
  class Image{constructor(){this.complete=true;this.naturalWidth=1536;this.width=1536;this.height=1024}set src(x){this._src=x;if(x.includes('room-')&&x.includes('-v5')){this.width=916;this.height=1717}else if(x.includes('relics-v5')){this.width=1448;this.height=1086}this.onload?.()}}
- const env={console,Image,location:{hostname:'127.0.0.1'},performance:{now:()=>now},innerWidth:mobile?390:1440,innerHeight:mobile?844:960,devicePixelRatio:dpr,matchMedia:()=>({matches:mobile}),localStorage:{getItem(){return null},setItem(){}},document:{getElementById:el,querySelectorAll(){return []},documentElement:el('root'),createElement:()=>el('made'+created++)},addEventListener(type,fn){(listeners[type]??=[]).push(fn)},setTimeout(fn,ms){timers.push({fn,at:now+ms});return timers.length},clearTimeout(){},requestAnimationFrame(fn){raf=fn},fetch:async()=>({ok:false,status:404})};env.window=env;vm.createContext(env);
+ const env={console,AF_ATLAS:{frames:{idle:[[0,0]]},images:{},loaded:{}},Image,location:{hostname:'127.0.0.1'},performance:{now:()=>now},innerWidth:mobile?390:1440,innerHeight:mobile?844:960,devicePixelRatio:dpr,matchMedia:()=>({matches:mobile}),localStorage:{getItem(){return null},setItem(){}},document:{getElementById:el,querySelectorAll(){return []},documentElement:el('root'),createElement:()=>el('made'+created++)},addEventListener(type,fn){(listeners[type]??=[]).push(fn)},setTimeout(fn,ms){timers.push({fn,at:now+ms});return timers.length},clearTimeout(){},requestAnimationFrame(fn){raf=fn},fetch:async()=>({ok:false,status:404})};env.window=env;vm.createContext(env);
  for(const file of ['art.js','core.js','render.js'])vm.runInContext(fs.readFileSync(root+'/'+file,'utf8'),env,{filename:file});
  const A=env.AF;
  function advance(ms){now+=ms;for(let i=timers.length-1;i>=0;i--)if(timers[i].at<=now){const {fn}=timers.splice(i,1)[0];fn()}if(A.started&&!A.dead&&!A.paused)A.update(1)}
@@ -27,9 +27,9 @@ function harness(mobile=false,dpr=1){
  room.enemies.forEach(e=>{e.x=A.player.x-60;e.y=A.player.y;e.s=0;e.aiCd=9999});A.keys.d=true;h.advance(17);
  assert.ok(A.player.faceX>0,'automatic fire behind player preserves movement direction');
  A.player.attackPose=14;A.player.hurtPose=0;A.player.inv=0;A.player.specialPose=0;h.draws.length=0;h.frame();
- const frame=h.draws.find(d=>d[0]===h.env.AF_ART.images.actions);assert.ok(frame,'Ethan visibly swings his sword while moving');
+ const frame=h.draws.find(d=>d[0]===h.env.AF_ART.images.ethanCombat);assert.ok(frame,'Ethan visibly swings his sword while moving');
  A.player.specialPose=24;A.player.attackAt=10000;h.draws.length=0;h.frame();
- assert.ok(h.draws.some(d=>d[0]===h.env.AF_ART.images.actions),'moving special still has attack animation');
+ assert.ok(h.draws.some(d=>d[0]===h.env.AF_ART.images.ethanCombat),'moving special still has attack animation');
  console.log('PASS movement: grounded cadence, unchanged speed, stable facing, moving basic and special poses');
 }
 // Use genuine XP pickup flow, then choose the displayed option by its actual key.
@@ -283,11 +283,11 @@ for(const mobile of [false,true]){
  const h=harness(mobile),{A}=h;A.newRun();const room=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${room.x},${room.y}`;A.update(0);const p=A.player;
  const template=room.enemies[0],enemy=(x)=>({...template,type:'crawler',x,y:p.y,r:18,hp:1000,max:1000,armor:0,s:0,stun:99999,aiCd:99999,aiWindup:0,dash:0,alive:true});
  p.inv=9999;p.basic=0;const front=enemy(p.x+60),behind=enemy(p.x-80),far=enemy(p.x+270);room.enemies=[front,behind,far];A.update(1);
- assert.equal(front.hp,976,'Ethan sword damages nearby enemy');assert.equal(behind.hp,1000,'sword has a directional arc');assert.equal(far.hp,1000,'sword cannot hit ranged enemies');assert.equal(A.projectiles.filter(q=>q.team==='p').length,0,'Ethan does not shoot');
+ assert.equal(front.hp,1000,'sword windup has no premature damage');for(let i=0;i<6;i++)A.update(1);assert.equal(front.hp,976,'damage occurs with the sword swing');assert.equal(behind.hp,1000,'sword has a directional arc');assert.equal(far.hp,1000,'sword cannot hit ranged enemies');assert.equal(A.projectiles.filter(q=>q.team==='p').length,0,'Ethan does not shoot');
  room.enemies=[far];p.basic=0;A.update(1);assert.equal(far.hp,1000,'out-of-range auto attack deals no damage');
- const target=enemy(p.x+120);room.enemies=[target];p.basic=9999;p.special=0;const startX=p.x;A.useSpecial();assert.equal(p.x,startX,'charge travels over time');
- for(let i=0;i<18;i++){A.update(1);h.frame()}
- assert.equal(p.mobility,null);assert.equal(target.hp,938,'charge hits each enemy once');assert.ok(target.x>startX+120,'charge pushes its target');assert.ok(p.x>startX+150);assert.equal(A.heroes.dawn.maxHp,150);assert.ok(A.heroes.dawn.speed<A.heroes.night.speed);
+ const target=enemy(p.x+120);room.enemies=[target];p.basic=9999;p.special=0;const startX=p.x;A.useSpecial();const protectedHp=p.hp;p.shield=0;p.inv=0;A.projectiles.push({team:'e',x:p.x+9,y:p.y,vx:0,vy:0,r:15,dmg:100,life:30});A.update(1);assert.equal(p.hp,protectedHp,'Ethan body charge is invulnerable');assert.ok(p.x>startX&&p.x<startX+20,'charge travels over time');
+ for(let i=0;i<11;i++){A.update(1);h.frame()}
+ assert.equal(p.mobility,null);assert.equal(target.hp,938,'charge hits each enemy once');assert.ok(target.x>startX+120,'charge pushes its target');assert.ok(p.x>=startX+100&&p.x<=startX+120,'short body charge covers about half the original distance');assert.ok(A.slashes.some(f=>f.kind==='chargeImpact'),'collision has a dedicated body impact');assert.ok(!A.slashes.some(f=>f.kind==='ethanSword'),'charge never swings a sword');assert.equal(A.heroes.dawn.maxHp,150);assert.ok(A.heroes.dawn.speed<A.heroes.night.speed);
  A.selected='night';A.newRun();const nr=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${nr.x},${nr.y}`;A.update(0);const n=A.player;nr.enemies=[{...template,type:'crawler',x:n.x+260,y:n.y,r:18,hp:1000,max:1000,armor:0,s:0,stun:99999,alive:true}];n.inv=9999;n.basic=0;A.update(1);assert.ok(A.projectiles.some(q=>q.team==='p'&&q.kind==='crescent'),'Noah shoots from range');
  n.basic=9999;n.inv=0;n.special=0;A.keys.d=true;const x=n.x,hp=n.hp,enemyHp=nr.enemies[0].hp;A.projectiles=[];nr.enemies[0].x=n.x+9;A.useSpecial();assert.equal(n.x,x,'roll travels over time');A.update(1);assert.equal(n.hp,hp,'roll prevents contact damage');assert.equal(nr.enemies[0].hp,enemyHp,'roll is an evasion skill without base damage');h.frame();for(let i=0;i<16;i++)A.update(1);assert.equal(n.mobility,null);assert.ok(n.x>x+120);
  A.keys.d=false;n.inv=0;nr.enemies[0].x=n.x;nr.enemies[0].y=n.y;A.update(1);assert.ok(n.hp<hp,'invulnerability ends after rolling');
@@ -308,5 +308,5 @@ console.log('PASS v49: Ethan directional melee and one-hit knockback charge; Noa
   assert.equal(p.data[(45*p.width+195)*4+3],0,'foreign weapon fragment is fully transparent');
   assert.equal(p.data[(35*p.width+49)*4+3],40,'soft actor edge remains intact');cleaned++;
  };
- h.env.AF_ART.ready.then(()=>{assert.equal(cleaned,114,'all 19 enemies × six walk poses isolated');console.log('PASS v48: foreign fragments removed from all walk frames; actor silhouette and soft alpha edges preserved')}).catch(err=>{console.error(err);process.exitCode=1});
+ h.env.AF_ART.ready.then(()=>{assert.equal(cleaned,122,'enemy walk poses and eight Ethan combat poses isolated');console.log('PASS v48: foreign fragments removed from all walk frames; actor silhouette and soft alpha edges preserved')}).catch(err=>{console.error(err);process.exitCode=1});
 }

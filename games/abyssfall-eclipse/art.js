@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const art=window.AF_ART={images:{},loaded:{}};
-  const paths={heroes:'../../assets/art/heroes-v4.webp',actions:'../../assets/art/actions-v4.webp',enemies:'../../assets/art/enemies-v2.webp',props:'../../assets/art/props-v1.webp',relics:'../../assets/art/relics-v5.webp',lavaFlow:'../../assets/art/lava-flow-v39.webp'};
+  const paths={heroes:'../../assets/art/heroes-v4.webp',actions:'../../assets/art/actions-v4.webp',ethanCombat:'../../assets/art/ethan-combat-v50.webp',enemies:'../../assets/art/enemies-v2.webp',props:'../../assets/art/props-v1.webp',relics:'../../assets/art/relics-v5.webp',lavaFlow:'../../assets/art/lava-flow-v39.webp'};
   Object.assign(paths,{bossA:'../../assets/art/boss-a-v46.webp',bossB:'../../assets/art/boss-b-v46.webp',mobA:'../../assets/art/mob-a-v46.webp',mobB:'../../assets/art/mob-b-v46.webp'});
   Object.assign(paths,{"walkBossA": "../../assets/art/boss-a-walk-v47.webp", "walkBossB": "../../assets/art/boss-b-walk-v47.webp", "walkMobA": "../../assets/art/mob-a-walk-v47.webp", "walkMobB": "../../assets/art/mob-b-walk-v47.webp", "walkBase": "../../assets/art/enemies-walk-v47.webp"});
   for(const zone of ['cathedral','graveyard','tower','abyss'])paths[zone]='../../assets/art/room-'+zone+'-v5.webp';
@@ -10,7 +10,7 @@
     const im=new Image();art.images[key]=im;
     im.onload=()=>{art.loaded[key]=true;if(key==='relics')relicIcons(im);resolve(true)};
     im.onerror=()=>{art.loaded[key]=false;resolve(false)};
-    im.src=path+'?v=49';
+    im.src=path+'?v=50';
   })));
   function relicIcons(im){
     art.relicIcons={};
@@ -132,7 +132,14 @@
   const heroRows=[0,278,512,773,1024],heroEdges=[0,256,512,768,1024,1280,1536];
   const heroFeet=[[264,264,264,263,264,264],[219,219,219,223,223,223],[250,250,250,250,250,253],[222,221,219,224,224,224]];
   const heroTorso=[[145,389,629,889,1140,1410],[146,389,641,889,1144,1420],[143,387,626,888,1140,1404],[143,388,640,888,1140,1410]];
+  const ethanFrames=[];
+  function ethanCombat(row,col){
+    if(!ethanFrames.length){const im=art.images.ethanCombat,ux=im.width/1774,uy=im.height/887,xs=[0,430,927,1410,1774],ys=[0,480,887],pivots=[[200,670,1150,1570],[211,690,1140,1600]],feet=[[450,451,453,453],[380,381,380,381]];
+      for(let r=0;r<2;r++)ethanFrames.push(Array.from({length:4},(_,c)=>({image:'ethanCombat',x:xs[c]*ux,y:ys[r]*uy,w:(xs[c+1]-xs[c])*ux,h:(ys[r+1]-ys[r])*uy,pivot:(pivots[r][c]-xs[c])*ux,foot:feet[r][c]*uy,scale:.65/uy})));
+    }return ethanFrames[row][Math.min(3,col)];
+  }
   art.hero=(key,anim,index)=>{
+    if(key==='dawn'&&(anim==='attack'||anim==='charge')&&art.loaded.ethanCombat)return ethanCombat(anim==='charge'?1:0,index);
     if((anim==='attack'||anim==='death')&&art.loaded.actions){
       const row=(key==='dawn'?0:2)+(anim==='death'?1:0),col=Math.min(3,index);
       const edges=[[0,315,630,975,1254],[0,315,630,950,1254],[0,315,630,975,1254],[0,315,630,950,1254]];
@@ -175,7 +182,7 @@
     return walkFrames[spec[0]][spec[1]][Math.floor((e.walkCycle||0)*6)%6];
   };
   function isolateWalk(f){
-    const c=document.createElement('canvas');c.width=f.w;c.height=f.h;const cc=c.getContext('2d');
+    const c=document.createElement('canvas');c.width=Math.ceil(f.w);c.height=Math.ceil(f.h);const cc=c.getContext('2d');
     cc.drawImage(art.images[f.image],f.x,f.y,f.w,f.h,0,0,f.w,f.h);
     const pixels=cc.getImageData?.(0,0,c.width,c.height);if(!pixels?.data)return;
     const data=pixels.data,w=c.width,h=c.height,n=w*h,labels=new Int32Array(n),queue=new Int32Array(n),sizes=[0];let label=0;
@@ -194,6 +201,6 @@
     for(let i=0;i<n;i++){if(!keep[i])data[i*4+3]=0;else {const edge=Math.min(i%w,w-1-i%w);data[i*4+3]*=Math.min(1,edge/4)}}
     cc.putImageData(pixels,0,0);f.surface=c;
   }
-  art.ready.then(()=>{for(const rows of Object.values(walkFrames))for(const poses of rows)for(const f of poses)if(art.loaded[f.image])isolateWalk(f)});
+  art.ready.then(()=>{for(const rows of Object.values(walkFrames))for(const poses of rows)for(const f of poses)if(art.loaded[f.image])isolateWalk(f);if(art.loaded.ethanCombat){for(let row=0;row<2;row++)for(let col=0;col<4;col++)isolateWalk(ethanCombat(row,col))}});
   art.draw=(ctx,key,f,scale,ground)=>ctx.drawImage(f.surface||art.images[key],f.surface?0:f.x,f.surface?0:f.y,f.w,f.h,-f.pivot*scale,ground-f.foot*scale,f.w*scale,f.h*scale);
 })();

@@ -22,7 +22,7 @@
   };
   const enemyImgs=AF.enemyImgs={}; Object.entries(ENEMY_SPR).forEach(([k,src])=>{const im=new Image();im.src=src;enemyImgs[k]=im});
   AF.heroes={
-    dawn:{key:'dawn',name:'Ethan',ko:'에단',color:'#ffd46f',accent:'#66d9ff',maxHp:150,speed:2.85,armor:.18,basicName:'검 휘두르기',basicIcon:'⚔',rate:42,damage:24,proj:8.1,specialName:'돌진 베기',specialIcon:'➤',specialCd:360,idle:'dawn_idle',run:'dawn_run',attack:'dawn_attack',drawW:mobile?112:98},
+    dawn:{key:'dawn',name:'Ethan',ko:'에단',color:'#ffd46f',accent:'#66d9ff',maxHp:150,speed:2.85,armor:.18,basicName:'검 휘두르기',basicIcon:'⚔',rate:42,damage:24,proj:8.1,specialName:'몸통 돌진',specialIcon:'➤',specialCd:360,idle:'dawn_idle',run:'dawn_run',attack:'dawn_attack',drawW:mobile?112:98},
     night:{key:'night',name:'Noah',ko:'노아',color:'#7bdfff',accent:'#9273ff',maxHp:96,speed:3.95,armor:0,basicName:'월광 사격',basicIcon:'☾',rate:25,damage:14,proj:9.2,specialName:'회피 구르기',specialIcon:'↻',specialCd:210,idle:'night_idle',run:'night_run',attack:'night_attack',drawW:mobile?106:94}
   };
   AF.selected='dawn'; AF.floor=1; AF.kills=0; AF.relics={}; AF.rooms={}; AF.runStart=0; AF.endless=false; AF.cleared=false; AF.transitioning=false; AF.current='0,0'; AF.started=false; AF.paused=true; AF.dead=false; AF.player=null; AF.projectiles=[]; AF.particles=[]; AF.shockwaves=[]; AF.pickups=[]; AF.slashes=[]; AF.soulBursts=[];
@@ -473,28 +473,35 @@
     if(Math.abs(m.dx)>.15)p.faceX=m.dx;p.faceY=m.dy;p.step+=step*.18;
     if(m.kind==='roll')p.inv=Math.max(p.inv,m.time+2);
     else{
-      p.attackPose=20;p.specialPose=20;p.meleeAim=Math.atan2(m.dy,m.dx);
+      p.attackPose=0;p.specialPose=0;p.inv=Math.max(p.inv,m.time+2);p.meleeAim=Math.atan2(m.dy,m.dx);
       for(const e of AF.cur().enemies)if(e.alive&&!m.hits.has(e)&&seg(sx,sy,p.x,p.y,e.x,e.y,e.r+32)){
+        const ix=(p.x+e.x)/2,iy=(p.y+e.y)/2;
         m.hits.add(e);damage(e,62+p.atk*2.2);pushEnemy(e,m.dx,m.dy,65);
-        AF.slashes.push({art:true,kind:'ethanSword',x:e.x,y:e.y,a:p.meleeAim,r:85,l:18,max:18});
+        AF.slashes.push({art:true,kind:'chargeImpact',x:ix,y:iy,a:p.meleeAim,r:46,l:22,max:22});
+        for(let i=0;i<14;i++){const a=i*Math.PI*2/14,speed=1.8+Math.random()*2.8;AF.particles.push({x:ix,y:iy-24,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed-1,l:18,color:i%3?'#bca779':'#fff1cf'})}
+
       }
     }
     AF.slashes.push({art:true,kind:m.kind==='roll'?'rollTrail':'chargeTrail',x:sx,y:sy,a:Math.atan2(m.dy,m.dx),l:10,max:10});
-    m.time-=step;if(m.time<=0||Math.hypot(p.x-sx,p.y-sy)<.01){p.mobility=null;p.slideX=p.slideY=0;p.specialPose=0}
+    m.time-=step;if(m.time<=0||Math.hypot(p.x-sx,p.y-sy)<.01){p.mobility=null;p.slideX=p.slideY=0;p.specialPose=0;if(m.kind==='charge'){p.chargeRecover=10;p.basic=Math.max(p.basic,12)}}
+  }
+  function resolveSword(swing){
+    const p=AF.player,a=swing.a;
+    AF.slashes.push({art:true,kind:'ethanSword',x:p.x,y:p.y,a,r:swing.reach,l:12,max:12});
+    for(const target of AF.cur().enemies){
+      if(!target.alive)continue;
+      const angle=Math.atan2(target.y-p.y,target.x-p.x),delta=Math.atan2(Math.sin(angle-a),Math.cos(angle-a));
+      if(Math.hypot(target.x-p.x,target.y-p.y)<=swing.reach+target.r&&Math.abs(delta)<1.1){damage(target,swing.power);pushEnemy(target,Math.cos(a),Math.sin(a),target.type==='boss'?2:9)}
+    }
   }
   function fireBasic(){
     const p=AF.player,h=p.hero,e=nearest();if(!e||p.mobility)return;const meleeReach=100+Math.min(45,p.range*.6);if(h.key==='dawn'&&Math.hypot(e.x-p.x,e.y-p.y)>meleeReach+e.r){p.basic=Math.min(p.basic,4);return;}sound()?.sfx('basic',h.key);
     const a=Math.atan2(e.y-p.y,e.x-p.x),blade=relicCount('relic-blade'),solar=h.key==='dawn'?relicCount('solar-shard'):0;
-    if(!p.moving){if(Math.abs(Math.cos(a))>.35)p.faceX=Math.cos(a);p.faceY=Math.sin(a)}p.attackPose=14;p.attackAt=performance.now();p.bladeShots=(p.bladeShots||0)+1;
+    if(!p.moving){if(Math.abs(Math.cos(a))>.35)p.faceX=Math.cos(a);p.faceY=Math.sin(a)}p.attackPose=h.key==='dawn'?18:14;p.attackAt=performance.now();p.bladeShots=(p.bladeShots||0)+1;
     const burst=blade>0&&p.bladeShots%3===0;
     if(h.key==='dawn'){
       p.meleeAim=a;
-      AF.slashes.push({art:true,kind:'ethanSword',x:p.x,y:p.y,a,r:meleeReach,l:18,max:18});
-      for(const target of AF.cur().enemies){
-        if(!target.alive)continue;
-        const angle=Math.atan2(target.y-p.y,target.x-p.x),delta=Math.atan2(Math.sin(angle-a),Math.cos(angle-a));
-        if(Math.hypot(target.x-p.x,target.y-p.y)<=meleeReach+target.r&&Math.abs(delta)<1.1){damage(target,(h.damage+p.atk)*(burst?1.3+.08*blade:1)*(1+.08*solar));pushEnemy(target,Math.cos(a),Math.sin(a),target.type==='boss'?2:9)}
-      }
+      p.swordSwing={time:6,a,reach:meleeReach,power:(h.damage+p.atk)*(burst?1.3+.08*blade:1)*(1+.08*solar)};
     }else{
       launch({team:'p',kind:'crescent',x:p.x,y:p.y,vx:Math.cos(a)*h.proj,vy:Math.sin(a)*h.proj,r:9,dmg:h.damage+p.atk,pierce:1+(p.level/6|0)+blade,life:85,color:'#9c7cff'},p,e);
       AF.slashes.push({x:p.x,y:p.y,a,l:14,max:14,r:36});
@@ -510,9 +517,10 @@
     if(relicCount('resonance-core'))p.echoTimer=18;
     const direction=mobilityDirection(h.key==='dawn');
     if(h.key==='dawn'){
-      p.mobility={kind:'charge',dx:direction.x,dy:direction.y,time:18,max:18,speed:12+Math.min(3,p.range*.025),hits:new Set()};
-      p.shield=Math.min(40,p.shield+10);p.inv=Math.max(p.inv,18);
-      AF.toast('돌진 베기');
+      p.mobility={kind:'charge',dx:direction.x,dy:direction.y,time:12,max:12,speed:9+Math.min(1,p.range*.01),hits:new Set()};
+      AF.slashes=AF.slashes.filter(fx=>fx.kind!=='ethanSword');p.swordSwing=null;
+      p.attackPose=0;p.specialPose=0;p.chargeRecover=0;p.shield=Math.min(40,p.shield+10);p.inv=Math.max(p.inv,14);
+      AF.toast('몸통 돌진');
     }else{
       p.mobility={kind:'roll',dx:direction.x,dy:direction.y,time:16,max:16,speed:9+Math.min(2,p.range*.02)};
       p.attackPose=0;p.specialPose=0;p.inv=Math.max(p.inv,18);
@@ -659,7 +667,7 @@
   };
   AF.nextFloor=(source='exit')=>{
     if(AF.rewardChoices?.length){AF.pendingFloor={source,room:AF.cur()};return}
-    AF.paused=false;sound()?.startExplore();AF.transitioning=false;AF.bossClearUntil=0;AF.floor++;if(AF.player)AF.player.mobility=null;
+    AF.paused=false;sound()?.startExplore();AF.transitioning=false;AF.bossClearUntil=0;AF.floor++;if(AF.player){AF.player.mobility=null;AF.player.swordSwing=null;}
     AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();
     const healRate=source==='boss'?(AF.floor>12?.22:.30):source==='endless'?.30:AF.floor>12?.10:.16;
     AF.player.slideX=AF.player.slideY=0;AF.player.x=W/2;AF.player.y=arena.y+arena.h/2;
@@ -677,7 +685,7 @@
     if(AF.floor>=24)AF.endless=true;
     AF.nextFloor('test');
   };
-  function hurt(n,nx,ny){const p=AF.player;if(p.mobility?.kind==='roll')return;n*=1-(p.hero.armor||0);if(p.shield>0){const b=Math.min(p.shield,n);p.shield-=b;n-=b;if(n<=0){p.inv=18;return}}p.hp-=Math.round(n);sound()?.sfx('hurt');p.inv=48;p.hurtPose=18;p.x+=nx*18;p.y+=ny*18;
+  function hurt(n,nx,ny){const p=AF.player;if(p.mobility)return;n*=1-(p.hero.armor||0);if(p.shield>0){const b=Math.min(p.shield,n);p.shield-=b;n-=b;if(n<=0){p.inv=18;return}}p.hp-=Math.round(n);sound()?.sfx('hurt');p.inv=48;p.hurtPose=18;p.x+=nx*18;p.y+=ny*18;
     const seal=relicCount('guardian-seal');
     if(seal&&n>0&&(p.guardianCd||0)<=0){
       p.guardianCd=Math.max(170,310-(seal-1)*30);
@@ -689,7 +697,7 @@
     }for(let i=0;i<10;i++)AF.particles.push({x:p.x,y:p.y,vx:(Math.random()-.5)*4,vy:(Math.random()-.5)*4,l:22,color:'#ff6478'});if(p.hp<=0&&!AF.dead){p.hp=0;AF.dead=true;AF.paused=true;sound()?.stopMusic();sound()?.sfx('gameOver');p.deathAt=performance.now();ui.resultText.textContent=`${p.hero.ko} · 지하 ${AF.floor}층 · Lv ${p.level} · 처치 ${AF.kills}`;setTimeout(()=>{if(AF.dead)ui.gameOver.classList.add('show')},900)}}
   function clamp(){const p=AF.player;p.x=Math.max(arena.x+p.r,Math.min(arena.x+arena.w-p.r,p.x));p.y=Math.max(arena.y+p.r,Math.min(arena.y+arena.h-p.r,p.y))}
   function enter(nk,from){
-    AF.player.mobility=null;
+    AF.player.mobility=null;AF.player.swordSwing=null;
     AF.player.slideX=AF.player.slideY=0;AF.current=nk;const r=AF.cur();r.seen=true;AF.projectiles=[];AF.slashes=[];AF.soulBursts=[];
     const p=AF.player;if(from==='W'){p.x=arena.x+35;p.y=AF.sideDoorY()}else if(from==='E'){p.x=arena.x+arena.w-35;p.y=AF.sideDoorY()}else if(from==='N'){p.x=W/2;p.y=arena.y+35}else if(from==='S'){p.x=W/2;p.y=arena.y+arena.h-35}
     p.inv=r.type==='boss'?120:35;
@@ -760,7 +768,7 @@
     e.bossCd=Math.max(44,118-phase*16-Math.min(34,(AF.floor-1)*2));
   }
 
-  AF.update=dt=>{const p=AF.player;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.specialPose>0)p.specialPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}let m=Math.hypot(vx,vy);if(p.mobility)updateMobility(dt);else fieldMovement(AF.cur(),p,vx,vy,m,dt);
+  AF.update=dt=>{const p=AF.player;if(p.chargeRecover>0)p.chargeRecover-=dt;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.specialPose>0)p.specialPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}let m=Math.hypot(vx,vy);if(p.mobility)updateMobility(dt);else fieldMovement(AF.cur(),p,vx,vy,m,dt);
     const sigil=relicCount('dash-sigil');
     if(m&&sigil){
       p.sigilCharge=(p.sigilCharge||0)+dt;
@@ -785,6 +793,7 @@
         }
       }
     }
+    if(p.swordSwing&&!p.mobility){p.swordSwing.time-=dt;if(p.swordSwing.time<=0){resolveSword(p.swordSwing);p.swordSwing=null}}
     p.basic-=dt;if(p.basic<=0&&!p.mobility){p.basic=Math.max(11,p.hero.rate-p.rate);fireBasic()}
     for(const e of r.enemies){
       if(!e.alive)continue;
