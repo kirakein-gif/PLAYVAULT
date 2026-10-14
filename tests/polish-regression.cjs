@@ -1,18 +1,19 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=require('node:path').join(__dirname,'../games/abyssfall-eclipse');
-function harness(mobile=false,dpr=1){
+function harness(mobile=false,dpr=1,delayImages=false){
+ const pendingImages=[];
  let now=10000,raf,created=0;const timers=[],draws=[],elements=new Map(),listeners={};
  const gradient={addColorStop(){}};
  const ctx=new Proxy({drawImage(...a){draws.push(a)},createLinearGradient(){return gradient},createRadialGradient(){return gradient}}, {get(t,k){return k in t?t[k]:()=>{}}});
  function el(id){if(!elements.has(id)){
   const classes=new Set(),e={style:{setProperty(){}},dataset:{},children:[],classList:{add(x){classes.add(x)},remove(x){classes.delete(x)},contains(x){return classes.has(x)},toggle(){}},addEventListener(){},setAttribute(){},appendChild(c){this.children.push(c)},getBoundingClientRect(){return {left:0,top:0,width:112,height:112}},getContext(){return ctx},toDataURL(){return 'data:image/png;base64,'},querySelector(s){return el(id+s)},querySelectorAll(){return []},closest(){return null},textContent:'',innerHTML:''};elements.set(id,e);
  }return elements.get(id)}
- class Image{constructor(){this.complete=true;this.naturalWidth=1536;this.width=1536;this.height=1024}set src(x){this._src=x;if(x.includes('room-')&&x.includes('-v5')){this.width=916;this.height=1717}else if(x.includes('relics-v5')){this.width=1448;this.height=1086}this.onload?.()}}
+ class Image{constructor(){this.complete=true;this.naturalWidth=1536;this.width=1536;this.height=1024}set src(x){this._src=x;if(x.includes('room-')&&x.includes('-v5')){this.width=916;this.height=1717}else if(x.includes('relics-v5')){this.width=1448;this.height=1086}if(delayImages){this.complete=false;pendingImages.push(this)}else this.onload?.()}}
  const env={console,AF_ATLAS:{frames:{idle:[[0,0]]},images:{},loaded:{}},Image,location:{hostname:'127.0.0.1'},performance:{now:()=>now},innerWidth:mobile?390:1440,innerHeight:mobile?844:960,devicePixelRatio:dpr,matchMedia:()=>({matches:mobile}),localStorage:{getItem(){return null},setItem(){}},document:{getElementById:el,querySelectorAll(){return []},documentElement:el('root'),createElement:()=>el('made'+created++)},addEventListener(type,fn){(listeners[type]??=[]).push(fn)},setTimeout(fn,ms){timers.push({fn,at:now+ms});return timers.length},clearTimeout(){},requestAnimationFrame(fn){raf=fn},fetch:async()=>({ok:false,status:404})};env.window=env;vm.createContext(env);
  for(const file of ['art.js','core.js','render.js'])vm.runInContext(fs.readFileSync(root+'/'+file,'utf8'),env,{filename:file});
  const A=env.AF;
  function advance(ms){now+=ms;for(let i=timers.length-1;i>=0;i--)if(timers[i].at<=now){const {fn}=timers.splice(i,1)[0];fn()}if(A.started&&!A.dead&&!A.paused)A.update(1)}
- return {env,A,ctx,draws,frame(){raf(now)},advance,elements,key(code,key,repeat=false,target={}){const event={code,key,repeat,target,preventDefault(){this.prevented=true}};for(const fn of listeners.keydown||[])fn(event);return event}};
+ return {env,A,ctx,draws,completeImages(failCombat=false){for(const im of pendingImages){im.complete=true;if(failCombat&&im._src.includes('ethan-combat'))im.onerror?.();else im.onload?.()}},frame(){raf(now)},advance,elements,key(code,key,repeat=false,target={}){const event={code,key,repeat,target,preventDefault(){this.prevented=true}};for(const fn of listeners.keydown||[])fn(event);return event}};
 }
 
 // Player cadence and auto-targeting must not override a moving character's gait.
@@ -270,7 +271,7 @@ console.log('PASS v46: eight boss identities, increasing HP/armor, all phase att
 // Walking comes from real distance; repeated drawing and stopped AI cannot animate feet.
 for(const floor of [1,4,7,10,13,16,19,22]){
  const h=harness(),{A}=h;A.newRun();while(A.floor<floor)A.nextFloor();
- const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.player.inv=99999;A.player.basic=99999;A.update(1);
+ const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.player.inv=99999;A.player.basic=99999;vm.runInContext('Math.random=()=>.9',h.env);A.update(1);
  const e=r.enemies.find(e=>e.type==='crawler');r.enemies=[e];e.aiCd=99999;e.aiWindup=0;e.attackPose=0;e.x=A.W/2-250;e.y=A.arena.y+A.arena.h*.5;A.player.x=A.W/2+250;A.player.y=e.y;
  const seen=new Set(),start=e.x;for(let i=0;i<100;i++){A.update(1);const f=h.env.AF_ART.enemyWalk(e);assert.ok(f,'walking sprite on floor '+floor);seen.add(f.x);h.frame()}
  assert.equal(seen.size,6,'all six foot poses appear through genuine AI movement');assert.ok(Math.abs(e.x-start-100*e.s)<.001,'walking does not change chase speed');
@@ -287,7 +288,7 @@ for(const mobile of [false,true]){
  room.enemies=[far];p.basic=0;A.update(1);assert.equal(far.hp,1000,'out-of-range auto attack deals no damage');
  const target=enemy(p.x+120);room.enemies=[target];p.basic=9999;p.special=0;const startX=p.x;A.useSpecial();const protectedHp=p.hp;p.shield=0;p.inv=0;A.projectiles.push({team:'e',x:p.x+9,y:p.y,vx:0,vy:0,r:15,dmg:100,life:30});A.update(1);assert.equal(p.hp,protectedHp,'Ethan body charge is invulnerable');assert.ok(p.x>startX&&p.x<startX+20,'charge travels over time');
  for(let i=0;i<11;i++){A.update(1);h.frame()}
- assert.equal(p.mobility,null);assert.equal(target.hp,938,'charge hits each enemy once');assert.ok(target.x>startX+120,'charge pushes its target');assert.ok(p.x>=startX+100&&p.x<=startX+120,'short body charge covers about half the original distance');assert.ok(A.slashes.some(f=>f.kind==='chargeImpact'),'collision has a dedicated body impact');assert.ok(!A.slashes.some(f=>f.kind==='ethanSword'),'charge never swings a sword');assert.equal(A.heroes.dawn.maxHp,150);assert.ok(A.heroes.dawn.speed<A.heroes.night.speed);
+ assert.equal(p.mobility,null);assert.equal(target.hp,938,'charge hits each enemy once');assert.ok(target.x>startX+120,'charge pushes its target');assert.ok(p.x>=startX+100&&p.x<=startX+120,'short body charge covers about half the original distance');assert.ok(A.slashes.some(f=>f.kind==='chargeImpact'),'collision has a dedicated body impact');assert.ok(!A.slashes.some(f=>f.kind==='ethanSword'),'charge never swings a sword');assert.equal(A.heroes.dawn.maxHp,175);assert.ok(A.heroes.dawn.speed<A.heroes.night.speed);
  A.selected='night';A.newRun();const nr=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${nr.x},${nr.y}`;A.update(0);const n=A.player;nr.enemies=[{...template,type:'crawler',x:n.x+260,y:n.y,r:18,hp:1000,max:1000,armor:0,s:0,stun:99999,alive:true}];n.inv=9999;n.basic=0;A.update(1);assert.ok(A.projectiles.some(q=>q.team==='p'&&q.kind==='crescent'),'Noah shoots from range');
  n.basic=9999;n.inv=0;n.special=0;A.keys.d=true;const x=n.x,hp=n.hp,enemyHp=nr.enemies[0].hp;A.projectiles=[];nr.enemies[0].x=n.x+9;A.useSpecial();assert.equal(n.x,x,'roll travels over time');A.update(1);assert.equal(n.hp,hp,'roll prevents contact damage');assert.equal(nr.enemies[0].hp,enemyHp,'roll is an evasion skill without base damage');h.frame();for(let i=0;i<16;i++)A.update(1);assert.equal(n.mobility,null);assert.ok(n.x>x+120);
  A.keys.d=false;n.inv=0;nr.enemies[0].x=n.x;nr.enemies[0].y=n.y;A.update(1);assert.ok(n.hp<hp,'invulnerability ends after rolling');
@@ -316,7 +317,7 @@ for(const key of ['dawn','night']){
 }
 console.log('PASS v51: consistent Ethan body scale, distinct relic cards and exclusive pools, melee/ranged crystal effects, one-use roll shot and Noah gear');
 for(const key of ['dawn','night']){
- const h=harness(),{A}=h;A.selected=key;A.newRun();const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.player.basic=9999;A.update(0);const p=A.player,e=r.enemies[0];r.enemies=[e];Object.assign(e,{hp:1000,max:1000,armor:0,s:0,stun:99999,x:p.x+60,y:p.y});
+ const h=harness(),{A}=h;A.selected=key;A.newRun();const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.player.basic=9999;A.update(0);const p=A.player,e=r.enemies[0];A.floor=4;r.enemies=[e];Object.assign(e,{hp:1000,max:1000,armor:0,s:0,stun:99999,x:p.x+60,y:p.y});
  const take=id=>{const o=A.relicOptions().find(o=>o.id===id);o.f(p);A.addRelic(o)};
  take('twin-grail');p.hp=p.maxHp;const before=e.hp;A.damage(e,10);const full=before-e.hp;p.hp=p.maxHp/2;const halfBefore=e.hp;A.damage(e,10);const half=halfBefore-e.hp;
  assert.ok(key==='dawn'?half>full:full>half,'grail rewards the selected role health curve');
@@ -343,3 +344,54 @@ console.log('PASS v51 relic triggers: opposite grail curves, reflection versus a
  };
  h.env.AF_ART.ready.then(()=>{assert.equal(cleaned,122,'enemy walk poses and eight Ethan combat poses isolated');console.log('PASS v48: foreign fragments removed from all walk frames; actor silhouette and soft alpha edges preserved')}).catch(err=>{console.error(err);process.exitCode=1});
 }
+
+// Shoulder control is brief and bounded, and never moves or interrupts a boss.
+for(const boss of [false,true]){
+ const h=harness(),{A}=h;A.newRun();A.floor=4;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player,e=r.enemies[0];
+ Object.assign(e,{type:boss?'boss':'crawler',x:p.x+60,y:p.y,s:0,hp:1000,max:1000,armor:0,stun:0,intro:0,aiCd:9999,bossCd:9999,bossTelegraph:0});r.enemies=[e];p.basic=9999;const x=e.x;A.useSpecial();A.update(3);
+ assert.ok(e.hp<1000);assert.ok(boss?e.x===x:e.x>x&&e.x<=x+32,'bounded non-boss knockback');assert.ok(boss?e.stun===0:e.stun>15&&e.stun<=24,'short non-boss stun');
+}
+{
+ const h=harness(),{A}=h;A.selected='night';A.newRun();A.floor=4;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player;p.basic=9999;p.inv=99999;A.relics['resonance-core']={count:1};A.useSpecial();for(let i=0;i<18;i++)A.update(1);assert.ok(p.rollBoost>0);h.frame();
+ const e=r.enemies[0];r.enemies=[e];Object.assign(e,{x:p.x+200,y:p.y,s:0,stun:99999});p.basic=0;A.update(1);assert.equal(p.rollBoost,0,'ready glow clears with the boosted shot');h.frame();
+}
+// Render every material throughout its lifetime without changing effect or hit coordinates.
+for(const mobile of [false,true]){
+ const h=harness(mobile),{A}=h;A.newRun();A.paused=true;
+ for(const life of [1,.75,.3,.01]){
+  A.slashes=[{}, {kind:'sigilPulse'}, {art:true,kind:'ethanSword'}, {bossWeapon:true,wide:true}, {bossCast:true}, {bossWeapon:true,slam:true}].map(f=>({...f,x:A.player.x,y:A.player.y,r:100,a:.6,color:'#bd9e73',max:30,l:30*life}));
+  A.shockwaves=[{x:A.player.x,y:A.player.y,r:80,max:130,l:28*life,color:'#c7a7ee'}];
+  A.projectiles=['crescent','priestBolt','bossLance','bossOrb','crystal'].map(kind=>({kind,x:A.player.x,y:A.player.y,vx:4,vy:1,visualAge:8}));const before=JSON.stringify([A.slashes,A.shockwaves,A.projectiles]);h.frame();assert.equal(JSON.stringify([A.slashes,A.shockwaves,A.projectiles]),before);
+ }
+}
+console.log('PASS v52: bounded shoulder knockback/stun, boss immunity, consumed violet shot readiness, all layered FX stages on desktop/mobile');
+
+{
+ const h=harness(),{A}=h;A.newRun();A.floor=4;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player,e=r.enemies[0];r.enemies=[e];Object.assign(e,{x:p.x+135,y:p.y,hp:1000,max:1000,armor:0,s:0,stun:99999});p.basic=0;p.inv=9999;A.update(1);for(let i=0;i<6;i++)A.update(1);assert.equal(e.hp,976,'extended sword reaches a target outside old reach');
+ const take=id=>{const o=A.relicOptions().find(o=>o.id===id);o.f(p);A.relics[id]={count:(A.relics[id]?.count||0)+1}};
+ for(let i=0;i<8;i++)take('guardian-seal');assert.equal(p.maxHp,175+8*36);assert.equal(p.armorBonus,.15);p.shield=0;p.guardianCd=9999;p.hp=p.maxHp;p.inv=0;e.x=p.x;e.y=p.y;e.d=100;A.update(1);assert.equal(p.maxHp-p.hp,60,'stacked guardian reduction caps at 40 percent');
+ e.x=p.x+65;e.y=p.y;p.inv=9999;take('relic-blade');p.bladeShots=2;p.basic=0;p.hp=p.maxHp-10;A.update(1);for(let i=0;i<6;i++)A.update(1);assert.equal(p.hp,p.maxHp-7,'third connected blade swing restores once');
+ e.x=p.x+65;e.y=p.y;e.type='boss';e.intro=99;p.bladeShots=2;p.basic=0;const before=p.hp;A.update(1);for(let i=0;i<6;i++)A.update(1);assert.equal(p.hp,before,'invulnerable boss intro cannot grant hit recovery');
+}
+console.log('PASS v52 growth: greater real melee reach, stacking HP/armor cap, and hit-confirmed blade recovery');
+
+for(const [hero,expected] of [['dawn',96],['night',50]]){
+ const h=harness(),{A}=h;A.selected=hero;A.newRun();vm.runInContext('Math.random=()=>.5',h.env);const p=A.player;p.basic=99999;
+ for(let i=0;i<9;i++){A.pickups.push({x:p.x,y:p.y,val:p.nextXp});A.update(1);const index=A.rewardChoices.findIndex(o=>o.n==='성물 증폭');assert.ok(index>=0);assert.ok(A.rewardChoices[index].d.includes(hero==='dawn'?'+8':'+4'));A.chooseReward(index)}
+ assert.equal(p.level,10);assert.equal(p.hero.damage+p.atk,expected,'role-specific attack growth through actual XP and choices');
+}
+console.log('PASS v52 role growth: nine real attack upgrades produce Ethan 96 / Noah 50 at level 10');
+
+for(const [hero,haste] of [['dawn',2],['night',4]]){
+ const h=harness(),{A}=h;A.selected=hero;A.newRun();vm.runInContext('Math.random=()=>.5',h.env);const p=A.player;A.pickups.push({x:p.x,y:p.y,val:p.nextXp});A.update(1);A.chooseReward(A.rewardChoices.findIndex(o=>o.n==='공명 가속'));assert.equal(p.rate,haste);
+}
+console.log('PASS v52 haste growth: Ethan 2 / Noah 4 frames per selected upgrade');
+
+(async()=>{
+ for(const fail of [false,true]){
+  const h=harness(false,1,true);assert.equal(h.elements.get('startBtn').disabled,true);assert.equal(h.A.started,false);assert.equal(h.A.assetsReady,false);
+  h.completeImages(fail);await h.env.AF_ART.prepared;await Promise.resolve();await Promise.resolve();await Promise.resolve();
+  assert.equal(h.A.assetsReady,!fail);assert.equal(h.elements.get('startBtn').disabled,false);assert.equal(h.elements.get('startBtn').textContent,fail?'이미지 불러오기 실패 · 다시 불러오기':'입장하기');assert.equal(h.A.started,false);
+ }
+ console.log('PASS v52 loading: pending images prevent entry; prepared assets unlock; failed combat image offers reload without starting old art');
+})().catch(e=>{console.error(e);process.exitCode=1});

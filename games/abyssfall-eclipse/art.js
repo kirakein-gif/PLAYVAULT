@@ -10,7 +10,7 @@
     const im=new Image();art.images[key]=im;
     im.onload=()=>{art.loaded[key]=true;if(key==='relics')relicIcons(im);resolve(true)};
     im.onerror=()=>{art.loaded[key]=false;resolve(false)};
-    im.src=path+'?v=51';
+    im.src=path+'?v=52';
   })));
   function relicIcons(im){
     art.relicIcons={};
@@ -203,10 +203,11 @@
     for(let i=0;i<n;i++){if(!keep[i])data[i*4+3]=0;else {const edge=Math.min(i%w,w-1-i%w);data[i*4+3]*=Math.min(1,edge/4)}}
     cc.putImageData(pixels,0,0);f.surface=c;
   }
-  art.ready.then(()=>{for(const rows of Object.values(walkFrames))for(const poses of rows)for(const f of poses)if(art.loaded[f.image])isolateWalk(f);if(art.loaded.ethanCombat){for(let row=0;row<2;row++)for(let col=0;col<4;col++)isolateWalk(ethanCombat(row,col))}});
+  art.prepared=art.ready.then(()=>{for(const rows of Object.values(walkFrames))for(const poses of rows)for(const f of poses)if(art.loaded[f.image])isolateWalk(f);if(art.loaded.ethanCombat){for(let row=0;row<2;row++)for(let col=0;col<4;col++)isolateWalk(ethanCombat(row,col))}});
   art.draw=(ctx,key,f,scale,ground)=>ctx.drawImage(f.surface||art.images[key],f.surface?0:f.x,f.surface?0:f.y,f.w,f.h,-f.pivot*scale,ground-f.foot*scale,f.w*scale,f.h*scale);
-  art.drawWard=(ctx,f,scale,ground)=>{
-    if(!f.ward){const c=document.createElement('canvas');c.width=Math.ceil(f.w);c.height=Math.ceil(f.h);const cc=c.getContext('2d');cc.drawImage(f.surface||art.images[f.image],f.surface?0:f.x,f.surface?0:f.y,f.w,f.h,0,0,f.w,f.h);cc.globalCompositeOperation='source-in';cc.fillStyle='#ffdc73';cc.fillRect(0,0,c.width,c.height);f.ward=c}
-    ctx.drawImage(f.ward,0,0,f.w,f.h,-f.pivot*scale,ground-f.foot*scale,f.w*scale,f.h*scale);
+  art.drawWard=(ctx,f,scale,ground,color='#ffdc73')=>{
+    f.wards??={};
+    if(!f.wards[color]){const c=document.createElement('canvas');c.width=Math.ceil(f.w);c.height=Math.ceil(f.h);const cc=c.getContext('2d');cc.drawImage(f.surface||art.images[f.image],f.surface?0:f.x,f.surface?0:f.y,f.w,f.h,0,0,f.w,f.h);cc.globalCompositeOperation='source-in';cc.fillStyle=color;cc.fillRect(0,0,c.width,c.height);f.wards[color]=c}
+    ctx.drawImage(f.wards[color],0,0,f.w,f.h,-f.pivot*scale,ground-f.foot*scale,f.w*scale,f.h*scale);
   };
 })();

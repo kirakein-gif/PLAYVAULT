@@ -22,7 +22,7 @@
   };
   const enemyImgs=AF.enemyImgs={}; Object.entries(ENEMY_SPR).forEach(([k,src])=>{const im=new Image();im.src=src;enemyImgs[k]=im});
   AF.heroes={
-    dawn:{key:'dawn',name:'Ethan',ko:'에단',color:'#ffd46f',accent:'#66d9ff',maxHp:150,speed:2.85,armor:.18,basicName:'검 휘두르기',basicIcon:'⚔',rate:42,damage:24,proj:8.1,specialName:'몸통 돌진',specialIcon:'➤',specialCd:360,idle:'dawn_idle',run:'dawn_run',attack:'dawn_attack',drawW:mobile?112:98},
+    dawn:{key:'dawn',name:'Ethan',ko:'에단',color:'#ffd46f',accent:'#66d9ff',maxHp:175,speed:2.85,armor:.25,basicName:'검 휘두르기',basicIcon:'⚔',rate:42,damage:24,proj:8.1,specialName:'몸통 돌진',specialIcon:'➤',specialCd:360,idle:'dawn_idle',run:'dawn_run',attack:'dawn_attack',drawW:mobile?112:98},
     night:{key:'night',name:'Noah',ko:'노아',color:'#7bdfff',accent:'#9273ff',maxHp:96,speed:3.95,armor:0,basicName:'월광 사격',basicIcon:'☾',rate:25,damage:14,proj:9.2,specialName:'회피 구르기',specialIcon:'↻',specialCd:210,idle:'night_idle',run:'night_run',attack:'night_attack',drawW:mobile?106:94}
   };
   AF.selected='dawn'; AF.floor=1; AF.kills=0; AF.relics={}; AF.rooms={}; AF.runStart=0; AF.endless=false; AF.cleared=false; AF.transitioning=false; AF.current='0,0'; AF.started=false; AF.paused=true; AF.dead=false; AF.player=null; AF.projectiles=[]; AF.particles=[]; AF.shockwaves=[]; AF.pickups=[]; AF.slashes=[]; AF.soulBursts=[];
@@ -382,7 +382,14 @@
     ui.specialBtn.style.setProperty('--skill-ring',ring);ui.specialBtn.style.setProperty('--skill-glow',glow);
   }
   AF.newRun=()=>{AF.pendingFloor=null;AF.pendingFinish=false;AF.rewardChoices=[];sound()?.unlock().then(()=>{sound()?.startExplore();sound()?.sfx('start')});const h=AF.heroes[AF.selected];AF.floor=1;AF.kills=0;AF.relics={};AF.runStart=performance.now();AF.testRun=false;AF.endless=false;AF.cleared=false;AF.transitioning=false;AF.bossClearUntil=0;AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();AF.player={x:W/2,y:arena.y+arena.h/2,r:17,hp:h.maxHp,maxHp:h.maxHp,speed:h.speed,hero:h,level:1,xp:0,nextXp:18,inv:0,faceX:1,faceY:0,moving:false,step:0,basic:16,special:0,atk:0,rate:0,range:0,specialBoost:0,shield:0,attackPose:0,specialPose:0,attackAt:0,hurtPose:0,deathAt:0,bladeShots:0,sigilCharge:0,guardianCd:0,crystalTimer:80,echoTimer:0};AF.projectiles=[];AF.particles=[];AF.shockwaves=[];AF.pickups=[];AF.slashes=[];AF.soulBursts=[];AF.dead=false;AF.paused=false;AF.started=true;ui.start.classList.remove('show');ui.gameOver.classList.remove('show');ui.levelUp.classList.remove('show');ui.clearScreen?.classList.remove('show');heroUI();AF.drawRelics();AF.hud();ui.toast.classList.remove('show')};
-  ui.startBtn.addEventListener('click',AF.newRun);ui.retryBtn.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
+  AF.assetsReady=false;ui.startBtn.disabled=true;ui.startBtn.textContent='이미지 준비 중…';
+  const portraitsReady=Promise.all([...document.querySelectorAll('.portrait img')].map(im=>new Promise(resolve=>{
+    const ready=async()=>{try{if(im.decode)await im.decode();im.classList.add('ready');resolve(true)}catch{resolve(false)}};
+    if(im.complete){im.naturalWidth?ready():resolve(false)}else{im.addEventListener('load',ready,{once:true});im.addEventListener('error',()=>resolve(false),{once:true})}
+  })));
+  const finishLoading=ok=>{AF.assetsReady=ok;ui.startBtn.disabled=false;ui.startBtn.textContent=ok?'입장하기':'이미지 불러오기 실패 · 다시 불러오기';};
+  Promise.all([window.AF_ART.prepared,portraitsReady]).then(([,portraits])=>finishLoading(Object.values(window.AF_ART.loaded).every(Boolean)&&portraits.every(Boolean)),()=>finishLoading(false));
+  ui.startBtn.addEventListener('click',()=>{if(AF.assetsReady)AF.newRun();else location.reload()});ui.retryBtn.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearRestart?.addEventListener('click',()=>{AF.selected=AF.player?.hero?.key||AF.selected;AF.newRun()});
   ui.clearLobby?.addEventListener('click',()=>{sound()?.stopMusic();AF.clearScreen?.classList.remove('show');AF.started=false;AF.paused=true;ui.start.classList.add('show')});
   ui.endlessBtn?.addEventListener('click',()=>{AF.endless=true;AF.cleared=true;AF.clearScreen?.classList.remove('show');AF.paused=false;AF.nextFloor('endless')});
@@ -452,11 +459,11 @@
     const muzzle=(q.muzzleX||0)*(1-t),height=(q.launchHeight??30)*(1-t)+(q.hitHeight??30)*t;
     return{x:q.x+muzzle,y:q.y-height,angle:Math.atan2(q.vy-(t<1?((q.hitHeight??30)-(q.launchHeight??30))*rate:0),q.vx-(t<1?(q.muzzleX||0)*rate:0))};
   };
-  function pushEnemy(e,dx,dy,distance){
+  function pushEnemy(e,dx,dy,distance,stun=12){
     const weight=e.type==='boss'?.18:e.type==='brute'?.65:1;
     e.x=Math.max(arena.x+e.r,Math.min(arena.x+arena.w-e.r,e.x+dx*distance*weight));
     e.y=Math.max(arena.y+e.r,Math.min(arena.y+arena.h-e.r,e.y+dy*distance*weight));
-    if(e.type!=='boss'){e.stun=Math.max(e.stun||0,12);e.dash=0;e.charge=0;e.aiWindup=0}
+    if(e.type!=='boss'){e.stun=Math.max(e.stun||0,stun);e.dash=0;e.charge=0;e.aiWindup=0}
   }
   function mobilityDirection(targeted){
     const p=AF.player;let x=(AF.keys.d||AF.keys.arrowright?1:0)-(AF.keys.a||AF.keys.arrowleft?1:0),y=(AF.keys.s||AF.keys.arrowdown?1:0)-(AF.keys.w||AF.keys.arrowup?1:0);
@@ -474,7 +481,7 @@
       p.attackPose=0;p.specialPose=0;p.inv=Math.max(p.inv,m.time+2);p.meleeAim=Math.atan2(m.dy,m.dx);
       for(const e of AF.cur().enemies)if(e.alive&&!m.hits.has(e)&&seg(sx,sy,p.x,p.y,e.x,e.y,e.r+32)){
         const ix=(p.x+e.x)/2,iy=(p.y+e.y)/2;
-        m.hits.add(e);damage(e,(62+p.atk*2.2)*(1+.12*relicCount('red-vow')));pushEnemy(e,m.dx,m.dy,65+15*relicCount('dash-sigil'));p.bodyFlash=6;
+        m.hits.add(e);damage(e,(62+p.atk*2.2)*(1+.12*relicCount('red-vow')));if(e.type!=='boss')pushEnemy(e,m.dx,m.dy,Math.min(48,32+5*relicCount('dash-sigil')),24);p.bodyFlash=6;
         AF.slashes.push({art:true,kind:'chargeImpact',x:ix,y:iy,a:p.meleeAim,r:46,l:22,max:22});
         for(let i=0;i<14;i++){const a=i*Math.PI*2/14,speed=1.8+Math.random()*2.8;AF.particles.push({x:ix,y:iy-24,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed-1,l:18,color:i%3?'#bca779':'#fff1cf'})}
 
@@ -484,22 +491,23 @@
     m.time-=step;if(m.time<=0||Math.hypot(p.x-sx,p.y-sy)<.01){p.mobility=null;p.slideX=p.slideY=0;p.specialPose=0;if(m.kind==='roll'&&relicCount('dash-sigil'))p.rollBoost=Math.max(p.rollBoost||0,.25*relicCount('dash-sigil'));if(m.kind==='charge'){p.chargeRecover=10;p.basic=Math.max(p.basic,12)}}
   }
   function resolveSword(swing){
-    const p=AF.player,a=swing.a;
+    const p=AF.player,a=swing.a;let connected=false;
     AF.slashes.push({art:true,kind:'ethanSword',x:p.x,y:p.y,a,r:swing.reach,l:12,max:12});
     for(const target of AF.cur().enemies){
-      if(!target.alive)continue;
+      if(!target.alive||(target.type==='boss'&&target.intro>0))continue;
       const angle=Math.atan2(target.y-p.y,target.x-p.x),delta=Math.atan2(Math.sin(angle-a),Math.cos(angle-a));
-      if(Math.hypot(target.x-p.x,target.y-p.y)<=swing.reach+target.r&&Math.abs(delta)<1.1){damage(target,swing.power);pushEnemy(target,Math.cos(a),Math.sin(a),target.type==='boss'?2:9)}
+      if(Math.hypot(target.x-p.x,target.y-p.y)<=swing.reach+target.r&&Math.abs(delta)<1.1){connected=true;damage(target,swing.power);pushEnemy(target,Math.cos(a),Math.sin(a),target.type==='boss'?2:9)}
     }
+    if(connected&&swing.sustain)p.hp=Math.min(p.maxHp,p.hp+swing.sustain);
   }
   function fireBasic(){
-    const p=AF.player,h=p.hero,e=nearest();if(!e||p.mobility)return;const meleeReach=100+Math.min(45,p.range*.6);if(h.key==='dawn'&&Math.hypot(e.x-p.x,e.y-p.y)>meleeReach+e.r){p.basic=Math.min(p.basic,4);return;}sound()?.sfx('basic',h.key);
+    const p=AF.player,h=p.hero,e=nearest();if(!e||p.mobility)return;const meleeReach=125+Math.min(55,p.range*.6);if(h.key==='dawn'&&Math.hypot(e.x-p.x,e.y-p.y)>meleeReach+e.r){p.basic=Math.min(p.basic,4);return;}sound()?.sfx('basic',h.key);
     const a=Math.atan2(e.y-p.y,e.x-p.x),blade=relicCount('relic-blade'),solar=h.key==='dawn'?relicCount('solar-shard'):0;
     if(!p.moving){if(Math.abs(Math.cos(a))>.35)p.faceX=Math.cos(a);p.faceY=Math.sin(a)}p.attackPose=h.key==='dawn'?18:14;p.attackAt=performance.now();p.bladeShots=(p.bladeShots||0)+1;
     const burst=blade>0&&p.bladeShots%3===0;
     if(h.key==='dawn'){
       p.meleeAim=a;
-      p.swordSwing={time:6,a,reach:meleeReach+(burst?14+blade*5:0),power:(h.damage+p.atk)*(burst?1.3+.08*blade:1)*(1+.08*solar)};
+      p.swordSwing={time:6,a,reach:meleeReach+(burst?14+blade*5:0),sustain:burst?2+blade:0,power:(h.damage+p.atk)*(burst?1.3+.08*blade:1)*(1+.12*solar)};
     }else{
       launch({team:'p',kind:'crescent',x:p.x,y:p.y,vx:Math.cos(a)*h.proj,vy:Math.sin(a)*h.proj,r:9,dmg:(h.damage+p.atk)*(1+(p.rollBoost||0)),pierce:1+(p.level/6|0)+blade,life:85,color:'#9c7cff'},p,e);
       p.rollBoost=0;AF.slashes.push({x:p.x,y:p.y,a,l:14,max:14,r:36});
@@ -517,7 +525,7 @@
     if(h.key==='dawn'){
       p.mobility={kind:'charge',dx:direction.x,dy:direction.y,time:12,max:12,speed:9+Math.min(1,p.range*.01),hits:new Set()};
       AF.slashes=AF.slashes.filter(fx=>fx.kind!=='ethanSword');p.swordSwing=null;
-      p.attackPose=0;p.specialPose=0;p.chargeRecover=0;p.bodyFlash=0;p.shield=Math.min(40,p.shield+10+4*relicCount('solar-shard'));p.inv=Math.max(p.inv,14);
+      p.attackPose=0;p.specialPose=0;p.chargeRecover=0;p.bodyFlash=0;p.shield=Math.min(40,p.shield+14+6*relicCount('solar-shard'));p.inv=Math.max(p.inv,14);
       AF.toast('몸통 돌진');
     }else{
       p.mobility={kind:'roll',dx:direction.x,dy:direction.y,time:16,max:16,speed:9+Math.min(2,p.range*.02)};
@@ -562,9 +570,10 @@
     if(pending&&AF.cur()===pending.room)AF.nextFloor(pending.source);
   };
   function upgrade(){
+    const attackGain=AF.player.hero.key==='dawn'?8:4,hasteGain=AF.player.hero.key==='dawn'?2:4;
     chooseReward([
-      {i:'✦',n:'성물 증폭',d:'기본 공격 피해 +5',f:p=>p.atk+=5},
-      {i:'⟲',n:'공명 가속',d:'자동 공격 간격 감소',f:p=>p.rate+=3},
+      {i:'✦',n:'성물 증폭',d:'기본 공격 피해 +'+attackGain,f:p=>p.atk+=attackGain},
+      {i:'⟲',n:'공명 가속',d:'자동 공격 간격 '+(hasteGain/60).toFixed(3)+'초 감소',f:p=>p.rate+=hasteGain},
       {i:'◎',n:'공간 확장',d:AF.player.hero.key==='dawn'?'검 공격 범위·돌진 이동거리 증가':'구르기 이동거리 증가',f:p=>p.range+=16},
       {i:'✹',n:'특수 공명',d:'특수기 재사용 대기시간 감소',f:p=>p.specialBoost+=28},
       {i:'♥',n:'생명 각인',d:'최대 체력 +20, 즉시 회복',f:p=>{p.maxHp+=20;p.hp=Math.min(p.maxHp,p.hp+28)}}
@@ -574,9 +583,9 @@
   AF.relicOptions=(key=AF.player.hero.key)=>{
     const role=key==='dawn'?0:1,heal=(p,n)=>p.hp=Math.min(p.maxHp,p.hp+n);
     const opts=[
-      {id:'relic-blade',i:'⚔',n:'유물의 칼날',rarity:'rare',d:['공격 +8 · 3회마다 더 넓고 강한 검 베기','공격 +6 · 사격 관통 +1 · 3회마다 부채꼴 추가 사격'],f:[p=>p.atk+=8,p=>p.atk+=6]},
+      {id:'relic-blade',i:'⚔',n:'유물의 칼날',rarity:'rare',d:['공격 +8 · 사거리 증가 · 3회마다 강화 베기와 적중 회복','공격 +6 · 사격 관통 +1 · 3회마다 부채꼴 추가 사격'],f:[p=>{p.atk+=8;p.range+=12},p=>p.atk+=6]},
       {id:'dash-sigil',i:'✧',n:'질주의 문장',rarity:'rare',d:['이속 +0.12 · 돌진 쿨 감소 · 밀치기 강화 · 이동 중 근접 충격','이속 +0.30 · 공격 가속 · 구르기 후 다음 사격 피해 +25%'],f:[p=>{p.speed+=.12;p.specialBoost+=18},p=>{p.speed+=.30;p.rate+=2}]},
-      {id:'guardian-seal',i:'◈',n:'수호자의 인장',rarity:'rare',d:['최대 HP +28 · 피격 시 보호막과 근접 반격','최대 HP +16 · 피격 시 보호막 · 구르기 대기시간 감소'],f:[p=>{p.maxHp+=28;heal(p,35)},p=>{p.maxHp+=16;heal(p,20)}]},
+      {id:'guardian-seal',i:'◈',n:'수호자의 인장',rarity:'rare',d:['최대 HP +36 · 방어 +3%p (총 40% 한도) · 피격 보호막과 반격','최대 HP +16 · 피격 시 보호막 · 구르기 대기시간 감소'],f:[p=>{p.maxHp+=36;p.armorBonus=Math.min(.15,(p.armorBonus||0)+.03);heal(p,40)},p=>{p.maxHp+=16;heal(p,20)}]},
       {id:'resonance-core',i:'✹',n:'공명 핵',rarity:'rare',d:['돌진 쿨 감소 · 사용 후 주변 적에게 충격 잔향','구르기 쿨 감소 · 짧은 추가 보호 · 다음 사격 강화'],f:[p=>{p.specialBoost+=42;p.range+=10},p=>{p.specialBoost+=32;p.range+=6}]},
       {id:'condensed-crystal',i:'◆',n:'응축 수정',rarity:'rare',d:['공격 +4 · 최대 HP +14 · 주기적으로 주변 적에게 수정 파편 피해','공격 +4 · 공격 가속 · 주기적으로 원거리 수정 탄막'],f:[p=>{p.atk+=4;p.maxHp+=14;heal(p,14)},p=>{p.atk+=4;p.rate+=1}]},
       {id:'twin-grail',i:'♜',n:'쌍둥이 성배',rarity:'epic',d:['체력이 낮을수록 가하는 피해 증가','체력을 높게 유지할수록 가하는 피해 증가'],f:[p=>heal(p,8),p=>heal(p,8)]},
@@ -585,7 +594,7 @@
       {id:'red-vow',i:'✕',n:'붉은 서약',rarity:'epic',d:['최대 HP 15% 감소 · 공격 +14 · 돌진 피해 +12%','최대 HP 10% 감소 · 공격 +10 · 이속 +0.12'],f:[p=>{p.maxHp=Math.max(45,Math.round(p.maxHp*.85));p.hp=Math.min(p.hp,p.maxHp);p.atk+=14},p=>{p.maxHp=Math.max(45,Math.round(p.maxHp*.90));p.hp=Math.min(p.hp,p.maxHp);p.atk+=10;p.speed+=.12}]},
       {id:'time-gear',i:'⌁',n:'시간의 톱니',rarity:'legendary',d:['돌진 사용 시 확률적으로 대기시간 즉시 초기화','구르기 쿨 35% 감소 · 중첩마다 +5% (최대 65%)'],f:[p=>{},p=>{}]}
     ];
-    opts.push(role===0?{id:'solar-shard',i:'☀',n:'태양의 파편',rarity:'epic',d:['검 피해 +8% · 돌진 보호막 강화',''],f:[p=>{},p=>{}]}:{id:'eclipse-fang',i:'☾',n:'월식의 송곳니',rarity:'epic',d:['','적 처치 시 추가 월광 사격 발생'],f:[p=>{},p=>{}]});
+    opts.push(role===0?{id:'solar-shard',i:'☀',n:'태양의 파편',rarity:'epic',d:['검 피해 +12% · 돌진 보호막 +6',''],f:[p=>{},p=>{}]}:{id:'eclipse-fang',i:'☾',n:'월식의 송곳니',rarity:'epic',d:['','적 처치 시 추가 월광 사격 발생'],f:[p=>{},p=>{}]});
     return opts.map(o=>({...o,d:(role===0?'에단':'노아')+' · '+o.d[role],f:o.f[role],img:relicIcon(o.id),relic:true}));
   };
   function treasureReward(){chooseReward(AF.relicOptions(),'보물 발견','상자에서 유물 하나를 선택하세요.');}
@@ -685,11 +694,11 @@
     if(AF.floor>=24)AF.endless=true;
     AF.nextFloor('test');
   };
-  function hurt(n,nx,ny){const p=AF.player;if(p.mobility)return;n*=1-(p.hero.armor||0);if(p.shield>0){const b=Math.min(p.shield,n);p.shield-=b;n-=b;if(n<=0){p.inv=18;return}}p.hp-=Math.round(n);sound()?.sfx('hurt');p.inv=48;p.hurtPose=18;p.x+=nx*18;p.y+=ny*18;
+  function hurt(n,nx,ny){const p=AF.player;if(p.mobility)return;n*=1-Math.min(.40,(p.hero.armor||0)+(p.armorBonus||0));if(p.shield>0){const b=Math.min(p.shield,n);p.shield-=b;n-=b;if(n<=0){p.inv=18;return}}p.hp-=Math.round(n);sound()?.sfx('hurt');p.inv=48;p.hurtPose=18;p.x+=nx*18;p.y+=ny*18;
     const seal=relicCount('guardian-seal');
     if(seal&&n>0&&(p.guardianCd||0)<=0){
       p.guardianCd=Math.max(170,310-(seal-1)*30);
-      p.shield=Math.min(60,p.shield+(p.hero.key==='dawn'?8+seal*6:6+seal*4));
+      p.shield=Math.min(60,p.shield+(p.hero.key==='dawn'?12+seal*8:6+seal*4));
       if(p.hero.key==='night')p.special=Math.max(0,p.special-30-seal*15);
       const rad=88+seal*10;
       AF.shockwaves.push({x:p.x,y:p.y,r:12,max:rad,l:24,color:'#6fe6c4'});
@@ -777,7 +786,7 @@
       if(p.sigilCharge>=threshold){
         p.sigilCharge=0;
         const rad=62+sigil*8,dmg=9+sigil*4+p.atk*.14;
-        AF.slashes.push({x:p.x,y:p.y,a:Math.atan2(p.faceY,p.faceX),l:16,max:16,r:rad,color:'#ffd46f'});
+        AF.slashes.push({kind:'sigilPulse',x:p.x,y:p.y,a:Math.atan2(p.faceY,p.faceX),l:16,max:16,r:rad,color:'#ffd46f'});
         AF.cur().enemies.forEach(e=>{if(e.alive&&Math.hypot(e.x-p.x,e.y-p.y)<rad)damage(e,dmg)});
       }
     }else p.sigilCharge=Math.max(0,(p.sigilCharge||0)-dt*1.4);
@@ -873,7 +882,7 @@
       // A planted foot stays planted while stopped or winding up an attack.
       const stride=e.type==='boss'?72:['frostWolf','plagueVermin'].includes(e.variant)?48:e.type==='brute'?60:44;
       if(e.moving)e.walkCycle=((e.walkCycle||0)+walked/stride)%1;
-      const cdx=p.x-e.x,cdy=p.y-e.y,cdist=Math.hypot(cdx,cdy)||1;if(cdist<p.r+e.r&&p.inv<=0&&!(e.type==='boss'&&e.intro>0)){e.attackPose=e.type==='boss'?22:14;const mult=e.type==='brute'&&e.charge>0?1.45:e.type==='crawler'&&e.dash>0?1.18:1;hurt(e.d*mult,cdx/cdist,cdy/cdist);if(e.type==='brute'&&e.charge>0){e.charge=0;e.stun=24;AF.shockwaves.push({x:e.x,y:e.y,r:8,max:58,l:18,color:'#ff9b63'})}}
+      const cdx=p.x-e.x,cdy=p.y-e.y,cdist=Math.hypot(cdx,cdy)||1;if(cdist<p.r+e.r&&p.inv<=0&&!(e.type==='boss'&&e.intro>0)){e.attackPose=e.type==='boss'?22:14;const mult=e.type==='brute'&&e.charge>0?1.45:e.type==='crawler'&&e.dash>0?1.18:1;if(e.type!=='boss')AF.slashes.push({kind:'clawStrike',x:e.x,y:e.y,a:Math.atan2(cdy,cdx),r:e.r+26,l:12,max:12,color:e.type==='brute'?'#b4a080':'#bb8a99'});hurt(e.d*mult,cdx/cdist,cdy/cdist);if(e.type==='brute'&&e.charge>0){e.charge=0;e.stun=24;AF.shockwaves.push({x:e.x,y:e.y,r:8,max:58,l:18,color:'#ff9b63'})}}
     }
     for(let i=AF.projectiles.length-1;i>=0;i--){
       const q=AF.projectiles[i];q.visualAge=(q.visualAge||0)+dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;
