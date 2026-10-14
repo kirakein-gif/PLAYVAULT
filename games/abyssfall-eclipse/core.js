@@ -22,8 +22,8 @@
   };
   const enemyImgs=AF.enemyImgs={}; Object.entries(ENEMY_SPR).forEach(([k,src])=>{const im=new Image();im.src=src;enemyImgs[k]=im});
   AF.heroes={
-    dawn:{key:'dawn',name:'Ethan',ko:'에단',color:'#ffd46f',accent:'#66d9ff',maxHp:120,speed:3.15,basicName:'추적 룬탄',basicIcon:'✦',rate:34,damage:17,proj:8.1,specialName:'태양낙인',specialIcon:'☀',specialCd:430,idle:'dawn_idle',run:'dawn_run',attack:'dawn_attack',drawW:mobile?112:98},
-    night:{key:'night',name:'Noah',ko:'노아',color:'#7bdfff',accent:'#9273ff',maxHp:96,speed:3.75,basicName:'월광 칼날',basicIcon:'☾',rate:26,damage:13,proj:9.2,specialName:'월영 질주',specialIcon:'◒',specialCd:360,idle:'night_idle',run:'night_run',attack:'night_attack',drawW:mobile?106:94}
+    dawn:{key:'dawn',name:'Ethan',ko:'에단',color:'#ffd46f',accent:'#66d9ff',maxHp:150,speed:2.85,armor:.18,basicName:'검 휘두르기',basicIcon:'⚔',rate:42,damage:24,proj:8.1,specialName:'돌진 베기',specialIcon:'➤',specialCd:360,idle:'dawn_idle',run:'dawn_run',attack:'dawn_attack',drawW:mobile?112:98},
+    night:{key:'night',name:'Noah',ko:'노아',color:'#7bdfff',accent:'#9273ff',maxHp:96,speed:3.95,armor:0,basicName:'월광 사격',basicIcon:'☾',rate:25,damage:14,proj:9.2,specialName:'회피 구르기',specialIcon:'↻',specialCd:210,idle:'night_idle',run:'night_run',attack:'night_attack',drawW:mobile?106:94}
   };
   AF.selected='dawn'; AF.floor=1; AF.kills=0; AF.relics={}; AF.rooms={}; AF.runStart=0; AF.endless=false; AF.cleared=false; AF.transitioning=false; AF.current='0,0'; AF.started=false; AF.paused=true; AF.dead=false; AF.player=null; AF.projectiles=[]; AF.particles=[]; AF.shockwaves=[]; AF.pickups=[]; AF.slashes=[]; AF.soulBursts=[];
   AF.keys={}; AF.joy={x:0,y:0,active:false,id:null};
@@ -454,40 +454,69 @@
     const muzzle=(q.muzzleX||0)*(1-t),height=(q.launchHeight??30)*(1-t)+(q.hitHeight??30)*t;
     return{x:q.x+muzzle,y:q.y-height,angle:Math.atan2(q.vy-(t<1?((q.hitHeight??30)-(q.launchHeight??30))*rate:0),q.vx-(t<1?(q.muzzleX||0)*rate:0))};
   };
+  function pushEnemy(e,dx,dy,distance){
+    const weight=e.type==='boss'?.18:e.type==='brute'?.65:1;
+    e.x=Math.max(arena.x+e.r,Math.min(arena.x+arena.w-e.r,e.x+dx*distance*weight));
+    e.y=Math.max(arena.y+e.r,Math.min(arena.y+arena.h-e.r,e.y+dy*distance*weight));
+    if(e.type!=='boss'){e.stun=Math.max(e.stun||0,12);e.dash=0;e.charge=0;e.aiWindup=0}
+  }
+  function mobilityDirection(targeted){
+    const p=AF.player;let x=(AF.keys.d||AF.keys.arrowright?1:0)-(AF.keys.a||AF.keys.arrowleft?1:0),y=(AF.keys.s||AF.keys.arrowdown?1:0)-(AF.keys.w||AF.keys.arrowup?1:0);
+    if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){x=AF.joy.x;y=AF.joy.y}
+    if(!x&&!y){const e=targeted?nearest():null;if(e){x=e.x-p.x;y=e.y-p.y}else{x=p.faceX;y=p.faceY}}
+    const length=Math.hypot(x,y)||1;return {x:x/length,y:y/length};
+  }
+  function updateMobility(dt){
+    const p=AF.player,m=p.mobility,step=Math.min(dt,m.time),sx=p.x,sy=p.y;
+    if(step<=0)return;
+    p.x+=m.dx*m.speed*step;p.y+=m.dy*m.speed*step;clamp();p.slideX=p.slideY=0;p.moving=true;
+    if(Math.abs(m.dx)>.15)p.faceX=m.dx;p.faceY=m.dy;p.step+=step*.18;
+    if(m.kind==='roll')p.inv=Math.max(p.inv,m.time+2);
+    else{
+      p.attackPose=20;p.specialPose=20;p.meleeAim=Math.atan2(m.dy,m.dx);
+      for(const e of AF.cur().enemies)if(e.alive&&!m.hits.has(e)&&seg(sx,sy,p.x,p.y,e.x,e.y,e.r+32)){
+        m.hits.add(e);damage(e,62+p.atk*2.2);pushEnemy(e,m.dx,m.dy,65);
+        AF.slashes.push({art:true,kind:'ethanSword',x:e.x,y:e.y,a:p.meleeAim,r:85,l:18,max:18});
+      }
+    }
+    AF.slashes.push({art:true,kind:m.kind==='roll'?'rollTrail':'chargeTrail',x:sx,y:sy,a:Math.atan2(m.dy,m.dx),l:10,max:10});
+    m.time-=step;if(m.time<=0||Math.hypot(p.x-sx,p.y-sy)<.01){p.mobility=null;p.slideX=p.slideY=0;p.specialPose=0}
+  }
   function fireBasic(){
-    const p=AF.player,h=p.hero,e=nearest();if(!e)return;sound()?.sfx('basic',h.key);
+    const p=AF.player,h=p.hero,e=nearest();if(!e||p.mobility)return;const meleeReach=100+Math.min(45,p.range*.6);if(h.key==='dawn'&&Math.hypot(e.x-p.x,e.y-p.y)>meleeReach+e.r){p.basic=Math.min(p.basic,4);return;}sound()?.sfx('basic',h.key);
     const a=Math.atan2(e.y-p.y,e.x-p.x),blade=relicCount('relic-blade'),solar=h.key==='dawn'?relicCount('solar-shard'):0;
     if(!p.moving){if(Math.abs(Math.cos(a))>.35)p.faceX=Math.cos(a);p.faceY=Math.sin(a)}p.attackPose=14;p.attackAt=performance.now();p.bladeShots=(p.bladeShots||0)+1;
     const burst=blade>0&&p.bladeShots%3===0;
     if(h.key==='dawn'){
-      const n=p.level>=7?2:1;
-      for(let i=0;i<n;i++){const o=(i-(n-1)/2)*.12;launch({team:'p',kind:'light',x:p.x,y:p.y,vx:Math.cos(a+o)*h.proj,vy:Math.sin(a+o)*h.proj,r:5,dmg:h.damage+p.atk,pierce:blade+solar,life:100,color:solar?'#ffe58a':'#7deaff'},p,e)}
+      p.meleeAim=a;
+      AF.slashes.push({art:true,kind:'ethanSword',x:p.x,y:p.y,a,r:meleeReach,l:18,max:18});
+      for(const target of AF.cur().enemies){
+        if(!target.alive)continue;
+        const angle=Math.atan2(target.y-p.y,target.x-p.x),delta=Math.atan2(Math.sin(angle-a),Math.cos(angle-a));
+        if(Math.hypot(target.x-p.x,target.y-p.y)<=meleeReach+target.r&&Math.abs(delta)<1.1){damage(target,(h.damage+p.atk)*(burst?1.3+.08*blade:1)*(1+.08*solar));pushEnemy(target,Math.cos(a),Math.sin(a),target.type==='boss'?2:9)}
+      }
     }else{
       launch({team:'p',kind:'crescent',x:p.x,y:p.y,vx:Math.cos(a)*h.proj,vy:Math.sin(a)*h.proj,r:9,dmg:h.damage+p.atk,pierce:1+(p.level/6|0)+blade,life:85,color:'#9c7cff'},p,e);
       AF.slashes.push({x:p.x,y:p.y,a,l:14,max:14,r:36});
     }
-    if(burst){
+    if(burst&&h.key==='night'){
       for(const o of [-.20,.20])launch({team:'p',kind:'relicBlade',x:p.x,y:p.y,vx:Math.cos(a+o)*(h.proj*.92),vy:Math.sin(a+o)*(h.proj*.92),r:6,dmg:(h.damage+p.atk)*(.48+.08*blade),pierce:0,life:82,color:'#ffd36b'},p,e);
     }
   }
   AF.useSpecial=()=>{
     const p=AF.player;if(!AF.started||AF.paused||AF.dead||!p||p.special>0)return;
     const h=p.hero;sound()?.sfx('special',h.key);
-    p.special=Math.max(150,h.specialCd-p.specialBoost);p.attackPose=24;p.specialPose=24;p.attackAt=performance.now();
+    p.special=Math.max(h.key==='night'?90:150,h.specialCd-p.specialBoost);p.attackPose=24;p.specialPose=24;p.attackAt=performance.now();
     if(relicCount('resonance-core'))p.echoTimer=18;
+    const direction=mobilityDirection(h.key==='dawn');
     if(h.key==='dawn'){
-      const rad=155+p.range;
-      AF.shockwaves.push({x:p.x,y:p.y,r:10,max:rad,l:28,color:'#ffd86a',kind:'sunSeal',duration:28});
-      AF.cur().enemies.forEach(e=>{if(e.alive&&Math.hypot(e.x-p.x,e.y-p.y)<rad)damage(e,42+p.atk*1.8)});
-      p.shield=Math.min(40,p.shield+16);p.inv=Math.max(p.inv,20);
-      AF.slashes.push({art:true,kind:'dawn',x:p.x,y:p.y,a:Math.atan2(p.faceY,p.faceX),l:18,max:18});
-      AF.toast('태양낙인 · 성광 폭발');
+      p.mobility={kind:'charge',dx:direction.x,dy:direction.y,time:18,max:18,speed:12+Math.min(3,p.range*.025),hits:new Set()};
+      p.shield=Math.min(40,p.shield+10);p.inv=Math.max(p.inv,18);
+      AF.toast('돌진 베기');
     }else{
-      let dx=p.faceX,dy=p.faceY,l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;
-      const sx=p.x,sy=p.y;p.x+=dx*(120+p.range*.4);p.y+=dy*(120+p.range*.4);clamp();p.inv=34;
-      AF.slashes.push({x:(sx+p.x)/2,y:(sy+p.y)/2,a:Math.atan2(dy,dx),l:24,max:24,r:125,color:'#7ce8ff',art:true,kind:'night',sx,sy,ex:p.x,ey:p.y});
-      AF.cur().enemies.forEach(e=>{if(e.alive&&seg(sx,sy,p.x,p.y,e.x,e.y,e.r+45))damage(e,50+p.atk*1.8)});
-      AF.toast('월영 질주 · 그림자 참격');
+      p.mobility={kind:'roll',dx:direction.x,dy:direction.y,time:16,max:16,speed:9+Math.min(2,p.range*.02)};
+      p.attackPose=0;p.specialPose=0;p.inv=Math.max(p.inv,18);
+      AF.toast('회피 구르기');
     }
     const gear=relicCount('time-gear');
     if(gear&&Math.random()<Math.min(.62,.22+.10*(gear-1))){
@@ -529,7 +558,7 @@
     chooseReward([
       {i:'✦',n:'성물 증폭',d:'기본 공격 피해 +5',f:p=>p.atk+=5},
       {i:'⟲',n:'공명 가속',d:'자동 공격 간격 감소',f:p=>p.rate+=3},
-      {i:'◎',n:'공간 확장',d:'특수기 범위·이동거리 증가',f:p=>p.range+=16},
+      {i:'◎',n:'공간 확장',d:'검 공격 범위·특수기 이동거리 증가',f:p=>p.range+=16},
       {i:'✹',n:'특수 공명',d:'특수기 재사용 대기시간 감소',f:p=>p.specialBoost+=28},
       {i:'♥',n:'생명 각인',d:'최대 체력 +20, 즉시 회복',f:p=>{p.maxHp+=20;p.hp=Math.min(p.maxHp,p.hp+28)}}
     ],'성물 공명','하나의 힘을 선택하세요.');
@@ -548,7 +577,7 @@
       {id:'red-vow',i:'✕',img:relicIcon('red-vow'),n:'붉은 서약',d:'최대 HP 15% 감소 · 공격력 +14',rarity:'epic',relic:true,f:p=>{p.maxHp=Math.max(45,Math.round(p.maxHp*.85));p.hp=Math.min(p.hp,p.maxHp);p.atk+=14}},
       {id:'time-gear',i:'⌁',img:relicIcon('time-gear'),n:'시간의 톱니',d:'특수기 사용 시 일정 확률로 쿨타임 즉시 초기화',rarity:'legendary',relic:true,f:p=>{}}
     ];
-    if(AF.player.hero.key==='dawn')opts.push({id:'solar-shard',i:'☀',img:relicIcon('solar-shard'),n:'태양의 파편',d:'Dawn 전용 · 추적 룬탄 관통 +1',rarity:'epic',relic:true,f:p=>{}});
+    if(AF.player.hero.key==='dawn')opts.push({id:'solar-shard',i:'☀',img:relicIcon('solar-shard'),n:'태양의 파편',d:'에단 전용 · 검 공격 피해 +8%',rarity:'epic',relic:true,f:p=>{}});
     else opts.push({id:'eclipse-fang',i:'☾',img:relicIcon('eclipse-fang'),n:'월식의 송곳니',d:'Night 전용 · 적 처치 시 추가 월광 칼날 발생',rarity:'epic',relic:true,f:p=>{}});
     chooseReward(opts,'보물 발견','상자에서 유물 하나를 선택하세요.');
   }
@@ -630,7 +659,7 @@
   };
   AF.nextFloor=(source='exit')=>{
     if(AF.rewardChoices?.length){AF.pendingFloor={source,room:AF.cur()};return}
-    AF.paused=false;sound()?.startExplore();AF.transitioning=false;AF.bossClearUntil=0;AF.floor++;
+    AF.paused=false;sound()?.startExplore();AF.transitioning=false;AF.bossClearUntil=0;AF.floor++;if(AF.player)AF.player.mobility=null;
     AF.rooms=makeDungeon(AF.roomTarget());AF.current='0,0';setupFloorObjective();
     const healRate=source==='boss'?(AF.floor>12?.22:.30):source==='endless'?.30:AF.floor>12?.10:.16;
     AF.player.slideX=AF.player.slideY=0;AF.player.x=W/2;AF.player.y=arena.y+arena.h/2;
@@ -648,7 +677,7 @@
     if(AF.floor>=24)AF.endless=true;
     AF.nextFloor('test');
   };
-  function hurt(n,nx,ny){const p=AF.player;if(p.shield>0){const b=Math.min(p.shield,n);p.shield-=b;n-=b;if(n<=0){p.inv=18;return}}p.hp-=Math.round(n);sound()?.sfx('hurt');p.inv=48;p.hurtPose=18;p.x+=nx*18;p.y+=ny*18;
+  function hurt(n,nx,ny){const p=AF.player;if(p.mobility?.kind==='roll')return;n*=1-(p.hero.armor||0);if(p.shield>0){const b=Math.min(p.shield,n);p.shield-=b;n-=b;if(n<=0){p.inv=18;return}}p.hp-=Math.round(n);sound()?.sfx('hurt');p.inv=48;p.hurtPose=18;p.x+=nx*18;p.y+=ny*18;
     const seal=relicCount('guardian-seal');
     if(seal&&n>0&&(p.guardianCd||0)<=0){
       p.guardianCd=Math.max(170,310-(seal-1)*30);
@@ -660,6 +689,7 @@
     }for(let i=0;i<10;i++)AF.particles.push({x:p.x,y:p.y,vx:(Math.random()-.5)*4,vy:(Math.random()-.5)*4,l:22,color:'#ff6478'});if(p.hp<=0&&!AF.dead){p.hp=0;AF.dead=true;AF.paused=true;sound()?.stopMusic();sound()?.sfx('gameOver');p.deathAt=performance.now();ui.resultText.textContent=`${p.hero.ko} · 지하 ${AF.floor}층 · Lv ${p.level} · 처치 ${AF.kills}`;setTimeout(()=>{if(AF.dead)ui.gameOver.classList.add('show')},900)}}
   function clamp(){const p=AF.player;p.x=Math.max(arena.x+p.r,Math.min(arena.x+arena.w-p.r,p.x));p.y=Math.max(arena.y+p.r,Math.min(arena.y+arena.h-p.r,p.y))}
   function enter(nk,from){
+    AF.player.mobility=null;
     AF.player.slideX=AF.player.slideY=0;AF.current=nk;const r=AF.cur();r.seen=true;AF.projectiles=[];AF.slashes=[];AF.soulBursts=[];
     const p=AF.player;if(from==='W'){p.x=arena.x+35;p.y=AF.sideDoorY()}else if(from==='E'){p.x=arena.x+arena.w-35;p.y=AF.sideDoorY()}else if(from==='N'){p.x=W/2;p.y=arena.y+35}else if(from==='S'){p.x=W/2;p.y=arena.y+arena.h-35}
     p.inv=r.type==='boss'?120:35;
@@ -730,7 +760,7 @@
     e.bossCd=Math.max(44,118-phase*16-Math.min(34,(AF.floor-1)*2));
   }
 
-  AF.update=dt=>{const p=AF.player;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.specialPose>0)p.specialPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}let m=Math.hypot(vx,vy);fieldMovement(AF.cur(),p,vx,vy,m,dt);
+  AF.update=dt=>{const p=AF.player;if(p.special>0)p.special-=dt;if(p.inv>0)p.inv-=dt;if(p.attackPose>0)p.attackPose-=dt;if(p.specialPose>0)p.specialPose-=dt;if(p.hurtPose>0)p.hurtPose-=dt;if(p.guardianCd>0)p.guardianCd-=dt;if(p.echoTimer>0){p.echoTimer-=dt;if(p.echoTimer<=0)triggerRelicEcho()}let vx=(AF.keys.a||AF.keys.arrowleft?-1:0)+(AF.keys.d||AF.keys.arrowright?1:0),vy=(AF.keys.w||AF.keys.arrowup?-1:0)+(AF.keys.s||AF.keys.arrowdown?1:0);if(AF.joy.active&&Math.hypot(AF.joy.x,AF.joy.y)>.08){vx=AF.joy.x;vy=AF.joy.y}let m=Math.hypot(vx,vy);if(p.mobility)updateMobility(dt);else fieldMovement(AF.cur(),p,vx,vy,m,dt);
     const sigil=relicCount('dash-sigil');
     if(m&&sigil){
       p.sigilCharge=(p.sigilCharge||0)+dt;
@@ -755,7 +785,7 @@
         }
       }
     }
-    p.basic-=dt;if(p.basic<=0){p.basic=Math.max(11,p.hero.rate-p.rate);fireBasic()}
+    p.basic-=dt;if(p.basic<=0&&!p.mobility){p.basic=Math.max(11,p.hero.rate-p.rate);fireBasic()}
     for(const e of r.enemies){
       if(!e.alive)continue;
       if(e.flash>0)e.flash-=dt;if(e.attackPose>0)e.attackPose-=dt;if(e.hurtPose>0)e.hurtPose-=dt;
@@ -838,8 +868,8 @@
       const q=AF.projectiles[i];q.visualAge=(q.visualAge||0)+dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;
       if(q.life<=0||q.x<arena.x-20||q.x>arena.x+arena.w+20||q.y<arena.y-20||q.y>arena.y+arena.h+20){AF.projectiles.splice(i,1);continue}
       if(q.team==='p'){
-        const e=r.enemies.find(e=>e.alive&&Math.hypot(e.x-q.x,e.y-q.y)<e.r+q.r);
-        if(e){damage(e,q.dmg);if(q.pierce>0)q.pierce--;else AF.projectiles.splice(i,1)}
+        const e=r.enemies.find(e=>e.alive&&!q.hitEnemies?.has(e)&&Math.hypot(e.x-q.x,e.y-q.y)<e.r+q.r);
+        if(e){(q.hitEnemies??=new Set()).add(e);damage(e,q.dmg);if(q.pierce>0)q.pierce--;else AF.projectiles.splice(i,1)}
       }else if(p.inv<=0&&Math.hypot(p.x-q.x,p.y-q.y)<p.r+q.r){
         const mirror=relicCount('abyss-mirror'),chance=Math.min(.55,.18+.07*Math.max(0,mirror-1));
         if(mirror&&Math.random()<chance){
@@ -901,7 +931,7 @@
   };
 
   AF.hud=()=>{const p=AF.player;if(!p)return;const r=AF.cur();ui.floorText.textContent=`지하 ${AF.floor}층 · ${AF.stageName()}`;ui.roomText.textContent=`ROOM ${AF.current} · ${AF.roomLabel(r)}`;ui.killText.textContent=AF.kills;ui.hpText.textContent=Math.max(0,Math.round(p.hp));ui.levelText.textContent=p.level;ui.enemyText.textContent=r.enemies.filter(e=>e.alive).length;ui.hpFill.style.width=`${Math.max(0,p.hp/p.maxHp*100)}%`;ui.xpFill.style.width=`${Math.max(0,p.xp/p.nextXp*100)}%`;
-    const total=Math.max(150,p.hero.specialCd-p.specialBoost),remain=Math.max(0,p.special),seconds=remain/60,ready=remain<=0,progress=ready?1:Math.max(0,Math.min(1,1-remain/total));
+    const total=Math.max(p.hero.key==='night'?90:150,p.hero.specialCd-p.specialBoost),remain=Math.max(0,p.special),seconds=remain/60,ready=remain<=0,progress=ready?1:Math.max(0,Math.min(1,1-remain/total));
     ui.specialCdText.textContent=ready?'READY':seconds<10?seconds.toFixed(1)+'s':Math.ceil(seconds)+'s';
     ui.specialBtn.classList.toggle('cooling',!ready);ui.specialBtn.classList.toggle('ready',ready);
     ui.specialBtn.style.setProperty('--cd-angle',(progress*360).toFixed(1)+'deg');
