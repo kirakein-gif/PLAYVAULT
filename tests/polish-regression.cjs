@@ -349,7 +349,7 @@ console.log('PASS v51 relic triggers: opposite grail curves, reflection versus a
 for(const boss of [false,true]){
  const h=harness(),{A}=h;A.newRun();A.floor=4;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player,e=r.enemies[0];
  Object.assign(e,{type:boss?'boss':'crawler',x:p.x+60,y:p.y,s:0,hp:1000,max:1000,armor:0,stun:0,intro:0,aiCd:9999,bossCd:9999,bossTelegraph:0});r.enemies=[e];p.basic=9999;const x=e.x;A.useSpecial();A.update(3);
- assert.ok(e.hp<1000);assert.ok(boss?e.x===x:e.x>x&&e.x<=x+32,'bounded non-boss knockback');assert.ok(boss?e.stun===0:e.stun>15&&e.stun<=24,'short non-boss stun');
+ assert.ok(e.hp<1000);assert.ok(boss?e.x===x:e.x>x&&e.x<=x+32,'bounded non-boss knockback');assert.equal(e.stun,0,'shoulder impact never applies attack-interrupting stun');
 }
 {
  const h=harness(),{A}=h;A.selected='night';A.newRun();A.floor=4;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player;p.basic=9999;p.inv=99999;A.relics['resonance-core']={count:1};A.useSpecial();for(let i=0;i<18;i++)A.update(1);assert.ok(p.rollBoost>0);h.frame();
@@ -364,7 +364,7 @@ for(const mobile of [false,true]){
   A.projectiles=['crescent','priestBolt','bossLance','bossOrb','crystal'].map(kind=>({kind,x:A.player.x,y:A.player.y,vx:4,vy:1,visualAge:8}));const before=JSON.stringify([A.slashes,A.shockwaves,A.projectiles]);h.frame();assert.equal(JSON.stringify([A.slashes,A.shockwaves,A.projectiles]),before);
  }
 }
-console.log('PASS v52: bounded shoulder knockback/stun, boss immunity, consumed violet shot readiness, all layered FX stages on desktop/mobile');
+console.log('PASS v52: bounded shoulder knockback without hit stun, boss immunity, consumed violet shot readiness, all layered FX stages on desktop/mobile');
 
 {
  const h=harness(),{A}=h;A.newRun();A.floor=4;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player,e=r.enemies[0];r.enemies=[e];Object.assign(e,{x:p.x+135,y:p.y,hp:1000,max:1000,armor:0,s:0,stun:99999});p.basic=0;p.inv=9999;A.update(1);for(let i=0;i<6;i++)A.update(1);assert.equal(e.hp,976,'extended sword reaches a target outside old reach');
@@ -451,3 +451,19 @@ for(const mobile of [false,true]){
  room.fieldAge=296;const early=A.fieldPhase(room,hazard).progress;room.fieldAge=388;assert.ok(A.fieldPhase(room,hazard).progress>early,'cooling fades forward while remaining safe');room.clear=true;assert.equal(A.fieldState(room,hazard),'inactive');
 }
 console.log('PASS v56: real reciprocal minimap corridors, combat/seal door states, hidden branches, and exact safe/hot/cooling lava boundaries on desktop/mobile');
+
+// Player hits displace survivors without cancelling windups or active charges.
+for(const special of [false,true])for(const type of ['crawler','shooter','brute']){
+ const {A}=harness();A.newRun();A.floor=4;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player,e=r.enemies[0];
+ r.enemies=[e];Object.assign(e,{type,x:p.x+60,y:p.y,r:18,s:0,hp:10000,max:10000,armor:0,stun:0,aiWindup:20,attackPose:18,dash:0,charge:0,shotAngle:0,aimX:1,aimY:0});p.inv=9999;p.basic=special?9999:0;const x=e.x;
+ if(special){A.useSpecial();A.update(3)}else {A.update(1);for(let i=0;i<6;i++)A.update(1)}
+ assert.ok(e.hp<10000);assert.ok(e.x>x,'surviving enemy is still pushed');assert.equal(e.stun,0);assert.ok(e.aiWindup>0&&e.aiWindup<20,'windup keeps advancing');assert.equal(e.hurtPose,0,'hit pose does not cover an attack');
+ p.basic=9999;p.mobility=null;for(let i=0;i<22;i++)A.update(1);
+ assert.ok(type==='shooter'?A.projectiles.some(q=>q.team==='e'):e.attackPose>0,'interrupted target completes its attack');
+}
+for(const type of ['crawler','brute']){
+ const {A}=harness();A.newRun();A.floor=4;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player,e=r.enemies[0];r.enemies=[e];
+ Object.assign(e,{type,x:p.x+60,y:p.y,r:18,s:0,hp:10000,max:10000,armor:0,stun:0,aiWindup:0,dash:type==='crawler'?10:0,charge:type==='brute'?18:0,aimX:1,aimY:0});p.inv=9999;p.basic=0;for(let i=0;i<7;i++)A.update(1);
+ assert.ok(e.hp<10000);assert.equal(e.stun,0);assert.equal(type==='crawler'?e.dash:e.charge,type==='crawler'?3:11,'active attack keeps its timer');
+}
+console.log('PASS v57: sword and shoulder hits preserve enemy windups, projectiles and active charges');

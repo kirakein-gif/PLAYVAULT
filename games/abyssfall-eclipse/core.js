@@ -69,7 +69,29 @@
   function resetJoy(){Object.assign(AF.joy,{x:0,y:0,active:false,id:null});joyKnob.style.transform='translate(0,0)'}
   function moveJoy(e){const r=joyBase.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=e.clientX-cx,dy=e.clientY-cy,d=Math.hypot(dx,dy)||1,m=32;if(d>m){dx=dx/d*m;dy=dy/d*m}AF.joy.x=dx/m;AF.joy.y=dy/m;joyKnob.style.transform=`translate(${dx}px,${dy}px)`}
   joyBase.addEventListener('pointerdown',e=>{e.preventDefault();AF.joy.active=true;AF.joy.id=e.pointerId;joyBase.setPointerCapture?.(e.pointerId);moveJoy(e)});joyBase.addEventListener('pointermove',e=>{if(AF.joy.active&&e.pointerId===AF.joy.id){e.preventDefault();moveJoy(e)}});joyBase.addEventListener('pointerup',resetJoy);joyBase.addEventListener('pointercancel',resetJoy);addEventListener('blur',()=>{resetJoy();AF.keys={}});ui.specialBtn.addEventListener('pointerdown',e=>{e.preventDefault();AF.useSpecial()});
-  if(ui.relicButton){const closeRelics=()=>{ui.relicPanel.classList.remove('show');ui.relicPanel.setAttribute('aria-hidden','true')};ui.relicButton.addEventListener('click',()=>{const open=!ui.relicPanel.classList.contains('show');ui.relicPanel.classList.toggle('show',open);ui.relicPanel.setAttribute('aria-hidden',open?'false':'true')});ui.relicClose&&ui.relicClose.addEventListener('click',closeRelics);}
+  if(ui.relicButton){
+    const placeRelics=()=>{
+      const hud=$('hud').getBoundingClientRect(),panel=ui.relicPanel;
+      const left=hud.left,top=hud.bottom+8,width=Math.min(hud.width,355);
+      let bottom=innerHeight-14;
+      // Reserve the actual space occupied by the visible controls in this column.
+      for(const id of ['abilityDock','joyBase','specialBtn']){
+        const r=$(id)?.getBoundingClientRect();
+        if(r?.width&&r.height&&r.left<left+width&&r.right>left)bottom=Math.min(bottom,r.top-8);
+      }
+      Object.assign(panel.style,{left:`${left}px`,top:`${top}px`,width:`${width}px`,maxHeight:`${Math.max(0,bottom-top)}px`});
+    };
+    const closeRelics=()=>{ui.relicPanel.classList.remove('show');ui.relicPanel.setAttribute('aria-hidden','true');ui.relicButton.setAttribute('aria-expanded','false')};
+    ui.relicButton.setAttribute('aria-controls','relicPanel');ui.relicButton.setAttribute('aria-expanded','false');
+    ui.relicButton.addEventListener('click',()=>{
+      const open=!ui.relicPanel.classList.contains('show');
+      if(open)placeRelics();
+      ui.relicPanel.classList.toggle('show',open);ui.relicPanel.setAttribute('aria-hidden',open?'false':'true');ui.relicButton.setAttribute('aria-expanded',String(open));
+    });
+    addEventListener('resize',()=>{if(ui.relicPanel.classList.contains('show'))placeRelics()});
+    if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>{if(ui.relicPanel.classList.contains('show'))placeRelics()}).observe($('hud'));
+    ui.relicClose&&ui.relicClose.addEventListener('click',closeRelics);
+  }
 
   function makeDungeon(n){
     const R={[key(0,0)]:{x:0,y:0}},path=['0,0'];
@@ -437,7 +459,7 @@
     const p=AF.player,grail=relicCount('twin-grail');
     if(grail){const missing=1-Math.max(0,p.hp)/p.maxHp;n*=1+(p.hero.key==='dawn'?missing*(.55+.18*(grail-1)):(1-missing)*(.18+.04*(grail-1)))}
     n*=1-(e.armor||0);if(e.type==='boss')n=Math.min(n,e.max*.10);
-    e.hp-=n;e.flash=7;e.hurtPose=11;sound()?.sfx('hit');
+    e.hp-=n;e.flash=7;e.hurtPose=(e.aiWindup>0||e.bossTelegraph>0||e.attackPose>0||e.dash>0||e.charge>0||e.bossRush>0)?0:11;sound()?.sfx('hit');
     for(let i=0;i<6;i++)AF.particles.push({x:e.x,y:e.y,vx:(Math.random()-.5)*3.5,vy:(Math.random()-.5)*3.5,l:18,color:p.hero.color});
     if(e.hp<=0){
       e.hp=0;e.alive=false;e.deadAt=performance.now();AF.kills++;sound()?.sfx(e.type==='boss'?'bossDefeat':'enemyDeath');
@@ -480,12 +502,12 @@
     const muzzle=(q.muzzleX||0)*(1-t),height=(q.launchHeight??30)*(1-t)+(q.hitHeight??30)*t;
     return{x:q.x+muzzle,y:q.y-height,angle:Math.atan2(q.vy-(t<1?((q.hitHeight??30)-(q.launchHeight??30))*rate:0),q.vx-(t<1?(q.muzzleX||0)*rate:0))};
   };
-  function pushEnemy(e,dx,dy,distance,stun=12){
+  function pushEnemy(e,dx,dy,distance){
     if(e.summonTime>0)return;
     const weight=e.type==='boss'?.18:e.type==='brute'?.65:1;
     e.x=Math.max(arena.x+e.r,Math.min(arena.x+arena.w-e.r,e.x+dx*distance*weight));
     e.y=Math.max(arena.y+e.r,Math.min(arena.y+arena.h-e.r,e.y+dy*distance*weight));
-    if(e.type!=='boss'){e.stun=Math.max(e.stun||0,stun);e.dash=0;e.charge=0;e.aiWindup=0}
+    // Displacement never cancels an enemy attack or adds hit stun.
   }
   function mobilityDirection(targeted){
     const p=AF.player;let x=(AF.keys.d||AF.keys.arrowright?1:0)-(AF.keys.a||AF.keys.arrowleft?1:0),y=(AF.keys.s||AF.keys.arrowdown?1:0)-(AF.keys.w||AF.keys.arrowup?1:0);
@@ -503,7 +525,7 @@
       p.attackPose=0;p.specialPose=0;p.inv=Math.max(p.inv,m.time+2);p.meleeAim=Math.atan2(m.dy,m.dx);
       for(const e of AF.cur().enemies)if(e.alive&&!(e.summonTime>0)&&!m.hits.has(e)&&seg(sx,sy,p.x,p.y,e.x,e.y,e.r+32)){
         const ix=(p.x+e.x)/2,iy=(p.y+e.y)/2;
-        m.hits.add(e);damage(e,(62+p.atk*2.2)*(1+.12*relicCount('red-vow')));if(e.type!=='boss')pushEnemy(e,m.dx,m.dy,Math.min(48,32+5*relicCount('dash-sigil')),24);p.bodyFlash=6;
+        m.hits.add(e);damage(e,(62+p.atk*2.2)*(1+.12*relicCount('red-vow')));if(e.type!=='boss')pushEnemy(e,m.dx,m.dy,Math.min(48,32+5*relicCount('dash-sigil')));p.bodyFlash=6;
         AF.slashes.push({art:true,kind:'chargeImpact',x:ix,y:iy,a:p.meleeAim,r:46,l:22,max:22});
         for(let i=0;i<14;i++){const a=i*Math.PI*2/14,speed=1.8+Math.random()*2.8;AF.particles.push({x:ix,y:iy-24,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed-1,l:18,color:i%3?'#bca779':'#fff1cf'})}
 
