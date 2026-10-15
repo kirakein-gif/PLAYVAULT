@@ -394,7 +394,7 @@
   ui.clearLobby?.addEventListener('click',()=>{sound()?.stopMusic();AF.clearScreen?.classList.remove('show');AF.started=false;AF.paused=true;ui.start.classList.add('show')});
   ui.endlessBtn?.addEventListener('click',()=>{AF.endless=true;AF.cleared=true;AF.clearScreen?.classList.remove('show');AF.paused=false;AF.nextFloor('endless')});
 
-  function nearest(){const a=AF.cur().enemies.filter(e=>e.alive);return a.length?a.reduce((x,y)=>Math.hypot(x.x-AF.player.x,x.y-AF.player.y)<Math.hypot(y.x-AF.player.x,y.y-AF.player.y)?x:y):null}
+  function nearest(){const a=AF.cur().enemies.filter(e=>e.alive&&!(e.summonTime>0));return a.length?a.reduce((x,y)=>Math.hypot(x.x-AF.player.x,x.y-AF.player.y)<Math.hypot(y.x-AF.player.x,y.y-AF.player.y)?x:y):null}
   const relicCount=id=>AF.relics[id]?.count||0;
   function triggerRelicEcho(){
     const p=AF.player,count=relicCount('resonance-core');if(!count||AF.dead)return;
@@ -411,7 +411,7 @@
     }
   }
   function damage(e,n){
-    if(!e.alive)return;
+    if(!e.alive||e.summonTime>0)return;
     if(e.type==='boss'&&e.intro>0)return;
     const p=AF.player,grail=relicCount('twin-grail');
     if(grail){const missing=1-Math.max(0,p.hp)/p.maxHp;n*=1+(p.hero.key==='dawn'?missing*(.55+.18*(grail-1)):(1-missing)*(.18+.04*(grail-1)))}
@@ -423,7 +423,7 @@
       AF.pickups.push({x:e.x,y:e.y,vx:(Math.random()-.5)*1.8,vy:(Math.random()-.5)*1.8,val:Math.round((e.type==='boss'?20:e.type==='brute'?5:3)*(1+Math.max(0,AF.floor-12)*.10))});
       const fang=p.hero.key==='night'?relicCount('eclipse-fang'):0;
       if(fang){
-        const targets=AF.cur().enemies.filter(x=>x.alive&&x!==e).sort((a,b)=>Math.hypot(a.x-e.x,a.y-e.y)-Math.hypot(b.x-e.x,b.y-e.y));
+        const targets=AF.cur().enemies.filter(x=>x.alive&&!(x.summonTime>0)&&x!==e).sort((a,b)=>Math.hypot(a.x-e.x,a.y-e.y)-Math.hypot(b.x-e.x,b.y-e.y));
         const count=Math.min(3,1+Math.floor((fang-1)/2)),base=(p.hero.damage+p.atk)*(.46+.07*fang);
         for(let i=0;i<Math.min(count,targets.length);i++){const t=targets[i],a=Math.atan2(t.y-e.y,t.x-e.x);launch({team:'p',kind:'moonFang',x:e.x,y:e.y,vx:Math.cos(a)*8.6,vy:Math.sin(a)*8.6,r:7,dmg:base,pierce:0,life:92,color:'#9b7cff'},e,t)}
       }
@@ -431,7 +431,7 @@
         const now=performance.now(),room=AF.cur();
         AF.paused=false;AF.transitioning=false;
         AF.projectiles=AF.projectiles.filter(q=>q.team==='p');
-        room.enemies.forEach(x=>{if(x!==e&&x.alive){x.alive=false;x.hp=0;x.deadAt=now}});
+        room.enemies.forEach(x=>{if(x!==e&&x.alive){x.alive=false;x.hp=0;x.deadAt=x.summonTime>0?0:now;x.summonTime=0}});
         room.clear=true;room.bossDefeated=true;room.portalUnlockAt=now+720;room.used=false;
         p.inv=Math.max(p.inv,150);p.basic=Math.max(p.basic,28);
         AF.bossClearUntil=now+720;e.bossAction='격파';
@@ -460,6 +460,7 @@
     return{x:q.x+muzzle,y:q.y-height,angle:Math.atan2(q.vy-(t<1?((q.hitHeight??30)-(q.launchHeight??30))*rate:0),q.vx-(t<1?(q.muzzleX||0)*rate:0))};
   };
   function pushEnemy(e,dx,dy,distance,stun=12){
+    if(e.summonTime>0)return;
     const weight=e.type==='boss'?.18:e.type==='brute'?.65:1;
     e.x=Math.max(arena.x+e.r,Math.min(arena.x+arena.w-e.r,e.x+dx*distance*weight));
     e.y=Math.max(arena.y+e.r,Math.min(arena.y+arena.h-e.r,e.y+dy*distance*weight));
@@ -479,7 +480,7 @@
     if(m.kind==='roll')p.inv=Math.max(p.inv,m.time+2);
     else{
       p.attackPose=0;p.specialPose=0;p.inv=Math.max(p.inv,m.time+2);p.meleeAim=Math.atan2(m.dy,m.dx);
-      for(const e of AF.cur().enemies)if(e.alive&&!m.hits.has(e)&&seg(sx,sy,p.x,p.y,e.x,e.y,e.r+32)){
+      for(const e of AF.cur().enemies)if(e.alive&&!(e.summonTime>0)&&!m.hits.has(e)&&seg(sx,sy,p.x,p.y,e.x,e.y,e.r+32)){
         const ix=(p.x+e.x)/2,iy=(p.y+e.y)/2;
         m.hits.add(e);damage(e,(62+p.atk*2.2)*(1+.12*relicCount('red-vow')));if(e.type!=='boss')pushEnemy(e,m.dx,m.dy,Math.min(48,32+5*relicCount('dash-sigil')),24);p.bodyFlash=6;
         AF.slashes.push({art:true,kind:'chargeImpact',x:ix,y:iy,a:p.meleeAim,r:46,l:22,max:22});
@@ -494,7 +495,7 @@
     const p=AF.player,a=swing.a;let connected=false;
     AF.slashes.push({art:true,kind:'ethanSword',x:p.x,y:p.y,a,r:swing.reach,l:12,max:12});
     for(const target of AF.cur().enemies){
-      if(!target.alive||(target.type==='boss'&&target.intro>0))continue;
+      if(!target.alive||target.summonTime>0||(target.type==='boss'&&target.intro>0))continue;
       const angle=Math.atan2(target.y-p.y,target.x-p.x),delta=Math.atan2(Math.sin(angle-a),Math.cos(angle-a));
       if(Math.hypot(target.x-p.x,target.y-p.y)<=swing.reach+target.r&&Math.abs(delta)<1.1){connected=true;damage(target,swing.power);pushEnemy(target,Math.cos(a),Math.sin(a),target.type==='boss'?2:9)}
     }
@@ -770,7 +771,8 @@
       for(let i=0;i<n;i++){
         const a=i*Math.PI*2/n+Math.random()*.5,rad=78+Math.random()*30,type=phase>=2&&i===0?'brute':(Math.random()<.42?'shooter':'crawler');
         const m=enemy(e.x+Math.cos(a)*rad,e.y+Math.sin(a)*rad,type);
-        m.summoned=true;m.hp*=.82+phase*.10;m.max=m.hp;m.d*=.88+phase*.08;
+        m.x=Math.max(arena.x+m.r+25,Math.min(arena.x+arena.w-m.r-25,m.x));m.y=Math.max(arena.y+m.r+25,Math.min(arena.y+arena.h-m.r-25,m.y));
+        m.summoned=true;m.summonTime=m.summonMax=114;m.summonColor=e.profile?.color||'#bb8dd6';m.moving=false;m.hp*=.82+phase*.10;m.max=m.hp;m.d*=.88+phase*.08;
         AF.cur().enemies.push(m);
       }
     }
@@ -808,6 +810,7 @@
     p.basic-=dt;if(p.basic<=0&&!p.mobility){p.basic=Math.max(11,p.hero.rate-p.rate);fireBasic()}
     for(const e of r.enemies){
       if(!e.alive)continue;
+      if(e.summonTime>0){e.summonTime=Math.max(0,e.summonTime-dt);e.moving=false;e.attackPose=e.aiWindup=e.dash=e.charge=0;continue}
       if(e.flash>0)e.flash-=dt;if(e.attackPose>0)e.attackPose-=dt;if(e.hurtPose>0)e.hurtPose-=dt;
       const ox=e.x,oy=e.y,dx=p.x-e.x,dy=p.y-e.y,dist=Math.hypot(dx,dy)||1;e.faceX=dx;
       if(e.type==='boss'){
@@ -888,7 +891,7 @@
       const q=AF.projectiles[i];q.visualAge=(q.visualAge||0)+dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;
       if(q.life<=0||q.x<arena.x-20||q.x>arena.x+arena.w+20||q.y<arena.y-20||q.y>arena.y+arena.h+20){AF.projectiles.splice(i,1);continue}
       if(q.team==='p'){
-        const e=r.enemies.find(e=>e.alive&&!q.hitEnemies?.has(e)&&Math.hypot(e.x-q.x,e.y-q.y)<e.r+q.r);
+        const e=r.enemies.find(e=>e.alive&&!(e.summonTime>0)&&!q.hitEnemies?.has(e)&&Math.hypot(e.x-q.x,e.y-q.y)<e.r+q.r);
         if(e){(q.hitEnemies??=new Set()).add(e);damage(e,q.dmg);if(q.pierce>0)q.pierce--;else AF.projectiles.splice(i,1)}
       }else if(p.inv<=0&&Math.hypot(p.x-q.x,p.y-q.y)<p.r+q.r){
         const mirror=relicCount('abyss-mirror'),chance=Math.min(.55,.18+.07*Math.max(0,mirror-1));

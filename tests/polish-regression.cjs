@@ -395,3 +395,23 @@ console.log('PASS v52 haste growth: Ethan 2 / Noah 4 frames per selected upgrade
  }
  console.log('PASS v52 loading: pending images prevent entry; prepared assets unlock; failed combat image offers reload without starting old art');
 })().catch(e=>{console.error(e);process.exitCode=1});
+
+// Real boss summon pattern: one second of floor warning, emergence, brief settle, then AI.
+for(const mobile of [false,true]){
+ const h=harness(mobile),{A}=h;A.newRun();while(A.floor<6)A.nextFloor();const r=Object.values(A.rooms).find(r=>r.type==='boss');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player,b=r.enemies[0];p.basic=99999;p.inv=99999;b.hp=b.max*.5;Object.assign(b,{intro:0,bossPattern:2,bossPhase:1,bossTelegraph:1,bossRush:0});A.update(1);
+ const summons=r.enemies.filter(e=>e.summoned);assert.equal(summons.length,3);b.bossCd=99999;const e=summons[0],x=e.x,y=e.y,hp=e.hp;
+ assert.ok(e.summonTime>100);A.damage(e,99999);assert.equal(e.hp,hp,'summon cannot be hit before appearing');
+ const states=[];for(let i=0;i<114;i++){A.update(1);if([20,65,95,112].includes(i)){states.push(e.summonTime);h.frame()}if(e.summonTime>0){assert.equal(e.x,x);assert.equal(e.y,y);assert.equal(e.attackPose,0);assert.equal(e.moving,false)}}
+ assert.ok(states[0]>54&&states[1]<54&&states[1]>18&&states[2]<=18);assert.equal(e.summonTime,0);A.update(1);assert.ok(e.x!==x||e.y!==y||e.aiWindup>0,'active AI begins after reveal');A.damage(e,10);assert.ok(e.hp<hp);
+ // Contact and ranged attacks are both blocked while the summon is materializing.
+ Object.assign(e,{alive:true,hp:999,x:p.x,y:p.y,summonTime:40,type:'shooter',fire:0});p.inv=0;p.shield=0;const health=p.hp;A.projectiles=[];r.enemies=[e];A.update(1);assert.equal(p.hp,health);assert.equal(A.projectiles.length,0);
+ // Defeating the summoner cancels pending bodies without a death sprite or XP rewards.
+ r.enemies=[b,e];b.hp=1;b.alive=true;A.damage(b,b.max);assert.equal(e.alive,false);assert.equal(e.deadAt,0);assert.equal(e.summonTime,0);
+}
+for(const mobile of [false,true]){
+ const h=harness(mobile),art=h.env.AF_ART,e={alive:true,moving:true,type:'boss',tier:2,walkCycle:.17/6,x:100,y:100};
+ const before=JSON.stringify(e),blend=art.enemyWalkTransition(e);assert.ok(blend&&blend.from!==blend.to&&blend.mix>0&&blend.mix<1);assert.equal(JSON.stringify(e),before,'visual transition never changes position or gait clock');
+ e.walkCycle=.6/6;assert.equal(art.enemyWalkTransition(e),null,'one image outside the short blend window');
+ for(const flag of ['attackPose','hurtPose','aiWindup','bossTelegraph','intro']){e[flag]=1;assert.equal(art.enemyWalkTransition(e),null,'no smoothing of attack or hurt timing');e[flag]=0}
+}
+console.log('PASS v54: delayed summon phases, safe emergence, activation, boss-death cancellation and timing-neutral walk transitions on desktop/mobile');

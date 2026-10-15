@@ -184,6 +184,14 @@
     if(!spec||!art.loaded[spec[0]])return null;
     return walkFrames[spec[0]][spec[1]][Math.floor((e.walkCycle||0)*6)%6];
   };
+  art.enemyWalkTransition=e=>{
+    const to=art.enemyWalk(e);if(!to)return null;
+    const phase=(e.walkCycle||0)*6,index=Math.floor(phase),fraction=phase-index;
+    // Blend only the beginning of a foot pose; attacks never pass this gate.
+    if(fraction>=.32)return null;
+    const u=fraction/.32,mix=u*u*(3-2*u),from=art.enemyWalk({...e,walkCycle:((index+5)%6)/6});
+    return {from,to,mix};
+  };
   function isolateActor(f){
     if(f.surface)return;
     const c=document.createElement('canvas');c.width=Math.ceil(f.w);c.height=Math.ceil(f.h);const cc=c.getContext('2d');
