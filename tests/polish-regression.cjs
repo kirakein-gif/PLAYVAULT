@@ -436,3 +436,18 @@ for(const [hero,base,haste] of [['dawn',8,2],['night',4,4]]){
  vm.runInContext('let testBonusSeed=42;Math.random=()=>{testBonusSeed=(Math.imul(testBonusSeed,1664525)+1013904223)>>>0;return testBonusSeed/4294967296}',h.env);let rare=0,total=0;for(let i=0;i<4000;i++)for(const o of A.levelOptions()){rare+=o.empowered?1:0;total++}assert.ok(rare/total>.09&&rare/total<.11,'approximately ten percent of cards are doubled');
 }
 console.log('PASS v55: role-labelled normal/double growth, exact probability boundary, one-time choice application, honest cap handling, and rising enemy/elite/boss XP');
+
+for(const mobile of [false,true]){
+ const h=harness(mobile),{A}=h;A.newRun();const r=A.cur();
+ // Adjacent rectangles are never mistaken for a door, and unknown branches stay hidden.
+ A.rooms={'0,0':r,'1,0':{x:1,y:0,seen:false,type:'combat',clear:false,doors:{W:true,E:true}},'2,0':{x:2,y:0,seen:false,type:'combat',doors:{W:true}},'0,1':{x:0,y:1,seen:false,type:'combat',doors:{}}};r.doors={E:true};r.clear=true;
+ let map=A.minimapData();assert.deepEqual(Array.from(map.nodes).sort(),['0,0','1,0']);assert.equal(map.links.length,1);assert.equal(map.links[0].state,'open');
+ r.clear=false;assert.equal(A.minimapData().links[0].state,'closed');r.clear=true;A.rooms['1,0'].type='boss';A.bossUnlocked=false;assert.equal(A.minimapData().links[0].state,'sealed');A.bossUnlocked=true;assert.equal(A.minimapData().links[0].state,'open');
+ A.rooms['1,0'].seen=true;map=A.minimapData();assert.equal(map.links.length,2,'seeing a room reveals its genuine next passage');assert.ok(map.nodes.includes('2,0'));A.rooms['1,0'].doors.W=false;assert.equal(A.minimapData().links.length,1,'broken reciprocal door never draws a phantom passage');h.frame();
+ A.newRun();while(A.floor<16)A.nextFloor();const room=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${room.x},${room.y}`;A.update(0);const lava=A.fieldPatches(room);for(const e of room.enemies){e.s=0;e.stun=99999;e.x=A.arena.x+25;e.y=A.arena.y+25}const hazard=lava[0],p=A.player;for(const h of lava)h.phase=0;p.basic=99999;p.hp=p.maxHp=1000;p.x=hazard.x;p.y=hazard.y;
+ for(const [age,state,damage] of [[120,'warning',false],[150,'active',true],[294,'active',true],[295,'cool',false],[389,'cool',false],[390,'warning',false]]){
+  room.fieldAge=age;p.inv=0;const hp=p.hp;assert.equal(A.fieldState(room,hazard),state);A.update(0);assert.equal(p.hp<hp,damage,'damage matches visible phase at exact boundary '+age);h.frame();
+ }
+ room.fieldAge=296;const early=A.fieldPhase(room,hazard).progress;room.fieldAge=388;assert.ok(A.fieldPhase(room,hazard).progress>early,'cooling fades forward while remaining safe');room.clear=true;assert.equal(A.fieldState(room,hazard),'inactive');
+}
+console.log('PASS v56: real reciprocal minimap corridors, combat/seal door states, hidden branches, and exact safe/hot/cooling lava boundaries on desktop/mobile');

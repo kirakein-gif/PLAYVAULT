@@ -175,6 +175,21 @@
     const v=dirs[d],target=AF.rooms[key(r.x+v[0],r.y+v[1])];
     return !!target&&!(target.type==='boss'&&!AF.bossUnlocked);
   };
+  AF.minimapData=()=>{
+    const nodes=new Set(),links=new Map(),current=AF.cur();
+    for(const [k,r] of Object.entries(AF.rooms))if(r.seen||k===AF.current){
+      nodes.add(k);
+      for(const [d,v] of Object.entries(dirs)){
+        const nk=key(r.x+v[0],r.y+v[1]),target=AF.rooms[nk];if(!r.doors[d]||!target||!target.doors[opp[d]])continue;
+        nodes.add(nk);const id=[k,nk].sort().join('|');
+        const fromCurrent=k===AF.current||nk===AF.current,cd=k===AF.current?d:opp[d];
+        const sealed=!AF.bossUnlocked&&(r.type==='boss'||target.type==='boss');
+        const state=sealed?'sealed':fromCurrent&&!AF.isDoorOpen(cd,current)?'closed':'open';
+        links.set(id,{from:k,to:nk,state,explored:!!(r.seen&&target.seen)});
+      }
+    }
+    return {nodes:[...nodes],links:[...links.values()]};
+  };
   function roomRand(r,n){const v=Math.sin((r.x*97+r.y*193+AF.floor*389+n*71.17))*43758.5453;return v-Math.floor(v)}
   AF.tracePoint=r=>{
     const left=r?.traceSide!=='right';
@@ -215,7 +230,7 @@
       if(kind==='lava')for(const side of [-1,1]){
         const edge=side<0?points:[...points].reverse();
         for(let j=0;j<edge.length-1;j++)for(let k=0;k<=4;k++){
-          const p=edge[j],q=edge[j+1],t=k/4,width=radius*(.95+roomRand(r,180+i*60+j*5+k+side)*.18);
+          const p=edge[j],q=edge[j+1],t=k/4,u=(j+t)/(edge.length-1),taper=Math.pow(Math.max(0,Math.sin(Math.PI*u)),.55),width=radius*taper*(.72+roomRand(r,180+i*60+j*5+k+side)*.40);
           banks.push({x:p.x+(q.x-p.x)*t,y:p.y+(q.y-p.y)*t+side*width});
         }
       }
@@ -231,14 +246,15 @@
     }
     return inside;
   };
-  AF.fieldState=(r,h)=>{
-    if(h.kind==='ice')return 'active';
-    if(!activeStageRoom(r))return 'inactive';
-    const age=r.fieldAge||0;
-    if(age<90)return 'warning';
-    if(h.kind==='poison')return 'active';
-    const t=(age-90+h.phase)%300;return t<95?'cool':t<155?'warning':'active';
+  AF.fieldPhase=(r,h)=>{
+    if(h.kind==='ice')return {state:'active',progress:0};
+    if(!activeStageRoom(r))return {state:'inactive',progress:1};
+    const age=r.fieldAge||0;if(age<90)return {state:'warning',progress:age/90};
+    if(h.kind==='poison')return {state:'active',progress:0};
+    const t=(age-90+h.phase)%300;
+    return t<60?{state:'warning',progress:t/60}:t<205?{state:'active',progress:(t-60)/145}:{state:'cool',progress:(t-205)/95};
   };
+  AF.fieldState=(r,h)=>AF.fieldPhase(r,h).state;
   function fieldMovement(r,p,vx,vy,m,dt){
     const patches=r?AF.fieldPatches(r):[],ice=!!r&&(AF.zoneIndex()===4||patches.some(h=>h.kind==='ice'&&AF.fieldContact(h,p)));
     const slow=patches.some(h=>h.kind==='poison'&&AF.fieldState(r,h)==='active'&&AF.fieldContact(h,p))?.78:1;

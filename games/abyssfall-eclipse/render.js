@@ -152,20 +152,27 @@
         if(h.kind==='lava'){
           const trace=()=>{ctx.beginPath();h.banks.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath()};
           // Charred lips sit on the stone; molten material is inset beneath them.
-          ctx.save();trace();ctx.clip();
+          ctx.save();const cooling=state==='cool'?1-A.fieldPhase(r,h).progress:1;ctx.globalAlpha=cooling;trace();ctx.clip();
           const texture=window.AF_ART;
           if(texture?.loaded.lavaFlow){
-            ctx.globalAlpha=active?.76:warn?.42:.20;
-            ctx.filter=active?'brightness(.68) saturate(.65)':warn?'brightness(.42) saturate(.5)':'brightness(.22) saturate(.3)';
-            ctx.drawImage(moltenTexture(texture.images.lavaFlow),h.x-82,h.y-h.r*1.7,164,h.r*3.4);ctx.filter='none';ctx.globalAlpha=1;
+            ctx.globalAlpha=active?.96:warn?.42:0;
+            ctx.filter=active?'brightness(1.12) saturate(1.8)':warn?'brightness(.42) saturate(.5)':'grayscale(1) brightness(.18)';
+            ctx.drawImage(moltenTexture(texture.images.lavaFlow),h.x-82,h.y-h.r*1.7,164,h.r*3.4);ctx.filter='none';ctx.globalAlpha=cooling;
           }
+          if(active){
+            const magma=ctx.createLinearGradient(h.x,h.y-h.r,h.x,h.y+h.r);magma.addColorStop(0,'rgba(166,29,11,.48)');magma.addColorStop(.5,'rgba(244,59,10,.38)');magma.addColorStop(1,'rgba(155,22,8,.55)');trace();ctx.fillStyle=magma;ctx.fill();
+            ctx.strokeStyle='rgba(255,172,54,.72)';ctx.lineWidth=1.4;ctx.beginPath();
+            h.points.forEach((p,j)=>{const y=p.y+Math.sin(j*2.7+h.phase)*h.r*.20;j?ctx.lineTo(p.x,y):ctx.moveTo(p.x,y)});ctx.stroke();
+            for(let j=0;j<16;j++){const u=hash(j*7+h.phase),x=h.x+(u-.5)*136,y=h.y+(hash(j*11)-.5)*h.r*1.2;ctx.fillStyle=j%3?'rgba(239,99,23,.6)':'rgba(255,205,88,.8)';ctx.beginPath();ctx.ellipse(x,y,1+hash(j)*2,.7,0,0,Math.PI*2);ctx.fill()}
+
+          }else if(!warn){trace();ctx.fillStyle='rgba(25,25,25,.45)';ctx.fill();}
           trace();ctx.strokeStyle='rgba(31,27,23,.30)';ctx.lineWidth=5;ctx.stroke();
           for(let j=0;j<48;j++){
             const x=h.x+(hash(j*7+h.phase)-.5)*160,y=h.y+(hash(j*11+h.phase)-.5)*h.r*3,size=1+hash(j+13)*5;
-            ctx.fillStyle=j%3?'rgba(36,31,25,.8)':'rgba(73,61,43,.65)';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+size,y-2);ctx.lineTo(x+size*.7,y+size*.6);ctx.lineTo(x-1,y+size*.35);ctx.closePath();ctx.fill();
+            ctx.fillStyle=j%3?(active?'rgba(44,30,23,.55)':'rgba(36,31,25,.8)'):'rgba(73,61,43,.65)';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+size,y-2);ctx.lineTo(x+size*.7,y+size*.6);ctx.lineTo(x-1,y+size*.35);ctx.closePath();ctx.fill();
           }
           ctx.restore();
-          if(active){const glow=ctx.createRadialGradient(h.x,h.y,2,h.x,h.y,95);glow.addColorStop(0,'rgba(185,74,23,.055)');glow.addColorStop(1,'rgba(185,74,23,0)');ctx.fillStyle=glow;ctx.fillRect(h.x-95,h.y-50,190,100)}
+          if(active){const glow=ctx.createRadialGradient(h.x,h.y,2,h.x,h.y,95);glow.addColorStop(0,'rgba(255,59,12,.22)');glow.addColorStop(1,'rgba(220,30,8,0)');ctx.fillStyle=glow;ctx.fillRect(h.x-95,h.y-50,190,100)}
         }else{
           if(h.kind==='poison'){
             ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=active?.85:.45;
@@ -665,20 +672,24 @@
   }
   function minimap(){
     const vals=Object.values(A.rooms),minX=Math.min(...vals.map(r=>r.x)),maxX=Math.max(...vals.map(r=>r.x)),minY=Math.min(...vals.map(r=>r.y)),maxY=Math.max(...vals.map(r=>r.y));
-    const bw=A.mobile?96:136,bh=A.mobile?72:100,bx=A.mobile?(arena.x+arena.w-bw-10):(W-bw-18),by=A.mobile?(arena.y+10):15;
-    const spanX=Math.max(1,maxX-minX),spanY=Math.max(1,maxY-minY),base=A.mobile?9:13,s=Math.max(4.5,Math.min(base,(bw-24)/spanX,(bh-28)/spanY)),cx=bx+bw/2,cy=by+bh/2+7;
-    const colors={start:'#8b9ab9',combat:'#6f83a8',treasure:'#e8b64f',recovery:'#55d8a5',elite:'#ef637a',exit:'#9b8b73',boss:'#bd6eff'};
-    ctx.save();ctx.fillStyle='rgba(7,9,19,.76)';ctx.strokeStyle='#ffffff1a';rr(bx,by,bw,bh,12);ctx.fill();ctx.stroke();
-    ctx.fillStyle=A.player.hero.color;ctx.font='700 10px sans-serif';ctx.fillText('MAP',bx+10,by+14);
-    for(const k in A.rooms){
-      const r=A.rooms[k],adj=Object.values(A.rooms).some(v=>v.seen&&Math.abs(v.x-r.x)+Math.abs(v.y-r.y)===1);
-      if(!r.seen&&!adj)continue;
-      const x=cx+(r.x-(minX+maxX)/2)*s,y=cy+(r.y-(minY+maxY)/2)*s;
-      ctx.fillStyle=r.seen?(r.bossDefeated?'#9b8b73':(r.type==='boss'&&!A.bossUnlocked?'#4d4359':(colors[r.type]||colors.combat))):'rgba(255,255,255,.10)';
-      const dot=s<7?6:8,half=dot/2;ctx.fillRect(x-half,y-half,dot,dot);
-      if(k===A.current){ctx.strokeStyle='#fff7b7';ctx.lineWidth=2;ctx.strokeRect(x-half-2,y-half-2,dot+4,dot+4)}
-      if(r.seen&&(r.type==='treasure'||r.type==='recovery')&&r.used){ctx.fillStyle='rgba(5,7,12,.55)';ctx.fillRect(x-2,y-2,4,4)}
+    const bw=A.mobile?200:190,bh=A.mobile?164:148,bx=A.mobile?(arena.x+arena.w-bw-10):(W-bw-18),by=A.mobile?(arena.y+10):15;
+    const spanX=Math.max(1,maxX-minX),spanY=Math.max(1,maxY-minY),base=A.mobile?22:20,s=Math.max(4,Math.min(base,(bw-30)/spanX,(bh-(A.mobile?72:54))/spanY)),cx=bx+bw/2,cy=by+bh/2-(A.mobile?8:1);
+    const colors={start:'#8b9ab9',combat:'#6f83a8',treasure:'#e8b64f',recovery:'#55d8a5',elite:'#ef637a',exit:'#9b8b73',boss:'#bd6eff'},map=A.minimapData();
+    const at=k=>{const r=A.rooms[k];return {x:cx+(r.x-(minX+maxX)/2)*s,y:cy+(r.y-(minY+maxY)/2)*s}};
+    ctx.save();ctx.fillStyle='rgba(7,9,19,.84)';ctx.strokeStyle='#ffffff26';rr(bx,by,bw,bh,12);ctx.fill();ctx.stroke();
+    ctx.fillStyle=A.player.hero.color;ctx.font=A.mobile?'700 18px sans-serif':'700 10px sans-serif';ctx.fillText('MAP',bx+10,by+(A.mobile?21:15));
+    // Only actual door connections from discovered rooms reveal the next room.
+    for(const link of map.links){const a=at(link.from),b=at(link.to),mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+      ctx.strokeStyle=link.explored?'#a5b9c9':'#718397';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+      if(link.state!=='open'){ctx.strokeStyle=link.state==='sealed'?'#d798ed':'#ff927d';ctx.lineWidth=2.5;ctx.beginPath();if(Math.abs(a.x-b.x)>0){ctx.moveTo(mx,my-3);ctx.lineTo(mx,my+3)}else{ctx.moveTo(mx-3,my);ctx.lineTo(mx+3,my)}ctx.stroke()}
     }
+    for(const k of map.nodes){
+      const r=A.rooms[k],{x,y}=at(k),dot=Math.min(A.mobile?6:8,s*.46),half=dot/2;
+      ctx.fillStyle=r.seen?(r.bossDefeated?'#9b8b73':(r.type==='boss'&&!A.bossUnlocked?'#4d4359':(colors[r.type]||colors.combat))):'#384253';ctx.fillRect(x-half,y-half,dot,dot);
+      if(k===A.current){ctx.strokeStyle='#fff7b7';ctx.lineWidth=1.5;ctx.strokeRect(x-half-2,y-half-2,dot+4,dot+4)}
+      if(r.seen&&(r.type==='treasure'||r.type==='recovery')&&r.used){ctx.fillStyle='rgba(5,7,12,.65)';ctx.fillRect(x-1.5,y-1.5,3,3)}
+    }
+    ctx.font=A.mobile?'16px sans-serif':'9px sans-serif';ctx.fillStyle='#a5b9c9';ctx.fillText('─ 통로',bx+10,by+bh-10);ctx.fillStyle='#ff927d';ctx.fillText('┃ 닫힘',bx+(A.mobile?78:65),by+bh-10);ctx.fillStyle='#d798ed';ctx.fillText('┃ 봉인',bx+(A.mobile?140:116),by+bh-10);
     ctx.restore();
   }
   function bossbar(){
