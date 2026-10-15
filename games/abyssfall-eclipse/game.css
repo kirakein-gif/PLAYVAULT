@@ -158,3 +158,6 @@
 /* Reveal portraits only after decoding, without legacy placeholders. */
 .portrait img{visibility:hidden}.portrait img.ready{visibility:visible}
 .primary:disabled{opacity:.65;cursor:wait}
+
+.upgrade.empowered{border-color:rgba(231,193,110,.7);background:linear-gradient(145deg,#302b25,#15131d);box-shadow:inset 0 0 24px rgba(219,177,90,.08)}
+.upgrade .bonusTag{display:block;font-size:12px;color:#f4d38b;margin:0 0 8px;font-weight:700}

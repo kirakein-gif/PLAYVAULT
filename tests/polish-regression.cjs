@@ -415,3 +415,24 @@ for(const mobile of [false,true]){
  for(const flag of ['attackPose','hurtPose','aiWindup','bossTelegraph','intro']){e[flag]=1;assert.equal(art.enemyWalkTransition(e),null,'no smoothing of attack or hurt timing');e[flag]=0}
 }
 console.log('PASS v54: delayed summon phases, safe emergence, activation, boss-death cancellation and timing-neutral walk transitions on desktop/mobile');
+
+for(const [hero,base,haste] of [['dawn',8,2],['night',4,4]]){
+ const h=harness(),{A}=h;A.selected=hero;A.newRun();const p=A.player;
+ for(const [roll,mult] of [[.5,1],[.099,2],[.1,1]]){
+  vm.runInContext('Math.random=()=>'+roll,h.env);const opts=A.levelOptions(),attack=opts.find(o=>o.id==='level-attack'),speed=opts.find(o=>o.id==='level-haste'),health=opts.find(o=>o.id==='level-health');
+  assert.equal(attack.empowered,mult===2);assert.equal(attack.amount,base*mult);assert.ok(attack.d.includes(p.hero.ko)&&attack.d.includes('+'+base*mult));const before=p.atk;attack.f(p);assert.equal(p.atk-before,base*mult);
+  assert.equal(speed.amount,haste*mult);assert.ok(!speed.d.includes('0.0'),'haste uses integer stat points');const copy={...p,hp:10};health.f(copy);assert.equal(copy.maxHp,p.maxHp+20*mult);assert.equal(copy.hp,10+28*mult);
+ }
+ p.rate=p.hero.rate-11;p.specialBoost=p.hero.specialCd-(hero==='dawn'?150:90);assert.equal(A.levelOptions().some(o=>o.id==='level-haste'||o.id==='level-special'),false,'capped upgrades are not offered');
+ p.rate=p.hero.rate-12;vm.runInContext('Math.random=()=>.05',h.env);const edge=A.levelOptions().find(o=>o.id==='level-haste');assert.equal(edge.amount,1);assert.equal(edge.empowered,false,'near-cap partial gain cannot claim double effect');
+}
+{
+ const h=harness(),{A}=h;let previous=0;
+ for(let f=1;f<=24;f++){const xp=A.enemyXp({type:'crawler'},f);assert.ok(xp>=previous);previous=xp;assert.ok(A.enemyXp({type:'crawler',elite:true},f)>xp);assert.ok(A.enemyXp({type:'boss'},f)>A.enemyXp({type:'brute'},f));}
+ assert.equal(A.enemyXp({type:'crawler'},1),3);assert.equal(A.enemyXp({type:'crawler'},24),12);assert.equal(A.enemyXp({type:'boss'},24),175);assert.equal(A.eliteClearXp(24),84);
+ // Every displayed card rolls once, then survives rendering and held-key repeats unchanged.
+ A.newRun();vm.runInContext('Math.random=()=>.05',h.env);const p=A.player;A.pickups.push({x:p.x,y:p.y,val:p.nextXp});A.update(1);assert.ok(A.rewardChoices.every(o=>o.empowered));const copy=A.rewardChoices.map(o=>o.amount);h.frame();assert.deepEqual(A.rewardChoices.map(o=>o.amount),copy);h.key('Digit1','1');const selected=p.atk;h.key('Digit1','1');assert.equal(p.atk,selected);
+ // Seeded frequency check across actual normal options, before any stat caps.
+ vm.runInContext('let testBonusSeed=42;Math.random=()=>{testBonusSeed=(Math.imul(testBonusSeed,1664525)+1013904223)>>>0;return testBonusSeed/4294967296}',h.env);let rare=0,total=0;for(let i=0;i<4000;i++)for(const o of A.levelOptions()){rare+=o.empowered?1:0;total++}assert.ok(rare/total>.09&&rare/total<.11,'approximately ten percent of cards are doubled');
+}
+console.log('PASS v55: role-labelled normal/double growth, exact probability boundary, one-time choice application, honest cap handling, and rising enemy/elite/boss XP');

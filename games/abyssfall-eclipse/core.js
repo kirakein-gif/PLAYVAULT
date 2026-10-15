@@ -410,6 +410,11 @@
       AF.toast('공명 핵 · 회피 보호와 강화 사격');
     }
   }
+  AF.enemyXp=(e,floor=AF.floor)=>{
+    const depth=Math.max(0,floor-1),base=e.type==='boss'?45:e.type==='brute'?5:3;
+    return Math.round(base*(1+depth*.08+depth*depth*.002)*(e.elite?1.5:1));
+  };
+  AF.eliteClearXp=(floor=AF.floor)=>12+floor*3;
   function damage(e,n){
     if(!e.alive||e.summonTime>0)return;
     if(e.type==='boss'&&e.intro>0)return;
@@ -420,7 +425,7 @@
     for(let i=0;i<6;i++)AF.particles.push({x:e.x,y:e.y,vx:(Math.random()-.5)*3.5,vy:(Math.random()-.5)*3.5,l:18,color:p.hero.color});
     if(e.hp<=0){
       e.hp=0;e.alive=false;e.deadAt=performance.now();AF.kills++;sound()?.sfx(e.type==='boss'?'bossDefeat':'enemyDeath');
-      AF.pickups.push({x:e.x,y:e.y,vx:(Math.random()-.5)*1.8,vy:(Math.random()-.5)*1.8,val:Math.round((e.type==='boss'?20:e.type==='brute'?5:3)*(1+Math.max(0,AF.floor-12)*.10))});
+      AF.pickups.push({x:e.x,y:e.y,vx:(Math.random()-.5)*1.8,vy:(Math.random()-.5)*1.8,val:AF.enemyXp(e)});
       const fang=p.hero.key==='night'?relicCount('eclipse-fang'):0;
       if(fang){
         const targets=AF.cur().enemies.filter(x=>x.alive&&!(x.summonTime>0)&&x!==e).sort((a,b)=>Math.hypot(a.x-e.x,a.y-e.y)-Math.hypot(b.x-e.x,b.y-e.y));
@@ -543,7 +548,7 @@
   };
   const seg=(x1,y1,x2,y2,cx,cy,r)=>{const dx=x2-x1,dy=y2-y1,l=dx*dx+dy*dy;if(!l)return Math.hypot(cx-x1,cy-y1)<r;let t=((cx-x1)*dx+(cy-y1)*dy)/l;t=Math.max(0,Math.min(1,t));return Math.hypot(cx-(x1+t*dx),cy-(y1+t*dy))<r};
 
-  function gainXp(n){const p=AF.player;p.xp+=n;if(!AF.rewardChoices?.length&&p.xp>=p.nextXp){p.xp-=p.nextXp;p.level++;p.nextXp=Math.floor(p.nextXp*(p.level<=12?1.32:1.14));upgrade()}}
+  function gainXp(n){const p=AF.player;p.xp+=n;if(!AF.rewardChoices?.length&&p.xp>=p.nextXp){p.xp-=p.nextXp;p.level++;p.nextXp=Math.floor(p.nextXp*(p.level<=12?1.28:1.12));upgrade()}}
   function chooseReward(opts,title,lead){
     AF.paused=true;
     const titleEl=ui.levelUp.querySelector('h2'),leadEl=ui.levelUp.querySelector('.lead');
@@ -551,8 +556,8 @@
     ui.upgradeCards.innerHTML='';
     AF.rewardChoices=opts.sort(()=>Math.random()-.5).slice(0,3);
     AF.rewardChoices.forEach((o,index)=>{
-      const b=document.createElement('button');b.className='upgrade'+(o.img?' relicChoice':'');
-      b.innerHTML=(o.img?'<img class="rewardImg" src="'+o.img+'" alt=""><span class="rarity rarity-'+(o.rarity||'rare')+'">'+(o.rarity==='legendary'?'LEGENDARY':o.rarity==='epic'?'EPIC':'RARE')+' RELIC</span>':'<span class="uicon">'+o.i+'</span>')+'<b>'+o.n+'</b><p>'+o.d+'</p>';
+      const b=document.createElement('button');b.className='upgrade'+(o.img?' relicChoice':'')+(o.empowered?' empowered':'');
+      b.innerHTML=(o.img?'<img class="rewardImg" src="'+o.img+'" alt=""><span class="rarity rarity-'+(o.rarity||'rare')+'">'+(o.rarity==='legendary'?'LEGENDARY':o.rarity==='epic'?'EPIC':'RARE')+' RELIC</span>':'<span class="uicon">'+o.i+'</span>')+(o.empowered?'<span class="bonusTag">희귀 강화 · 효과 2배</span>':'')+'<b>'+o.n+'</b><p>'+o.d+'</p>';
       b.innerHTML='<span class="choiceKey" aria-hidden="true">'+(index+1)+'</span>'+b.innerHTML;
       b.setAttribute('aria-keyshortcuts',String(index+1));
       b.onclick=()=>AF.chooseReward(index);
@@ -570,16 +575,21 @@
     const pending=AF.pendingFloor;AF.pendingFloor=null;
     if(pending&&AF.cur()===pending.room)AF.nextFloor(pending.source);
   };
-  function upgrade(){
-    const attackGain=AF.player.hero.key==='dawn'?8:4,hasteGain=AF.player.hero.key==='dawn'?2:4;
-    chooseReward([
-      {i:'✦',n:'성물 증폭',d:'기본 공격 피해 +'+attackGain,f:p=>p.atk+=attackGain},
-      {i:'⟲',n:'공명 가속',d:'자동 공격 간격 '+(hasteGain/60).toFixed(3)+'초 감소',f:p=>p.rate+=hasteGain},
-      {i:'◎',n:'공간 확장',d:AF.player.hero.key==='dawn'?'검 공격 범위·돌진 이동거리 증가':'구르기 이동거리 증가',f:p=>p.range+=16},
-      {i:'✹',n:'특수 공명',d:'특수기 재사용 대기시간 감소',f:p=>p.specialBoost+=28},
-      {i:'♥',n:'생명 각인',d:'최대 체력 +20, 즉시 회복',f:p=>{p.maxHp+=20;p.hp=Math.min(p.maxHp,p.hp+28)}}
-    ],'성물 공명','하나의 힘을 선택하세요.');
-  }
+  AF.levelOptions=()=>{
+    const p=AF.player,hero=p.hero,dawn=hero.key==='dawn',hasteCap=hero.rate-11,specialCap=hero.specialCd-(dawn?150:90);
+    const defs=[
+      {id:'attack',i:'✦',n:'성물 증폭',base:dawn?8:4,describe:n=>'기본 공격 피해 +'+n,apply:(p,n)=>p.atk+=n},
+      {id:'haste',i:'⟲',n:'공명 가속',base:dawn?2:4,room:hasteCap-p.rate,describe:n=>'공격 가속 +'+n+' · 현재 '+p.rate+' → '+(p.rate+n),apply:(p,n)=>p.rate+=n},
+      {id:'range',i:'◎',n:'공간 확장',base:16,describe:n=>(dawn?'검·돌진':'구르기')+' 범위 강화 +'+n,apply:(p,n)=>p.range+=n},
+      {id:'special',i:'✹',n:'특수 공명',base:30,room:specialCap-p.specialBoost,describe:n=>'특수기 재사용 '+Number((n/60).toFixed(1))+'초 단축',apply:(p,n)=>p.specialBoost+=n},
+      {id:'health',i:'♥',n:'생명 각인',base:20,describe:(n,m)=>'최대 체력 +'+n+' · 즉시 '+(28*m)+' 회복',apply:(p,n,m)=>{p.maxHp+=n;p.hp=Math.min(p.maxHp,p.hp+28*m)}}
+    ];
+    return defs.filter(o=>(o.room??Infinity)>0).map(o=>{
+      const empowered=Math.random()<.10&&(o.room??Infinity)>=o.base*2,multiplier=empowered?2:1,amount=Math.min(o.base*multiplier,o.room??Infinity);
+      return {id:'level-'+o.id,i:o.i,n:o.n,empowered,amount,multiplier,d:hero.ko+' · '+o.describe(amount,multiplier),f:target=>o.apply(target,amount,multiplier)};
+    });
+  };
+  function upgrade(){chooseReward(AF.levelOptions(),'성물 공명','하나의 힘을 선택하세요.');}
   const relicIcon=id=>window.AF_ART?.relicIcons?.[id]||'../../assets/relics/'+id+'.webp?v=35';
   AF.relicOptions=(key=AF.player.hero.key)=>{
     const role=key==='dawn'?0:1,heal=(p,n)=>p.hp=Math.min(p.maxHp,p.hp+n);
@@ -927,7 +937,7 @@
       }
       if(!wasClear&&r.type==='elite'&&!r.eliteRewarded){
         r.eliteRewarded=true;
-        const bonus=8+AF.floor*2;gainXp(bonus);
+        const bonus=AF.eliteClearXp();gainXp(bonus);
         for(let i=0;i<4;i++)AF.pickups.push({x:W/2+(i-1.5)*22,y:arena.y+arena.h/2,vx:(Math.random()-.5)*1.4,vy:(Math.random()-.5)*1.4,val:2});
         AF.toast(`엘리트 격파 · 공명 +${bonus}`);
       }
