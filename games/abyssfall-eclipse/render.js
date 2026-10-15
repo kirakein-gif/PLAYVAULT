@@ -672,24 +672,23 @@
   }
   function minimap(){
     const vals=Object.values(A.rooms),minX=Math.min(...vals.map(r=>r.x)),maxX=Math.max(...vals.map(r=>r.x)),minY=Math.min(...vals.map(r=>r.y)),maxY=Math.max(...vals.map(r=>r.y));
-    const bw=A.mobile?200:190,bh=A.mobile?164:148,bx=A.mobile?(arena.x+arena.w-bw-10):(W-bw-18),by=A.mobile?(arena.y+10):15;
-    const spanX=Math.max(1,maxX-minX),spanY=Math.max(1,maxY-minY),base=A.mobile?22:20,s=Math.max(4,Math.min(base,(bw-30)/spanX,(bh-(A.mobile?72:54))/spanY)),cx=bx+bw/2,cy=by+bh/2-(A.mobile?8:1);
+    const bw=A.mobile?96:136,bh=A.mobile?72:100,bx=A.mobile?(arena.x+arena.w-bw-10):(W-bw-18),by=A.mobile?(arena.y+10):15;
+    const spanX=Math.max(1,maxX-minX),spanY=Math.max(1,maxY-minY),base=A.mobile?9:13,s=Math.max(3,Math.min(base,(bw-24)/spanX,(bh-28)/spanY)),cx=bx+bw/2,cy=by+bh/2+7;
     const colors={start:'#8b9ab9',combat:'#6f83a8',treasure:'#e8b64f',recovery:'#55d8a5',elite:'#ef637a',exit:'#9b8b73',boss:'#bd6eff'},map=A.minimapData();
     const at=k=>{const r=A.rooms[k];return {x:cx+(r.x-(minX+maxX)/2)*s,y:cy+(r.y-(minY+maxY)/2)*s}};
     ctx.save();ctx.fillStyle='rgba(7,9,19,.84)';ctx.strokeStyle='#ffffff26';rr(bx,by,bw,bh,12);ctx.fill();ctx.stroke();
-    ctx.fillStyle=A.player.hero.color;ctx.font=A.mobile?'700 18px sans-serif':'700 10px sans-serif';ctx.fillText('MAP',bx+10,by+(A.mobile?21:15));
+    ctx.fillStyle=A.player.hero.color;ctx.font='700 10px sans-serif';ctx.fillText('MAP',bx+10,by+15);
     // Only actual door connections from discovered rooms reveal the next room.
     for(const link of map.links){const a=at(link.from),b=at(link.to),mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
-      ctx.strokeStyle=link.explored?'#a5b9c9':'#718397';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
-      if(link.state!=='open'){ctx.strokeStyle=link.state==='sealed'?'#d798ed':'#ff927d';ctx.lineWidth=2.5;ctx.beginPath();if(Math.abs(a.x-b.x)>0){ctx.moveTo(mx,my-3);ctx.lineTo(mx,my+3)}else{ctx.moveTo(mx-3,my);ctx.lineTo(mx+3,my)}ctx.stroke()}
+      ctx.strokeStyle=link.explored?'#a5b9c9':'#718397';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+      if(link.state!=='open'){ctx.strokeStyle=link.state==='sealed'?'#d798ed':'#ff927d';ctx.lineWidth=1.5;ctx.beginPath();if(Math.abs(a.x-b.x)>0){ctx.moveTo(mx,my-2);ctx.lineTo(mx,my+2)}else{ctx.moveTo(mx-2,my);ctx.lineTo(mx+2,my)}ctx.stroke()}
     }
     for(const k of map.nodes){
-      const r=A.rooms[k],{x,y}=at(k),dot=Math.min(A.mobile?6:8,s*.46),half=dot/2;
+      const r=A.rooms[k],{x,y}=at(k),dot=Math.min(A.mobile?6:8,s*.62),half=dot/2;
       ctx.fillStyle=r.seen?(r.bossDefeated?'#9b8b73':(r.type==='boss'&&!A.bossUnlocked?'#4d4359':(colors[r.type]||colors.combat))):'#384253';ctx.fillRect(x-half,y-half,dot,dot);
       if(k===A.current){ctx.strokeStyle='#fff7b7';ctx.lineWidth=1.5;ctx.strokeRect(x-half-2,y-half-2,dot+4,dot+4)}
       if(r.seen&&(r.type==='treasure'||r.type==='recovery')&&r.used){ctx.fillStyle='rgba(5,7,12,.65)';ctx.fillRect(x-1.5,y-1.5,3,3)}
     }
-    ctx.font=A.mobile?'16px sans-serif':'9px sans-serif';ctx.fillStyle='#a5b9c9';ctx.fillText('─ 통로',bx+10,by+bh-10);ctx.fillStyle='#ff927d';ctx.fillText('┃ 닫힘',bx+(A.mobile?78:65),by+bh-10);ctx.fillStyle='#d798ed';ctx.fillText('┃ 봉인',bx+(A.mobile?140:116),by+bh-10);
     ctx.restore();
   }
   function bossbar(){
