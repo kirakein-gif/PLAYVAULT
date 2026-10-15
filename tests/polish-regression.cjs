@@ -349,7 +349,7 @@ console.log('PASS v51 relic triggers: opposite grail curves, reflection versus a
 for(const boss of [false,true]){
  const h=harness(),{A}=h;A.newRun();A.floor=4;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player,e=r.enemies[0];
  Object.assign(e,{type:boss?'boss':'crawler',x:p.x+60,y:p.y,s:0,hp:1000,max:1000,armor:0,stun:0,intro:0,aiCd:9999,bossCd:9999,bossTelegraph:0});r.enemies=[e];p.basic=9999;const x=e.x;A.useSpecial();A.update(3);
- assert.ok(e.hp<1000);assert.ok(boss?e.x===x:e.x>x&&e.x<=x+32,'bounded non-boss knockback');assert.equal(e.stun,0,'shoulder impact never applies attack-interrupting stun');
+ assert.ok(e.hp<1000);assert.ok(boss?e.x===x:e.x>x&&e.x<=x+32,'bounded non-boss knockback');assert.ok(boss?e.stun===0:e.stun>15&&e.stun<=24,'idle shoulder stagger remains brief; boss is immune');
 }
 {
  const h=harness(),{A}=h;A.selected='night';A.newRun();A.floor=4;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player;p.basic=9999;p.inv=99999;A.relics['resonance-core']={count:1};A.useSpecial();for(let i=0;i<18;i++)A.update(1);assert.ok(p.rollBoost>0);h.frame();
@@ -364,7 +364,7 @@ for(const mobile of [false,true]){
   A.projectiles=['crescent','priestBolt','bossLance','bossOrb','crystal'].map(kind=>({kind,x:A.player.x,y:A.player.y,vx:4,vy:1,visualAge:8}));const before=JSON.stringify([A.slashes,A.shockwaves,A.projectiles]);h.frame();assert.equal(JSON.stringify([A.slashes,A.shockwaves,A.projectiles]),before);
  }
 }
-console.log('PASS v52: bounded shoulder knockback without hit stun, boss immunity, consumed violet shot readiness, all layered FX stages on desktop/mobile');
+console.log('PASS v52: bounded shoulder knockback and idle stagger, boss immunity, consumed violet shot readiness, all layered FX stages on desktop/mobile');
 
 {
  const h=harness(),{A}=h;A.newRun();A.floor=4;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player,e=r.enemies[0];r.enemies=[e];Object.assign(e,{x:p.x+135,y:p.y,hp:1000,max:1000,armor:0,s:0,stun:99999});p.basic=0;p.inv=9999;A.update(1);for(let i=0;i<6;i++)A.update(1);assert.equal(e.hp,976,'extended sword reaches a target outside old reach');

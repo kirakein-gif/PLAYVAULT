@@ -502,12 +502,13 @@
     const muzzle=(q.muzzleX||0)*(1-t),height=(q.launchHeight??30)*(1-t)+(q.hitHeight??30)*t;
     return{x:q.x+muzzle,y:q.y-height,angle:Math.atan2(q.vy-(t<1?((q.hitHeight??30)-(q.launchHeight??30))*rate:0),q.vx-(t<1?(q.muzzleX||0)*rate:0))};
   };
-  function pushEnemy(e,dx,dy,distance){
+  function pushEnemy(e,dx,dy,distance,stun=12){
     if(e.summonTime>0)return;
     const weight=e.type==='boss'?.18:e.type==='brute'?.65:1;
     e.x=Math.max(arena.x+e.r,Math.min(arena.x+arena.w-e.r,e.x+dx*distance*weight));
     e.y=Math.max(arena.y+e.r,Math.min(arena.y+arena.h-e.r,e.y+dy*distance*weight));
-    // Displacement never cancels an enemy attack or adds hit stun.
+    // Keep the brief idle stagger, but never interrupt a committed attack.
+    if(e.type!=='boss'&&!(e.aiWindup>0||e.attackPose>0||e.dash>0||e.charge>0))e.stun=Math.max(e.stun||0,stun);
   }
   function mobilityDirection(targeted){
     const p=AF.player;let x=(AF.keys.d||AF.keys.arrowright?1:0)-(AF.keys.a||AF.keys.arrowleft?1:0),y=(AF.keys.s||AF.keys.arrowdown?1:0)-(AF.keys.w||AF.keys.arrowup?1:0);
@@ -525,7 +526,7 @@
       p.attackPose=0;p.specialPose=0;p.inv=Math.max(p.inv,m.time+2);p.meleeAim=Math.atan2(m.dy,m.dx);
       for(const e of AF.cur().enemies)if(e.alive&&!(e.summonTime>0)&&!m.hits.has(e)&&seg(sx,sy,p.x,p.y,e.x,e.y,e.r+32)){
         const ix=(p.x+e.x)/2,iy=(p.y+e.y)/2;
-        m.hits.add(e);damage(e,(62+p.atk*2.2)*(1+.12*relicCount('red-vow')));if(e.type!=='boss')pushEnemy(e,m.dx,m.dy,Math.min(48,32+5*relicCount('dash-sigil')));p.bodyFlash=6;
+        m.hits.add(e);damage(e,(62+p.atk*2.2)*(1+.12*relicCount('red-vow')));if(e.type!=='boss')pushEnemy(e,m.dx,m.dy,Math.min(48,32+5*relicCount('dash-sigil')),24);p.bodyFlash=6;
         AF.slashes.push({art:true,kind:'chargeImpact',x:ix,y:iy,a:p.meleeAim,r:46,l:22,max:22});
         for(let i=0;i<14;i++){const a=i*Math.PI*2/14,speed=1.8+Math.random()*2.8;AF.particles.push({x:ix,y:iy-24,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed-1,l:18,color:i%3?'#bca779':'#fff1cf'})}
 
