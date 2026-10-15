@@ -467,3 +467,37 @@ for(const type of ['crawler','brute']){
  assert.ok(e.hp<10000);assert.equal(e.stun,0);assert.equal(type==='crawler'?e.dash:e.charge,type==='crawler'?3:11,'active attack keeps its timer');
 }
 console.log('PASS v57: sword and shoulder hits preserve enemy windups, projectiles and active charges');
+
+// Depth increases actual rush travel, not windup/attack clocks or homing.
+for(const mobile of [false,true])for(const type of ['crawler','brute','boss']){
+ const distances=[];
+ for(const floor of [1,6,12,18,24]){
+  const {A}=harness(mobile);A.newRun();A.floor=floor;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player,e=r.enemies[0];r.enemies=[e];
+  const duration=type==='crawler'?11:type==='brute'?19:18;
+  Object.assign(e,{type,x:A.arena.x+60,y:A.arena.y+100,r:17,s:1,stun:0,aiWindup:0,dash:type==='crawler'?duration:0,charge:type==='brute'?duration:0,bossRush:type==='boss'?duration:0,bossAim:0,aimX:1,aimY:0,intro:0,hp:10000,max:10000,bossCd:9999,aiCd:9999});
+  p.basic=9999;p.inv=99999;p.x=A.arena.x+400;p.y=e.y+100;const start=e.x;
+  for(let i=0;i<duration;i++)A.update(1);
+  distances.push(e.x-start);assert.ok(Math.abs(e.y-(A.arena.y+100))<.001,'rush never tracks the player after aim lock');
+  assert.equal(type==='crawler'?e.dash:type==='brute'?e.charge:e.bossRush,0,'same attack duration');
+ }
+ for(let i=1;i<distances.length;i++)assert.ok(distances[i]>distances[i-1],'greater actual distance at deeper floors');
+ assert.ok(Math.abs(distances[4]/distances[0]-3.53)<.001);
+}
+{
+ const {A}=harness();assert.ok(A.rushContact({x:200,y:100,r:17},{x:150,y:100,r:17},100,100),'fast enemy crossing hits even when ending past player');
+ assert.ok(!A.rushContact({x:200,y:100,r:17},{x:150,y:150,r:17},100,100),'sideways dodge remains safe');
+ assert.equal(A.enemyRushScale(100),A.enemyRushScale(24),'bounded endless speed multiplier');
+}
+console.log('PASS v60: depth-scaled rush distance, fixed attack duration/aim, swept contact and safe lateral dodge on desktop/mobile');
+
+for(const type of ['crawler','brute'])for(const floor of [1,24]){
+ const {A}=harness();A.newRun();A.floor=floor;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player,e=r.enemies[0];r.enemies=[e];
+ p.x=A.arena.x+70;p.y=A.arena.y+100;p.inv=99999;p.basic=99999;Object.assign(e,{type,x:p.x+(type==='crawler'?300:400),y:p.y,s:0,stun:0,aiCd:0,fire:9999,aiWindup:0,dash:0,charge:0});A.update(1);
+ assert.equal(e.aiWindup,floor===24?(type==='crawler'?17:35):0,'longer depth engagement with unchanged windup');
+}
+{
+ const {A}=harness();A.newRun();A.floor=24;const r=Object.values(A.rooms).find(r=>r.type==='combat');A.current=`${r.x},${r.y}`;A.update(0);const p=A.player,e=r.enemies[0];r.enemies=[e];
+ p.x=A.arena.x+190;p.y=A.arena.y+100;p.inv=0;p.basic=99999;p.hp=p.maxHp=1000;Object.assign(e,{type:'crawler',x:A.arena.x+70,y:p.y,s:8,r:17,d:10,stun:0,aiWindup:0,dash:11,aimX:1,aimY:0});A.update(2.2);
+ assert.ok(Math.abs(e.x-p.x)>e.r+p.r,'fast rush ends beyond player');assert.ok(p.hp<1000,'actual update applies swept rush contact damage');
+}
+console.log('PASS v60 engagement: deep enemies initiate from range; unchanged windups and real high-dt rush collision');

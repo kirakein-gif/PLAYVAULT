@@ -376,6 +376,14 @@
     {name:'역병 사신',weapon:'scythe',color:'#b8c78b',armor:.25,patterns:[5,1,2,6],reach:185},
     {name:'심연 군주',weapon:'spellblade',color:'#beaedc',armor:.28,patterns:[3,4,0,5,6,1,2],reach:192}
   ];
+  // Keep attack duration and aim locks; deeper enemies cover more ground in that time.
+  AF.enemyRushScale=(floor=AF.floor)=>1+Math.min(23,Math.max(0,floor-1))*.11;
+  AF.enemyRushSpeed=e=>e.s*(e.type==='boss'?5.2:e.type==='brute'?5.8:4.4)*AF.enemyRushScale();
+  AF.rushContact=(e,p,ox,oy)=>{
+    const dx=e.x-ox,dy=e.y-oy,len=dx*dx+dy*dy;
+    const t=len?Math.max(0,Math.min(1,((p.x-ox)*dx+(p.y-oy)*dy)/len)):0;
+    return Math.hypot(p.x-ox-dx*t,p.y-oy-dy*t)<p.r+e.r;
+  };
   AF.enemyVariant=(tier,type)=>{
     const rows=[{}, {crawler:'skeleton'}, {brute:'gargoyle'}, {crawler:'skeleton',brute:'gargoyle'}, {crawler:'frostWolf',brute:'frostKnight'}, {crawler:'emberImp',brute:'slagGuard'}, {crawler:'plagueVermin',brute:'slagGuard'}, {crawler:'voidKnight',shooter:'voidKnight',brute:'slagGuard'}];
     return rows[Math.min(7,tier)]?.[type]||null;
@@ -861,7 +869,7 @@
       if(!e.alive)continue;
       if(e.summonTime>0){e.summonTime=Math.max(0,e.summonTime-dt);e.moving=false;e.attackPose=e.aiWindup=e.dash=e.charge=0;continue}
       if(e.flash>0)e.flash-=dt;if(e.attackPose>0)e.attackPose-=dt;if(e.hurtPose>0)e.hurtPose-=dt;
-      const ox=e.x,oy=e.y,dx=p.x-e.x,dy=p.y-e.y,dist=Math.hypot(dx,dy)||1;e.faceX=dx;
+      const ox=e.x,oy=e.y,wasRushing=e.dash>0||e.charge>0||e.bossRush>0,dx=p.x-e.x,dy=p.y-e.y,dist=Math.hypot(dx,dy)||1;e.faceX=dx;
       if(e.type==='boss'){
         const phase=bossPhase(e);
         e.bossPhase=phase;
@@ -871,7 +879,7 @@
         }else{
           if(phase>e.phaseAnnounced){e.phaseAnnounced=phase;AF.toast((e.bossName||'심연의 감시자')+(phase===1?' · 2단계':' · 3단계'))}
           if(e.bossRush>0){
-            e.bossRush-=dt;e.x+=Math.cos(e.bossAim)*e.s*5.2*dt;e.y+=Math.sin(e.bossAim)*e.s*5.2*dt;e.attackPose=20;
+            e.bossRush-=dt;e.x+=Math.cos(e.bossAim)*AF.enemyRushSpeed(e)*dt;e.y+=Math.sin(e.bossAim)*AF.enemyRushSpeed(e)*dt;e.attackPose=20;
             if(e.bossRush<=0){bossStrike(e);e.bossCd=55}
           }else if(e.bossTelegraph>0){
             e.bossTelegraph-=dt;e.moving=false;
@@ -887,14 +895,14 @@
       }else if(e.type==='crawler'){
         if(e.stun>0){e.stun-=dt}
         else if(e.dash>0){
-          e.x+=e.aimX*e.s*4.4*dt;e.y+=e.aimY*e.s*4.4*dt;e.dash-=dt;e.attackPose=10;
+          e.x+=e.aimX*AF.enemyRushSpeed(e)*dt;e.y+=e.aimY*AF.enemyRushSpeed(e)*dt;e.dash-=dt;e.attackPose=10;
           if(e.dash<=0){e.dash=0;e.stun=10}
         }else if(e.aiWindup>0){
           e.aiWindup-=dt;e.moving=false;
           if(e.aiWindup<=0){e.aiWindup=0;e.dash=11;e.attackPose=18}
         }else{
           e.aiCd-=dt;
-          if(e.aiCd<=0&&dist<225){e.aimX=dx/dist;e.aimY=dy/dist;e.aiWindup=17;e.aiCd=(82+Math.random()*34)/(e.pressure||1)}
+          if(e.aiCd<=0&&dist<225+Math.min(23,AF.floor-1)*7){e.aimX=dx/dist;e.aimY=dy/dist;e.aiWindup=17;e.aiCd=(82+Math.random()*34)/(e.pressure||1)}
           else{e.x+=dx/dist*e.s*dt;e.y+=dy/dist*e.s*dt}
         }
       }else if(e.type==='shooter'){
@@ -916,14 +924,14 @@
       }else if(e.type==='brute'){
         if(e.stun>0){e.stun-=dt}
         else if(e.charge>0){
-          e.x+=e.aimX*e.s*5.8*dt;e.y+=e.aimY*e.s*5.8*dt;e.charge-=dt;e.attackPose=18;
+          e.x+=e.aimX*AF.enemyRushSpeed(e)*dt;e.y+=e.aimY*AF.enemyRushSpeed(e)*dt;e.charge-=dt;e.attackPose=18;
           if(e.charge<=0){e.charge=0;e.stun=26}
         }else if(e.aiWindup>0){
           e.aiWindup-=dt;e.moving=false;
           if(e.aiWindup<=0){e.aiWindup=0;e.charge=19;e.attackPose=22}
         }else{
           e.aiCd-=dt;
-          if(e.aiCd<=0&&dist<345&&dist>72){e.aimX=dx/dist;e.aimY=dy/dist;e.aiWindup=35;e.aiCd=(128+Math.random()*46)/(e.pressure||1)}
+          if(e.aiCd<=0&&dist<345+Math.min(23,AF.floor-1)*6&&dist>72){e.aimX=dx/dist;e.aimY=dy/dist;e.aiWindup=35;e.aiCd=(128+Math.random()*46)/(e.pressure||1)}
           else{e.x+=dx/dist*e.s*.88*dt;e.y+=dy/dist*e.s*.88*dt}
         }
       }
@@ -934,7 +942,7 @@
       // A planted foot stays planted while stopped or winding up an attack.
       const stride=e.type==='boss'?72:['frostWolf','plagueVermin'].includes(e.variant)?48:e.type==='brute'?60:44;
       if(e.moving)e.walkCycle=((e.walkCycle||0)+walked/stride)%1;
-      const cdx=p.x-e.x,cdy=p.y-e.y,cdist=Math.hypot(cdx,cdy)||1;if(cdist<p.r+e.r&&p.inv<=0&&!(e.type==='boss'&&e.intro>0)){e.attackPose=e.type==='boss'?22:14;const mult=e.type==='brute'&&e.charge>0?1.45:e.type==='crawler'&&e.dash>0?1.18:1;if(e.type!=='boss')AF.slashes.push({kind:'clawStrike',x:e.x,y:e.y,a:Math.atan2(cdy,cdx),r:e.r+26,l:12,max:12,color:e.type==='brute'?'#b4a080':'#bb8a99'});hurt(e.d*mult,cdx/cdist,cdy/cdist);if(e.type==='brute'&&e.charge>0){e.charge=0;e.stun=24;AF.shockwaves.push({x:e.x,y:e.y,r:8,max:58,l:18,color:'#ff9b63'})}}
+      const cdx=p.x-e.x,cdy=p.y-e.y,cdist=Math.hypot(cdx,cdy)||1;if((cdist<p.r+e.r||(wasRushing&&AF.rushContact(e,p,ox,oy)))&&p.inv<=0&&!(e.type==='boss'&&e.intro>0)){e.attackPose=e.type==='boss'?22:14;const mult=e.type==='brute'&&e.charge>0?1.45:e.type==='crawler'&&e.dash>0?1.18:1;if(e.type!=='boss')AF.slashes.push({kind:'clawStrike',x:e.x,y:e.y,a:Math.atan2(cdy,cdx),r:e.r+26,l:12,max:12,color:e.type==='brute'?'#b4a080':'#bb8a99'});hurt(e.d*mult,cdx/cdist,cdy/cdist);if(e.type==='brute'&&e.charge>0){e.charge=0;e.stun=24;AF.shockwaves.push({x:e.x,y:e.y,r:8,max:58,l:18,color:'#ff9b63'})}}
     }
     for(let i=AF.projectiles.length-1;i>=0;i--){
       const q=AF.projectiles[i];q.visualAge=(q.visualAge||0)+dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;
