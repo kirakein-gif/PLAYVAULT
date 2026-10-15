@@ -342,7 +342,7 @@ console.log('PASS v51 relic triggers: opposite grail curves, reflection versus a
   assert.equal(p.data[(45*p.width+195)*4+3],0,'foreign weapon fragment is fully transparent');
   assert.equal(p.data[(35*p.width+49)*4+3],40,'soft actor edge remains intact');cleaned++;
  };
- h.env.AF_ART.ready.then(()=>{assert.equal(cleaned,122,'enemy walk poses and eight Ethan combat poses isolated');console.log('PASS v48: foreign fragments removed from all walk frames; actor silhouette and soft alpha edges preserved')}).catch(err=>{console.error(err);process.exitCode=1});
+ h.env.AF_ART.prepared.then(()=>{assert.equal(cleaned,210,'all walk, stationary, windup, attack, hurt and death frames isolated');const art=h.env.AF_ART;for(let tier=0;tier<8;tier++)for(let col=0;col<4;col++){const f=art.regionalEnemy({type:'boss',tier},col);assert.ok(f.surface);assert.equal(art.regionalEnemy({type:'boss',tier},col),f,'renderer reuses the cleaned frame')}for(const type of ['crawler','shooter','brute','boss'])for(let col=0;col<6;col++)assert.ok(art.enemy(type,col).surface);console.log('PASS v53: all 210 actor frames isolated, cached and used by renderer; body and soft edges retained')}).catch(err=>{console.error(err);process.exitCode=1});
 }
 
 // Shoulder control is brief and bounded, and never moves or interrupts a boss.
