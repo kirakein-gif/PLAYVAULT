@@ -79,14 +79,27 @@
     path([[453,382],[475,386],[487,418],[471,441],[496,586],[470,622],[451,588],[459,441],[444,419]],'#795047');line([[354,478],[370,635]],'#93977f',4);line([[548,474],[576,642]],'#8d947c',4);path([[451,301],[448,372],[470,391],[504,361],[509,301]],'#bd906c');
     const ex=C.enemyHead.x+hit*15,ey=C.enemyHead.y+idle-hit*10;ctx.save();ctx.translate(ex,ey);ctx.rotate(hit*.12);oval(0,0,76+hit*3,99-hit*6,'#dab28c');path([[19,-72],[64,-49],[77,12],[56,62],[15,88],[24,38],[36,5]],'#b98767',null);path([[-74,-10],[-83,-57],[-60,-94],[-13,-110],[40,-100],[77,-68],[67,-33],[31,-59],[-7,-67],[-45,-41]],'#293638');line([[-57,-61],[-22,-80],[27,-77]],'#52605b',4);oval(-69,15,12,22,'#bd916e');path([[46,-12],[82,23],[48,30]],'#bd8a65','#6e5a49',2);line([[-40,-21],[-12,-29]],'#293638',6);line([[17,-26],[43,-17]],'#293638',6);
     if(hit){line([[-40,0],[-16,13],[-35,22]],'#293638',4);line([[17,0],[38,14],[20,22]],'#293638',4);oval(1,56,16,23,'#674b40');}else{oval(-27,3,16,10,'#eee6cc','#5d5c4c',2);oval(29,7,11,9,'#eee6cc','#5d5c4c',2);oval(-20,3,5,8,'#33474a',null);oval(33,7,4,7,'#33474a',null);line([[-22,58],[14,61],[31,55]],'#6d5042',3);}line([[-31,39],[-18,43]],'#b48464',2);ctx.restore();
-    // Right foreground head and shoulders face left, with neck and side profile.
-    path([[652,720],[665,542],[737,464],[793,446],[899,440],[1007,481],[1095,574],[1177,720]],'#2d4652');path([[741,472],[785,446],[810,480],[784,513]],'#d3d8c4');path([[899,440],[937,454],[906,507],[855,481]],'#c6cfba');path([[805,397],[803,467],[835,484],[892,454],[898,388]],'#be9574');line([[1007,505],[1051,637]],'#58717a',4);line([[722,552],[694,650]],'#1b343e',4);
-    ctx.save();ctx.translate(C.playerHead.x-hurt*11,C.playerHead.y+idle+hurt*9);ctx.rotate(-hurt*.07);oval(0,0,89,113-hurt*5,'#263941');path([[-72,-35],[-86,-5],[-99,18],[-79,28],[-73,68],[-45,93],[-24,74],[-40,23],[-34,-39]],'#c19a78');path([[-71,-56],[-38,-105],[24,-115],[72,-83],[89,-28],[54,-46],[12,-67],[-30,-45]],'#263941');line([[11,-91],[55,-65],[69,-31]],'#43555a',4);oval(59,23,16,26,'#c19a78');line([[60,11],[52,22],[63,30]],'#916b54',3);line([[-80,2],[-65,-4]],'#263941',4);ctx.restore();
-    // A shared table occupies the gap between the two torsos. Idle hands stay behind it.
-    path([[570,475],[795,475],[962,650],[450,650]],'#9d8158');line([[574,482],[795,482]],'#d3b98a',4);path([[450,650],[962,650],[957,676],[456,676]],'#725c3d');line([[486,676],[481,720]],'#443e32',12);line([[927,676],[937,720]],'#443e32',12);
+    // The far end sits at upper left; the near edge recedes under the player's back.
+    const corners=C.table.map(p=>[p.x,p.y]);
+    path(corners,'#9d8158');
+    path([[810,730],[1000,650],[998,673],[812,753]],'#725c3d');
+    path([[520,500],[810,730],[812,753],[522,519]],'#806844');
+    line([[526,500],[811,723],[992,649]],'#d3b98a',4);
+    line([[970,685],[979,720]],'#443e32',12);
     const ep=enemyPose(m),pp=playerPose(m);
     if(ep.kind!=='hammer'&&pp.kind!=='hammer')hammer(C.hammerHome);
     if(ep.kind!=='pot'&&pp.kind!=='pot')pot(C.potHome);
+    // Foreground is strictly the back of the head and jacket: no facial plane or ear.
+    path([[752,720],[755,595],[755,532],[739,498],[803,515],[900,509],[994,550],[1090,623],[1164,720]],'#2d4652');
+    path([[807,469],[805,528],[844,549],[899,526],[896,466]],'#b78f6f');
+    path([[739,498],[805,520],[847,546],[899,519],[959,536],[908,565],[844,577],[789,549]],'#bfcab6');
+    line([[844,580],[870,648],[889,720]],'#203943',5);line([[994,568],[1040,689]],'#57707a',4);line([[774,590],[773,689]],'#203943',4);
+    ctx.save();ctx.translate(C.playerHead.x-hurt*11,C.playerHead.y+idle+hurt*9);ctx.rotate(-.12-hurt*.07);
+    oval(0,0,89,113-hurt*5,'#263941');
+    path([[-85,-20],[-77,-72],[-34,-108],[17,-115],[65,-84],[88,-30],[76,45],[51,94],[25,102],[2,91],[-23,101],[-55,81],[-79,37]],'#283b43');
+    line([[-60,-56],[-27,-84],[16,-93],[51,-72]],'#43565d',5);
+    line([[62,-49],[69,-9],[61,39]],'#354b53',4);
+    line([[-51,70],[-24,84],[1,77],[23,88],[47,77]],'#1b3038',4);ctx.restore();
     function actorArm(p,color,width){
       if(!p.visible)return;
       arm(p,color,width);
@@ -95,8 +108,8 @@
       hand(p.wrist.x,p.wrist.y,p.value,p.mode==='rps'?1:.64,p.mode==='rps'?.05:0);
     }
     actorArm(ep,'#afb097',42);actorArm(pp,'#3e5c69',46);
-    if(m.phase==='react'){text('최주임 · '+names[m.enemy],490,117,16);text('도전자 · '+names[m.player],850,150,16);}
-    if(['select','react'].includes(m.phase))for(const [p,label]of [[C.hammerHome,'망치 손잡이'],[C.potHome,'냄비 테두리']]){oval(p.x,p.y,23,23,'#f1d89b14','#deca99',1.5);text(label,p.x,635,13);}
+    if(m.phase==='react'){text('최주임 · '+names[m.enemy],490,100,16);text('도전자 · '+names[m.player],850,255,16);}
+    if(['select','react'].includes(m.phase))for(const [p,label]of [[C.hammerHome,'망치 손잡이'],[C.potHome,'냄비 테두리']]){oval(p.x,p.y,23,23,'#f1d89b14','#deca99',1.5);text(label,p.x,p.y+49,13);}
     if(m.held==='hammer'&&m.trace.length>1){for(let i=1;i<m.trace.length;i++){ctx.globalAlpha=i/m.trace.length*.45;line([[m.trace[i-1].x,m.trace[i-1].y],[m.trace[i].x,m.trace[i].y]],'#ffda82',3);}ctx.globalAlpha=1;}
     if(impact&&m.contact)for(let i=0;i<8;i++){const a=i*Math.PI/4,p=age/360;ctx.globalAlpha=1-p;line([[m.contact.x+Math.cos(a)*(50+p*30),m.contact.y+Math.sin(a)*(50+p*30)],[m.contact.x+Math.cos(a)*(65+p*80),m.contact.y+Math.sin(a)*(65+p*80)]],m.result==='block'?'#e1f4e9':'#ffdb87',4);}ctx.globalAlpha=1;
     if(m.phase==='react'){rect(482,687,445,4,'#455d58');rect(482,687,445*Math.max(0,1-(t-m.reactAt)/C.reactMs),4,'#ddbf7c');}

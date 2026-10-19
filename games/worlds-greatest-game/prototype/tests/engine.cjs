@@ -16,7 +16,7 @@ test('all nine pairs expose hands and accept action immediately',()=>{
   const m=round();assert(m.grab(C.hammerHome,1,0));assert.equal(m.result,null);
 });
 test('fast swept hit scores exactly once',()=>{const m=round();m.grab(C.hammerHome,1,10);m.move(hitWrist,1,160);assert.equal(m.result,'hit');for(let i=0;i<10;i++)m.move(hitWrist,1,170+i);assert.equal(m.score.player,1);});
-test('tiny movements, click and slow movement cannot auto-hit',()=>{const m=round();m.grab(C.hammerHome,1,10);m.move({x:652,y:599},1,30);assert.equal(m.result,null);m.move(hitWrist,1,950);assert.equal(m.result,null);m.release(1);assert.equal(m.result,'miss');});
+test('tiny movements, click and slow movement cannot auto-hit',()=>{const m=round();m.grab(C.hammerHome,1,10);m.move({x:C.hammerHome.x+2,y:C.hammerHome.y-1},1,30);assert.equal(m.result,null);m.move(hitWrist,1,950);assert.equal(m.result,null);m.release(1);assert.equal(m.result,'miss');});
 test('pointer ownership and safe cancellation',()=>{const m=round();m.grab(C.hammerHome,5,10);m.move(hitWrist,9,160);assert.equal(m.tool.x,C.hammerHome.x);assert(!m.release(9));m.release(5,true);assert.equal(m.held,null);assert.equal(m.result,null);});
 test('pot alignment then held defense',()=>{const m=round(0,1);holdPot(m);assert(m.equipped);m.tick(C.enemyStrikeMs);assert.equal(m.result,'block');assert.equal(m.score.enemy,0);});
 test('pot release or leaving head removes defense',()=>{for(const release of [true,false]){const m=round(0,1);holdPot(m);if(release)m.release(1);else m.move(C.potHome,1,300);assert(!m.equipped);m.tick(C.enemyStrikeMs);assert.equal(m.result,'hurt');}});
