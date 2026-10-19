@@ -9,15 +9,16 @@
     const p=len?clamp(((c.x-a.x)*dx+(c.y-a.y)*dy)/len,0,1):0;
     return Math.hypot(a.x+p*dx-c.x,a.y+p*dy-c.y)<=r;
   }
-  function reach(p) {
-    const d=dist(p,C.shoulder), max=C.upperArm+C.forearm-2;
-    if(d<=max)return {...p};
-    return {x:C.shoulder.x+(p.x-C.shoulder.x)*max/d,y:C.shoulder.y+(p.y-C.shoulder.y)*max/d};
+  function reach(p,shoulder=C.shoulder,a=C.upperArm,b=C.forearm) {
+    const d=dist(p,shoulder), bounded=clamp(d,Math.abs(a-b)+1,a+b-2);
+    if(d===bounded)return {...p};
+    const angle=d?Math.atan2(p.y-shoulder.y,p.x-shoulder.x):Math.PI/2;
+    return {x:shoulder.x+Math.cos(angle)*bounded,y:shoulder.y+Math.sin(angle)*bounded};
   }
-  function ik(shoulder,wrist,a=C.upperArm,b=C.forearm) {
+  function ik(shoulder,wrist,a=C.upperArm,b=C.forearm,bend=1) {
     const d=clamp(dist(shoulder,wrist),Math.abs(a-b)+.01,a+b-.01);
     const theta=Math.atan2(wrist.y-shoulder.y,wrist.x-shoulder.x);
-    const angle=theta+Math.acos(clamp((a*a+d*d-b*b)/(2*a*d),-1,1));
+    const angle=theta+bend*Math.acos(clamp((a*a+d*d-b*b)/(2*a*d),-1,1));
     return {x:shoulder.x+Math.cos(angle)*a,y:shoulder.y+Math.sin(angle)*a};
   }
   class Match {
@@ -37,14 +38,12 @@
       if (this.phase !== 'select' || !Number.isInteger(hand) || hand < 0 || hand > 2) return false;
       this.player = hand; this.enemy = Math.floor(this.random() * 3);
       this.rule = outcome(this.player, this.enemy);
-      this.phase = 'reveal'; this.phaseAt = this.time; this.events.push('cue');
+      // Full hand silhouettes and input become live in the same update.
+      this.phase = 'react'; this.phaseAt = this.time; this.reactAt = this.time; this.events.push('cue');
       return true;
     }
     tick(now) {
       this.time = Math.max(this.time, now);
-      if (this.phase === 'reveal' && this.time - this.phaseAt >= C.revealMs) {
-        this.phase = 'react'; this.reactAt = this.time;
-      }
       if(this.phase==='react'&&this.held==='pot')this.updateEquip();
       if(this.phase==='react'){
         const elapsed=this.time-this.reactAt;
@@ -73,7 +72,7 @@
       }
       this.held=kind;this.pointerId=id;
       const home=kind==='hammer'?C.hammerHome:C.potHome;
-      this.tool={...home,angle:-Math.PI/2};this.lastMove=now;this.pathLength=0;
+      this.tool={...home,angle:-Math.PI/2};this.lastMove=this.time;this.pathLength=0;
       this.offset={x:home.x-p.x,y:home.y-p.y};
       this.trace=[{...this.tip(),t:now}];this.events.push('grab');return true;
     }

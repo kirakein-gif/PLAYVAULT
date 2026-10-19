@@ -2,15 +2,16 @@
   'use strict';
   const config = {
     width: 1200, height: 720,
-    revealMs: 650, reactMs: 3000, recoverMs: 1250,
-    enemyGuardMs: 2250, enemyStrikeMs: 2100, tieMs: 1200,
-    swingMinLength: 105, swingMinSpeed: 460, hammerRadius: 29,
-    equipRadius: 43, equipMs: 130, snapMs: 160,
+    revealMs: 0, reactMs: 1700, recoverMs: 300,
+    enemyGuardMs: 1100, enemyStrikeMs: 1050, tieMs: 450,
+    swingMinLength: 90, swingMinSpeed: 460, hammerRadius: 29,
+    equipRadius: 38, equipMs: 70, snapMs: 90,
     hitstopMs: 85, targetScore: 3,
-    playerHead: { x: 255, y: 405, r: 57 },
-    enemyHead: { x: 795, y: 215, r: 56 },
-    shoulder: { x: 385, y: 540 }, upperArm: 250, forearm: 260,
-    hammerHome: { x: 520, y: 570 }, potHome: { x: 835, y: 570 },
+    playerHead: { x: 850, y: 330, r: 85 },
+    enemyHead: { x: 490, y: 230, r: 76 },
+    shoulder: { x: 760, y: 480 }, upperArm: 155, forearm: 160,
+    enemyShoulder: { x: 555, y: 390 }, enemyUpperArm: 165, enemyForearm: 175,
+    hammerHome: { x: 650, y: 600 }, potHome: { x: 970, y: 600 },
     hammerLength: 95, potOffset: 80, grabRadius: 35
   };
   if (typeof module === 'object') module.exports = config;
