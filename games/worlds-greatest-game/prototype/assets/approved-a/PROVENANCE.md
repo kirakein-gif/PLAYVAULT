@@ -1,5 +1,7 @@
 # A안 게임 아트 제작 기록
 
+v0.10 완성형 정지 포즈와 전체 프롬프트는 [STILLS_PROVENANCE.md](STILLS_PROVENANCE.md)에 기록했습니다. 현재 실행 페이지는 office / enemy-rps / player-rps / enemy-stills / player-stills만 로드합니다. 아래 설명은 이전 버전의 제작 이력입니다.
+
 v0.9 도구 구간의 몸통·오른손 그립 아트와 전체 프롬프트는 [TOOLS_PROVENANCE.md](TOOLS_PROVENANCE.md)에 기록했습니다.
 
 v0.8 오른손 가위바위보 연결형 포즈, 기준 이미지와 전체 프롬프트는 [RPS_PROVENANCE.md](RPS_PROVENANCE.md)에 기록했습니다.

@@ -74,7 +74,30 @@
     const lean=resolving&&m.result==='hit'?(m.enemyImpactLean||0)*(1-ease(age/260)):mode==='rps'||mode==='idle'?0:clamp(target.x-shoulder.x-horizontal,0,C.enemyMaxLean);
     shoulder.x+=lean;
     const reachProgress=attacking?ease((elapsed-220)/230):ease((elapsed-(C.enemyGuardMs-600))/230);
-    return {target,shoulder,lean,reachProgress,head:{...C.enemyHead,x:C.enemyHead.x+lean},kind,mode,visible:mode!=='idle',angle:-Math.PI/2};
+    return {target,shoulder,lean,reachProgress,head:{...C.enemyHead},kind,mode,visible:mode!=='idle',angle:-Math.PI/2};
+  }
+  // Complete drawings change only at explicit action steps; no limb interpolation.
+  function stillPose(m,near){
+    if(m.phase==='select')return 'idle';
+    if(['resolve','end'].includes(m.phase)){
+      if(near){
+        if(m.frozenTool?.kind==='hammer')return ['hit','guarded','miss'].includes(m.result)?'hammer-strike':'hammer-pickup';
+        if(m.frozenTool?.kind==='pot')return m.equipped?'pot-wear':'pot-pickup';
+      }else{
+        if(['hurt','block'].includes(m.result))return 'hammer-strike';
+        if(m.result==='guarded')return 'pot-wear';
+      }
+      return 'idle';
+    }
+    if(near){
+      if(m.held==='hammer')return m.tool.y<C.hammerHome.y-110?'hammer-lift':'hammer-pickup';
+      if(m.held==='pot')return m.equipped||dist(m.tip(),{x:C.playerHead.x,y:C.playerHead.y-C.playerHead.r+7})<90?'pot-wear':'pot-pickup';
+      return 'rps';
+    }
+    const f=enemyFrame(m),elapsed=m.time-m.reactAt;
+    if(f.kind==='hammer')return elapsed>=C.enemyStrikeMs-120?'hammer-strike':elapsed>=620?'hammer-lift':'hammer-pickup';
+    if(f.kind==='pot')return elapsed>=C.enemyGuardMs-100?'pot-wear':'pot-pickup';
+    return 'rps';
   }
   class Match {
     constructor(random = Math.random) { this.random = random; this.reset(); }
@@ -195,7 +218,7 @@
     }
     drainEvents() { return this.events.splice(0); }
   }
-  const api = { Match, C, dist, clamp, outcome, segmentCircle, reach, ik, playerRig, potFrame, enemyPotFrame, enemyFrame, ease, mix };
+  const api = { Match, C, dist, clamp, outcome, segmentCircle, reach, ik, playerRig, potFrame, enemyPotFrame, enemyFrame, ease, mix, stillPose };
   if (typeof module === 'object') module.exports = api;
   else root.WGG = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

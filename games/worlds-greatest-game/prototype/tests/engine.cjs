@@ -47,10 +47,10 @@ test('AI reaches the shared tabletop before taking either prop',()=>{
 test('sparse and dense input produce the same valid swing',()=>{for(const steps of [1,4,8,16]){const m=round();m.grab(C.hammerHome,1,10);for(let i=1;i<=steps;i++)m.move({x:C.hammerHome.x+(hitWrist.x-C.hammerHome.x)*i/steps,y:C.hammerHome.y+(hitWrist.y-C.hammerHome.y)*i/steps},1,10+180*i/steps);assert.equal(m.result,'hit',`samples=${steps}`);}});
 test('pot perspective keeps grip and collision center aligned',()=>{const atTable=api.potFrame(C.potHome),atHead=api.potFrame(potWrist);assert.equal(atTable.offset,C.potOffset);assert.equal(atHead.offset,C.potWearOffset);assert(atHead.scale>atTable.scale);const m=round(0,1);holdPot(m);assert(dist(m.tip(),{x:C.playerHead.x,y:potWrist.y})<C.equipRadius);bones(playerPose(m));});
 test('AI elbows turn continuously through reach and recovery',()=>{for(const rule of ['win','lose']){let prev=null;for(let t=0;t<=C.enemyStrikeMs;t+=2){const p=enemyPose({phase:'react',rule,time:t,reactAt:0});bones(p);assert(p.a<=C.enemyUpperArm+.01&&p.b<=C.enemyForearm+.01);if(prev)assert(dist(prev.elbow,p.elbow)<35,'no elbow branch snap');prev=p;}}});
-test('right shoulder, moving torso and head collision share the same motion',()=>{
+test('static pose target stays fixed while input reach remains bounded',()=>{
   assert(C.enemyShoulder.x<C.enemyHead.x-100);
   const m=round();m.tick(C.enemyGuardMs-370);
-  const f=api.enemyFrame(m);assert(f.lean>0);assert.equal(f.head.x-C.enemyHead.x,f.shoulder.x-C.enemyShoulder.x);
+  const f=api.enemyFrame(m);assert(f.lean>0);assert.equal(f.head.x,C.enemyHead.x);
   m.resolve('hit');assert.equal(api.enemyFrame(m).lean,f.lean);m.tick(m.resolvedAt+260);assert.equal(api.enemyFrame(m).lean,0);
 });
 test('hover reaches either prop without grabbing or exposing the correct choice',()=>{
@@ -64,5 +64,15 @@ test('opponent pot fits the head and keeps the held handle on its rim',()=>{
   const m=round();m.tick(C.enemyGuardMs);const f=api.enemyFrame(m),pot=api.enemyPotFrame(f.target);
   assert.equal(pot.scale,1.6);assert(Math.abs(f.target.x-pot.offset-f.head.x)<.01);
   assert.equal(f.target.y,C.enemyHead.y-C.enemyHead.r+7);
+});
+test('player uses exactly three hammer stills and two pot stills',()=>{
+  const m=round();m.grab(C.hammerHome,1,10);assert.equal(api.stillPose(m,true),'hammer-pickup');
+  m.move({x:650,y:450},1,180);assert.equal(api.stillPose(m,true),'hammer-lift');
+  m.move(hitWrist,1,300);assert.equal(m.result,'hit');assert.equal(api.stillPose(m,true),'hammer-strike');
+  const p=round(0,1);p.grab(C.potHome,1,10);assert.equal(api.stillPose(p,true),'pot-pickup');p.move(potWrist,1,160);p.tick(240);assert.equal(api.stillPose(p,true),'pot-wear');
+});
+test('opponent stills change only at action steps',()=>{
+  const m=round(0,1);m.tick(450);assert.equal(api.stillPose(m,false),'hammer-pickup');m.tick(620);assert.equal(api.stillPose(m,false),'hammer-lift');m.tick(C.enemyStrikeMs);assert.equal(api.stillPose(m,false),'hammer-strike');
+  const p=round();p.tick(C.enemyGuardMs-370);assert.equal(api.stillPose(p,false),'pot-pickup');p.tick(C.enemyGuardMs);assert.equal(api.stillPose(p,false),'pot-wear');
 });
 console.log(`${count} scenarios passed`);

@@ -26,6 +26,16 @@ const C=require('../config.js');
     async function round(enemy=2,player=0){await page.locator('#reset').click();await page.evaluate(b=>{globalThis.testEnemy=b;globalThis.inputLog=[];},enemy);await page.locator(`[data-hand="${player}"]`).click();await status('직접 판단');}
     async function snap(name){if(dest)await page.screenshot({path:path.join(dest,`${name}.png`),fullPage:true});}
     await snap('01-arena');
+    for(const side of ['player','enemy']){
+      await page.locator('#poseActor').selectOption(side);
+      for(const pose of ['hammer-pickup','hammer-lift','hammer-strike','pot-pickup','pot-wear']){
+        await page.locator(`[data-pose="${pose}"]`).click();await status('정지 포즈');
+        if(dest)await page.locator('#arena').screenshot({path:path.join(dest,`still-${side}-${pose}.png`)});
+      }
+    }
+    const still=await page.locator('#arena').screenshot();await page.waitForTimeout(250);
+    assert(still.equals(await page.locator('#arena').screenshot()),'pose preview is pixel-stable without animation');
+    await page.locator('#poseExit').click();console.log('PASS ten complete still poses and stable preview');
     // Render fixed recoil ages so visual QA covers the join throughout impact,
     // independently of requestAnimationFrame timing and the brief hit stop.
     const poses=[...[0,150,290,430].map(age=>({name:`neck-recoil-${age}`,age})),
@@ -72,6 +82,6 @@ const C=require('../config.js');
     const fallback=await browser.newPage({viewport:{width:1200,height:1000}});
     await fallback.addInitScript(()=>{window.Image=class{constructor(){queueMicrotask(()=>this.onerror?.());}};});
     await fallback.goto(url);await fallback.waitForFunction(()=>WGG.art.failed);
-    await fallback.locator('[data-hand="0"]').click();assert(await fallback.locator('[data-hand="0"]').isDisabled());await fallback.close();console.log('PASS browser asset failure retains playable fallback');
+    await fallback.locator('[data-hand="0"]').click();assert(await fallback.locator('[data-hand="0"]').isDisabled());await fallback.close();console.log('PASS browser asset failure shows retry screen without script errors');
   }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
