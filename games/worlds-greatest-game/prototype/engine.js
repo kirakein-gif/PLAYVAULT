@@ -4,6 +4,22 @@
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const outcome = (a, b) => a === b ? 'tie' : (a + 2) % 3 === b ? 'win' : 'lose';
+  function segmentCircle(a,b,c,r) {
+    const dx=b.x-a.x,dy=b.y-a.y,len=dx*dx+dy*dy;
+    const p=len?clamp(((c.x-a.x)*dx+(c.y-a.y)*dy)/len,0,1):0;
+    return Math.hypot(a.x+p*dx-c.x,a.y+p*dy-c.y)<=r;
+  }
+  function reach(p) {
+    const d=dist(p,C.shoulder), max=C.upperArm+C.forearm-2;
+    if(d<=max)return {...p};
+    return {x:C.shoulder.x+(p.x-C.shoulder.x)*max/d,y:C.shoulder.y+(p.y-C.shoulder.y)*max/d};
+  }
+  function ik(shoulder,wrist,a=C.upperArm,b=C.forearm) {
+    const d=clamp(dist(shoulder,wrist),Math.abs(a-b)+.01,a+b-.01);
+    const theta=Math.atan2(wrist.y-shoulder.y,wrist.x-shoulder.x);
+    const angle=theta+Math.acos(clamp((a*a+d*d-b*b)/(2*a*d),-1,1));
+    return {x:shoulder.x+Math.cos(angle)*a,y:shoulder.y+Math.sin(angle)*a};
+  }
   class Match {
     constructor(random = Math.random) { this.random = random; this.reset(); }
     reset() {
@@ -29,10 +45,67 @@
       if (this.phase === 'reveal' && this.time - this.phaseAt >= C.revealMs) {
         this.phase = 'react'; this.reactAt = this.time;
       }
+      if(this.phase==='react'&&this.held==='pot')this.updateEquip();
+    }
+    tip(tool=this.tool) {
+      if(!tool)return null;
+      return this.held==='pot'?{x:tool.x-C.potOffset,y:tool.y}:
+        {x:tool.x+Math.cos(tool.angle)*C.hammerLength,y:tool.y+Math.sin(tool.angle)*C.hammerLength};
+    }
+    grab(p,id,now) {
+      this.tick(now);
+      if(this.held||this.phase==='resolve'||this.phase==='end')return false;
+      const kind=dist(p,C.hammerHome)<=C.grabRadius?'hammer':dist(p,C.potHome)<=C.grabRadius?'pot':null;
+      if(!kind)return false;
+      if(this.phase!=='react')return false;
+      this.held=kind;this.pointerId=id;
+      const home=kind==='hammer'?C.hammerHome:C.potHome;
+      this.tool={...home,angle:-Math.PI/2};this.lastMove=now;this.pathLength=0;
+      this.offset={x:home.x-p.x,y:home.y-p.y};
+      this.trace=[{...this.tip(),t:now}];this.events.push('grab');return true;
+    }
+    move(p,id,now) {
+      this.tick(now);
+      if(!this.held||id!==this.pointerId||this.phase!=='react')return false;
+      const previous=this.tip(), old=this.tool, dt=Math.max(1,now-this.lastMove);
+      const wrist=reach({x:p.x+this.offset.x,y:p.y+this.offset.y});
+      const vx=(wrist.x-old.x)/dt*1000;
+      const target=-Math.PI/2+clamp(vx/1800,-.8,.8);
+      const angle=this.held==='hammer'?old.angle+(target-old.angle)*Math.min(1,dt/65):0;
+      this.tool={...wrist,angle};this.lastMove=now;
+      const tip=this.tip(), length=dist(previous,tip);
+      this.pathLength+=length;this.trace.push({...tip,t:now});
+      this.trace=this.trace.filter(p=>now-p.t<160).slice(-24);
+      if(this.held==='pot')this.updateEquip();
+      else if(this.pathLength>=C.swingMinLength&&length/dt*1000>=C.swingMinSpeed&&
+        (tip.x-previous.x)*(C.enemyHead.x-previous.x)+(tip.y-previous.y)*(C.enemyHead.y-previous.y)>0&&
+        segmentCircle(previous,tip,C.enemyHead,C.enemyHead.r+C.hammerRadius)) {
+        this.contact={...C.enemyHead};this.resolve('hit');
+      }
+      return true;
+    }
+    updateEquip() {
+      const center=this.tip(),target={x:C.playerHead.x,y:C.playerHead.y-C.playerHead.r+7};
+      if(dist(center,target)<=C.equipRadius){
+        if(this.alignSince===null)this.alignSince=this.time;
+        if(!this.equipped&&this.time-this.alignSince>=C.equipMs){
+          this.equipped=true;this.readyAt=this.time;this.snapFrom={...this.tool};this.events.push('equip');
+        }
+      }else{this.alignSince=null;this.equipped=false;this.readyAt=null;}
+    }
+    release(id,cancel=false) {
+      if(id!==this.pointerId)return false;
+      this.clearTools();return true;
+    }
+    resolve(result) {
+      if(this.phase!=='react')return;
+      this.result=result;this.phase='resolve';this.resolvedAt=this.time;
+      this.frozenTool=this.tool?{...this.tool,kind:this.held}:null;
+      this.held=null;this.pointerId=null;this.events.push(result);
     }
     drainEvents() { return this.events.splice(0); }
   }
-  const api = { Match, C, dist, clamp, outcome };
+  const api = { Match, C, dist, clamp, outcome, segmentCircle, reach, ik };
   if (typeof module === 'object') module.exports = api;
   else root.WGG = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

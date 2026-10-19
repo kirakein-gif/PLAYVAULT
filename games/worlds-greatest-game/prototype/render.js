@@ -55,4 +55,50 @@
     ctx.restore();
   }
   root.WGG.render=render;
+  root.WGG.drawTools=function(ctx,m,d) {
+    const {oval,line,text}=d;
+    const {ik}=root.WGG;
+    const tool=m.tool, held=m.held, frozen=m.phase==='resolve'?m.frozenTool:null;
+    function hammer(x,y,a=-Math.PI/2,scale=1) {
+      ctx.save();ctx.translate(x,y);ctx.rotate(a+Math.PI/2);ctx.scale(scale,scale);
+      line([[0,10],[0,-95]],'#23353b',18);line([[0,10],[0,-95]],'#d1b373',11);
+      ctx.fillStyle='#c34e43';ctx.strokeStyle='#29393a';ctx.lineWidth=4;ctx.beginPath();ctx.roundRect(-44,-119,88,48,10);ctx.fill();ctx.stroke();
+      line([[-31,-109],[-31,-83]],'#f19b6b',5);line([[30,-109],[30,-83]],'#923e3a',6);
+      ctx.restore();
+    }
+    function pot(x,y,worn=false) {
+      const wobble=m.phase==='resolve'&&m.result==='block'?Math.sin((m.time-m.resolvedAt)/18)*Math.max(0,1-(m.time-m.resolvedAt)/450)*5:0;
+      ctx.save();ctx.translate(x,y+wobble);
+      ctx.beginPath();ctx.moveTo(-61,7);ctx.quadraticCurveTo(-54,-43,0,-45);ctx.quadraticCurveTo(54,-43,61,7);ctx.closePath();ctx.fillStyle='#bdc9bc';ctx.fill();ctx.strokeStyle='#344950';ctx.lineWidth=5;ctx.stroke();
+      oval(0,7,65,10,'#728e90');line([[-43,-19],[-22,-31],[11,-32]],'#edf0d6',5);
+      line([[59,0],[80,0],[88,6]],'#2a4148',11);line([[-59,0],[-78,0]],'#2a4148',9);
+      if(worn)line([[-58,12],[58,12]],'#e5e7cc',3);
+      ctx.restore();
+    }
+    const heldKind=held||frozen?.kind;
+    if(heldKind!=='hammer')hammer(C.hammerHome.x,C.hammerHome.y);
+    if(heldKind!=='pot')pot(C.potHome.x-C.potOffset,C.potHome.y);
+    if(m.phase==='select'||m.phase==='react'){
+      oval(C.hammerHome.x,C.hammerHome.y,25,25,'#ead09220','#ecd28e',2);
+      oval(C.potHome.x,C.potHome.y,25,25,'#cadac620','#e2e5cf',2);
+      text('망치 손잡이',520,628,14);text('냄비 테두리',803,628,14);
+    }
+    let wrist=held?{...tool}:frozen?{...frozen}:{x:418,y:640};
+    if(held==='pot'&&m.equipped){
+      const p=Math.min(1,(m.time-m.readyAt)/C.snapMs);
+      wrist={x:m.snapFrom.x+(C.playerHead.x+C.potOffset-m.snapFrom.x)*p,y:m.snapFrom.y+(C.playerHead.y-C.playerHead.r+7-m.snapFrom.y)*p};
+    }
+    const elbow=ik(C.shoulder,wrist);
+    line([[C.shoulder.x,C.shoulder.y],[elbow.x,elbow.y],[wrist.x,wrist.y]],'#142c34',34);
+    line([[C.shoulder.x,C.shoulder.y],[elbow.x,elbow.y],[wrist.x,wrist.y]],'#3e5c69',25);
+    oval(elbow.x,elbow.y,13,13,'#496875','#263d44',2);
+    if(heldKind==='hammer')hammer(wrist.x,wrist.y,tool?.angle||frozen?.angle||-Math.PI/2);
+    if(heldKind==='pot')pot(wrist.x-C.potOffset,wrist.y,m.equipped);
+    oval(wrist.x,wrist.y,15,13,'#dfb78f','#253b40',3);
+    if(heldKind)line([[wrist.x-9,wrist.y-4],[wrist.x+7,wrist.y-1]],'#9e7658',2);
+    if(m.equipped){text('装',255,395,18,'#f8df9e');}
+    if(held==='hammer'&&m.trace.length>1){
+      for(let i=1;i<m.trace.length;i++){ctx.globalAlpha=i/m.trace.length*.55;line([[m.trace[i-1].x,m.trace[i-1].y],[m.trace[i].x,m.trace[i].y]],'#ffdc86',3+i*.15);}ctx.globalAlpha=1;
+    }
+  };
 })(globalThis);
