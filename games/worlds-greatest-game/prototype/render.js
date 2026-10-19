@@ -6,6 +6,9 @@
     const t = m.time, idle = Math.sin(t / 600) * 2;
     ctx.save();
     ctx.fillStyle = '#344b50'; ctx.fillRect(0, 0, 1200, 720);
+    const age=m.phase==='resolve'?t-m.resolvedAt:9999;
+    const impact=['hit','hurt','block','guarded'].includes(m.result)&&age<420;
+    if(impact&&!options.reduced){const intensity=Math.max(0,1-age/420);ctx.translate(Math.sin(age/15)*5*intensity,Math.cos(age/19)*3*intensity);ctx.translate(600,360);ctx.scale(1+.009*intensity,1+.009*intensity);ctx.translate(-600,-360);}
     function rect(x,y,w,h,fill,stroke='#172d32',lw=3) { ctx.beginPath();ctx.rect(x,y,w,h);ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke(); }
     function oval(x,y,rx,ry,fill,stroke='#172d32',lw=4) {ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke();}
     function line(points,color,width) {ctx.beginPath();ctx.moveTo(...points[0]);points.slice(1).forEach(p=>ctx.lineTo(...p));ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();}
@@ -30,7 +33,8 @@
     ctx.beginPath();ctx.moveTo(420,440);ctx.lineTo(1120,440);ctx.lineTo(1200,720);ctx.lineTo(300,720);ctx.closePath();ctx.fillStyle='#9e835e';ctx.fill();ctx.strokeStyle='#28383a';ctx.lineWidth=6;ctx.stroke();
     line([[413,470],[1126,470]],'#c5ab7c',3);line([[330,678],[1185,678]],'#735f47',6);
     ctx.beginPath();ctx.moveTo(85,720);ctx.quadraticCurveTo(92,520,207,495+idle);ctx.lineTo(298,488+idle);ctx.quadraticCurveTo(415,503,454,720);ctx.closePath();ctx.fillStyle='#29424e';ctx.fill();ctx.strokeStyle='#142c34';ctx.lineWidth=7;ctx.stroke();
-    oval(255,405+idle,57,70,'#26363d');oval(303,422+idle,13,20,'#ca9d77');
+    const hurt=m.result==='hurt'?Math.sin(Math.min(1,age/550)*Math.PI)*18:0;
+    oval(255-hurt*.5,405+idle+hurt,57+hurt*.4,70-hurt*.8,'#26363d');oval(303-hurt*.5,422+idle+hurt,13,20,'#ca9d77');
     line([[207,471],[248,501],[285,478]],'#c5cfbc',12);line([[180,535],[150,635]],'#496575',6);
     // Both hands use identical reveal progress. Labels never disclose the rule outcome.
     const show=m.phase!=='select', revealing=m.phase==='reveal';
@@ -52,6 +56,15 @@
     if(root.WGG.drawTools)root.WGG.drawTools(ctx,m,{rect,oval,line,text},options);
     if(m.phase==='react'){const progress=Math.max(0,1-(t-m.reactAt)/C.reactMs);rect(475,698,650,5,'#445c5b','#445c5b',0);rect(475,698,650*progress,5,'#e4c37d','#e4c37d',0);}
     if(m.phase==='reveal')text('가위 · 바위 · 보',600,160,22);
+    if(m.phase==='resolve'){
+      if(impact&&m.contact){
+        const p=age/420;
+        for(let i=0;i<10;i++){const a=i*Math.PI/5;ctx.globalAlpha=1-p;line([[m.contact.x+Math.cos(a)*(35+p*40),m.contact.y+Math.sin(a)*(35+p*40)],[m.contact.x+Math.cos(a)*(50+p*90),m.contact.y+Math.sin(a)*(50+p*90)]],m.result==='block'||m.result==='guarded'?'#d4eee4':'#ffda80',4);}ctx.globalAlpha=1;
+      }
+      const copy={hit:'뿅!',hurt:'뿅!',block:'깡!',guarded:'깡!',miss:'휙…',foul:'파울',tie:'재경기'};
+      text(copy[m.result],600,180,40,m.result==='foul'?'#ffae83':'#ffdf94');
+      if(m.result==='foul'){rect(565,207,70,24,'#d0974b');text('審 判',600,225,14,'#24383e');}
+    }
     ctx.restore();
   }
   root.WGG.render=render;
@@ -84,6 +97,10 @@
       text('망치 손잡이',520,628,14);text('냄비 테두리',803,628,14);
     }
     let wrist=held?{...tool}:frozen?{...frozen}:{x:418,y:640};
+    if(frozen&&m.result==='hit'){
+      const recoil=Math.sin(Math.min(1,(m.time-m.resolvedAt)/550)*Math.PI);
+      wrist.x-=recoil*28;wrist.y+=recoil*38;
+    }
     if(held==='pot'&&m.equipped){
       const p=Math.min(1,(m.time-m.readyAt)/C.snapMs);
       wrist={x:m.snapFrom.x+(C.playerHead.x+C.potOffset-m.snapFrom.x)*p,y:m.snapFrom.y+(C.playerHead.y-C.playerHead.r+7-m.snapFrom.y)*p};
@@ -110,7 +127,8 @@
       const elapsed=m.phase==='react'?m.time-m.reactAt:C.enemyStrikeMs;
       const anticipation=Math.min(1,elapsed/(C.enemyStrikeMs-450));
       const swing=Math.max(0,Math.min(1,(elapsed-(C.enemyStrikeMs-450))/450));
-      const x=965-80*anticipation-630*swing,y=310-160*anticipation+350*swing;
+      const stopped=m.result==='block'||m.phase==='react'&&m.equipped;
+      const x=965-80*anticipation-630*swing,y=310-160*anticipation+(stopped?300:350)*swing;
       line([[868,323],[1000-170*swing,265],[x,y]],'#253c3f',34);line([[868,323],[1000-170*swing,265],[x,y]],'#a9ad93',25);hammer(x,y,-Math.PI/2);oval(x,y,14,13,'#dfb78f');
     }
   };

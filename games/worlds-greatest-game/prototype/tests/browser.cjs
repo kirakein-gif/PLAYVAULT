@@ -33,6 +33,11 @@ const fs=require('node:fs');
     await round(0);await move(520,570);await page.mouse.down();await page.mouse.up();await status('파울');console.log('PASS browser tied tool foul');
     await page.setViewportSize({width:960,height:900});await round();await move(520,570);await page.mouse.down();await move(795,310,5);await status('명중');await page.mouse.up();await snap('04-resized');console.log('PASS browser resized coordinate mapping');
     await page.setViewportSize({width:1440,height:1100});await round();await move(520,570);await page.mouse.down();await page.dispatchEvent('canvas','pointercancel',{pointerId:1});await page.mouse.up();await status('기회 종료');console.log('PASS browser pointercancel');
+    await round();await move(520,570);await page.mouse.down();await move(-40,570);await page.mouse.up();await status('기회 종료');console.log('PASS browser canvas exit cancels capture');
+    await round(1);await move(835,570);await page.mouse.down();await move(335,355,8);await page.waitForTimeout(180);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await page.mouse.up();await status('피격');console.log('PASS browser focus loss releases defense');
+    await page.locator('#mute').click();assert.equal(await page.locator('#mute').getAttribute('aria-pressed'),'true');
+    await page.locator('#motion').check();await round();await move(520,570);await page.mouse.down();await move(795,310,5);await status('명중');await page.mouse.up();console.log('PASS browser mute and reduced motion controls');
+    const retina=await browser.newPage({viewport:{width:1280,height:1000},deviceScaleFactor:2});await retina.goto(url);await retina.locator('[data-hand="0"]').click();await retina.waitForTimeout(750);assert.equal(await retina.locator('canvas').evaluate(c=>c.width),Math.round(await retina.locator('canvas').evaluate(c=>c.clientWidth)*2));await retina.close();console.log('PASS browser DPR 2 render at 1280px');
     await page.locator('#reset').click();await move(520,570);await page.mouse.down();await page.mouse.up();await status('조기 출발');console.log('PASS browser premature grab');
     assert.deepEqual(errors,[]);console.log('PASS no browser script errors');
   }finally{await browser.close();}
