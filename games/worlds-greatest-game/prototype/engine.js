@@ -59,7 +59,7 @@
         const pickup=450,windEnd=C.enemyStrikeMs-260,wind={x:480,y:210};
         if(elapsed<220){mode='rps';target=C.enemyRps;}
         else if(elapsed<pickup){mode='reach';target=mix(C.enemyRps,C.hammerHome,ease((elapsed-220)/(pickup-220)));}
-        else{kind='hammer';mode='tool';target=elapsed<windEnd?mix(C.hammerHome,wind,ease((elapsed-pickup)/(windEnd-pickup))):mix(wind,{x:C.playerHead.x-40,y:(m.equipped||m.result==='block'?C.playerHead.y-C.playerHead.r+7:C.playerHead.y)+C.hammerLength},ease((elapsed-windEnd)/(C.enemyStrikeMs-windEnd)));}
+        else{kind='hammer';mode='tool';target=elapsed<windEnd?mix(C.hammerHome,wind,ease((elapsed-pickup)/(windEnd-pickup))):mix(wind,{x:C.playerCrown.x-40,y:C.playerCrown.y+C.hammerLength},ease((elapsed-windEnd)/(C.enemyStrikeMs-windEnd)));}
       }else if(guarding){
         const start=C.enemyGuardMs-600,pickup=C.enemyGuardMs-370;
         if(elapsed<start){mode='rps';target=C.enemyRps;}
@@ -95,12 +95,13 @@
       return 'rps';
     }
     const f=enemyFrame(m),elapsed=m.time-m.reactAt;
-    if(f.kind==='hammer')return elapsed>=C.enemyStrikeMs-120?'hammer-strike':elapsed>=620?'hammer-lift':'hammer-pickup';
+    if(f.kind==='hammer')return elapsed>=C.enemyStrikeMs?'hammer-strike':elapsed>=620?'hammer-lift':'hammer-pickup';
     if(f.kind==='pot')return elapsed>=C.enemyGuardMs-100?'pot-wear':'pot-pickup';
     return 'rps';
   }
   class Match {
     constructor(random = Math.random) { this.random = random; this.reset(); }
+    get energy() { return { player: Math.max(0,C.maxEnergy-this.score.enemy*C.hitDamage), enemy: Math.max(0,C.maxEnergy-this.score.player*C.hitDamage) }; }
     reset() {
       this.phase = 'select'; this.time = 0; this.round = 1;
       this.player = null; this.enemy = null; this.result = null;
@@ -128,7 +129,7 @@
         const elapsed=this.time-this.reactAt;
         if(this.rule==='tie'&&elapsed>=C.tieMs)this.resolve('tie');
         else if(this.rule==='lose'&&elapsed>=C.enemyStrikeMs){
-          this.contact={...C.playerHead};
+          this.contact={...C.playerCrown};
           this.resolve(this.equipped&&this.readyAt<=this.reactAt+C.enemyStrikeMs?'block':'hurt');
         }else if(elapsed>=C.reactMs)this.resolve('miss');
       }
@@ -177,10 +178,10 @@
       this.trace=this.trace.filter(p=>now-p.t<160).slice(-24);
       if(this.held==='pot')this.updateEquip();
       else {
-        const head=enemyFrame(this).head;
+        const head=C.enemyCrown;
         if(this.pathLength>=C.swingMinLength&&length/dt*1000>=C.swingMinSpeed&&
           (tip.x-previous.x)*(head.x-previous.x)+(tip.y-previous.y)*(head.y-previous.y)>0&&
-          segmentCircle(previous,tip,head,C.enemyHead.r+C.hammerRadius)) {
+          segmentCircle(previous,tip,head,C.enemyCrown.r+C.hammerRadius)) {
           this.contact={...head};this.resolve(this.time-this.reactAt>=C.enemyGuardMs?'guarded':'hit');
         }
       }

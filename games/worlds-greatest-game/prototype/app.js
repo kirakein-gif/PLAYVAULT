@@ -44,10 +44,10 @@
     ctx.setTransform(canvas.width/C.width,0,0,canvas.height/C.height,0,0);render(ctx,visual,options);
     document.querySelectorAll('[data-hand]').forEach(b=>b.disabled=match.phase!=='select');
     const resultCopy={hit:'뿅! · 명중',block:'깡! · 방어',guarded:'깡! · 상대가 막았습니다',hurt:'뿅! · 피격',miss:'휙 · 빗나감 / 공격 기회 종료',tie:'동시에 손을 거두었습니다',foul:`삐익! · 파울: ${match.reason}`};
-    $('#status').textContent=match.phase==='end'?(match.score.player>=C.targetScore?'연수 경기 종료 · 도전자 3점':'연수 경기 종료 · 최주임 3점'):match.phase==='resolve'?resultCopy[match.result]:match.phase==='select'?'가위 · 바위 · 보를 선택하세요.':match.phase==='reveal'?'양쪽 손을 보세요.':'손을 보고 직접 판단하세요. 손잡이를 누른 채 움직이세요.';
+    $('#status').textContent=match.phase==='end'?(match.energy.enemy===0?'연수 경기 종료 · 도전자 승리':'연수 경기 종료 · 최주임 승리'):match.phase==='resolve'?resultCopy[match.result]:match.phase==='select'?'가위 · 바위 · 보를 선택하세요.':match.phase==='reveal'?'양쪽 손을 보세요.':'손을 보고 직접 판단하세요. 손잡이를 누른 채 움직이세요.';
     if(options.preview)$('#status').textContent='정지 포즈 · '+(options.preview.near?'주인공':'최주임')+' · '+({'hammer-pickup':'망치 잡기','hammer-lift':'망치 들기','hammer-strike':'망치 내려치기','pot-pickup':'냄비 잡기','pot-wear':'냄비 착용'})[options.preview.state];
     $('#next').hidden=match.phase!=='resolve'||match.time-match.resolvedAt<C.recoverMs;
-    $('#playerScore').textContent=match.score.player;$('#enemyScore').textContent=match.score.enemy;
+    $('#playerScore').textContent=match.energy.player;$('#enemyScore').textContent=match.energy.enemy;
     $('#round').textContent=`연수 경기 · ROUND ${String(match.round).padStart(2,'0')}`;
     requestAnimationFrame(frame);
   }

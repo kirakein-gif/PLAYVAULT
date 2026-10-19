@@ -9,9 +9,17 @@
     ctx.save();ctx.clearRect(0,0,1200,720);
     ctx.drawImage(art.images.office,0,0,1200,720);
     ctx.fillStyle='#e9dfcf1a';ctx.fillRect(0,0,1200,720);
+    // A wider static contact shot leaves room above both crowns for the mallet.
+    const wideShot=ep==='hammer-strike'||pp==='hammer-strike';
+    function drawActor(state,near){ctx.save();if(wideShot){ctx.translate(108,110);ctx.scale(.82,.82);}actor(state,near);ctx.restore();}
     function sprite(name,x,y,w,h){const s=art.sprites[name];ctx.drawImage(s.image,...s.rect,x,y,w,h);}
     function actor(state,near){
       if(state==='rps'){rpsActor({value:near?m.player:m.enemy},near);return;}
+      if(state==='hammer-strike'){
+        const img=art.images[(near?'player':'enemy')+'-crown-strike'],scale=.65;
+        const contact=near?C.enemyCrown:C.playerCrown,source=near?[130,306]:[1116,300];
+        ctx.drawImage(img,contact.x-source[0]*scale,contact.y-source[1]*scale,img.naturalWidth*scale,img.naturalHeight*scale);return;
+      }
       const frames=['hammer-pickup','hammer-lift','hammer-strike','pot-pickup','pot-wear','idle'],i=frames.indexOf(state);
       const anchors=near?[[315,170],[288,175],[301,172],[315,150],[288,175],[315,170]]:[[315,165],[315,190],[300,190],[315,125],[320,160],[290,165]];
       const scale=near?1.45:1.15,head=near?C.playerHead:C.enemyHead;
@@ -45,7 +53,7 @@
       oval(0,-7,64,16,'#d7d6cd','#65645c');oval(0,-8,56,11,'#8d8b83');line([[-44,-10],[-20,-15],[20,-14]],'#efebdb',2);
       line([[59,-1],[80,0]],'#666861',8);line([[61,-2],[79,-2]],'#e3e0d3',3);line([[-60,-1],[-79,-1]],'#666861',8);line([[-62,-2],[-78,-2]],'#e3e0d3',3);ctx.restore();
     }
-    actor(ep,false);
+    drawActor(ep,false);
     // Authored tabletop perspective, warm grain, bevel and contact shadows.
     const corners=C.table.map(p=>[p.x,p.y]),[a,b,c,d]=corners;
     ctx.save();ctx.beginPath();ctx.moveTo(...a);corners.slice(1).forEach(p=>ctx.lineTo(...p));ctx.closePath();ctx.clip();
@@ -70,15 +78,27 @@
       for(const points of contours){ctx.moveTo(...points[0]);points.slice(1).forEach(p=>ctx.lineTo(...p));ctx.closePath();}
       ctx.clip();actor(ep,false);ctx.restore();
     }
-    actor(pp,true);
+    drawActor(pp,true);
+    function energyBar(near){
+      const value=m.energy[near?'player':'enemy'];
+      const x=wideShot?(near?860:ep==='hammer-strike'?700:450):(near?C.playerHead.x:C.enemyHead.x);
+      const y=wideShot?(near?16:ep==='hammer-strike'?120:12):(near?68:12),w=220,h=16;
+      ctx.fillStyle='#15252be8';ctx.fillRect(x-w/2-4,y-4,w+8,h+8);
+      ctx.fillStyle='#46535a';ctx.fillRect(x-w/2,y,w,h);
+      ctx.fillStyle=value>50?'#69b99b':value>25?'#e6bc65':'#df6a59';ctx.fillRect(x-w/2,y,w*value/C.maxEnergy,h);
+      ctx.strokeStyle='#e9dfc2';ctx.lineWidth=1;ctx.strokeRect(x-w/2,y,w,h);
+      ctx.fillStyle='#15252be8';ctx.fillRect(x-70,y+h+4,140,21);
+      text((near?'도전자':'최주임')+' · '+value+'/'+C.maxEnergy,x,y+h+20,14,'#f4e8ce');
+    }
+    energyBar(false);energyBar(true);
     if(!options.preview&&!m.held&&['select','react'].includes(m.phase))for(const [p,label]of [[C.hammerHome,'망치'],[C.potHome,'냄비']]){
       oval(p.x,p.y,23,23,'#ffedbe0c','#d5bd8c');text(label,p.x,p.y+42,13,'#3d3329');
     }
     if(m.phase==='react'){
-      const hands=['가위','바위','보'];text('최주임 · '+hands[m.enemy],C.enemyHead.x,66,15);text('내 패 · '+hands[m.player],C.playerHead.x,68,15);
+      const hands=['가위','바위','보'];text('최주임 · '+hands[m.enemy],C.enemyHead.x,70,15);text('내 패 · '+hands[m.player],C.playerHead.x,127,15);
       line([[380,699],[800,699]],'#4b3e2c44',4);line([[380,699],[380+420*Math.max(0,1-(t-m.reactAt)/C.reactMs),699]],'#f2d292',4);
     }
-    if(m.phase==='resolve')text(({hit:'뿅!',hurt:'뿅!',block:'깡!',guarded:'깡!',foul:'파울',tie:'재경기',miss:'휙…'})[m.result],650,130,34,'#5e3728');
+    if(m.phase==='resolve')text(({hit:'뿅!',hurt:'뿅!',block:'깡!',guarded:'깡!',foul:'파울',tie:'재경기',miss:'휙…'})[m.result],650,ep==='hammer-strike'?90:130,34,'#5e3728');
     ctx.restore();
   };
 })();
