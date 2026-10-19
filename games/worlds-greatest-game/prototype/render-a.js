@@ -62,7 +62,10 @@
         const depth=near&&p.kind==='pot'?1+(WGG.potFrame(p.wrist).scale-1)*.35:1;
         const scale=(near?.40:.34)*depth,width=s.rect[2]*scale,height=s.rect[3]*scale;
       segment(prefix+'Upper',p.shoulder,p.elbow,w);
-      const grip=p.kind!==null,angle=grip&&p.kind==='hammer'?(p.angle??-Math.PI/2)+Math.PI/2:0;
+      const grip=p.kind!==null;
+      // RPS fingers point across the table toward the other person, rather
+      // than toward the ceiling. Keep the wrist anchored to the same arm.
+      const angle=p.mode==='rps'?(near?-1.3:1.65):grip&&p.kind==='hammer'?(p.angle??-Math.PI/2)+Math.PI/2:0;
       const base=grip?{x:p.wrist.x-Math.sin(angle)*height*.48,y:p.wrist.y+Math.cos(angle)*height*.48}:p.wrist;
       segment(prefix+'Fore',p.elbow,base,w*.76);
       if(p.kind==='hammer')hammer(p.wrist,p.angle??-Math.PI/2);

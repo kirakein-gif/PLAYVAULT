@@ -27,15 +27,17 @@ const C=require('../config.js');
     await snap('01-arena');
     // Render fixed recoil ages so visual QA covers the join throughout impact,
     // independently of requestAnimationFrame timing and the brief hit stop.
-    if(dest)for(const age of [0,150,290,430]){
-      await page.evaluate(age=>{
-        const m=new WGG.Match(()=>2/3);m.choose(0);
-        m.phase='resolve';m.result='hit';m.resolvedAt=100;m.time=100+age;
+    const poses=[...[0,150,290,430].map(age=>({name:`neck-recoil-${age}`,age})),
+      ...[0,1,2].map(hand=>({name:`forward-rps-${hand}`,hand}))];
+    if(dest)for(const pose of poses){
+      await page.evaluate(pose=>{
+        const m=new WGG.Match(()=>((pose.hand??0)+1)%3/3);m.choose(pose.hand??0);
+        if(pose.age!==undefined){m.phase='resolve';m.result='hit';m.resolvedAt=100;m.time=100+pose.age;}
         const c=document.createElement('canvas');c.width=1200;c.height=720;
         c.id='pose-capture';c.style.cssText='position:fixed;top:0;left:0;width:1200px;height:720px;z-index:9999';
         document.body.append(c);WGG.render(c.getContext('2d'),m,{reduced:true});
-      },age);
-      await page.locator('#pose-capture').screenshot({path:path.join(dest,`neck-recoil-${age}.png`)});
+      },pose);
+      await page.locator('#pose-capture').screenshot({path:path.join(dest,`${pose.name}.png`)});
       await page.locator('#pose-capture').evaluate(c=>c.remove());
     }
     await page.evaluate(()=>{globalThis.inputLog=[];for(const method of ['grab','move','release']){const original=WGG.Match.prototype[method];WGG.Match.prototype[method]=function(...args){const r=original.apply(this,args);globalThis.inputLog.push({method,args,phase:this.phase,tool:this.tool,tip:this.tip(),rule:this.rule,result:this.result,held:this.held});return r;};}});
