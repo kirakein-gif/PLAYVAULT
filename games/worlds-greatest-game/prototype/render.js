@@ -1,6 +1,6 @@
 (function(root){
   'use strict';
-  const {C,clamp,reach,ik}=root.WGG;
+  const {C,clamp,reach,ik,dist}=root.WGG;
   const names=['가위','바위','보'];
   // Every wrist, including AI and free hands, has a fixed-length two-bone arm.
   function armPose(shoulder,target,a,b,bend=1){
@@ -12,32 +12,43 @@
     const resolving=m.phase==='resolve'||m.phase==='end';
     const age=resolving?Math.max(0,m.time-m.resolvedAt):0;
     const recovery=clamp(age/260,0,1),rest={x:555,y:650};
-    let kind=null,target=rest,mode='idle';
+    let kind=null,target=rest,mode='idle',pole=0;
     const mix=(a,b,p)=>({x:a.x+(b.x-a.x)*p,y:a.y+(b.y-a.y)*p});
     if(m.phase==='react'&&m.rule==='lose'||resolving&&['hurt','block'].includes(m.result)){
       mode='tool';kind='hammer';const pickup=450,wind=clamp((elapsed-pickup)/(C.enemyStrikeMs-260-pickup),0,1),swing=clamp((elapsed-C.enemyStrikeMs+260)/260,0,1);
+      pole=1-wind;
       const blocked=m.result==='block'||m.phase==='react'&&m.equipped;
       target={x:C.hammerHome.x+(610-C.hammerHome.x)*wind+(C.playerHead.x-610)*swing,y:C.hammerHome.y+(155-C.hammerHome.y)*wind+((blocked?C.playerHead.y-C.playerHead.r+7:C.playerHead.y)+C.hammerLength-155)*swing};
-      if(!resolving&&elapsed<pickup){kind=null;mode=elapsed<220?'rps':'reach';target=elapsed<220?C.enemyRps:mix(C.enemyRps,C.hammerHome,clamp((elapsed-220)/(pickup-220),0,1));}
+      if(!resolving&&elapsed<pickup){kind=null;mode=elapsed<220?'rps':'reach';pole=clamp((elapsed-220)/(pickup-220),0,1);target=elapsed<220?C.enemyRps:mix(C.enemyRps,C.hammerHome,pole);}
     }else if(m.phase==='react'&&m.rule==='win'||resolving&&m.result==='guarded'){
       const start=C.enemyGuardMs-600,pickup=C.enemyGuardMs-370;
-      if(!resolving&&elapsed<pickup){mode=elapsed<start?'rps':'reach';target=elapsed<start?C.enemyRps:mix(C.enemyRps,C.potHome,clamp((elapsed-start)/(pickup-start),0,1));}
-      else{kind='pot';mode='tool';const p=resolving?1:clamp((elapsed-pickup)/(C.enemyGuardMs-pickup),0,1);target=mix(C.potHome,{x:C.enemyHead.x+C.potOffset,y:C.enemyHead.y-C.enemyHead.r+7},p);}
+      if(!resolving&&elapsed<pickup){mode=elapsed<start?'rps':'reach';pole=clamp((elapsed-start)/(pickup-start),0,1);target=elapsed<start?C.enemyRps:mix(C.enemyRps,C.potHome,pole);}
+      else{kind='pot';mode='tool';const p=resolving?1:clamp((elapsed-pickup)/(C.enemyGuardMs-pickup),0,1);pole=1-p;target=mix(C.potHome,{x:C.enemyHead.x+C.potOffset,y:C.enemyHead.y-C.enemyHead.r+7},p);}
     }else if(m.phase==='react'){mode='rps';target=C.enemyRps;}
     if(resolving){
       if(mode!=='idle'){target=mix(target,rest,recovery);mode=recovery===1?'idle':'recover';}
       if(recovery===1)kind=null;
+      pole=recovery;
     }
-    return {...armPose(C.enemyShoulder,target,C.enemyUpperArm,C.enemyForearm,1),kind,mode,visible:mode!=='idle',value:mode==='rps'?m.enemy:null};
+    let shoulder={...C.enemyShoulder};
+    if(kind==='hammer')shoulder.x+=clamp((target.x-shoulder.x-250)*.55,0,95);
+    const blend=mode==='rps'?0:mode==='reach'?pole:1;
+    const a=C.rpsUpperArm+(C.enemyUpperArm-C.rpsUpperArm)*blend,b=C.rpsForearm+(C.enemyForearm-C.rpsForearm)*blend;
+    const pose=armPose(shoulder,target,a,b,1),other=ik(shoulder,pose.wrist,a,b,-1);
+    // Rotation into depth changes projected lengths, rather than flipping the elbow.
+    pose.elbow=mix(pose.elbow,other,pole);
+    pose.a=dist(shoulder,pose.elbow);pose.b=dist(pose.elbow,pose.wrist);
+    return {...pose,kind,mode,visible:mode!=='idle',value:mode==='rps'?m.enemy:null};
   }
   function playerPose(m){
     const age=Math.max(0,m.time-m.resolvedAt),frozen=['resolve','end'].includes(m.phase)&&age<240?m.frozenTool:null;
     let mode='idle',target={x:810,y:665},kind=null,angle=-Math.PI/2;
     if(m.held){mode='tool';target={...m.tool};kind=m.held;angle=m.tool.angle;
-      if(kind==='pot'&&m.equipped){const p=clamp((m.time-m.readyAt)/C.snapMs,0,1);target={x:m.snapFrom.x+(C.playerHead.x+C.potOffset-m.snapFrom.x)*p,y:m.snapFrom.y+(C.playerHead.y-C.playerHead.r+7-m.snapFrom.y)*p};}
+      if(kind==='pot'&&m.equipped){const p=clamp((m.time-m.readyAt)/C.snapMs,0,1);target={x:m.snapFrom.x+(C.playerHead.x+C.potWearOffset-m.snapFrom.x)*p,y:m.snapFrom.y+(C.playerHead.y-C.playerHead.r+7-m.snapFrom.y)*p};}
     }else if(frozen){mode='recover';kind=frozen.kind;angle=frozen.angle;const p=clamp(age/240,0,1);target={x:frozen.x+(810-frozen.x)*p,y:frozen.y+(665-frozen.y)*p};}
     else if(m.phase==='react'){mode='rps';target=C.playerRps;}
-    const pose=armPose(C.shoulder,target,C.upperArm,C.forearm,kind==='pot'?1:-1);
+    const rig=mode==='rps'?{shoulder:C.shoulder,a:C.rpsUpperArm,b:C.rpsForearm}:root.WGG.playerRig(target,kind);
+    const pose=armPose(rig.shoulder,target,rig.a,rig.b,kind==='pot'?1:-1);
     return {...pose,kind,angle,mode,visible:mode!=='idle',value:mode==='rps'?m.player:null};
   }
   function render(ctx,m,options={}){

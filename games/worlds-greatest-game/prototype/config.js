@@ -7,13 +7,16 @@
     swingMinLength: 90, swingMinSpeed: 460, hammerRadius: 29,
     equipRadius: 38, equipMs: 70, snapMs: 90,
     hitstopMs: 85, targetScore: 3,
-    playerHead: { x: 850, y: 400, r: 85 },
-    enemyHead: { x: 490, y: 210, r: 76 },
-    shoulder: { x: 730, y: 500 }, upperArm: 155, forearm: 160,
-    enemyShoulder: { x: 555, y: 370 }, enemyUpperArm: 165, enemyForearm: 175,
-    hammerHome: { x: 560, y: 515 }, potHome: { x: 740, y: 535 },
-    enemyRps: { x: 650, y: 365 }, playerRps: { x: 695, y: 450 },
-    table: [{x:390,y:480},{x:1000,y:450},{x:1090,y:600},{x:350,y:630}],
+    playerHead: { x: 920, y: 270, r: 110 },
+    enemyHead: { x: 420, y: 210, r: 76 },
+    shoulder: { x: 805, y: 520 }, upperArm: 155, forearm: 165,
+    enemyShoulder: { x: 535, y: 365 }, enemyUpperArm: 165, enemyForearm: 175,
+    rpsUpperArm: 85, rpsForearm: 105,
+    potUpperArm: 220, potForearm: 235, potWearOffset: 160,
+    hammerHome: { x: 530, y: 540 }, potHome: { x: 715, y: 480 },
+    hammerHomeAngle: -2.9,
+    enemyRps: { x: 620, y: 350 }, playerRps: { x: 650, y: 430 },
+    table: [{x:80,y:485},{x:840,y:395},{x:1200,y:650},{x:0,y:720}],
     hammerLength: 95, potOffset: 80, grabRadius: 35
   };
   if (typeof module === 'object') module.exports = config;

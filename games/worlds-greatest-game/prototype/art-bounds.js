@@ -1,0 +1,9 @@
+WGG.ART_BOUNDS={
+  enemyHurt:[193,73,894,1106],
+  enemyHead:[119,51,435,538],enemyBody:[648,113,584,485],
+  playerHead:[98,671,529,520],playerBody:[627,783,610,390],
+  beigeUpper:[138,10,199,423],beigeFore:[566,17,177,411],
+  navyUpper:[1014,7,203,419],navyFore:[1456,13,172,417],
+  rock:[106,545,249,285],scissors:[574,464,183,377],
+  paper:[970,455,328,388],grip:[1455,514,174,318]
+};

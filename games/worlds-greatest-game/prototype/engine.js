@@ -21,6 +21,26 @@
     const angle=theta+bend*Math.acos(clamp((a*a+d*d-b*b)/(2*a*d),-1,1));
     return {x:shoulder.x+Math.cos(angle)*a,y:shoulder.y+Math.sin(angle)*a};
   }
+  // Projected shoulder travel represents leaning/raising the near shoulder.
+  // RPS has its own foreshortened authored pose; reach never stretches a bone.
+  function playerRig(target,kind){
+    const s={...C.shoulder};
+    if(kind==='pot'){
+      const depth=clamp(dist(s,target)/(C.potUpperArm+C.potForearm)*1.3,.4,1);
+      return {shoulder:s,a:C.potUpperArm*depth,b:C.potForearm*depth};
+    }else{
+      s.x-=clamp((s.x-target.x)*.35,0,135);
+      s.y-=clamp((s.y-target.y)*.16,0,35);
+    }
+    const depth=clamp(dist(s,target)/(C.upperArm+C.forearm)*1.35,.48,1);
+    return {shoulder:s,a:C.upperArm*depth,b:C.forearm*depth};
+  }
+  function potFrame(tool){
+    const crown=C.playerHead.y-C.playerHead.r+7;
+    const depth=clamp((C.potHome.y-tool.y)/(C.potHome.y-crown),0,1);
+    const offset=C.potOffset+(C.potWearOffset-C.potOffset)*depth;
+    return {offset,scale:offset/C.potOffset};
+  }
   class Match {
     constructor(random = Math.random) { this.random = random; this.reset(); }
     reset() {
@@ -58,7 +78,7 @@
     }
     tip(tool=this.tool) {
       if(!tool)return null;
-      return this.held==='pot'?{x:tool.x-C.potOffset,y:tool.y}:
+      return this.held==='pot'?{x:tool.x-potFrame(tool).offset,y:tool.y}:
         {x:tool.x+Math.cos(tool.angle)*C.hammerLength,y:tool.y+Math.sin(tool.angle)*C.hammerLength};
     }
     grab(p,id,now) {
@@ -72,7 +92,7 @@
       }
       this.held=kind;this.pointerId=id;
       const home=kind==='hammer'?C.hammerHome:C.potHome;
-      this.tool={...home,angle:-Math.PI/2};this.lastMove=this.time;this.pathLength=0;
+      this.tool={...home,angle:kind==='hammer'?C.hammerHomeAngle:-Math.PI/2};this.lastMove=this.time;this.pathLength=0;
       this.offset={x:home.x-p.x,y:home.y-p.y};
       this.trace=[{...this.tip(),t:now}];this.events.push('grab');return true;
     }
@@ -81,7 +101,9 @@
       now=this.time;
       if(!this.held||id!==this.pointerId||this.phase!=='react')return false;
       const previous=this.tip(), old=this.tool, dt=Math.max(1,now-this.lastMove);
-      const wrist=reach({x:p.x+this.offset.x,y:p.y+this.offset.y});
+      const requested={x:p.x+this.offset.x,y:p.y+this.offset.y};
+      const rig=playerRig(requested,this.held);
+      const wrist=reach(requested,rig.shoulder,rig.a,rig.b);
       const vx=(wrist.x-old.x)/dt*1000;
       const target=-Math.PI/2+clamp(vx/1800,-.8,.8);
       const angle=this.held==='hammer'?old.angle+(target-old.angle)*Math.min(1,dt/65):0;
@@ -128,7 +150,7 @@
     }
     drainEvents() { return this.events.splice(0); }
   }
-  const api = { Match, C, dist, clamp, outcome, segmentCircle, reach, ik };
+  const api = { Match, C, dist, clamp, outcome, segmentCircle, reach, ik, playerRig, potFrame };
   if (typeof module === 'object') module.exports = api;
   else root.WGG = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
