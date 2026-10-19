@@ -13,7 +13,7 @@
     enemyShoulder: { x: 555, y: 370 }, enemyUpperArm: 165, enemyForearm: 175,
     hammerHome: { x: 560, y: 515 }, potHome: { x: 740, y: 535 },
     enemyRps: { x: 650, y: 365 }, playerRps: { x: 695, y: 450 },
-    table: [{x:520,y:500},{x:680,y:440},{x:1000,y:650},{x:810,y:730}],
+    table: [{x:390,y:480},{x:1000,y:450},{x:1090,y:600},{x:350,y:630}],
     hammerLength: 95, potOffset: 80, grabRadius: 35
   };
   if (typeof module === 'object') module.exports = config;
