@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const art=WGG.art={ready:false,failed:false,images:{},sprites:{},loading:null};
-  art.loading=Promise.all(['office','enemy-rps','player-rps','enemy-stills','player-stills','enemy-crown-strike','player-crown-strike'].map(name=>new Promise((resolve,reject)=>{
+  art.loading=Promise.all(['office','table-horizontal','enemy-rps','player-rps','enemy-stills','player-stills','enemy-crown-compact','player-crown-compact'].map(name=>new Promise((resolve,reject)=>{
     const img=new Image();img.onload=()=>{art.images[name]=img;resolve();};img.onerror=()=>reject(new Error(name));img.src=`assets/approved-a/${name}.png`;
   }))).then(()=>{
     for(const side of ['enemy','player'])for(let hand=0;hand<3;hand++){

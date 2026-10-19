@@ -20,7 +20,7 @@
     hammerHome: { x: 480, y: 610 }, potHome: { x: 675, y: 540 },
     hammerHomeAngle: -2.9,
     enemyRps: { x: 400, y: 425 }, playerRps: { x: 755, y: 470 },
-    table: [{x:50,y:555},{x:840,y:465},{x:1250,y:720},{x:-100,y:790}],
+    table: [{x:96,y:540},{x:1104,y:540},{x:1420,y:800},{x:-220,y:800}],
     hammerLength: 95, potOffset: 80, grabRadius: 35
   };
   if (typeof module === 'object') module.exports = config;

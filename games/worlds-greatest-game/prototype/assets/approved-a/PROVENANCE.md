@@ -1,5 +1,7 @@
 # A안 게임 아트 제작 기록
 
+v0.13 수평 테이블과 짧은 뿅망치 타격 그림의 출처·전체 프롬프트는 [STAGE_PROVENANCE.md](STAGE_PROVENANCE.md)에 기록했습니다. 현재는 `table-horizontal`과 `*-crown-compact`를 사용하며 이전 strike 파일은 이력으로 보존합니다.
+
 v0.11 정수리 내려치기 단일 이미지의 출처와 프롬프트는 [CROWN_PROVENANCE.md](CROWN_PROVENANCE.md)에 기록했습니다. 현재 로더는 이전 5개 이미지에 `enemy-crown-strike`, `player-crown-strike`를 추가합니다.
 
 v0.10 완성형 정지 포즈와 전체 프롬프트는 [STILLS_PROVENANCE.md](STILLS_PROVENANCE.md)에 기록했습니다. 현재 실행 페이지는 office / enemy-rps / player-rps / enemy-stills / player-stills만 로드합니다. 아래 설명은 이전 버전의 제작 이력입니다.

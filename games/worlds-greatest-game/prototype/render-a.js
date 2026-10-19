@@ -9,14 +9,13 @@
     ctx.save();ctx.clearRect(0,0,1200,720);
     ctx.drawImage(art.images.office,0,0,1200,720);
     ctx.fillStyle='#e9dfcf1a';ctx.fillRect(0,0,1200,720);
-    // A wider static contact shot leaves room above both crowns for the mallet.
-    const wideShot=ep==='hammer-strike'||pp==='hammer-strike';
-    function drawActor(state,near){ctx.save();if(wideShot){ctx.translate(108,110);ctx.scale(.82,.82);}actor(state,near);ctx.restore();}
+    // Every action uses the same stage coordinates; contact never zooms the scene.
+    function drawActor(state,near){actor(state,near);}
     function sprite(name,x,y,w,h){const s=art.sprites[name];ctx.drawImage(s.image,...s.rect,x,y,w,h);}
     function actor(state,near){
       if(state==='rps'){rpsActor({value:near?m.player:m.enemy},near);return;}
       if(state==='hammer-strike'){
-        const img=art.images[(near?'player':'enemy')+'-crown-strike'],scale=.65;
+        const img=art.images[(near?'player':'enemy')+'-crown-compact'],scale=near?.72:.65;
         const contact=near?C.enemyCrown:C.playerCrown,source=near?[130,306]:[1116,300];
         ctx.drawImage(img,contact.x-source[0]*scale,contact.y-source[1]*scale,img.naturalWidth*scale,img.naturalHeight*scale);return;
       }
@@ -33,7 +32,6 @@
       const name=(near?'player':'enemy')+'Rps'+p.value,inset=art.sprites[name].inset;
       sprite(name,head.x+(inset-anchors[p.value])*scale,near?105:80,(724-inset)*scale,724*scale);
     }
-    function poly(points,fill,stroke='#594a3b',width=2){ctx.beginPath();ctx.moveTo(...points[0]);points.slice(1).forEach(p=>ctx.lineTo(...p));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.stroke();}}
     function line(p,c,w=2){ctx.beginPath();ctx.moveTo(...p[0]);p.slice(1).forEach(q=>ctx.lineTo(...q));ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap='round';ctx.stroke();}
     function oval(x,y,rx,ry,fill,stroke=null){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke();}}
     function text(s,x,y,size=16,color='#342e28'){ctx.font=`600 ${size}px "Malgun Gothic",sans-serif`;ctx.textAlign='center';ctx.fillStyle=color;ctx.fillText(s,x,y);}
@@ -54,15 +52,14 @@
       line([[59,-1],[80,0]],'#666861',8);line([[61,-2],[79,-2]],'#e3e0d3',3);line([[-60,-1],[-79,-1]],'#666861',8);line([[-62,-2],[-78,-2]],'#e3e0d3',3);ctx.restore();
     }
     drawActor(ep,false);
-    // Authored tabletop perspective, warm grain, bevel and contact shadows.
-    const corners=C.table.map(p=>[p.x,p.y]),[a,b,c,d]=corners;
-    ctx.save();ctx.beginPath();ctx.moveTo(...a);corners.slice(1).forEach(p=>ctx.lineTo(...p));ctx.closePath();ctx.clip();
-    const wood=ctx.createLinearGradient(0,390,1200,720);wood.addColorStop(0,'#c4a27a');wood.addColorStop(.55,'#ae865f');wood.addColorStop(1,'#c4a17a');ctx.fillStyle=wood;ctx.fillRect(0,390,1200,330);
-    for(let i=0;i<65;i++){const y=402+i*5.5;ctx.beginPath();ctx.moveTo(-100,y+95);ctx.bezierCurveTo(300,y+56+Math.sin(i)*5,700,y+8,1300,y-24);ctx.strokeStyle=i%4?'#5b3c2515':'#f3d0a135';ctx.lineWidth=i%4?.7:1.5;ctx.stroke();}
-    ctx.restore();poly([d,c,[c[0],c[1]+20],[d[0],d[1]+20]],'#765b40');line([a,b],'#ddc09a',4);line([d,c],'#6f533a',3);
-    for(const [p,rx]of [[C.hammerHome,90],[C.potHome,90]])oval(p.x-(p===C.potHome?C.potOffset*1.25:48),p.y+24,rx,15,'#4f382421');
-    if(!ep.startsWith('hammer')&&!pp.startsWith('hammer'))hammer(C.hammerHome);
-    if(!ep.startsWith('pot')&&!pp.startsWith('pot'))pot(C.potHome);
+    // The long back edge is level at y=540; only the short sides recede.
+    ctx.drawImage(art.images['table-horizontal'],0,165,1200,605);
+    if(!ep.startsWith('hammer')&&!pp.startsWith('hammer')){
+      oval(C.hammerHome.x-48,C.hammerHome.y+24,90,13,'#4f38242c');hammer(C.hammerHome);
+    }
+    if(!ep.startsWith('pot')&&!pp.startsWith('pot')){
+      oval(C.potHome.x-C.potOffset*1.25,C.potHome.y+78,92,13,'#4f382438');pot(C.potHome);
+    }
     // Repaint the same complete drawing over the tabletop only at the hand/prop
     // region; torso remains behind it. No limb is transformed independently.
     if(ep.endsWith('pickup')){
@@ -81,9 +78,9 @@
     drawActor(pp,true);
     function energyBar(near){
       const value=m.energy[near?'player':'enemy'];
-      const wearing=(near?pp:ep)==='pot-wear';
-      const x=wearing?(near?720:200):wideShot?(near?860:ep==='hammer-strike'?700:450):(near?C.playerHead.x:C.enemyHead.x);
-      const y=wearing?12:wideShot?(near?16:ep==='hammer-strike'?120:12):(near?68:12),w=220,h=16;
+      const overhead=(near?pp:ep)==='pot-wear'||(near?ep:pp)==='hammer-strike';
+      const x=overhead?(near?720:200):(near?C.playerHead.x:C.enemyHead.x);
+      const y=overhead?12:(near?68:12),w=220,h=16;
       ctx.fillStyle='#15252be8';ctx.fillRect(x-w/2-4,y-4,w+8,h+8);
       ctx.fillStyle='#46535a';ctx.fillRect(x-w/2,y,w,h);
       ctx.fillStyle=value>50?'#69b99b':value>25?'#e6bc65':'#df6a59';ctx.fillRect(x-w/2,y,w*value/C.maxEnergy,h);
