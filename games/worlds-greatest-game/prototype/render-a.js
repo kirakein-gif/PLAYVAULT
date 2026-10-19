@@ -36,10 +36,10 @@
       oval(0,-7,64,16,'#d7d6cd','#65645c');oval(0,-8,56,11,'#8d8b83');line([[-44,-10],[-20,-15],[20,-14]],'#efebdb',2);
       line([[59,-1],[80,0]],'#666861',8);line([[61,-2],[79,-2]],'#e3e0d3',3);line([[-60,-1],[-79,-1]],'#666861',8);line([[-62,-2],[-78,-2]],'#e3e0d3',3);ctx.restore();
     }
-    // Far actor is seated; torso lean and head reaction are separate layers.
-    sprite('enemyBody',210+eLean,270+breathe,420,349);
+    // A continuous bust keeps jaw, neck and collar connected during recoil.
     const recoil=m.result==='hit'?Math.sin(clamp(age/430,0,1)*Math.PI):0;
-    ctx.save();ctx.translate(C.enemyHead.x+eLean+recoil*16,C.enemyHead.y+breathe-recoil*6);ctx.rotate(recoil*.1);ctx.scale(1+recoil*.035,1-recoil*.065);sprite(m.result==='hit'&&age<430?'enemyHurt':'enemyHead',-85,-135,170,210);ctx.restore();
+    ctx.save();ctx.translate(420+eLean,495+breathe);ctx.rotate(recoil*.025);
+    sprite(m.result==='hit'&&age<430?'enemyBustHurt':'enemyBust',-225,-420,420,502);ctx.restore();
     // Authored tabletop perspective, warm grain, bevel and contact shadows.
     const corners=C.table.map(p=>[p.x,p.y]),[a,b,c,d]=corners;
     ctx.save();ctx.beginPath();ctx.moveTo(...a);corners.slice(1).forEach(p=>ctx.lineTo(...p));ctx.closePath();ctx.clip();

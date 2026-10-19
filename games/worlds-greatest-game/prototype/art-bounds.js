@@ -1,4 +1,6 @@
 WGG.ART_BOUNDS={
+  enemyBust:[30,34,1099,1324],
+  enemyBustHurt:[30,34,1099,1324],
   enemyHurt:[193,73,894,1106],
   enemyHead:[119,51,435,538],enemyBody:[648,113,584,485],
   playerHead:[98,671,529,520],playerBody:[627,783,610,390],

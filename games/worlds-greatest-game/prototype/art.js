@@ -9,7 +9,7 @@
     rock:['limbs',0,1,4,2],scissors:['limbs',1,1,4,2],
     paper:['limbs',2,1,4,2],grip:['limbs',3,1,4,2]
   };
-  art.loading=Promise.all(['characters','limbs','office','hurt'].map(name=>new Promise((resolve,reject)=>{
+  art.loading=Promise.all(['characters','limbs','office','enemy-bust','enemy-bust-hurt'].map(name=>new Promise((resolve,reject)=>{
     const img=new Image();img.onload=()=>{art.images[name]=img;resolve();};img.onerror=()=>reject(new Error(name));img.src=`assets/approved-a/${name}.png`;
   }))).then(()=>{
     for(const [name,[sheet,col,row,cols,rows]]of Object.entries(layout)){
@@ -17,8 +17,10 @@
       const authored=WGG.ART_BOUNDS?.[name];
       art.sprites[name]={image:img,rect:authored||[col*w+w*.075,row*h+h*.075,w*.85,h*.85]};
     }
-    const hurt=art.images.hurt;
-    art.sprites.enemyHurt={image:hurt,rect:WGG.ART_BOUNDS.enemyHurt||[0,0,hurt.naturalWidth,hurt.naturalHeight]};
+    for(const [name,file]of [['enemyBust','enemy-bust'],['enemyBustHurt','enemy-bust-hurt']]){
+      const img=art.images[file];
+      art.sprites[name]={image:img,rect:WGG.ART_BOUNDS[name]||[0,0,img.naturalWidth,img.naturalHeight]};
+    }
     art.ready=true;
   }).catch(()=>{art.failed=true;});
 })();

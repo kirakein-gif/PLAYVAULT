@@ -12,6 +12,19 @@
 
 ## 생성 프롬프트
 
+### v0.7.1 enemy-bust / enemy-bust-hurt
+
+- 내장 image_gen 편집, 투명 배경. 기존 `characters.png`를 기준으로 연결된 상반신 `enemy-bust.png` 생성. 이를 기준으로 같은 구도의 `enemy-bust-hurt.png` 생성. 두 파일 모두 1145×1374. 원본 PNG는 재가공하지 않았으며 같은 샘플링 영역을 사용합니다.
+- 상대는 이제 머리와 몸통 파츠 및 예전 `hurt.png`를 렌더링하지 않습니다. 새 상반신 전체가 함께 반동합니다. 기존 파츠는 제작 이력으로 보존합니다.
+
+enemy-bust 전체 프롬프트:
+
+Use case: compositing. Edit target: supplied character atlas. Make a NEW single transparent game sprite: combine ONLY the stern dark-haired man's top-left head and top-right beige suit torso into ONE anatomically continuous seated upper-body portrait. Preserve his identity, face, hairstyle, illustrated ink and painted shading style, beige jacket, white shirt and burgundy tie. Head upright at same three-quarter angle looking toward viewer-right, natural complete neck connected seamlessly to shirt collar; absolutely no cut seam, floating head, missing neck or detached skin triangles. Show entire hair to waist, relaxed arms kept at sides, no hands extended. The head and body must be drawn as one continuous connected character. Transparent background, one character centered with generous transparent margins, no other sprites, no table, no text. Keep same head-to-shoulder proportions as reference: head width about 40 percent of shoulder width.
+
+enemy-bust-hurt 전체 프롬프트:
+
+Use case: identity-preserve. Edit target supplied continuous transparent beige-suited man sprite. Change ONLY his facial expression: eyes squeezed shut, brows raised in startled comic pain and mouth slightly open saying ouch, from a harmless toy hammer hit, no injury. Keep EXACT same canvas dimensions, framing, pixel positions, silhouette, head shape, hair, ears, complete neck, continuous collar, beige jacket, shirt, tie, body pose, ink style and shading. No head movement, no neck seam, no head separation, no crop, no added objects or text. Transparent background preserved. This is a registered alternate-expression frame of the identical full upper-body sprite; everything outside eyes eyebrows cheeks and mouth must stay unchanged.
+
 ### characters
 
 Use the supplied A storyboard as an EXACT art/character design reference, not an edit target. Create a production game character-parts ATLAS on a genuinely TRANSPARENT background, square 2048x2048, EXACTLY 2 columns by 2 rows, equal 1024x1024 cells, NO drawn cell borders, NO text, NO shadows cast outside each piece. Every piece stays entirely within its own cell with at least 8% transparent padding. Maintain the beautiful mature semi-realistic Korean comic ink-and-cel-shading style and exact two adult men from the reference. Do not make crude flat vector figures.

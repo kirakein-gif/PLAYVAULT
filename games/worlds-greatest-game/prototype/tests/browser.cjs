@@ -25,6 +25,19 @@ const C=require('../config.js');
     async function round(enemy=2,player=0){await page.locator('#reset').click();await page.evaluate(b=>{globalThis.testEnemy=b;globalThis.inputLog=[];},enemy);await page.locator(`[data-hand="${player}"]`).click();await status('직접 판단');}
     async function snap(name){if(dest)await page.screenshot({path:path.join(dest,`${name}.png`),fullPage:true});}
     await snap('01-arena');
+    // Render fixed recoil ages so visual QA covers the join throughout impact,
+    // independently of requestAnimationFrame timing and the brief hit stop.
+    if(dest)for(const age of [0,150,290,430]){
+      await page.evaluate(age=>{
+        const m=new WGG.Match(()=>2/3);m.choose(0);
+        m.phase='resolve';m.result='hit';m.resolvedAt=100;m.time=100+age;
+        const c=document.createElement('canvas');c.width=1200;c.height=720;
+        c.id='pose-capture';c.style.cssText='position:fixed;top:0;left:0;width:1200px;height:720px;z-index:9999';
+        document.body.append(c);WGG.render(c.getContext('2d'),m,{reduced:true});
+      },age);
+      await page.locator('#pose-capture').screenshot({path:path.join(dest,`neck-recoil-${age}.png`)});
+      await page.locator('#pose-capture').evaluate(c=>c.remove());
+    }
     await page.evaluate(()=>{globalThis.inputLog=[];for(const method of ['grab','move','release']){const original=WGG.Match.prototype[method];WGG.Match.prototype[method]=function(...args){const r=original.apply(this,args);globalThis.inputLog.push({method,args,phase:this.phase,tool:this.tool,tip:this.tip(),rule:this.rule,result:this.result,held:this.held});return r;};}});
     await round();
     assert(!/승리|패배|이겼|졌|망치를|냄비를/.test(await page.locator('#status').innerText()));
