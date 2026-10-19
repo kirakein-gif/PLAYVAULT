@@ -3,6 +3,7 @@
   const config = {
     width: 1200, height: 720,
     revealMs: 0, reactMs: 1700, recoverMs: 300,
+    countdownMs: 3000, autoNextMs: 900,
     enemyGuardMs: 1100, enemyStrikeMs: 1050, tieMs: 450,
     swingMinLength: 90, swingMinSpeed: 460, hammerRadius: 29,
     equipRadius: 38, equipMs: 70, snapMs: 90,

@@ -81,8 +81,9 @@
     drawActor(pp,true);
     function energyBar(near){
       const value=m.energy[near?'player':'enemy'];
-      const x=wideShot?(near?860:ep==='hammer-strike'?700:450):(near?C.playerHead.x:C.enemyHead.x);
-      const y=wideShot?(near?16:ep==='hammer-strike'?120:12):(near?68:12),w=220,h=16;
+      const wearing=(near?pp:ep)==='pot-wear';
+      const x=wearing?(near?720:200):wideShot?(near?860:ep==='hammer-strike'?700:450):(near?C.playerHead.x:C.enemyHead.x);
+      const y=wearing?12:wideShot?(near?16:ep==='hammer-strike'?120:12):(near?68:12),w=220,h=16;
       ctx.fillStyle='#15252be8';ctx.fillRect(x-w/2-4,y-4,w+8,h+8);
       ctx.fillStyle='#46535a';ctx.fillRect(x-w/2,y,w,h);
       ctx.fillStyle=value>50?'#69b99b':value>25?'#e6bc65':'#df6a59';ctx.fillRect(x-w/2,y,w*value/C.maxEnergy,h);
@@ -99,6 +100,11 @@
       line([[380,699],[800,699]],'#4b3e2c44',4);line([[380,699],[380+420*Math.max(0,1-(t-m.reactAt)/C.reactMs),699]],'#f2d292',4);
     }
     if(m.phase==='resolve')text(({hit:'뿅!',hurt:'뿅!',block:'깡!',guarded:'깡!',foul:'파울',tie:'재경기',miss:'휙…'})[m.result],650,ep==='hammer-strike'?90:130,34,'#5e3728');
+    if(options.countdown){
+      oval(600,270,75,75,'#15252be8','#e0c28a');
+      text(String(options.countdown),600,293,68,'#f6dca4');
+      text('가위 · 바위 · 보',600,382,22,'#f6dca4');
+    }
     ctx.restore();
   };
 })();

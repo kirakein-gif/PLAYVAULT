@@ -7,15 +7,15 @@
 </head>
 <body>
   <main>
-    <header><div><small>OFFICE ATHLETICS FEDERATION · INPUT LAB 01</small><h1>세계 최고의 게임</h1></div><span class="build">APPROVED A / 0.11</span></header>
+    <header><div><small>OFFICE ATHLETICS FEDERATION · INPUT LAB 01</small><h1>세계 최고의 게임</h1></div><span class="build">APPROVED A / 0.12</span></header>
     <section class="scoreboard"><span>도전자 에너지 <b id="playerScore">100</b></span><span id="round">연수 경기 · ROUND 01</span><span><b id="enemyScore">100</b> 최주임 에너지</span></section>
     <canvas id="arena" width="1200" height="720" aria-label="A안 우측 어깨너머 시점. 왼쪽 최주임의 표정과 오른쪽 도전자의 뒤통수, 테이블의 도구가 보입니다."></canvas>
     <section class="controls">
       <div id="status" role="status" aria-live="polite">가위 · 바위 · 보를 선택하세요.</div>
       <div class="hands" id="hands"><button data-hand="0">1 · 가위</button><button data-hand="1">2 · 바위</button><button data-hand="2">3 · 보</button></div>
-      <div class="settings"><button id="next" hidden>다음 판</button><button id="reset">경기 다시 시작</button><button id="mute" aria-pressed="false">소리 켜짐</button><label><input type="checkbox" id="motion">화면 흔들림 줄이기</label></div>
+      <div class="settings"><button id="reset">경기 다시 시작</button><button id="mute" aria-pressed="false">소리 켜짐</button><label><input type="checkbox" id="motion">화면 흔들림 줄이기</label></div>
     </section>
-    <details><summary>직접 조작 안내</summary><p>준비 중에는 손을 내리고, 패를 고르면 두 사람이 손을 내밉니다. 이겼으면 망치, 졌으면 냄비, 비겼으면 기다립니다. 손 공개 즉시 도구를 잡을 수 있습니다.</p><p>테이블의 원형 손잡이 영역을 누른 채 움직이세요. 망치는 왼쪽 상대 정수리를 향해 휘두르고, 냄비는 오른쪽 내 머리 위로 옮겨 상대 공격까지 잡고 계세요. 잡기·들기·타격 또는 착용 단계에 맞춰 정지 그림이 바뀝니다. 잘못된 도구와 조기 출발은 파울입니다. Esc는 잡기 취소.</p><p class="note">최주임 1명 · 에너지 100 · 명중/파울 시 25 감소 · 0이면 종료 · 정지 포즈 방식 · 합성 효과음</p></details>
+    <details><summary>직접 조작 안내</summary><p>매 판 3 → 2 → 1 카운트 중 패를 고르세요. 마지막으로 고른 패를 카운트 종료와 함께 내밉니다. 이겼으면 망치, 졌으면 냄비, 비겼으면 기다립니다. 손 공개 즉시 도구를 잡을 수 있습니다. 판정 후에는 다음 판 카운트로 자동 진행합니다.</p><p>테이블의 원형 손잡이 영역을 누른 채 움직이세요. 망치는 왼쪽 상대 정수리를 향해 휘두르고, 냄비는 오른쪽 내 머리 위로 옮겨 상대 공격까지 잡고 계세요. 잡기·들기·타격 또는 착용 단계에 맞춰 정지 그림이 바뀝니다. 잘못된 도구와 조기 출발은 파울입니다. Esc는 잡기 취소.</p><p class="note">최주임 1명 · 에너지 100 · 명중/파울 시 25 감소 · 0이면 종료 · 정지 포즈 방식 · 합성 효과음</p></details>
     <details open><summary>정지 포즈 확인</summary>
       <div class="settings"><label>인물 <select id="poseActor"><option value="player">주인공</option><option value="enemy">최주임</option></select></label>
       <button data-pose="hammer-pickup">망치 · 잡기</button><button data-pose="hammer-lift">망치 · 들기</button><button data-pose="hammer-strike">망치 · 내려치기</button>
@@ -23,6 +23,6 @@
     </details>
     <footer>인류가 찾아낸 궁극의 공정함. <a href="../index.html">v0.1 원본</a></footer>
   </main>
-  <script src="config.js"></script><script src="engine.js"></script><script src="art.js"></script><script src="render-a.js"></script><script src="audio.js"></script><script src="app.js"></script>
+  <script src="config.js"></script><script src="engine.js"></script><script src="round-flow.js"></script><script src="art.js"></script><script src="render-a.js"></script><script src="audio.js"></script><script src="app.js"></script>
 </body>
 </html>

@@ -36,6 +36,13 @@ const C=require('../config.js');
     const still=await page.locator('#arena').screenshot();await page.waitForTimeout(250);
     assert(still.equals(await page.locator('#arena').screenshot()),'pose preview is pixel-stable without animation');
     await page.locator('#poseExit').click();console.log('PASS ten complete still poses and stable preview');
+    await page.evaluate(()=>{globalThis.revealCount=0;const original=WGG.Match.prototype.choose;WGG.Match.prototype.choose=function(...args){globalThis.revealCount++;return original.apply(this,args);};});
+    await page.locator('#reset').click();await status('3 ·');await snap('count-3');
+    await page.locator('[data-hand="0"]').click();assert.equal(await page.evaluate(()=>globalThis.revealCount),0);
+    await status('2 ·');await snap('count-2');await page.locator('[data-hand="1"]').click();
+    await status('1 ·');await snap('count-1');await page.locator('[data-hand="0"]').click();
+    await status('직접 판단');assert.equal(await page.evaluate(()=>globalThis.revealCount),1);await snap('count-reveal');console.log('PASS visible 3-2-1 countdown queues the latest hand and reveals once');
+    await page.locator('#reset').click();await status('가위 · 바위 · 보를 선택하세요.');assert.equal(await page.evaluate(()=>globalThis.revealCount),1);assert(await page.locator('[data-hand="0"]').isEnabled());console.log('PASS missing choice waits without inventing a hand');
     // Render fixed recoil ages so visual QA covers the join throughout impact,
     // independently of requestAnimationFrame timing and the brief hit stop.
     const poses=[...[0,150,290,430].map(age=>({name:`neck-recoil-${age}`,age})),
@@ -64,7 +71,7 @@ const C=require('../config.js');
     await move(C.hammerHome.x,C.hammerHome.y);await page.mouse.down();await move(C.enemyHead.x,C.enemyCrown.y+C.hammerLength,4);await status('명중');await page.mouse.up();
     assert.equal(await page.locator('#enemyScore').innerText(),'75');assert.equal(await page.locator('#playerScore').innerText(),'100');await snap('02-hit');console.log('PASS browser direct hammer swing and concealed rule');
     for(let i=2;i<=4;i++){
-      await page.locator('#next').click();await page.locator('[data-hand="0"]').click();await status('직접 판단');
+      await page.waitForFunction(()=>!document.querySelector('[data-hand="0"]').disabled);await page.locator('[data-hand="0"]').click();await status('직접 판단');
       await move(C.hammerHome.x,C.hammerHome.y);await page.mouse.down();await move(C.enemyCrown.x,C.enemyCrown.y+C.hammerLength,4);await status('명중');await page.mouse.up();assert.equal(await page.locator('#enemyScore').innerText(),String(100-25*i));
     }
     await status('도전자 승리');await snap('energy-empty');console.log('PASS browser energy persists and zero ends match');
@@ -88,6 +95,6 @@ const C=require('../config.js');
     const fallback=await browser.newPage({viewport:{width:1200,height:1000}});
     await fallback.addInitScript(()=>{window.Image=class{constructor(){queueMicrotask(()=>this.onerror?.());}};});
     await fallback.goto(url);await fallback.waitForFunction(()=>WGG.art.failed);
-    await fallback.locator('[data-hand="0"]').click();assert(await fallback.locator('[data-hand="0"]').isDisabled());await fallback.close();console.log('PASS browser asset failure shows retry screen without script errors');
+    assert(await fallback.locator('[data-hand="0"]').isDisabled());await fallback.close();console.log('PASS browser asset failure shows retry screen without script errors');
   }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
