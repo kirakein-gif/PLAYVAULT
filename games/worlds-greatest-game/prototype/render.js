@@ -12,17 +12,33 @@
     const resolving=m.phase==='resolve'||m.phase==='end';
     const age=resolving?Math.max(0,m.time-m.resolvedAt):0;
     const recovery=clamp(age/260,0,1),rest={x:555,y:650};
-    let kind=null,target=rest;
+    let kind=null,target=rest,mode='idle';
+    const mix=(a,b,p)=>({x:a.x+(b.x-a.x)*p,y:a.y+(b.y-a.y)*p});
     if(m.phase==='react'&&m.rule==='lose'||resolving&&['hurt','block'].includes(m.result)){
-      kind='hammer';const wind=clamp(elapsed/(C.enemyStrikeMs-260),0,1),swing=clamp((elapsed-C.enemyStrikeMs+260)/260,0,1);
+      mode='tool';kind='hammer';const pickup=450,wind=clamp((elapsed-pickup)/(C.enemyStrikeMs-260-pickup),0,1),swing=clamp((elapsed-C.enemyStrikeMs+260)/260,0,1);
       const blocked=m.result==='block'||m.phase==='react'&&m.equipped;
-      target={x:640-30*wind+(C.playerHead.x-610)*swing,y:300-145*wind+((blocked?C.playerHead.y-C.playerHead.r+7:C.playerHead.y)+C.hammerLength-155)*swing};
-    }else if(m.phase==='react'&&m.rule==='win'&&elapsed>C.enemyGuardMs-260||resolving&&m.result==='guarded'){
-      kind='pot';const p=resolving?1:clamp((elapsed-C.enemyGuardMs+260)/260,0,1);
-      target={x:640+(C.enemyHead.x+C.potOffset-640)*p,y:550+(C.enemyHead.y-C.enemyHead.r+7-550)*p};
+      target={x:C.hammerHome.x+(610-C.hammerHome.x)*wind+(C.playerHead.x-610)*swing,y:C.hammerHome.y+(155-C.hammerHome.y)*wind+((blocked?C.playerHead.y-C.playerHead.r+7:C.playerHead.y)+C.hammerLength-155)*swing};
+      if(!resolving&&elapsed<pickup){kind=null;mode=elapsed<220?'rps':'reach';target=elapsed<220?C.enemyRps:mix(C.enemyRps,C.hammerHome,clamp((elapsed-220)/(pickup-220),0,1));}
+    }else if(m.phase==='react'&&m.rule==='win'||resolving&&m.result==='guarded'){
+      const start=C.enemyGuardMs-600,pickup=C.enemyGuardMs-370;
+      if(!resolving&&elapsed<pickup){mode=elapsed<start?'rps':'reach';target=elapsed<start?C.enemyRps:mix(C.enemyRps,C.potHome,clamp((elapsed-start)/(pickup-start),0,1));}
+      else{kind='pot';mode='tool';const p=resolving?1:clamp((elapsed-pickup)/(C.enemyGuardMs-pickup),0,1);target=mix(C.potHome,{x:C.enemyHead.x+C.potOffset,y:C.enemyHead.y-C.enemyHead.r+7},p);}
+    }else if(m.phase==='react'){mode='rps';target=C.enemyRps;}
+    if(resolving){
+      if(mode!=='idle'){target=mix(target,rest,recovery);mode=recovery===1?'idle':'recover';}
+      if(recovery===1)kind=null;
     }
-    if(resolving){target={x:target.x+(rest.x-target.x)*recovery,y:target.y+(rest.y-target.y)*recovery};if(recovery===1)kind=null;}
-    return {...armPose(C.enemyShoulder,target,C.enemyUpperArm,C.enemyForearm,1),kind};
+    return {...armPose(C.enemyShoulder,target,C.enemyUpperArm,C.enemyForearm,1),kind,mode,visible:mode!=='idle',value:mode==='rps'?m.enemy:null};
+  }
+  function playerPose(m){
+    const age=Math.max(0,m.time-m.resolvedAt),frozen=['resolve','end'].includes(m.phase)&&age<240?m.frozenTool:null;
+    let mode='idle',target={x:810,y:665},kind=null,angle=-Math.PI/2;
+    if(m.held){mode='tool';target={...m.tool};kind=m.held;angle=m.tool.angle;
+      if(kind==='pot'&&m.equipped){const p=clamp((m.time-m.readyAt)/C.snapMs,0,1);target={x:m.snapFrom.x+(C.playerHead.x+C.potOffset-m.snapFrom.x)*p,y:m.snapFrom.y+(C.playerHead.y-C.playerHead.r+7-m.snapFrom.y)*p};}
+    }else if(frozen){mode='recover';kind=frozen.kind;angle=frozen.angle;const p=clamp(age/240,0,1);target={x:frozen.x+(810-frozen.x)*p,y:frozen.y+(665-frozen.y)*p};}
+    else if(m.phase==='react'){mode='rps';target=C.playerRps;}
+    const pose=armPose(C.shoulder,target,C.upperArm,C.forearm,kind==='pot'?1:-1);
+    return {...pose,kind,angle,mode,visible:mode!=='idle',value:mode==='rps'?m.player:null};
   }
   function render(ctx,m,options={}){
     const t=m.time,age=['resolve','end'].includes(m.phase)?Math.max(0,t-m.resolvedAt):9999;
@@ -66,23 +82,25 @@
     // Right foreground head and shoulders face left, with neck and side profile.
     path([[652,720],[665,542],[737,464],[793,446],[899,440],[1007,481],[1095,574],[1177,720]],'#2d4652');path([[741,472],[785,446],[810,480],[784,513]],'#d3d8c4');path([[899,440],[937,454],[906,507],[855,481]],'#c6cfba');path([[805,397],[803,467],[835,484],[892,454],[898,388]],'#be9574');line([[1007,505],[1051,637]],'#58717a',4);line([[722,552],[694,650]],'#1b343e',4);
     ctx.save();ctx.translate(C.playerHead.x-hurt*11,C.playerHead.y+idle+hurt*9);ctx.rotate(-hurt*.07);oval(0,0,89,113-hurt*5,'#263941');path([[-72,-35],[-86,-5],[-99,18],[-79,28],[-73,68],[-45,93],[-24,74],[-40,23],[-34,-39]],'#c19a78');path([[-71,-56],[-38,-105],[24,-115],[72,-83],[89,-28],[54,-46],[12,-67],[-30,-45]],'#263941');line([[11,-91],[55,-65],[69,-31]],'#43555a',4);oval(59,23,16,26,'#c19a78');line([[60,11],[52,22],[63,30]],'#916b54',3);line([[-80,2],[-65,-4]],'#263941',4);ctx.restore();
-    const open=m.player!==null,bounce=m.phase==='react'?Math.sin(clamp((t-m.phaseAt)/100,0,1)*Math.PI)*5:0;
-    const eh=open?{x:635,y:435-bounce}:{x:390,y:555},ph=open?{x:714,y:488-bounce}:{x:1000,y:650};
-    arm(armPose({x:390,y:404},eh,145,150,1),'#abad94',38);hand(eh.x,eh.y,open?m.enemy:null,1.08,.12);arm(armPose({x:1000,y:505},ph,150,155,-1),'#3a5563',43);hand(ph.x,ph.y,open?m.player:null,1.04,-.12);if(open){text(names[m.enemy],620,510,18);text(names[m.player],712,555,18);}
-    // Narrow equipment shelf, at the actors' waist rather than a distant table.
-    path([[430,577],[1124,577],[1200,720],[348,720]],'#947850');line([[436,585],[1127,585]],'#cfb281',5);line([[356,705],[1190,705]],'#66533b',8);
-    const frozen=['resolve','end'].includes(m.phase)&&age<280?m.frozenTool:null,kind=m.held||frozen?.kind;
-    if(kind!=='hammer')hammer(C.hammerHome);if(kind!=='pot')pot(C.potHome);
-    let wrist=m.held?{...m.tool}:frozen?{...frozen}:{x:922,y:555};
-    if(m.held==='pot'&&m.equipped){const p=clamp((t-m.readyAt)/C.snapMs,0,1);wrist={x:m.snapFrom.x+(C.playerHead.x+C.potOffset-m.snapFrom.x)*p,y:m.snapFrom.y+(C.playerHead.y-C.playerHead.r+7-m.snapFrom.y)*p};}
-    if(frozen){const p=clamp(age/280,0,1);wrist={x:wrist.x+(922-wrist.x)*p,y:wrist.y+(555-wrist.y)*p};}
-    const ep=enemyPose(m);arm(ep,'#afb097',42);if(ep.kind==='hammer')hammer(ep.wrist);if(ep.kind==='pot')pot(ep.wrist,true,m.result==='guarded');hand(ep.wrist.x,ep.wrist.y,null,.68);
-    const pp=armPose(C.shoulder,wrist,C.upperArm,C.forearm);arm(pp,'#3e5c69',46);if(kind==='hammer'&&age<280||m.held==='hammer')hammer(pp.wrist,m.tool?.angle??frozen?.angle??-Math.PI/2);if(kind==='pot'&&age<280||m.held==='pot')pot(pp.wrist,m.equipped,m.result==='block');hand(pp.wrist.x,pp.wrist.y,null,.64);
-    if(['select','react'].includes(m.phase))for(const [p,label]of [[C.hammerHome,'망치 손잡이'],[C.potHome,'냄비 테두리']]){oval(p.x,p.y,23,23,'#f1d89b14','#deca99',1.5);text(label,p.x,684,13);}
+    // A shared table occupies the gap between the two torsos. Idle hands stay behind it.
+    path([[570,475],[795,475],[962,650],[450,650]],'#9d8158');line([[574,482],[795,482]],'#d3b98a',4);path([[450,650],[962,650],[957,676],[456,676]],'#725c3d');line([[486,676],[481,720]],'#443e32',12);line([[927,676],[937,720]],'#443e32',12);
+    const ep=enemyPose(m),pp=playerPose(m);
+    if(ep.kind!=='hammer'&&pp.kind!=='hammer')hammer(C.hammerHome);
+    if(ep.kind!=='pot'&&pp.kind!=='pot')pot(C.potHome);
+    function actorArm(p,color,width){
+      if(!p.visible)return;
+      arm(p,color,width);
+      if(p.kind==='hammer')hammer(p.wrist,p.angle);
+      if(p.kind==='pot')pot(p.wrist,m.equipped,m.result==='block'||m.result==='guarded');
+      hand(p.wrist.x,p.wrist.y,p.value,p.mode==='rps'?1:.64,p.mode==='rps'?.05:0);
+    }
+    actorArm(ep,'#afb097',42);actorArm(pp,'#3e5c69',46);
+    if(m.phase==='react'){text('최주임 · '+names[m.enemy],490,117,16);text('도전자 · '+names[m.player],850,150,16);}
+    if(['select','react'].includes(m.phase))for(const [p,label]of [[C.hammerHome,'망치 손잡이'],[C.potHome,'냄비 테두리']]){oval(p.x,p.y,23,23,'#f1d89b14','#deca99',1.5);text(label,p.x,635,13);}
     if(m.held==='hammer'&&m.trace.length>1){for(let i=1;i<m.trace.length;i++){ctx.globalAlpha=i/m.trace.length*.45;line([[m.trace[i-1].x,m.trace[i-1].y],[m.trace[i].x,m.trace[i].y]],'#ffda82',3);}ctx.globalAlpha=1;}
     if(impact&&m.contact)for(let i=0;i<8;i++){const a=i*Math.PI/4,p=age/360;ctx.globalAlpha=1-p;line([[m.contact.x+Math.cos(a)*(50+p*30),m.contact.y+Math.sin(a)*(50+p*30)],[m.contact.x+Math.cos(a)*(65+p*80),m.contact.y+Math.sin(a)*(65+p*80)]],m.result==='block'?'#e1f4e9':'#ffdb87',4);}ctx.globalAlpha=1;
-    if(m.phase==='react'){rect(433,709,690,4,'#455d58');rect(433,709,690*Math.max(0,1-(t-m.reactAt)/C.reactMs),4,'#ddbf7c');}
+    if(m.phase==='react'){rect(482,687,445,4,'#455d58');rect(482,687,445*Math.max(0,1-(t-m.reactAt)/C.reactMs),4,'#ddbf7c');}
     if(m.phase==='resolve'){const copy={hit:'뿅!',hurt:'뿅!',block:'깡!',guarded:'깡!',miss:'휙…',foul:'파울',tie:'재경기'};text(copy[m.result],770,110,38,m.result==='foul'?'#ffab7f':'#f4d695');}ctx.restore();
   }
-  root.WGG.render=render;root.WGG.armPose=armPose;root.WGG.enemyPose=enemyPose;
+  root.WGG.render=render;root.WGG.armPose=armPose;root.WGG.enemyPose=enemyPose;root.WGG.playerPose=playerPose;
 })(globalThis);

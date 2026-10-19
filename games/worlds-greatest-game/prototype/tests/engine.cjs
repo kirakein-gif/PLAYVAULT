@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const api=require('../engine.js'),{Match,C,dist,reach,ik,segmentCircle}=api;
 globalThis.WGG=api;require('../render.js');
-const {armPose,enemyPose}=api;
+const {armPose,enemyPose,playerPose}=api;
 let count=0;
 function test(name,fn){fn();count++;console.log(`PASS ${name}`);}
 function round(a=0,b=2){const m=new Match(()=>b/3);m.choose(a);return m;}
@@ -30,6 +30,19 @@ test('AI arms never stretch during attack, guard or recovery',()=>{for(const rul
   const strike=enemyPose({phase:'react',rule:'lose',time:C.enemyStrikeMs,reactAt:0});assert(Math.abs(strike.wrist.x-C.playerHead.x)<.01);assert(Math.abs(strike.wrist.y-C.hammerLength-C.playerHead.y)<.01);
   const block=enemyPose({phase:'react',rule:'lose',time:C.enemyStrikeMs,reactAt:0,equipped:true});assert(Math.abs(block.wrist.y-C.hammerLength-potWrist.y)<.01);
 });
-test('free RPS arms maintain exact bone lengths',()=>{for(const bend of [-1,1])for(const target of [{x:635,y:435},{x:390,y:555},{x:714,y:488},{x:1000,y:650}])bones(armPose({x:650,y:450},target,150,155,bend));});
+test('idle has no exposed hands, one arm switches from RPS to tool then withdraws',()=>{
+  const m=new Match(()=>2/3);assert(!playerPose(m).visible);assert(!enemyPose(m).visible);
+  m.choose(0);assert.equal(playerPose(m).mode,'rps');assert.equal(enemyPose(m).mode,'rps');
+  assert.equal(playerPose(m).value,0);assert.equal(enemyPose(m).value,2);
+  m.grab(C.hammerHome,1,10);assert.equal(playerPose(m).mode,'tool');assert.equal(playerPose(m).value,null);
+  m.move(hitWrist,1,160);assert.equal(playerPose(m).mode,'recover');assert(!enemyPose(m).visible);
+  m.tick(460);assert(!playerPose(m).visible);assert(!enemyPose(m).visible);
+});
+test('same shoulder and fixed bones serve RPS, carrying and recovery',()=>{for(const b of [1,2]){const m=round(0,b);for(let t=0;t<1000;t+=10){m.tick(t);const p=playerPose(m),e=enemyPose(m);bones(p);bones(e);assert.deepEqual(p.shoulder,C.shoulder);assert.deepEqual(e.shoulder,C.enemyShoulder);}}});
+test('AI reaches the shared tabletop before taking either prop',()=>{
+  let m=round(0,1);m.tick(449);assert.equal(enemyPose(m).mode,'reach');assert.equal(enemyPose(m).kind,null);
+  m.tick(450);let p=enemyPose(m);assert.equal(p.kind,'hammer');assert(dist(p.wrist,C.hammerHome)<.01);
+  m=round();m.tick(C.enemyGuardMs-370);p=enemyPose(m);assert.equal(p.kind,'pot');assert(dist(p.wrist,C.potHome)<.01);
+});
 test('sparse and dense input produce the same valid swing',()=>{for(const steps of [1,4,8,16]){const m=round();m.grab(C.hammerHome,1,10);for(let i=1;i<=steps;i++)m.move({x:C.hammerHome.x+(hitWrist.x-C.hammerHome.x)*i/steps,y:C.hammerHome.y+(hitWrist.y-C.hammerHome.y)*i/steps},1,10+180*i/steps);assert.equal(m.result,'hit',`samples=${steps}`);}});
 console.log(`${count} scenarios passed`);

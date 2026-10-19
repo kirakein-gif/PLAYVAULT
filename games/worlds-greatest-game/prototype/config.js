@@ -11,7 +11,8 @@
     enemyHead: { x: 490, y: 230, r: 76 },
     shoulder: { x: 760, y: 480 }, upperArm: 155, forearm: 160,
     enemyShoulder: { x: 555, y: 390 }, enemyUpperArm: 165, enemyForearm: 175,
-    hammerHome: { x: 650, y: 600 }, potHome: { x: 970, y: 600 },
+    hammerHome: { x: 620, y: 570 }, potHome: { x: 840, y: 570 },
+    enemyRps: { x: 650, y: 385 }, playerRps: { x: 695, y: 465 },
     hammerLength: 95, potOffset: 80, grabRadius: 35
   };
   if (typeof module === 'object') module.exports = config;

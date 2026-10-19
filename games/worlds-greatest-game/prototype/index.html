@@ -7,15 +7,15 @@
 </head>
 <body>
   <main>
-    <header><div><small>OFFICE ATHLETICS FEDERATION · INPUT LAB 01</small><h1>세계 최고의 게임</h1></div><span class="build">ACTION PROTOTYPE / 0.3</span></header>
+    <header><div><small>OFFICE ATHLETICS FEDERATION · INPUT LAB 01</small><h1>세계 최고의 게임</h1></div><span class="build">ACTION PROTOTYPE / 0.4</span></header>
     <section class="scoreboard"><span>도전자 <b id="playerScore">0</b></span><span id="round">연수 경기 · ROUND 01</span><span><b id="enemyScore">0</b> 최주임</span></section>
-    <canvas id="arena" width="1200" height="720" aria-label="왼쪽 최주임, 오른쪽 앞 내 머리. 아래 선반 손잡이를 누른 채 도구를 움직이세요."></canvas>
+    <canvas id="arena" width="1200" height="720" aria-label="왼쪽 최주임과 오른쪽 도전자가 비스듬히 마주봅니다. 두 사람 사이 테이블의 도구를 누른 채 움직이세요."></canvas>
     <section class="controls">
       <div id="status" role="status" aria-live="polite">가위 · 바위 · 보를 선택하세요.</div>
       <div class="hands" id="hands"><button data-hand="0">1 · 가위</button><button data-hand="1">2 · 바위</button><button data-hand="2">3 · 보</button></div>
       <div class="settings"><button id="next" hidden>다음 판</button><button id="reset">경기 다시 시작</button><button id="mute" aria-pressed="false">소리 켜짐</button><label><input type="checkbox" id="motion">화면 흔들림 줄이기</label></div>
     </section>
-    <details><summary>직접 조작 안내</summary><p>손을 보고 판단하세요. 이겼으면 망치, 졌으면 냄비, 비겼으면 기다립니다. 손은 선택 즉시 공개되고 그 순간부터 도구를 잡을 수 있습니다.</p><p>망치: 아래 손잡이를 누른 채 왼쪽 상대 얼굴로 빠르게 휘두르세요. 냄비: 오른쪽 테두리를 잡아 오른쪽 앞 내 머리 위로 옮긴 뒤 상대 공격까지 누르세요. 팔이 닿는 범위에서 도구가 움직입니다. 잘못된 도구와 조기 출발은 파울입니다. Esc는 잡기 취소.</p><p class="note">최주임 1명 · 먼저 3점 · 임시 절차적 아트 / 고정 길이 양팔 IK / 합성 효과음</p></details>
+    <details><summary>직접 조작 안내</summary><p>준비 중에는 손을 내리고, 패를 고르면 두 사람이 손을 내밉니다. 이겼으면 망치, 졌으면 냄비, 비겼으면 기다립니다. 손 공개 즉시 도구를 잡을 수 있습니다.</p><p>두 사람 사이 테이블에서 망치 손잡이나 냄비의 오른쪽 테두리를 누른 채 움직이세요. 가위바위보를 내민 그 팔로 도구를 집습니다. 망치는 왼쪽 상대 얼굴로 휘두르고, 냄비는 오른쪽 내 머리 위로 옮겨 상대 공격까지 잡고 계세요. 잘못된 도구와 조기 출발은 파울입니다. Esc는 잡기 취소.</p><p class="note">최주임 1명 · 먼저 3점 · 임시 절차적 아트 / 인물마다 하나의 동작 팔 / 합성 효과음</p></details>
     <footer>인류가 찾아낸 궁극의 공정함. <a href="../index.html">v0.1 원본</a></footer>
   </main>
   <script src="config.js"></script><script src="engine.js"></script><script src="render.js"></script><script src="audio.js"></script><script src="app.js"></script>
