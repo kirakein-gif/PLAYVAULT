@@ -100,5 +100,18 @@
     if(held==='hammer'&&m.trace.length>1){
       for(let i=1;i<m.trace.length;i++){ctx.globalAlpha=i/m.trace.length*.55;line([[m.trace[i-1].x,m.trace[i-1].y],[m.trace[i].x,m.trace[i].y]],'#ffdc86',3+i*.15);}ctx.globalAlpha=1;
     }
+    // AI uses the same visible arm-to-grip connection. Wind-up precedes contact.
+    if(m.phase==='react'&&m.rule==='win'&&m.time-m.reactAt>C.enemyGuardMs-500||m.result==='guarded'){
+      const p=m.phase==='react'?Math.min(1,(m.time-m.reactAt-(C.enemyGuardMs-500))/500):1;
+      const x=1020+(795-1020)*p,y=420+(155-420)*p;
+      line([[870,320],[940,310],[x+80,y]],'#263d40',32);line([[870,320],[940,310],[x+80,y]],'#a9ad93',24);pot(x,y);oval(x+80,y,13,13,'#dfb78f');
+    }
+    if(m.phase==='react'&&m.rule==='lose'||m.result==='hurt'||m.result==='block'){
+      const elapsed=m.phase==='react'?m.time-m.reactAt:C.enemyStrikeMs;
+      const anticipation=Math.min(1,elapsed/(C.enemyStrikeMs-450));
+      const swing=Math.max(0,Math.min(1,(elapsed-(C.enemyStrikeMs-450))/450));
+      const x=965-80*anticipation-630*swing,y=310-160*anticipation+350*swing;
+      line([[868,323],[1000-170*swing,265],[x,y]],'#253c3f',34);line([[868,323],[1000-170*swing,265],[x,y]],'#a9ad93',25);hammer(x,y,-Math.PI/2);oval(x,y,14,13,'#dfb78f');
+    }
   };
 })(globalThis);

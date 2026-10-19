@@ -46,6 +46,16 @@
         this.phase = 'react'; this.reactAt = this.time;
       }
       if(this.phase==='react'&&this.held==='pot')this.updateEquip();
+      if(this.phase==='react'){
+        const elapsed=this.time-this.reactAt;
+        if(this.rule==='tie'&&elapsed>=C.tieMs)this.resolve('tie');
+        else if(this.rule==='lose'&&elapsed>=C.enemyStrikeMs){
+          this.contact={...C.playerHead};
+          this.resolve(this.equipped&&this.readyAt<=this.reactAt+C.enemyStrikeMs?'block':'hurt');
+        }else if(elapsed>=C.reactMs)this.resolve('miss');
+      }
+      if(this.phase==='resolve'&&this.time-this.resolvedAt>=C.recoverMs&&
+        (this.score.player>=C.targetScore||this.score.enemy>=C.targetScore))this.phase='end';
     }
     tip(tool=this.tool) {
       if(!tool)return null;
@@ -57,7 +67,10 @@
       if(this.held||this.phase==='resolve'||this.phase==='end')return false;
       const kind=dist(p,C.hammerHome)<=C.grabRadius?'hammer':dist(p,C.potHome)<=C.grabRadius?'pot':null;
       if(!kind)return false;
-      if(this.phase!=='react')return false;
+      if(this.phase!=='react'){this.resolve('foul','조기 출발');return false;}
+      if(this.rule==='tie'||(this.rule==='win'&&kind!=='hammer')||(this.rule==='lose'&&kind!=='pot')){
+        this.resolve('foul',this.rule==='tie'?'무승부 중 도구 사용':'잘못된 도구');return false;
+      }
       this.held=kind;this.pointerId=id;
       const home=kind==='hammer'?C.hammerHome:C.potHome;
       this.tool={...home,angle:-Math.PI/2};this.lastMove=now;this.pathLength=0;
@@ -66,6 +79,7 @@
     }
     move(p,id,now) {
       this.tick(now);
+      now=this.time;
       if(!this.held||id!==this.pointerId||this.phase!=='react')return false;
       const previous=this.tip(), old=this.tool, dt=Math.max(1,now-this.lastMove);
       const wrist=reach({x:p.x+this.offset.x,y:p.y+this.offset.y});
@@ -80,7 +94,7 @@
       else if(this.pathLength>=C.swingMinLength&&length/dt*1000>=C.swingMinSpeed&&
         (tip.x-previous.x)*(C.enemyHead.x-previous.x)+(tip.y-previous.y)*(C.enemyHead.y-previous.y)>0&&
         segmentCircle(previous,tip,C.enemyHead,C.enemyHead.r+C.hammerRadius)) {
-        this.contact={...C.enemyHead};this.resolve('hit');
+        this.contact={...C.enemyHead};this.resolve(this.time-this.reactAt>=C.enemyGuardMs?'guarded':'hit');
       }
       return true;
     }
@@ -95,13 +109,23 @@
     }
     release(id,cancel=false) {
       if(id!==this.pointerId)return false;
+      if(this.held==='hammer'&&!cancel&&this.phase==='react'){this.resolve('miss');return true;}
       this.clearTools();return true;
     }
-    resolve(result) {
-      if(this.phase!=='react')return;
+    resolve(result,reason='') {
+      if(this.phase==='resolve'||this.phase==='end')return;
+      if(this.phase!=='react'&&result!=='foul')return;
       this.result=result;this.phase='resolve';this.resolvedAt=this.time;
+      this.reason=reason;
+      if(result==='hit')this.score.player++;
+      if(result==='hurt'||result==='foul')this.score.enemy++;
       this.frozenTool=this.tool?{...this.tool,kind:this.held}:null;
       this.held=null;this.pointerId=null;this.events.push(result);
+    }
+    next() {
+      if(this.phase!=='resolve'||this.time-this.resolvedAt<C.recoverMs)return false;
+      this.clearTools();this.round++;this.phase='select';this.player=null;this.enemy=null;
+      this.result=null;this.reason='';this.frozenTool=null;this.contact=null;return true;
     }
     drainEvents() { return this.events.splice(0); }
   }
