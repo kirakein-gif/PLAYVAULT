@@ -17,6 +17,7 @@ const C=require('../config.js');
     await page.goto(url);
     await page.waitForFunction(()=>WGG.art.ready||WGG.art.failed);
     assert(await page.evaluate(()=>WGG.art.ready),'approved A assets load');
+    assert(await page.evaluate(()=>['enemy','player'].every(side=>[0,1,2].every(hand=>{const s=WGG.art.sprites[side+'Rps'+hand];return s&&s.rect[2]+s.inset===s.image.naturalWidth/3&&s.rect[3]===s.image.naturalHeight;}))),'both right-hand actor atlases have all three choices');
     assert(await page.evaluate(()=>Object.values(WGG.art.sprites).every(s=>{const [x,y,w,h]=s.rect;return x>=0&&y>=0&&w>0&&h>0&&x+w<=s.image.naturalWidth&&y+h<=s.image.naturalHeight;})),'atlas bounds');
     console.log('PASS browser approved A assets and atlas bounds');
     async function pos(x,y){const b=await page.locator('canvas').boundingBox();return{x:b.x+x*b.width/1200,y:b.y+y*b.height/720};}
@@ -28,10 +29,10 @@ const C=require('../config.js');
     // Render fixed recoil ages so visual QA covers the join throughout impact,
     // independently of requestAnimationFrame timing and the brief hit stop.
     const poses=[...[0,150,290,430].map(age=>({name:`neck-recoil-${age}`,age})),
-      ...[0,1,2].map(hand=>({name:`forward-rps-${hand}`,hand}))];
+      ...[0,1,2].flatMap(hand=>[0,1,2].map(enemy=>({name:`rps-${hand}-${enemy}`,hand,enemy})))];
     if(dest)for(const pose of poses){
       await page.evaluate(pose=>{
-        const m=new WGG.Match(()=>((pose.hand??0)+1)%3/3);m.choose(pose.hand??0);
+        const m=new WGG.Match(()=>(pose.enemy??2)/3);m.choose(pose.hand??0);
         if(pose.age!==undefined){m.phase='resolve';m.result='hit';m.resolvedAt=100;m.time=100+pose.age;}
         const c=document.createElement('canvas');c.width=1200;c.height=720;
         c.id='pose-capture';c.style.cssText='position:fixed;top:0;left:0;width:1200px;height:720px;z-index:9999';

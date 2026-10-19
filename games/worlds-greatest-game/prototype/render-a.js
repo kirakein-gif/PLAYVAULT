@@ -14,6 +14,12 @@
     ctx.drawImage(art.images.office,0,0,1200,720);
     ctx.fillStyle='#e9dfcf1a';ctx.fillRect(0,0,1200,720);
     function sprite(name,x,y,w,h){const s=art.sprites[name];ctx.drawImage(s.image,...s.rect,x,y,w,h);}
+    function rpsActor(p,near){
+      const anchors=near?[430,404.5,389]:[420,392.5,382],scale=near?.94:.65;
+      const head=near?C.playerHead:C.enemyHead;
+      const name=(near?'player':'enemy')+'Rps'+p.value,inset=art.sprites[name].inset;
+      sprite(name,head.x+(inset-anchors[p.value])*scale,(near?105:80)+breathe,(724-inset)*scale,724*scale);
+    }
     function poly(points,fill,stroke='#594a3b',width=2){ctx.beginPath();ctx.moveTo(...points[0]);points.slice(1).forEach(p=>ctx.lineTo(...p));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.stroke();}}
     function line(p,c,w=2){ctx.beginPath();ctx.moveTo(...p[0]);p.slice(1).forEach(q=>ctx.lineTo(...q));ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap='round';ctx.stroke();}
     function oval(x,y,rx,ry,fill,stroke=null){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke();}}
@@ -38,8 +44,9 @@
     }
     // A continuous bust keeps jaw, neck and collar connected during recoil.
     const recoil=m.result==='hit'?Math.sin(clamp(age/430,0,1)*Math.PI):0;
-    ctx.save();ctx.translate(420+eLean,495+breathe);ctx.rotate(recoil*.025);
-    sprite(m.result==='hit'&&age<430?'enemyBustHurt':'enemyBust',-225,-420,420,502);ctx.restore();
+    if(ep.mode==='rps')rpsActor(ep,false);
+    else{ctx.save();ctx.translate(420+eLean,495+breathe);ctx.rotate(recoil*.025);
+      sprite(m.result==='hit'&&age<430?'enemyBustHurt':'enemyBust',-225,-420,420,502);ctx.restore();}
     // Authored tabletop perspective, warm grain, bevel and contact shadows.
     const corners=C.table.map(p=>[p.x,p.y]),[a,b,c,d]=corners;
     ctx.save();ctx.beginPath();ctx.moveTo(...a);corners.slice(1).forEach(p=>ctx.lineTo(...p));ctx.closePath();ctx.clip();
@@ -50,22 +57,21 @@
     if(ep.kind!=='hammer'&&pp.kind!=='hammer')hammer(C.hammerHome);
     if(ep.kind!=='pot'&&pp.kind!=='pot')pot(C.potHome);
     // Near actor: separate painted nape and navy jacket retain the approved A camera.
-    sprite('playerBody',640+pLean.x,372+pLean.y+breathe,660,422);
     const hurt=m.result==='hurt'?Math.sin(clamp(age/430,0,1)*Math.PI):0;
-    ctx.save();ctx.translate(C.playerHead.x+pLean.x-hurt*8,C.playerHead.y+pLean.y+breathe+hurt*8);ctx.rotate(-.07-hurt*.06);sprite('playerHead',-160,-140,320,315);ctx.restore();
+    if(pp.mode==='rps')rpsActor(pp,true);
+    else{sprite('playerBody',640+pLean.x,372+pLean.y+breathe,660,422);
+      ctx.save();ctx.translate(C.playerHead.x+pLean.x-hurt*8,C.playerHead.y+pLean.y+breathe+hurt*8);ctx.rotate(-.07-hurt*.06);sprite('playerHead',-160,-140,320,315);ctx.restore();}
     function drawArm(p,near){
-      if(!p.visible)return;
-        const prefix=near?'navy':'beige',w=near?96:76;
-      const name=p.mode==='rps'?['scissors','rock','paper'][p.value]:'grip',s=art.sprites[name];
-        // The foreground hand already has a near-camera scale; do not double it
-        // again when the pot itself grows from tabletop depth to head depth.
-        const depth=near&&p.kind==='pot'?1+(WGG.potFrame(p.wrist).scale-1)*.35:1;
-        const scale=(near?.40:.34)*depth,width=s.rect[2]*scale,height=s.rect[3]*scale;
+      if(!p.visible||p.mode==='rps')return;
+      const prefix=near?'navy':'beige',w=near?96:76;
+      const name='grip',s=art.sprites[name];
+      // The foreground hand already has a near-camera scale; do not double it
+      // again when the pot itself grows from tabletop depth to head depth.
+      const depth=near&&p.kind==='pot'?1+(WGG.potFrame(p.wrist).scale-1)*.35:1;
+      const scale=(near?.40:.34)*depth,width=s.rect[2]*scale,height=s.rect[3]*scale;
       segment(prefix+'Upper',p.shoulder,p.elbow,w);
       const grip=p.kind!==null;
-      // RPS fingers point across the table toward the other person, rather
-      // than toward the ceiling. Keep the wrist anchored to the same arm.
-      const angle=p.mode==='rps'?(near?-1.3:1.65):grip&&p.kind==='hammer'?(p.angle??-Math.PI/2)+Math.PI/2:0;
+      const angle=grip&&p.kind==='hammer'?(p.angle??-Math.PI/2)+Math.PI/2:0;
       const base=grip?{x:p.wrist.x-Math.sin(angle)*height*.48,y:p.wrist.y+Math.cos(angle)*height*.48}:p.wrist;
       segment(prefix+'Fore',p.elbow,base,w*.76);
       if(p.kind==='hammer')hammer(p.wrist,p.angle??-Math.PI/2);
