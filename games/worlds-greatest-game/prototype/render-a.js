@@ -55,9 +55,12 @@
     ctx.save();ctx.translate(C.playerHead.x+pLean.x-hurt*8,C.playerHead.y+pLean.y+breathe+hurt*8);ctx.rotate(-.07-hurt*.06);sprite('playerHead',-160,-140,320,315);ctx.restore();
     function drawArm(p,near){
       if(!p.visible)return;
-      const prefix=near?'navy':'beige',w=near?58:48;
+        const prefix=near?'navy':'beige',w=near?96:76;
       const name=p.mode==='rps'?['scissors','rock','paper'][p.value]:'grip',s=art.sprites[name];
-      const scale=(near?.26:.22)*(near&&p.kind==='pot'?WGG.potFrame(p.wrist).scale:1),width=s.rect[2]*scale,height=s.rect[3]*scale;
+        // The foreground hand already has a near-camera scale; do not double it
+        // again when the pot itself grows from tabletop depth to head depth.
+        const depth=near&&p.kind==='pot'?1+(WGG.potFrame(p.wrist).scale-1)*.35:1;
+        const scale=(near?.40:.34)*depth,width=s.rect[2]*scale,height=s.rect[3]*scale;
       segment(prefix+'Upper',p.shoulder,p.elbow,w);
       const grip=p.kind!==null,angle=grip&&p.kind==='hammer'?(p.angle??-Math.PI/2)+Math.PI/2:0;
       const base=grip?{x:p.wrist.x-Math.sin(angle)*height*.48,y:p.wrist.y+Math.cos(angle)*height*.48}:p.wrist;
