@@ -29,10 +29,17 @@ const C=require('../config.js');
     // Render fixed recoil ages so visual QA covers the join throughout impact,
     // independently of requestAnimationFrame timing and the brief hit stop.
     const poses=[...[0,150,290,430].map(age=>({name:`neck-recoil-${age}`,age})),
-      ...[0,1,2].flatMap(hand=>[0,1,2].map(enemy=>({name:`rps-${hand}-${enemy}`,hand,enemy})))];
+      ...[0,1,2].flatMap(hand=>[0,1,2].map(enemy=>({name:`rps-${hand}-${enemy}`,hand,enemy}))),
+      ...[220,450,650,790,940,1050].map(time=>({name:`enemy-hammer-${time}`,enemy:1,time})),
+      ...[500,730,900,1100].map(time=>({name:`enemy-pot-${time}`,enemy:2,time})),
+      ...['hammer','pot'].flatMap(tool=>[0,.5,1].map(depth=>({name:`player-${tool}-${depth}`,enemy:tool==='pot'?1:2,tool,depth})))];
     if(dest)for(const pose of poses){
       await page.evaluate(pose=>{
         const m=new WGG.Match(()=>(pose.enemy??2)/3);m.choose(pose.hand??0);
+        if(pose.time!==undefined)m.tick(pose.time);
+        if(pose.tool){const C=WGG.C,home=pose.tool==='hammer'?C.hammerHome:C.potHome;
+          const end=pose.tool==='hammer'?{x:550,y:300}:{x:C.playerHead.x+C.potWearOffset,y:C.playerHead.y-C.playerHead.r+7};
+          m.grab(home,1,10);m.move(WGG.mix(home,end,pose.depth),1,200);if(pose.tool==='pot')m.tick(360);}
         if(pose.age!==undefined){m.phase='resolve';m.result='hit';m.resolvedAt=100;m.time=100+pose.age;}
         const c=document.createElement('canvas');c.width=1200;c.height=720;
         c.id='pose-capture';c.style.cssText='position:fixed;top:0;left:0;width:1200px;height:720px;z-index:9999';

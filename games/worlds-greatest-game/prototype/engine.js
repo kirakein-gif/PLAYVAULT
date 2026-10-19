@@ -41,6 +41,41 @@
     const offset=C.potOffset+(C.potWearOffset-C.potOffset)*depth;
     return {offset,scale:offset/C.potOffset};
   }
+  function enemyPotFrame(tool){
+    const depth=clamp((C.potHome.y-tool.y)/(C.potHome.y-(C.enemyHead.y-C.enemyHead.r+7)),0,1);
+    const scale=1+.6*depth;return {offset:C.potOffset*scale,scale};
+  }
+  const ease=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
+  const mix=(a,b,t)=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
+  // One motion plan drives the opponent's wrist, torso and hit target.
+  function enemyFrame(m){
+    const resolving=['resolve','end'].includes(m.phase),age=resolving?Math.max(0,m.time-m.resolvedAt):0;
+    const attacking=m.rule==='lose'||['hurt','block'].includes(m.result);
+    const guarding=m.rule==='win'||m.result==='guarded';
+    const elapsed=resolving?(attacking?C.enemyStrikeMs:C.enemyGuardMs):m.time-m.reactAt;
+    let kind=null,mode='idle',target={x:340,y:625};
+    if(m.phase==='react'||resolving&&['hurt','block','guarded'].includes(m.result)){
+      if(attacking){
+        const pickup=450,windEnd=C.enemyStrikeMs-260,wind={x:480,y:210};
+        if(elapsed<220){mode='rps';target=C.enemyRps;}
+        else if(elapsed<pickup){mode='reach';target=mix(C.enemyRps,C.hammerHome,ease((elapsed-220)/(pickup-220)));}
+        else{kind='hammer';mode='tool';target=elapsed<windEnd?mix(C.hammerHome,wind,ease((elapsed-pickup)/(windEnd-pickup))):mix(wind,{x:C.playerHead.x-40,y:(m.equipped||m.result==='block'?C.playerHead.y-C.playerHead.r+7:C.playerHead.y)+C.hammerLength},ease((elapsed-windEnd)/(C.enemyStrikeMs-windEnd)));}
+      }else if(guarding){
+        const start=C.enemyGuardMs-600,pickup=C.enemyGuardMs-370;
+        if(elapsed<start){mode='rps';target=C.enemyRps;}
+        else if(elapsed<pickup){mode='reach';target=mix(C.enemyRps,C.potHome,ease((elapsed-start)/(pickup-start)));}
+        else{kind='pot';mode='tool';target=mix(C.potHome,{x:C.enemyHead.x+C.potOffset*1.6,y:C.enemyHead.y-C.enemyHead.r+7},ease((elapsed-pickup)/(C.enemyGuardMs-pickup)));}
+      }else{mode='rps';target=C.enemyRps;}
+    }
+    if(resolving){const p=ease(age/260);target=mix(target,{x:340,y:625},p);mode=p===1?'idle':'recover';if(p===1)kind=null;}
+    if(resolving&&!['hurt','block','guarded'].includes(m.result)){mode='idle';kind=null;}
+    const shoulder={...C.enemyShoulder},span=C.enemyUpperArm+C.enemyForearm-3;
+    const horizontal=Math.sqrt(Math.max(0,span*span-(target.y-shoulder.y)**2));
+    const lean=resolving&&m.result==='hit'?(m.enemyImpactLean||0)*(1-ease(age/260)):mode==='rps'||mode==='idle'?0:clamp(target.x-shoulder.x-horizontal,0,C.enemyMaxLean);
+    shoulder.x+=lean;
+    const reachProgress=attacking?ease((elapsed-220)/230):ease((elapsed-(C.enemyGuardMs-600))/230);
+    return {target,shoulder,lean,reachProgress,head:{...C.enemyHead,x:C.enemyHead.x+lean},kind,mode,visible:mode!=='idle',angle:-Math.PI/2};
+  }
   class Match {
     constructor(random = Math.random) { this.random = random; this.reset(); }
     reset() {
@@ -53,6 +88,7 @@
       this.held = null; this.pointerId = null; this.equipped = false;
       this.tool = null; this.trace = []; this.pathLength = 0;
       this.alignSince = null; this.readyAt = null;
+      this.hoverTool=null;this.hoverAt=null;
     }
     choose(hand) {
       if (this.phase !== 'select' || !Number.isInteger(hand) || hand < 0 || hand > 2) return false;
@@ -80,6 +116,11 @@
       if(!tool)return null;
       return this.held==='pot'?{x:tool.x-potFrame(tool).offset,y:tool.y}:
         {x:tool.x+Math.cos(tool.angle)*C.hammerLength,y:tool.y+Math.sin(tool.angle)*C.hammerLength};
+    }
+    hover(p,now){
+      if(this.held||this.phase!=='react')return;
+      const kind=p&&dist(p,C.hammerHome)<C.grabRadius+25?'hammer':p&&dist(p,C.potHome)<C.grabRadius+25?'pot':null;
+      if(kind!==this.hoverTool){this.hoverTool=kind;this.hoverAt=now;}
     }
     grab(p,id,now) {
       this.tick(now);
@@ -112,10 +153,13 @@
       this.pathLength+=length;this.trace.push({...tip,t:now});
       this.trace=this.trace.filter(p=>now-p.t<160).slice(-24);
       if(this.held==='pot')this.updateEquip();
-      else if(this.pathLength>=C.swingMinLength&&length/dt*1000>=C.swingMinSpeed&&
-        (tip.x-previous.x)*(C.enemyHead.x-previous.x)+(tip.y-previous.y)*(C.enemyHead.y-previous.y)>0&&
-        segmentCircle(previous,tip,C.enemyHead,C.enemyHead.r+C.hammerRadius)) {
-        this.contact={...C.enemyHead};this.resolve(this.time-this.reactAt>=C.enemyGuardMs?'guarded':'hit');
+      else {
+        const head=enemyFrame(this).head;
+        if(this.pathLength>=C.swingMinLength&&length/dt*1000>=C.swingMinSpeed&&
+          (tip.x-previous.x)*(head.x-previous.x)+(tip.y-previous.y)*(head.y-previous.y)>0&&
+          segmentCircle(previous,tip,head,C.enemyHead.r+C.hammerRadius)) {
+          this.contact={...head};this.resolve(this.time-this.reactAt>=C.enemyGuardMs?'guarded':'hit');
+        }
       }
       return true;
     }
@@ -136,6 +180,7 @@
     resolve(result,reason='') {
       if(this.phase==='resolve'||this.phase==='end')return;
       if(this.phase!=='react'&&result!=='foul')return;
+      this.enemyImpactLean=enemyFrame(this).lean;
       this.result=result;this.phase='resolve';this.resolvedAt=this.time;
       this.reason=reason;
       if(result==='hit')this.score.player++;
@@ -150,7 +195,7 @@
     }
     drainEvents() { return this.events.splice(0); }
   }
-  const api = { Match, C, dist, clamp, outcome, segmentCircle, reach, ik, playerRig, potFrame };
+  const api = { Match, C, dist, clamp, outcome, segmentCircle, reach, ik, playerRig, potFrame, enemyPotFrame, enemyFrame, ease, mix };
   if (typeof module === 'object') module.exports = api;
   else root.WGG = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

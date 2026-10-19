@@ -25,10 +25,10 @@ test('wrong tool, tie and early grabs foul only once',()=>{for(const [b,home]of 
 test('opponent pot blocks a late valid swing',()=>{const m=round();m.grab(C.hammerHome,1,C.enemyGuardMs+10);m.move(hitWrist,1,C.enemyGuardMs+160);assert.equal(m.result,'guarded');});
 test('timeout, tie and short recovery gate',()=>{let m=round();m.tick(C.reactMs);assert.equal(m.result,'miss');assert(!m.next());m.tick(C.reactMs+C.recoverMs);assert(m.next());assert.equal(m.phase,'select');m=round(0,0);m.tick(C.tieMs);assert.equal(m.result,'tie');assert(C.recoverMs<=300);});
 test('three-point ending and reset',()=>{const m=new Match();for(let i=0;i<3;i++){m.grab(C.hammerHome,1,m.time);m.tick(m.time+C.recoverMs);if(i<2)assert(m.next());}assert.equal(m.phase,'end');m.reset();assert.equal(m.phase,'select');assert.equal(m.score.enemy,0);});
-test('bounded player arm includes near, far and zero-distance targets',()=>{assert(C.upperArm<=180&&C.forearm<=180);for(const target of [C.hammerHome,C.potHome,potWrist,hitWrist,C.shoulder,{x:-1000,y:2000}]){const wrist=reach(target);bones({shoulder:C.shoulder,elbow:ik(C.shoulder,wrist),wrist,a:C.upperArm,b:C.forearm});}assert(segmentCircle({x:250,y:230},{x:700,y:230},C.enemyHead,C.enemyHead.r));});
+test('bounded player arm includes near, far and zero-distance targets',()=>{assert(C.upperArm<=C.playerHead.r*2&&C.forearm<=C.playerHead.r*2);for(const target of [C.hammerHome,C.potHome,potWrist,hitWrist,C.shoulder,{x:-1000,y:2000}]){const wrist=reach(target);bones({shoulder:C.shoulder,elbow:ik(C.shoulder,wrist),wrist,a:C.upperArm,b:C.forearm});}assert(segmentCircle({x:250,y:230},{x:700,y:230},C.enemyHead,C.enemyHead.r));});
 test('AI arms never stretch during attack, guard or recovery',()=>{for(const rule of ['win','lose'])for(let t=0;t<=C.reactMs;t+=10){const m={phase:'react',rule,time:t,reactAt:0};bones(enemyPose(m));}for(const result of ['hurt','block','guarded'])for(let t=0;t<=500;t+=10)bones(enemyPose({phase:'resolve',result,time:t,resolvedAt:0}));
-  const strike=enemyPose({phase:'react',rule:'lose',time:C.enemyStrikeMs,reactAt:0});assert(Math.abs(strike.wrist.x-C.playerHead.x)<.01);assert(Math.abs(strike.wrist.y-C.hammerLength-C.playerHead.y)<.01);
-  const block=enemyPose({phase:'react',rule:'lose',time:C.enemyStrikeMs,reactAt:0,equipped:true});assert(Math.abs(block.wrist.y-C.hammerLength-potWrist.y)<.01);
+  const strike=enemyPose({phase:'react',rule:'lose',time:C.enemyStrikeMs,reactAt:0});assert(Math.abs(strike.wrist.x-C.playerHead.x)<C.playerHead.r);assert(dist({x:strike.wrist.x,y:strike.wrist.y-C.hammerLength},C.playerHead)<C.playerHead.r);
+  const block=enemyPose({phase:'react',rule:'lose',time:C.enemyStrikeMs,reactAt:0,equipped:true});assert(dist({x:block.wrist.x,y:block.wrist.y-C.hammerLength},{x:C.playerHead.x,y:potWrist.y})<C.equipRadius+C.hammerRadius);
 });
 test('idle has no exposed hands, one arm switches from RPS to tool then withdraws',()=>{
   const m=new Match(()=>2/3);assert(!playerPose(m).visible);assert(!enemyPose(m).visible);
@@ -38,7 +38,7 @@ test('idle has no exposed hands, one arm switches from RPS to tool then withdraw
   m.move(hitWrist,1,160);assert.equal(playerPose(m).mode,'recover');assert(!enemyPose(m).visible);
   m.tick(460);assert(!playerPose(m).visible);assert(!enemyPose(m).visible);
 });
-test('authored RPS projection and bounded leaning preserve each pose bones',()=>{for(const b of [1,2]){const m=round(0,b);for(let t=0;t<1000;t+=10){m.tick(t);const p=playerPose(m),e=enemyPose(m);bones(p);bones(e);assert(Math.abs(p.shoulder.x-C.shoulder.x)<=135);assert(Math.abs(e.shoulder.x-C.enemyShoulder.x)<=95);if(p.mode==='rps'){assert.equal(p.a,C.rpsUpperArm);assert.equal(p.b,C.rpsForearm);}}}});
+test('authored RPS projection and bounded leaning preserve each pose bones',()=>{for(const b of [1,2]){const m=round(0,b);for(let t=0;t<1000;t+=10){m.tick(t);const p=playerPose(m),e=enemyPose(m);bones(p);bones(e);assert(Math.abs(p.shoulder.x-C.shoulder.x)<=135);assert(Math.abs(e.shoulder.x-C.enemyShoulder.x)<=C.enemyMaxLean);if(p.mode==='rps'){assert(p.a<=C.rpsUpperArm);assert(p.b<=C.rpsForearm);}}}});
 test('AI reaches the shared tabletop before taking either prop',()=>{
   let m=round(0,1);m.tick(449);assert.equal(enemyPose(m).mode,'reach');assert.equal(enemyPose(m).kind,null);
   m.tick(450);let p=enemyPose(m);assert.equal(p.kind,'hammer');assert(dist(p.wrist,C.hammerHome)<.01);
@@ -47,4 +47,22 @@ test('AI reaches the shared tabletop before taking either prop',()=>{
 test('sparse and dense input produce the same valid swing',()=>{for(const steps of [1,4,8,16]){const m=round();m.grab(C.hammerHome,1,10);for(let i=1;i<=steps;i++)m.move({x:C.hammerHome.x+(hitWrist.x-C.hammerHome.x)*i/steps,y:C.hammerHome.y+(hitWrist.y-C.hammerHome.y)*i/steps},1,10+180*i/steps);assert.equal(m.result,'hit',`samples=${steps}`);}});
 test('pot perspective keeps grip and collision center aligned',()=>{const atTable=api.potFrame(C.potHome),atHead=api.potFrame(potWrist);assert.equal(atTable.offset,C.potOffset);assert.equal(atHead.offset,C.potWearOffset);assert(atHead.scale>atTable.scale);const m=round(0,1);holdPot(m);assert(dist(m.tip(),{x:C.playerHead.x,y:potWrist.y})<C.equipRadius);bones(playerPose(m));});
 test('AI elbows turn continuously through reach and recovery',()=>{for(const rule of ['win','lose']){let prev=null;for(let t=0;t<=C.enemyStrikeMs;t+=2){const p=enemyPose({phase:'react',rule,time:t,reactAt:0});bones(p);assert(p.a<=C.enemyUpperArm+.01&&p.b<=C.enemyForearm+.01);if(prev)assert(dist(prev.elbow,p.elbow)<35,'no elbow branch snap');prev=p;}}});
+test('right shoulder, moving torso and head collision share the same motion',()=>{
+  assert(C.enemyShoulder.x<C.enemyHead.x-100);
+  const m=round();m.tick(C.enemyGuardMs-370);
+  const f=api.enemyFrame(m);assert(f.lean>0);assert.equal(f.head.x-C.enemyHead.x,f.shoulder.x-C.enemyShoulder.x);
+  m.resolve('hit');assert.equal(api.enemyFrame(m).lean,f.lean);m.tick(m.resolvedAt+260);assert.equal(api.enemyFrame(m).lean,0);
+});
+test('hover reaches either prop without grabbing or exposing the correct choice',()=>{
+  for(const enemy of [1,2])for(const [kind,home]of [['hammer',C.hammerHome],['pot',C.potHome]]){
+    const m=round(0,enemy);m.hover(home,0);m.tick(100);const p=playerPose(m);
+    assert.equal(p.mode,'reach');assert.equal(m.held,null);assert.equal(m.result,null);assert(dist(p.wrist,home)<1);
+    m.hover(null,100);assert.equal(playerPose(m).mode,'rps');
+  }
+});
+test('opponent pot fits the head and keeps the held handle on its rim',()=>{
+  const m=round();m.tick(C.enemyGuardMs);const f=api.enemyFrame(m),pot=api.enemyPotFrame(f.target);
+  assert.equal(pot.scale,1.6);assert(Math.abs(f.target.x-pot.offset-f.head.x)<.01);
+  assert.equal(f.target.y,C.enemyHead.y-C.enemyHead.r+7);
+});
 console.log(`${count} scenarios passed`);

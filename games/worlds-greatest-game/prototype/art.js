@@ -9,7 +9,7 @@
     rock:['limbs',0,1,4,2],scissors:['limbs',1,1,4,2],
     paper:['limbs',2,1,4,2],grip:['limbs',3,1,4,2]
   };
-  art.loading=Promise.all(['characters','limbs','office','enemy-bust','enemy-bust-hurt','enemy-rps','player-rps'].map(name=>new Promise((resolve,reject)=>{
+  art.loading=Promise.all(['characters','limbs','office','enemy-bust','enemy-bust-hurt','enemy-rps','player-rps','tool-bodies','tool-grips'].map(name=>new Promise((resolve,reject)=>{
     const img=new Image();img.onload=()=>{art.images[name]=img;resolve();};img.onerror=()=>reject(new Error(name));img.src=`assets/approved-a/${name}.png`;
   }))).then(()=>{
     for(const [name,[sheet,col,row,cols,rows]]of Object.entries(layout)){
@@ -28,6 +28,9 @@
       const cell=img.naturalWidth/3,inset=side==='player'?24:0;
       art.sprites[side+'Rps'+hand]={image:img,inset,rect:[hand*cell+inset,0,cell-inset,img.naturalHeight]};
     }
+    for(const [col,name]of ['enemyToolBody','enemyToolHurt','playerToolBody'].entries())art.sprites[name]={image:art.images['tool-bodies'],rect:[col*724,0,724,724]};
+    art.sprites.enemyGrip={image:art.images['tool-grips'],rect:[78,132,735,573]};
+    art.sprites.playerGrip={image:art.images['tool-grips'],rect:[998,135,697,564]};
     art.ready=true;
   }).catch(()=>{art.failed=true;});
 })();

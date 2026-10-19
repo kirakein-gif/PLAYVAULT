@@ -1,5 +1,7 @@
 # A안 게임 아트 제작 기록
 
+v0.9 도구 구간의 몸통·오른손 그립 아트와 전체 프롬프트는 [TOOLS_PROVENANCE.md](TOOLS_PROVENANCE.md)에 기록했습니다.
+
 v0.8 오른손 가위바위보 연결형 포즈, 기준 이미지와 전체 프롬프트는 [RPS_PROVENANCE.md](RPS_PROVENANCE.md)에 기록했습니다.
 
 - 방식: 내장 image_gen. 2026-10-19, 사용자 선택 A · 우측 어깨너머 구도와 그림체 반영.

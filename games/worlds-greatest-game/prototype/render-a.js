@@ -8,7 +8,7 @@
     const impact=['hit','hurt','block','guarded'].includes(m.result)&&age<360;
     const breathe=Math.sin(t/800)*1.2,ep=WGG.enemyPose(m),pp=WGG.playerPose(m);
     const eLean=ep.shoulder.x-C.enemyShoulder.x;
-    const pLean=pp.kind==='hammer'?{x:pp.shoulder.x-C.shoulder.x,y:pp.shoulder.y-C.shoulder.y}:{x:0,y:0};
+    const pLean=pp.visible&&pp.mode!=='rps'?{x:pp.shoulder.x-C.shoulder.x,y:pp.shoulder.y-C.shoulder.y}:{x:0,y:0};
     ctx.save();ctx.clearRect(0,0,1200,720);
     if(impact&&!options.reduced){const q=1-age/360;ctx.translate(Math.sin(age/17)*4*q,Math.cos(age/21)*2*q);}
     ctx.drawImage(art.images.office,0,0,1200,720);
@@ -25,6 +25,7 @@
     function oval(x,y,rx,ry,fill,stroke=null){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke();}}
     function text(s,x,y,size=16,color='#342e28'){ctx.font=`600 ${size}px "Malgun Gothic",sans-serif`;ctx.textAlign='center';ctx.fillStyle=color;ctx.fillText(s,x,y);}
     function segment(name,a,b,width){const length=dist(a,b);ctx.save();ctx.translate(a.x,a.y);ctx.rotate(Math.atan2(b.y-a.y,b.x-a.x)-Math.PI/2);sprite(name,-width/2,-8,width,length+16);ctx.restore();}
+    function restArm(prefix,s,e,w,width){segment(prefix+'Upper',s,e,width);segment(prefix+'Fore',e,w,width*.78);}
     function hammer(p,angle=C.hammerHomeAngle){
       ctx.save();ctx.translate(p.x,p.y);ctx.rotate(angle+Math.PI/2);
       line([[0,12],[0,-C.hammerLength]],'#8e692f',15);line([[-2,10],[-2,-C.hammerLength]],'#e8c267',10);
@@ -34,7 +35,7 @@
       oval(-43,-C.hammerLength,7,21,'#b44030','#893c30');oval(43,-C.hammerLength,7,21,'#d8593d','#893c30');ctx.restore();
     }
     function pot(p,flip=0,metal=false,near=false){
-      const frame=near?WGG.potFrame(p):{offset:C.potOffset,scale:1};
+      const frame=near?WGG.potFrame(p):WGG.enemyPotFrame(p);
       const x=p.x-frame.offset,y=p.y+(metal?Math.sin(age/13)*Math.max(0,1-age/280)*3:0);
       ctx.save();ctx.translate(x,y);ctx.scale(frame.scale,(1-2*flip||.01)*frame.scale);
       const steel=ctx.createLinearGradient(-65,0,65,0);steel.addColorStop(0,'#7b7771');steel.addColorStop(.17,'#d7d5cb');steel.addColorStop(.3,'#9c9a91');steel.addColorStop(.53,'#f1eee0');steel.addColorStop(.8,'#aaa89e');steel.addColorStop(1,'#686963');
@@ -45,8 +46,12 @@
     // A continuous bust keeps jaw, neck and collar connected during recoil.
     const recoil=m.result==='hit'?Math.sin(clamp(age/430,0,1)*Math.PI):0;
     if(ep.mode==='rps')rpsActor(ep,false);
-    else{ctx.save();ctx.translate(420+eLean,495+breathe);ctx.rotate(recoil*.025);
-      sprite(m.result==='hit'&&age<430?'enemyBustHurt':'enemyBust',-225,-420,420,502);ctx.restore();}
+    else{const hurt=m.result==='hit'&&age<430;
+      ctx.save();ctx.translate(420+eLean,495+breathe);ctx.rotate(recoil*.025);
+      sprite(hurt?'enemyToolHurt':'enemyToolBody',-(hurt?430:459)*.65,-410,724*.65,724*.65);ctx.restore();
+      restArm('beige',{x:540+eLean,y:395},{x:565+eLean,y:490},{x:550+eLean,y:615},96);
+      if(!ep.visible)restArm('beige',{x:C.enemyShoulder.x+eLean,y:C.enemyShoulder.y},{x:210+eLean,y:505},{x:280+eLean,y:630},100);
+    }
     // Authored tabletop perspective, warm grain, bevel and contact shadows.
     const corners=C.table.map(p=>[p.x,p.y]),[a,b,c,d]=corners;
     ctx.save();ctx.beginPath();ctx.moveTo(...a);corners.slice(1).forEach(p=>ctx.lineTo(...p));ctx.closePath();ctx.clip();
@@ -59,21 +64,26 @@
     // Near actor: separate painted nape and navy jacket retain the approved A camera.
     const hurt=m.result==='hurt'?Math.sin(clamp(age/430,0,1)*Math.PI):0;
     if(pp.mode==='rps')rpsActor(pp,true);
-    else{sprite('playerBody',640+pLean.x,372+pLean.y+breathe,660,422);
-      ctx.save();ctx.translate(C.playerHead.x+pLean.x-hurt*8,C.playerHead.y+pLean.y+breathe+hurt*8);ctx.rotate(-.07-hurt*.06);sprite('playerHead',-160,-140,320,315);ctx.restore();}
+    else{sprite('playerToolBody',C.playerHead.x-318.5*.94+pLean.x-hurt*8,120+pLean.y+breathe+hurt*8,724*.94,724*.94);
+      restArm('navy',{x:700+pLean.x,y:560+pLean.y},{x:675+pLean.x,y:710+pLean.y},{x:710+pLean.x,y:820+pLean.y},150);
+    }
     function drawArm(p,near){
       if(!p.visible||p.mode==='rps')return;
-      const prefix=near?'navy':'beige',w=near?96:76;
-      const name='grip',s=art.sprites[name];
+      const prefix=near?'navy':'beige',w=96;
+      const name=near?'playerGrip':'enemyGrip',s=art.sprites[name];
       // The foreground hand already has a near-camera scale; do not double it
       // again when the pot itself grows from tabletop depth to head depth.
       const depth=near&&p.kind==='pot'?1+(WGG.potFrame(p.wrist).scale-1)*.35:1;
-      const scale=(near?.40:.34)*depth,width=s.rect[2]*scale,height=s.rect[3]*scale;
-      segment(prefix+'Upper',p.shoulder,p.elbow,w);
+      const scale=(near?.155:.125)*depth,width=s.rect[2]*scale,height=s.rect[3]*scale;
       const grip=p.kind!==null;
-      const angle=grip&&p.kind==='hammer'?(p.angle??-Math.PI/2)+Math.PI/2:0;
-      const base=grip?{x:p.wrist.x-Math.sin(angle)*height*.48,y:p.wrist.y+Math.cos(angle)*height*.48}:p.wrist;
-      segment(prefix+'Fore',p.elbow,base,w*.76);
+      const lift=p.kind==='pot'?clamp((C.potHome.y-p.wrist.y)/(C.potHome.y-(near?C.playerHead.y-C.playerHead.r+7:C.enemyHead.y-C.enemyHead.r+7)),0,1):0;
+      const angle=grip&&p.kind==='hammer'?(p.angle??-Math.PI/2)+Math.PI/2:(near?1:-1)*Math.PI/2*lift;
+      const offset=(near?1:-1)*width*.58;
+      const base={x:p.wrist.x+Math.cos(angle)*offset-Math.sin(angle)*height*.12,y:p.wrist.y+Math.sin(angle)*offset+Math.cos(angle)*height*.12};
+      const solved=WGG.ik(p.shoulder,WGG.reach(base,p.shoulder,p.a,p.b),p.a,p.b,near?(p.kind==='pot'?1:-1):1);
+      const elbow=p.mode==='reach'?p.elbow:solved;
+      segment(prefix+'Upper',p.shoulder,elbow,w);
+      segment(prefix+'Fore',elbow,base,w*.76);
       if(p.kind==='hammer')hammer(p.wrist,p.angle??-Math.PI/2);
       if(p.kind==='pot'){
         const target={x:C.playerHead.x,y:C.playerHead.y-C.playerHead.r+7};
@@ -82,7 +92,7 @@
         pot(p.wrist,flip,m.result==='block'||m.result==='guarded',near);
       }
       ctx.save();ctx.translate(p.wrist.x,p.wrist.y);ctx.rotate(angle);
-      sprite(name,-width/2,grip?-height*.45:-height*.94,width,height);ctx.restore();
+      sprite(name,near?-width*.25:-width*.75,-height*.48,width,height);ctx.restore();
     }
     drawArm(ep,false);drawArm(pp,true);
     if(['select','react'].includes(m.phase))for(const [p,label]of [[C.hammerHome,'망치'],[C.potHome,'냄비']]){

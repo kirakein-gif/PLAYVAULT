@@ -19,13 +19,14 @@
   });
   canvas.addEventListener('pointermove',e=>{
     const p=point(e);
+    match.hover(p,e.timeStamp);
     if(match.held&&(p.x<0||p.y<0||p.x>C.width||p.y>C.height)){cancelGrab();return;}
     const samples=e.getCoalescedEvents?.()||[];
     for(const sample of samples.length?samples:[e])match.move(point(sample),e.pointerId,sample.timeStamp);
   });
   function release(e){match.release(e.pointerId,e.type!=='pointerup');if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);canvas.style.cursor='grab';}
   canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);canvas.addEventListener('lostpointercapture',release);
-  canvas.addEventListener('pointerleave',e=>{if(match.held)release(e);});
+  canvas.addEventListener('pointerleave',e=>{match.hover(null,e.timeStamp);if(match.held)release(e);});
   window.addEventListener('blur',cancelGrab);
   document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelGrab();});
   $('#next').onclick=()=>match.next();
