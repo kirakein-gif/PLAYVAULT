@@ -466,3 +466,21 @@
 - 5개 관리 문서 검토: WORK_LOG 누적, STATUS/CHANGELOG 갱신. AGENTS/CLAUDE는 절차 변경이 없어 해당 항목 변경 없음. 과거 WORK_LOG는 수정하지 않음.
 - 제출/인계: 같은 PR #4에 푸시하며 수정 커밋은 PR head 참조. 다음 검토 담당 **Claude Code / 재검토 대기**. 독립 테스트 재실행·브라우저 조작·이번 네 수정 확인 요청. 병합·수동 배포 명령 없음. 저장소 GitHub 연동 Cloudflare 미리보기 자동 배포 댓글은 별도 관찰로 구분.
 - 미확인: 실기기·Safari/Firefox·장시간 플레이·사용자 손맛 승인. 자동 통과를 조작감 완성으로 표현하지 않음. 원격 밖 PC 로컬 작업은 미확인.
+
+
+### 2026-10-31 (Asia/Seoul) · PR #4 추가 수정 — 모바일 화면 크기 + 가로 전체 화면
+
+- 담당 Codex / 검토 담당 **Claude Code / 재검토 대기**. 사용자가 실제 휴대전화에서 게임 화면이 너무 작다고 확인한 뒤 모바일 확대·전체 화면 구현을 요청.
+- 기준: `codex/hollow-keep-foundation`의 `229a50ca6f9e5b667afd2fa7d47b099243a21d89`. 원격 전체 브랜치 fetch 후 PR #4의 “모바일 화면이 너무 작음”, “모바일 가로 전체 화면” 댓글과 규격 §7-1/§7-2, 최신 원본 검사 두 파일을 직접 읽음. `fa33f01`과 `44bd915`를 순서대로 cherry-pick(`462f363`, `d304724`)하고 담당·범위를 STATUS에 기록/원격 공유(`018654f`).
+- 범위/버전: `next/`의 입력·배치·전체 화면 및 관리 문서. 기존 게임·공용 자산·다른 게임·루트 런처·기존 회귀·sim.js/CONFIG/공중 감속은 변경하지 않음. 룬탄 비관통과 Noah 콤보 보류 유지. 게임/캐시 버전 변경 없음.
+- 배치: 모바일 가로 제목줄/아래 조작줄을 없애고 좌우 72px 이상 여백을 제외한 최대 16:9 캔버스를 사용. 740×320→약 569×320, 780×330→587×330, 844×390→693×390, 915×412→732×412. 스크롤 없음. 도구는 여백 상단, 한 축 조이스틱은 왼쪽, 교대/공격/점프는 오른쪽. 조작 44px 이상, 도구/전체 화면 36px 이상이며 캔버스/서로를 가리지 않음. 수치 패널은 사용자가 열 때 별도 스크롤 영역으로 표시.
+- 입력: `data-control="move"` 한 축 조이스틱에 포인터 캡처·중앙 데드존·좌우 전환·손 떼기/취소/초점 해제 처리를 추가. 조이스틱+점프 멀티터치 유지. 시뮬레이션의 기존 속도를 그대로 사용하고 새 이동 수치를 부여하지 않음.
+- 전체 화면: 새 `fullscreen.js`에서 가로 `[data-fullscreen]`과 `#rotate` 안 버튼을 연결. 클릭 순간 `document.documentElement.requestFullscreen({navigationUI:'hide'})` 호출 후 `screen.orientation.lock('landscape')`. 가로 고정 거절 시 전체 화면 유지+안내, 전체 화면 거절/미지원 시 안내 및 처리되지 않은 Promise 거절 없음. 재클릭 해제 및 잠금 해제 시도. 자동 진입 없음. resize/fullscreenchange에 동적 CSS 재배치와 입력/누적 시간 초기화, 캔버스 포커스 복원.
+- 변경 파일: `next/{index.html,style.css,input.js,app.js,fullscreen.js,README.md}`, `next/tests/browser-playtest.cjs`, `docs/{WORK_LOG.md,STATUS.md}`, `CHANGELOG.md`. 원본 `foundation-contract.cjs`, `mobile-layout.cjs`, `mobile-fullscreen.cjs`는 최신 규격 커밋 원본과 동일하며 직접 수정/약화하지 않음.
+- 이번 검사: `mobile-layout.cjs` **20/20**, `mobile-fullscreen.cjs` **6/6**, `foundation-contract.cjs` **41/41**, `foundation-edge.cjs` **12/12**, `room-traversal.cjs` **4/4**, `browser-playtest.cjs` **18/18 통과**. 기존 `tests/polish-regression.cjs`, `tests/audio-regression.cjs`, `tests/audio-wind-regression.cjs` **3종 통과**. 오디오 404는 의도적인 실패 경로 로그. 검사 원본·보호 경로·기존 이력 보존, JS 구문, diff 검사도 수행.
+- 환경/재현: 저장소 루트 HTTP 서버 127.0.0.1:8766, `HK_URL=http://127.0.0.1:8766/games/the-hollow-keep/next/`, `CHROMIUM_PATH=/usr/bin/chromium`, Playwright/시스템 Chromium. 배치는 4개 가로 크기/DPR2. 기존 브라우저 검사의 터치 위치를 조이스틱으로 변경하고, 좌우 전환/취소·자동 진입 없음·전체 화면 거절 후 조작 유지·전체 화면 중 780×330→915×412 재배치도 검사.
+- 중간 실패: 기존 8765 HTTP 서버가 ERR_EMPTY_RESPONSE를 반환해 8766의 새 로컬 서버로 검증. 초기 고정 위치 도구는 offsetParent 기준 가시성 검사에 걸려 배치 16/20·전체 화면 4/6이었고, main 내부 절대 위치로 바꾸어 최종 20/20·6/6 통과. 검사 파일을 고치지 않고 구현을 수정.
+- 캡처: `HK_SHOT_DIR=/tmp`의 `/tmp/hk-mobile-{740x320,780x330,844x390,915x412}.png` 및 `/tmp/hollow-keep-mobile-start.png`, `/tmp/hollow-keep-mobile-fullscreen.png`. 가로 780×330/844×390 및 전체 화면 캡처 육안 확인. 시작 주인공과 바닥/표적/라벨이 보이고 조작은 여백에 있음.
+- 5개 관리 문서 검토: WORK_LOG 누적, STATUS/CHANGELOG 갱신, AGENTS/CLAUDE는 절차 변경이 없어 해당 항목 변경 없음. 과거 WORK_LOG 보존. README에 배치/전체 화면 사용법·미지원 안내·검증 명령·한계 갱신.
+- 한계: **실제 화면 회전은 실기기 확인 필요**. headless 검사는 전체 화면 진입/해제와 가로 고정 요청 및 거절 대응을 확인하며, 실제 Android 회전/주소창·노치/iPhone Safari 설치 모드/터치 손맛을 검증한 것은 아님. 실기기·타 브라우저·장시간 플레이·사용자 손맛 평가는 미확인.
+- 제출/인계: 같은 PR #4에 푸시, 수정 커밋은 PR head 참조. Claude Code가 원본 검사 전체 재실행·독립 브라우저·실기기 확인 항목 검토. 병합·수동 배포 명령 없음. GitHub 연동 미리보기는 별도 자동 작업으로 구분.

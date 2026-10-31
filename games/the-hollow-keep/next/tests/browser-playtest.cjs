@@ -24,7 +24,7 @@ const url = process.env.HK_URL || 'http://127.0.0.1:8765/games/the-hollow-keep/n
   async function reset(page) {await page.locator('#reset').click();await page.locator('canvas').focus();await ticks(page,3);}
   try {
     const desktop=await browser.newContext({viewport:{width:1280,height:900}}),page=await setup(desktop);
-    await check('debug hidden by default', async()=>assert.equal(await page.locator('#debug').isVisible(),false));
+    await check('debug hidden and fullscreen never entered automatically', async()=>{assert.equal(await page.locator('#debug').isVisible(),false);assert.equal(await page.evaluate(()=>!!document.fullscreenElement),false);});
     await check('D key moves the actual player',async()=>{
       const x=(await snap(page)).player.x;await page.keyboard.down('KeyD');await ticks(page,20);await page.keyboard.up('KeyD');
       assert.ok((await snap(page)).player.x>x+30);
@@ -64,15 +64,22 @@ const url = process.env.HK_URL || 'http://127.0.0.1:8765/games/the-hollow-keep/n
     await page.screenshot({path:'/tmp/hollow-keep-desktop.png',fullPage:true});
     const mobile=await browser.newContext({viewport:{width:844,height:390},isMobile:true,hasTouch:true,deviceScaleFactor:2}),touch=await setup(mobile);
     const cdp=await mobile.newCDPSession(touch);
-    const point=async(action,id)=>{const b=await touch.locator(`[data-action="${action}"]`).boundingBox();assert.ok(b);return{x:b.x+b.width/2,y:b.y+b.height/2,id};};
+    const point=async(action,id)=>{
+      const movement=action==='left'||action==='right';
+      const b=await touch.locator(movement?'[data-control="move"]':`[data-action="${action}"]`).boundingBox();
+      assert.ok(b);return{x:b.x+b.width*(movement?(action==='left'?.15:.85):.5),y:b.y+b.height/2,id};
+    };
     await check('mobile landscape fits stage and controls',async()=>{
       assert.equal(await touch.locator('#rotate').isVisible(),false);
-      for(const action of ['left','right','jump','attack','swap']) {const b=await touch.locator(`[data-action="${action}"]`).boundingBox();assert.ok(b.x>=0&&b.y>=0&&b.x+b.width<=844&&b.y+b.height<=390);}
+      const controls=['[data-control="move"]','[data-action="jump"]','[data-action="attack"]','[data-action="swap"]'];
+      for(const selector of controls) {const b=await touch.locator(selector).boundingBox();assert.ok(b.x>=0&&b.y>=0&&b.x+b.width<=844&&b.y+b.height<=390);}
       const canvasBox=await touch.locator('canvas').boundingBox();
       assert.ok(canvasBox.x>=0&&canvasBox.y>=0&&canvasBox.x+canvasBox.width<=844&&canvasBox.y+canvasBox.height<=390);
-      for(const action of ['left','right','jump','attack','swap']) {
-        const b=await touch.locator(`[data-action="${action}"]`).boundingBox();
-        assert.ok(b.y>=canvasBox.y+canvasBox.height,action+' must be below the canvas');
+      for(const selector of controls) {
+        const b=await touch.locator(selector).boundingBox();
+        const width=Math.min(b.x+b.width,canvasBox.x+canvasBox.width)-Math.max(b.x,canvasBox.x);
+        const height=Math.min(b.y+b.height,canvasBox.y+canvasBox.height)-Math.max(b.y,canvasBox.y);
+        assert.ok(width<=0||height<=0,selector+' must not overlap the canvas');
       }
       assert.ok(await touch.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
     });
@@ -91,11 +98,20 @@ const url = process.env.HK_URL || 'http://127.0.0.1:8765/games/the-hollow-keep/n
       await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await ticks(touch,65);
       assert.ok((await snap(touch)).player.onGround);assert.equal((await snap(touch)).player.vx,0);
     });
+    await check('joystick steers left and releases on touch cancellation',async()=>{
+      await reset(touch);
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[await point('right',1)]});await ticks(touch,10);
+      const x=(await snap(touch)).player.x;
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[await point('left',1)]});await ticks(touch,10);
+      assert.ok((await snap(touch)).player.x<x);
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});await ticks(touch,10);
+      assert.equal((await snap(touch)).player.vx,0);assert.equal(await touch.locator('[data-control="move"].pressed').count(),0);
+    });
     await check('touch attack and swap buttons trigger gameplay',async()=>{
       await reset(touch);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[await point('attack',1)]});await ticks(touch,3);
       await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await ticks(touch,25);assert.equal((await snap(touch)).dummies[0].hp,978);
       await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[await point('swap',1)]});await ticks(touch,3);
-      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await ticks(touch,2);assert.equal((await snap(touch)).active,'noah');assert.equal(await touch.locator('[data-action].pressed').count(),0);
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await ticks(touch,2);assert.equal((await snap(touch)).active,'noah');assert.equal(await touch.locator('[data-action].pressed,[data-control].pressed').count(),0);
     });
     await touch.screenshot({path:'/tmp/hollow-keep-mobile.png'});
     await check('portrait pauses and landscape resumes without stuck input',async()=>{
@@ -103,7 +119,41 @@ const url = process.env.HK_URL || 'http://127.0.0.1:8765/games/the-hollow-keep/n
       const before=(await snap(touch)).tick;await touch.waitForTimeout(150);assert.equal((await snap(touch)).tick,before);
       await touch.setViewportSize({width:844,height:390});await ticks(touch,5);assert.equal(await touch.locator('#rotate').isVisible(),false);assert.equal((await snap(touch)).player.vx,0);
     });
+    await check('fullscreen reflows after resizing and keeps joystick input',async()=>{
+      assert.equal(await touch.evaluate(()=>!!document.fullscreenElement),false);
+      await touch.locator('#fullscreen-toggle').tap();
+      await touch.waitForFunction(()=>!!document.fullscreenElement);
+      for(const [width,height] of [[780,330],[915,412]]) {
+        await touch.setViewportSize({width,height});await ticks(touch,3);
+        const box=await touch.locator('canvas').boundingBox();
+        const best=Math.min(height/540,(width-144)/960)*960;
+        assert.ok(box.width>=best*.9&&box.x>=0&&box.y>=0&&box.x+box.width<=width+.5&&box.y+box.height<=height+.5);
+        assert.ok(await touch.evaluate(()=>document.scrollingElement.scrollHeight<=innerHeight+1));
+      }
+      await reset(touch);
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[await point('right',1)]});await ticks(touch,10);
+      assert.ok((await snap(touch)).player.x>45);
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await ticks(touch,10);
+      await touch.screenshot({path:'/tmp/hollow-keep-mobile-fullscreen.png'});
+      await touch.locator('#fullscreen-toggle').tap();await touch.waitForFunction(()=>!document.fullscreenElement);
+      await touch.setViewportSize({width:844,height:390});await ticks(touch,3);
+    });
+    await check('denied fullscreen request reports guidance and keeps controls usable',async()=>{
+      await touch.evaluate(()=>{
+        window.__deniedFullscreen=[];window.__fullscreenCalls=0;
+        window.addEventListener('unhandledrejection',e=>window.__deniedFullscreen.push(String(e.reason)));
+        document.documentElement.requestFullscreen=()=>{window.__fullscreenCalls++;return Promise.reject(new DOMException('denied','NotAllowedError'));};
+      });
+      assert.equal(await touch.evaluate(()=>window.__fullscreenCalls),0);
+      await touch.locator('#fullscreen-toggle').tap();
+      await touch.waitForFunction(()=>window.__fullscreenCalls===1);
+      assert.match(await touch.locator('#notice').textContent(),/全|전체/);
+      assert.equal(await touch.evaluate(()=>!!document.fullscreenElement),false);
+      assert.deepEqual(await touch.evaluate(()=>window.__deniedFullscreen),[]);
+      await reset(touch);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[await point('right',1)]});await ticks(touch,10);
+      assert.ok((await snap(touch)).player.x>45);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    });
     await check('no page errors or missing resources',async()=>{assert.deepEqual(errors,[]);assert.deepEqual(failures,[]);});
-    console.log(`${checks}/${checks} browser checks passed; screenshots: /tmp/hollow-keep-{desktop,mobile,mobile-start}.png`);
+    console.log(`${checks}/${checks} browser checks passed; screenshots: /tmp/hollow-keep-{desktop,mobile,mobile-start,mobile-fullscreen}.png`);
   } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

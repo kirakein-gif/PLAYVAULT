@@ -63,6 +63,7 @@
   });
   function suspend(){input.clear();accumulator=0;last=null;}
   window.addEventListener('blur',suspend);document.addEventListener('visibilitychange',suspend);portrait.addEventListener('change',suspend);
+  window.addEventListener('resize',suspend);document.addEventListener('fullscreenchange',suspend);
   function frame(time){
     if(last===null)last=time;
     const elapsed=Math.max(0,(time-last)/1000);last=time;
