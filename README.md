@@ -1,5 +1,12 @@
 # PLAYVAULT
 
+## AI 공동 개발 문서
+
+- [공통 개발 규칙](AGENTS.md) · [Claude Code 진입 지침](CLAUDE.md)
+- [현재 개발 상태·브랜치별 현황](docs/STATUS.md)
+- [누적 개발 이력·인계 양식](docs/WORK_LOG.md)
+- [게임별 변경 내역](CHANGELOG.md)
+
 ## Eclipse art/audio polish (v30)
 
 - Stable sprite scale, authored torso/foot pivots, DPR capped at 2, nearest-pixel presentation; gameplay coordinates remain unchanged.
