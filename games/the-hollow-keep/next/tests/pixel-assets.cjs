@@ -161,6 +161,7 @@ async function analyze(page, file, opts) {
           assert.ok(Array.isArray(a.ticks) && a.ticks.length === a.frames && a.ticks.every(isInt), `${name} ticks는 프레임 수만큼의 양의 정수`);
         }
         if (name === 'idle' || name === 'run') assert.equal(a.loop, true, `${name}.loop는 true`);
+        if (name === 'attack') assert.ok(a.ticks[0] <= 2, `attack 첫(준비) 프레임 ${a.ticks[0]}틱 > 2틱 — 판정은 누르는 즉시 생기므로 휘두르기 전에 피해가 먼저 보임`);
         assert.ok(/\.png$/i.test(a.file || ''), `${name} 파일은 .png`);
       }
     });

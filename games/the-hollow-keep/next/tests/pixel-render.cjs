@@ -9,6 +9,7 @@
  * 환경 변수: HK_URL, CHROMIUM_PATH, HK_SHOT_DIR(지정하면 점프 자세 캡처 저장)
  * 그림 밀도: HKPlaytest.artStatus().scale(1 또는 2, 없으면 1). 실제 해상도는 (960×scale)의 정수 배여야 한다.
  * 시험본 비교: HK_URL에 ?art=trial-x1 / ?art=trial-x2 처럼 시험본 주소를 붙여 같은 검사를 돌린다.
+ * 베기 효과 검사는 기본 자산(assets/pixel/manifest.json)에 noah fx-slash가 있을 때만 판정한다.
  */
 'use strict';
 const assert = require('node:assert/strict');
@@ -100,6 +101,54 @@ const VIEWS = [
       assert.deepEqual(errors, [], `페이지 오류: ${errors.join(' | ')}`);
       await ctx.close();
     });
+
+    // ── Noah 베기 효과: 휘두르는 프레임부터, 공격 그림과 함께만, 몸 앞쪽에만 (ART_DIRECTION §4-4) ──
+    const SLASH_HOOK = () => {
+      window.__draws = [];
+      const orig = CanvasRenderingContext2D.prototype.drawImage;
+      CanvasRenderingContext2D.prototype.drawImage = function (img, ...a) {
+        const src = (img && img.src) || '';
+        const m = /noah-(attack|fx-slash)\.png/.exec(src);
+        if (m && a.length === 8 && window.HKPlaytest) {
+          const t = this.getTransform(), w = HKPlaytest.snapshot();
+          const xs = [a[4], a[4] + a[6]].map((x) => [a[5], a[5] + a[7]].map((y) => t.a * x + t.c * y + t.e)).flat();
+          window.__draws.push({ kind: m[1], sx: a[0], tick: w.tick, face: w.player.face, cx: w.player.x + w.player.w / 2,
+            left: Math.min(...xs), right: Math.max(...xs), unit: this.canvas.width / 960 });
+          if (window.__draws.length > 400) window.__draws.shift();
+        }
+        return orig.call(this, img, ...a);
+      };
+    };
+    for (const dir of ['right', 'left']) {
+      await test(`Noah 베기 효과(${dir === 'right' ? '오른쪽' : '왼쪽'}): 휘두르는 프레임부터·공격 그림과 함께만·몸 앞쪽에만`, async () => {
+        const { ctx, page } = await open(VIEWS[0], (p) => p.addInitScript(SLASH_HOOK));
+        const man = await page.evaluate(() => fetch('assets/pixel/manifest.json').then((r) => r.json()).catch(() => null));
+        const fx = man && man.heroes && man.heroes.noah && man.heroes.noah.animations['fx-slash'];
+        const atk = man && man.heroes && man.heroes.noah && man.heroes.noah.animations.attack;
+        assert.ok(atk, 'manifest에 noah attack이 없음');
+        if (!fx) { await ctx.close(); return; } // 베기 효과가 없는 구성은 검사 대상 아님
+        await page.locator('canvas').focus();
+        await page.keyboard.press('KeyQ'); await page.waitForTimeout(300);
+        if (dir === 'left') { await page.keyboard.down('KeyA'); await page.waitForTimeout(60); await page.keyboard.up('KeyA'); }
+        else { await page.keyboard.down('KeyD'); await page.waitForTimeout(60); await page.keyboard.up('KeyD'); }
+        await page.waitForTimeout(400);
+        await page.evaluate(() => { window.__draws = []; });
+        await page.keyboard.press('KeyX'); await page.waitForTimeout(900);
+        const draws = await page.evaluate(() => window.__draws);
+        const fxDraws = draws.filter((d) => d.kind === 'fx-slash');
+        assert.ok(fxDraws.length > 0, '공격했지만 fx-slash가 한 번도 그려지지 않음');
+        for (const f of fxDraws) {
+          const same = draws.filter((d) => d.kind === 'attack' && d.tick === f.tick);
+          assert.ok(same.length > 0, `tick ${f.tick}: 공격 그림 없이 효과만 그려짐`);
+          const frame = Math.floor(same[same.length - 1].sx / atk.frameW);
+          assert.ok(frame >= 1, `tick ${f.tick}: 공격 ${frame}번(준비) 프레임에 효과가 이미 그려짐`);
+          const L = f.left / f.unit, R = f.right / f.unit;
+          if (f.face > 0) assert.ok(L >= f.cx - 2, `오른쪽을 보는데 효과 왼쪽 끝 ${L.toFixed(1)}이 몸 중심 ${f.cx.toFixed(1)}보다 뒤쪽`);
+          else assert.ok(R <= f.cx + 2, `왼쪽을 보는데 효과 오른쪽 끝 ${R.toFixed(1)}이 몸 중심 ${f.cx.toFixed(1)}보다 뒤쪽`);
+        }
+        await ctx.close();
+      });
+    }
 
     if (process.env.HK_SHOT_DIR) {
       const { ctx, page } = await open(VIEWS[0]);
