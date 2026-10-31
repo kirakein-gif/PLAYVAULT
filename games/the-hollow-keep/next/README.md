@@ -2,7 +2,30 @@
 
 픽셀아트 HD 주인공·타일 위에서 이동·점프·무기·교대를 비교하는 독립 시험 방입니다. 리뷰의 4건 수정과 모바일 화면 확대·가로 전체 화면과 도약 종류별 공중 조작 요구를 반영했으며 사용자 조작감 평가와 Claude Code 재검토를 기다립니다. 게임 버전 번호는 부여하지 않았습니다. 기존 게임과 루트 런처는 그대로입니다.
 
-## 픽셀 자산과 렌더링
+## 목표 외형 밀도 시험 · CODEX_TASK_03
+
+현재 작업은 전체 재제작 전의 **밀도 선택용 시험본**입니다. 사용자가 지정한 `docs/reference/target-pose-board-2026-10-31.jpg`의 원본 PNG를 경로 A 밑그림으로 사용했습니다. 어느 쪽이 낫다는 판단은 하지 않습니다.
+
+- `/games/the-hollow-keep/next/?art=trial-x1`: scale1, Ethan68px / Noah64px 기준.
+- `/games/the-hollow-keep/next/?art=trial-x2`: scale2, Ethan136px / Noah128px 기준.
+- 게임 속 몸 크기·조작·방은 같고, 그림의 원래 픽셀 밀도만 다릅니다. 같은 원본과 같은 64색 팔레트에서 각각 독립적으로 면적 샘플링·윤곽/얼굴/손/알파/프레임 정리를 했습니다. x2는 x1을 두 배 확대한 파일이 아닙니다.
+- 두 폴더 모두 Ethan idle4/run6, Noah idle4만 제공합니다. 빠진 점프·공격·착지/Noah run은 도형으로 대신 그립니다. `artStatus()`는 scale도 반환합니다. 전체 스프라이트·베기 효과 재제작은 사용자가 밀도를 선택한 뒤 진행합니다.
+- `assets/pixel-trial/x1|x2/`의 manifest/palette/PROVENANCE에 원래 프레임·pivot·처리 과정을 적었습니다. 원본 PNG와 새 달리기 원본은 `tools/art-source/`, 재생성은 `tools/build-density-trial.py`(Pillow/numpy/scipy)입니다. 두 밀도 모두 같은 포즈/위상으로 제작했습니다.
+- [비교 캡처 모음](assets/pixel-trial/comparison/README.md): 목표 자세 | x1 | x2를 같은 표시 높이로 나란히, PC1280×900와 모바일780×330 게임 화면에서 두 모드를 비교할 수 있습니다. 캡처는 PR #8에도 링크했습니다.
+
+```sh
+python games/the-hollow-keep/next/tools/build-density-trial.py
+HK_ART_REQUIRE="ethan:idle,run;noah:idle" HK_ART_DIR=games/the-hollow-keep/next/assets/pixel-trial/x1 CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/pixel-assets.cjs
+# x2 폴더도 같은 명령으로 검사
+CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/density-trial.cjs
+```
+
+이번 결과: x1/x2 자산 각각 **18/18**, 각 시험본과 기본 모드의 렌더 검사 **5/5**, 추가 시험본 런타임 검사 **10/10**. 원래 pixel-render를 그대로 실행했을 때는 시험본에서 각각4/5였습니다. 강제404 경로가 기본 `/assets/pixel/`로 고정되어 시험본 요청을 막지 못한 문제여서, `4917569`에서 정규식 대상에 `pixel-trial/x[12]`도 포함하는 한 줄만 보완했습니다. 기존 failed/이동/오류 판정은 모두 그대로이며 완화·건너뛰기가 아닙니다. 실제 시험 경로를 막는 추가 검사에서도 404/대체/이동을 확인했습니다. 이 원본 검사 경로 변경은 검토 담당이 별도로 확인해야 합니다.
+
+기본 자산도 새 원본 검사로 재실행해 **50/51**입니다. 알려진 `noah/fx-slash.loop=true`가 실패하며 전체/베기 재제작 보류 지시 때문에 그대로 두었습니다. 기본 pixel-render **5/5**, 인수51/51·경계16/16·구덩이4/4·배치20/20·전체 화면6/6·브라우저20/20·기존 회귀3종은 통과했습니다. 사용자 밀도 선택·외형 판단 및 실제 휴대전화 확인은 대기입니다.
+
+## 이전 기본 픽셀 자산과 렌더링 (CODEX_TASK_02)
+
 
 `assets/pixel/`에 46색 공통 팔레트, manifest, 제작 기록, 두 주인공의 네이티브 PNG 시트 12개와 선택 효과 2개, 30px 타일셋, 960×540 배경을 둡니다. 타이틀 키아트는 외형 참고로만 사용했습니다. 이미지 생성 보드 역시 참고용이며 최종 픽셀을 복사·축소하지 않았습니다. 전체 지시문·재작성·팔레트/투명도 정리 과정은 [PROVENANCE.md](assets/pixel/PROVENANCE.md)에 있습니다.
 
@@ -16,9 +39,9 @@
 
 발 기준점은 (48,95), idle 불투명 높이는 Ethan 68px/Noah 64px입니다. 오른쪽 방향으로 그리고 왼쪽은 렌더러에서 뒤집습니다. 룬탄 2프레임/참격 3프레임 효과와 바닥 윗면·벽 속·16px 발판 3종 타일도 같은 팔레트/0·255 투명도를 사용합니다.
 
-캔버스는 표시 크기×DPR 이상인 최소 정수 k의 960k×540k 해상도를 쓰고, `setTransform(k)`와 `imageSmoothingEnabled=false`로 그립니다. PNG는 원래 해상도 그대로이며 화면에서만 확대/축소합니다. 스프라이트·타일의 출력 좌표는 반올림하지만 시뮬레이션 좌표와 CONFIG는 바꾸지 않습니다. 창·전체 화면 크기가 달라져도 매 프레임 필요한 backing 크기를 확인합니다.
+캔버스는 표시 크기×DPR 이상인 최소 정수 k의 (960×scale)k×(540×scale)k 해상도를 쓰고, `setTransform(k)`와 `imageSmoothingEnabled=false`로 그립니다. PNG는 원래 해상도 그대로이며 화면에서만 확대/축소합니다. 스프라이트 출력 좌표는 그림 픽셀 단위로 반올림하고(/scale) 타일 크기도 scale을 반영하지만 시뮬레이션 좌표와 CONFIG는 바꾸지 않습니다. 창·전체 화면 크기가 달라져도 매 프레임 필요한 backing 크기를 확인합니다.
 
-`HKPlaytest.artStatus()`는 `{loaded, failed}`를 반환합니다. 이미지/manifest가 실패해도 게임은 계속 진행하며, 실패한 동작/타일/배경은 기존 도형·배경 경로로 대신 표시합니다. 개별 이미지 실패가 나머지 정상 이미지를 막지 않습니다.
+`HKPlaytest.artStatus()`는 `{loaded, failed, scale}`를 반환합니다. 이미지/manifest가 실패해도 게임은 계속 진행하며, 실패한 동작/타일/배경은 기존 도형·배경 경로로 대신 표시합니다. 개별 이미지 실패가 나머지 정상 이미지를 막지 않습니다.
 
 자산 재작성은 Python 3와 Pillow(이번 실행 12.3.0)가 있는 도구 환경에서 다음과 같이 실행합니다. 런타임에는 Python이 필요 없습니다.
 
@@ -148,7 +171,7 @@ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/browser-pl
 
 서버 주소는 `HK_URL`, Chromium 경로는 `CHROMIUM_PATH`로 바꿉니다. 스크린샷은 `/tmp/hollow-keep-desktop.png`, `/tmp/hollow-keep-mobile.png`, 시작 위치 확인용 `/tmp/hollow-keep-mobile-start.png`, 전체 화면 `/tmp/hollow-keep-mobile-fullscreen.png`, 자세 비교 `/tmp/hollow-keep-standing-jump.png`와 `/tmp/hollow-keep-running-jump.png`에 저장됩니다. `HK_SHOT_DIR=/tmp`를 지정해 `mobile-layout.cjs`를 실행하면 4개 가로 크기의 캡처도 저장합니다.
 
-이번 픽셀 작업 실행: 픽셀 자산 **49/49**, 픽셀 렌더 **5/5**, 게임 규칙(6ce2654)의 원본 인수 **51/51**, 모바일 배치 **20/20**, 전체 화면 **6/6**, 추가 경계 검사 **16/16**, 시험 방 통과 검사 **4/4**, Chromium 브라우저 **20/20**, 기존 Node 회귀 **3종 통과**. 브라우저는 PC 1280×900 및 모바일 가로 844×390/DPR 2 에뮬레이션에서 실제 키보드·CDP 멀티터치 입력으로 검사했습니다. 세로 전환/복귀, 초점 해제, 수치 적용과 JSON 내보내기도 확인했습니다. 조이스틱/버튼과 캔버스의 비겹침, 시작 위치 Ethan의 가시성을 검사하고 캡처로 확인했습니다. 조이스틱 좌우 전환·취소, 전체 화면 중 뷰포트 변경과 조작 유지, 전체 화면 요청 자체의 거절 처리도 검사했습니다. 추가로 도약 종류·속도와 패널 적용, 실제 멀티터치로 조이스틱을 누른 채 전체 화면 진입/resize 후 이동 유지와 손 떼기 정지를 검사했습니다. 룬탄은 가까운 표적만 맞고 먼 표적은 무피해임을 검사합니다. 기존 회귀는 ECLIPSE 보존 검사이며 이 게임의 전체 플레이 검증을 대신하지 않습니다.
+CODEX_TASK_02 당시 실행 기록(최신 시험 결과는 위 항목 참조): 픽셀 자산 **49/49**, 픽셀 렌더 **5/5**, 게임 규칙(6ce2654)의 원본 인수 **51/51**, 모바일 배치 **20/20**, 전체 화면 **6/6**, 추가 경계 검사 **16/16**, 시험 방 통과 검사 **4/4**, Chromium 브라우저 **20/20**, 기존 Node 회귀 **3종 통과**. 브라우저는 PC 1280×900 및 모바일 가로 844×390/DPR 2 에뮬레이션에서 실제 키보드·CDP 멀티터치 입력으로 검사했습니다. 세로 전환/복귀, 초점 해제, 수치 적용과 JSON 내보내기도 확인했습니다. 조이스틱/버튼과 캔버스의 비겹침, 시작 위치 Ethan의 가시성을 검사하고 캡처로 확인했습니다. 조이스틱 좌우 전환·취소, 전체 화면 중 뷰포트 변경과 조작 유지, 전체 화면 요청 자체의 거절 처리도 검사했습니다. 추가로 도약 종류·속도와 패널 적용, 실제 멀티터치로 조이스틱을 누른 채 전체 화면 진입/resize 후 이동 유지와 손 떼기 정지를 검사했습니다. 룬탄은 가까운 표적만 맞고 먼 표적은 무피해임을 검사합니다. 기존 회귀는 ECLIPSE 보존 검사이며 이 게임의 전체 플레이 검증을 대신하지 않습니다.
 
 ## 현재 한계와 인계
 

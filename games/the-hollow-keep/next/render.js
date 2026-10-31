@@ -5,9 +5,10 @@
     let previousWorld = null, visual = {};
     function backing() {
       const box = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
-      const k = Math.max(1, Math.ceil(Math.max(box.width * dpr / 960, box.height * dpr / 540) - 1e-9));
-      if (canvas.width !== 960 * k || canvas.height !== 540 * k) { canvas.width = 960 * k; canvas.height = 540 * k; }
-      ctx.setTransform(k, 0, 0, k, 0, 0); ctx.imageSmoothingEnabled = false;
+      const scale = HKPixel.status().scale, unit = 960 * scale;
+      const k = Math.max(1, Math.ceil(Math.max(box.width * dpr / unit, box.height * dpr / (540 * scale)) - 1e-9));
+      if (canvas.width !== unit * k || canvas.height !== 540 * scale * k) { canvas.width = unit * k; canvas.height = 540 * scale * k; }
+      ctx.setTransform(k * scale, 0, 0, k * scale, 0, 0); ctx.imageSmoothingEnabled = false;
     }
     function timed(anim, age) {
       const ticks = anim.ticks || Array(anim.frames).fill(6), total = ticks.reduce((a,b)=>a+b,0);
@@ -19,8 +20,9 @@
       const anim = HKPixel.manifest()?.heroes[hero]?.animations[action], img = anim && HKPixel.image(anim.file);
       if (!img) return false;
       const index = Math.min(anim.frames-1,Math.max(0,frame(anim)));
-      ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(face,1);
-      ctx.drawImage(img,index*anim.frameW,0,anim.frameW,anim.frameH,-anim.pivot.x,-anim.pivot.y,anim.frameW,anim.frameH);
+      const scale=HKPixel.status().scale;
+      ctx.save();ctx.translate(Math.round(x*scale)/scale,Math.round(y*scale)/scale);ctx.scale(face,1);
+      ctx.drawImage(img,index*anim.frameW,0,anim.frameW,anim.frameH,-anim.pivot.x/scale,-anim.pivot.y/scale,anim.frameW/scale,anim.frameH/scale);
       ctx.restore();return true;
     }
     function tileBlock(block) {
@@ -30,7 +32,8 @@
       for(let row=0;row<h;row+=30)for(let col=0;col<w;col+=30){
         const cell=tile.cells[h<=16?'ledge':row===0?'floor-top':'wall-fill'];
         const cw=Math.min(30,w-col),ch=Math.min(30,h-row);
-        ctx.drawImage(image,cell[0]*30,cell[1]*30,cw,ch,x+col,y+row,cw,ch);
+        const scale=HKPixel.status().scale;
+        ctx.drawImage(image,cell[0]*30*scale,cell[1]*30*scale,cw*scale,ch*scale,x+col,y+row,cw,ch);
       }
       return true;
     }
@@ -44,7 +47,7 @@
       const p = HKSim.getPlayer(world), room = world.room;
       ctx.clearRect(0, 0, 960, 540); ctx.fillStyle = '#101320'; ctx.fillRect(0, 0, 960, 540);
       const background=HKPixel.manifest()?.background,pixelBackground=background&&HKPixel.image(background);
-      if(pixelBackground)ctx.drawImage(pixelBackground,0,0);
+      if(pixelBackground)ctx.drawImage(pixelBackground,0,0,960,540);
       else if (backdrop.complete && backdrop.naturalWidth) {
         ctx.globalAlpha = .18; ctx.drawImage(backdrop, 0, 0, 960, 540); ctx.globalAlpha = 1;
       }
@@ -71,7 +74,7 @@
       const light = world.active === 'ethan';
       let action = p.onGround ? Math.abs(p.vx)>.1?'run':'idle' : p.jumpKind==='running'?'jump-running':'jump-standing';
       const state=visual[world.active]||{},anims=HKPixel.manifest()?.heroes[world.active]?.animations;
-      const duration=name=>anims?.[name]?.ticks?.reduce((a,b)=>a+b,0)||0;
+      const duration=name=>anims?.[name]?.ticks?.reduce((a,b)=>a+b,0)||({attack:20,land:8}[name]||0);
       if(state.attack!==undefined&&world.tick-state.attack<duration('attack'))action='attack';
       else if(p.onGround&&state.land!==undefined&&world.tick-state.land<duration('land'))action='land';
       const age=action==='attack'?world.tick-state.attack:action==='land'?world.tick-state.land:world.tick;

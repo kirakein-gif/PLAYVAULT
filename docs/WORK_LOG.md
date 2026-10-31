@@ -761,3 +761,21 @@
 - 사용자 재요청 횟수: 1회(외형 차이 — 같은 주제 두 번째 지적).
 - 다음: Codex가 `CODEX_TASK_03.md`로 시험본 제작 → Claude Code 검토 → 사용자 밀도 선택 → 전체 재제작.
 - 종료 상태: 시험 준비 완료.
+
+
+### 2026-10-31 (Asia/Seoul) · CODEX_TASK_03 목표 외형 시험본 x1/x2
+
+- 담당 Codex / **검토 담당 Claude Code / 검토 대기**. 사용자 재요청 횟수 1회(이전 외형 차이 피드백 후 시험본 우선 지시), 이번 검토 발견 문제 수 미확정. 밀도는 사용자가 선택하며 우열 판정하지 않음.
+- 기준: 같은 PR #8 `codex/hollow-keep-pixel-art`의 `e82b5f2`. 원격 fetch/열린 PR #7/#8, “순서 변경: 목표 외형 시험본 먼저” 댓글, CODEX_TASK_03/ART_DIRECTION/목표 참고 README·JPEG/원본 PNG 확인. `3350dfb`, `0224e70`, `89453ef`를 순서대로 cherry-pick(`0e1b23d`, `5525153`, `b99a679`). WORK_LOG 충돌은 기존 구현/제출 항목 전체 뒤에 검토 항목을 붙여 양측 원문을 시간순으로 보존. 착수 STATUS `5791d6c` 공유 후 구현.
+- 범위/버전: `next/assets/pixel-trial/` x1/x2(각 Ethan idle4/run6, Noah idle4), 비교 캡처, 경로 A 소스 PNG/빌더, scale 렌더/로더, 추가 런타임 검사, README·관리 문서. sim.js/CONFIG·기존 게임·기본 pixel 자산·입력/지형·공용 자산·런처·다른 게임·기타 검사 원본 보존. pixel-render의 실패 주입 경로만 한 줄 보완, 판정 조건은 보존. 게임/캐시 버전 변경 없음. 전체 스프라이트/베기 재제작은 밀도 선택 후로 보류.
+- 제작: 목표 보드 JPEG 대신 이전 image_gen 원본 PNG를 사용하고 같은 인물의 여섯 달리기 위상을 새로 생성. 특정 게임/작가 이름 모방 지시 없음. 원본 두 PNG를 `next/tools/art-source/`에 보존, 두 시험 폴더 PROVENANCE에 전체 지시문/경로 A/손질/소스 출처 기록. 첫 running 프레임은 목표 보드의 해당 자세를 유지하고 나머지 위상은 새 원본에서 제작.
+- 밀도/손질: 같은 소스를 각각 독립 면적 샘플링(x2는 x1 확대 아님), 두 시안 합동에서 공통64색 팔레트 도출. alpha0/255·투명RGB정리·떨어진 단일픽셀/흐린조각 제거·1px 선택 윤곽, 내부 얼굴 눈/눈썹/하이라이트 재찍기(튀어나온 코 도형 없음), 손/옷 고립1px 구멍 정리. 같은 게임공간의 호흡/자락 위상, 머리/몸 정렬과 접지 고정. x1 frame128×96/pivot64,95; x2 frame256×192/pivot128,190; body는 게임42×68/39×64 유지. tileSize30/60 메타데이터, 새 타일/배경은 시험 범위 밖.
+- 렌더: 선택 query에서 x1/x2 manifest/그림 로드, artStatus.scale 반환. 실제 해상도=(960×scale)×k, setTransform(k×scale), PNG는 frame/scale 게임 크기로 출력하며 그림픽셀 좌표로 반올림. 빠진 run/jump/attack/land와 효과는 도형 대체. 없는 공격/착지의 표시 기간도 기존20/8틱을 유지해 idle 그림으로 잘못 대체하지 않게 함. 기본 mode는 scale1·기존 자산 그대로.
+- 시험 자산: 지정 HK_ART_REQUIRE=`ethan:idle,run;noah:idle`, HK_ART_DIR x1/x2, CHROMIUM_PATH=/usr/bin/chromium의 원본 pixel-assets는 **각각18/18 통과**. 기록 작성 전 17/18(PROVENANCE 없음), 기록 작성 후18/18.
+- 원래 pixel-render 그대로는 두 trial HK_URL에서 **각각4/5**. 정상 로드/세 뷰포트 backing/resize 통과. 실패 주입 정규식이 `/assets/pixel/ethan-idle.png`로 고정되어 시험 PNG를 막지 못한 것이 원인. 검사 강도를 유지하고 시험 폴더도 404로 차단하도록 정규식을 `/assets/(?:pixel|pixel-trial/x[12])/ethan-idle.png/`로 한 줄 확장(`4917569`), failed/이동/오류 판정은 바꾸지 않음. 보완 후 **두 시험본 및 기본 각각5/5 통과**. 처음에는 원본 보존/별도 검사로 구분하려 했으나, 이 오류는 판정 약화 없이 실제 선택 경로를 검사하게 고칠 수 있어 수정하고 별도 커밋으로 검토 대상으로 명시. 원본 작성자의 한 줄 변경 검토 필요.
+- 추가 검사 `density-trial.cjs`: **10/10 통과**. 실제 시험 PNG 경로의404/failed기록/대체 후 이동, 두 scale/backing·같은 게임크기·native정렬·run/좌우반전·누락점프 대체·PC/모바일(780×330) 캡처 확인. 원래 시험의 경로 문제와 한 줄 보완을 숨기지 않고 추가 결과와 구분.
+- 기본 자산 재실행: 최신 원본 pixel-assets **50/51**, 유일 실패 `noah/fx-slash.loop=true`. 알려진 전체/베기 재제작 보류 지시 때문에 기본 자산은 그대로 둠. 기본 pixel-render **5/5**, foundation-contract **51/51**, foundation-edge **16/16**, room-traversal **4/4**, mobile-layout **20/20**, mobile-fullscreen **6/6**, browser-playtest **20/20**, ABYSSFALL polish/audio/audio-wind **3종 통과**. audio404는 의도적인 실패 경로. pixel-render 주입 경로 외 원본 검사 변경/건너뛰기 없음.
+- 비교/첨부: `next/assets/pixel-trial/comparison/`에 Ethan idle/run·Noah idle의 목표|x1|x2 같은 표시 높이 이미지3장 및 두 모드의 PC1280×900·모바일780×330/DPR2 Ethan/Noah 게임 캡처8장, 설명 README. 원본/candidate를 같은 물리 표시 높이로 비교. 게임 캡처는 실제 재생 중 idle 위상이 조금 다를 수 있음. PR #8에 이미지/비교 모음 링크를 첨부.
+- 환경: Python3/Pillow/numpy/scipy, Playwright/Chromium, HTTP127.0.0.1:8766, HK_URL query trial-x1/x2 및 기본. 실제 휴대전화·화면 회전·장시간 동작은 미확인. 자동 검사는 외형/자연스러움/우열 판단을 하지 않음.
+- 5개 관리 문서 검토: WORK_LOG 누적·STATUS/CHANGELOG 갱신, AGENTS/CLAUDE는 절차 변경이 없어 해당 항목 변경 없음. README에 시험 주소/밀도/원본과 추가 검사 결과/보류 사항 추가. 과거·검토 기록 보존.
+- 제출/인계: 같은 PR #8에 푸시, 구현 커밋은 PR head 참조. **사용자 밀도 선택 / Claude Code 검토 대기**. pixel-render 주입 경로 한 줄 확장을 검토 담당에게 별도 검토 요청하고, 선택 후 전체 동작/베기 재제작을 진행. 병합·수동 배포 없음.
