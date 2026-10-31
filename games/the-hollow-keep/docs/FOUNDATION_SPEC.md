@@ -1,6 +1,6 @@
 # THE HOLLOW KEEP · 1단계 기반(Foundation) 규격
 
-> 작성: Claude Code, 2026-10-31. 구현 담당: Codex (`AGENTS.md` §9).
+> 작성: Claude Code, 2026-10-31. 구현 담당: Codex (`AGENTS.md` "역할 분담(시범 운영)").
 > 방향: [DESIGN_DIRECTION.md](DESIGN_DIRECTION.md) · 현재 구현 분석: [BASELINE_ANALYSIS.md](BASELINE_ANALYSIS.md)
 > 인수 테스트: `games/the-hollow-keep/next/tests/foundation-contract.cjs`
 
@@ -98,11 +98,11 @@ world.dummies            // 표적 목록(hp 확인용)
 | 달리기 | 최고 속도 = `runSpeed`(±5%), 바라보는 방향, `stopTicks` 안에 정지, 좌우 동시 입력 시 정지 |
 | 충돌 | 벽 통과 없음(점프 중 포함), 천장에 부딪히면 통과 없이 낙하 |
 | 점프 | 최고 높이 = `jumpHeight`(±8%), 짧은 점프 = `minJumpHeight`(±15%), 누르고 있어도 연속 점프 없음, 공중 재점프 없음, 코요테 타임, 점프 버퍼 |
-| 무기 | 앞 표적 명중, 1회 공격 = 1회 피해(`damage`), 등 뒤 표적 무피해, 판정은 바라보는 쪽, 누르고 있어도 자동 연사 없음, 연타해도 `cooldownTicks`보다 빠르지 않음 |
+| 무기 | 앞 표적 명중, 1회 공격 = 1회 피해(`damage`), 등 뒤 표적 무피해, 판정은 바라보는 쪽, 누르고 있어도 자동 연사 없음, 연타해도 `cooldownTicks`보다 빠르지 않음, **투사체는 첫 표적 명중 시 소멸(관통 없음)** |
 | 교대 | 발 위치 유지, `swapCooldownTicks` 동안 재교대 불가, 교대 후 그 주인공의 수치로 움직임 |
 
 테스트는 손맛 수치를 정하지 않습니다. 수치를 정하는 것은 사용자의 플레이 판단입니다.
-이 테스트는 Claude Code가 저장소 밖의 임시 참조 구현으로 40개 항목 전부가 통과 가능함을 확인했습니다(2026-10-31). 참조 구현은 커밋하지 않았습니다.
+이 테스트는 Claude Code가 저장소 밖의 임시 참조 구현으로 전 항목이 통과 가능함을 확인했습니다(2026-10-31, 처음 40개 + 관통 금지 1개 = 41개). 참조 구현은 커밋하지 않았습니다.
 
 ## 6. 테스트 파일 변경 규칙
 

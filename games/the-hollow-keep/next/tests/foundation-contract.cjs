@@ -390,6 +390,25 @@ for (const h of HEROES) {
   });
 }
 
+test('weapon[projectile]: 투사체는 첫 표적에 명중하면 사라짐(관통 없음, 2026-10-31 사용자 결정)', () => {
+  const shooters = HEROES.filter((h) => cfg(h).weapon.kind === 'projectile');
+  assert.ok(shooters.length > 0, '투사체 무기를 가진 주인공이 없어 검사할 수 없습니다');
+  for (const h of shooters) {
+    const c = cfg(h);
+    const px = 100, gap = 60;
+    const first = { id: 'first', x: px + c.width + 40, y: FLOOR_Y - 60, w: 30, h: 60, hp: 1000 };
+    const second = { id: 'second', x: first.x + first.w + gap, y: FLOOR_Y - 60, w: 30, h: 60, hp: 1000 };
+    assert.ok(second.x + second.w - (px + c.width) < c.weapon.range, '두 번째 표적이 사거리 안에 있어야 테스트가 유효합니다');
+    const w = world(h, flatRoom({ dummies: [first, second] }), { x: px, y: FLOOR_Y - c.height });
+    step(w, input({ right: true })); settle(w, 10);
+    for (let i = 0; i < 180; i++) step(w, input({ attack: i === 0 }));
+    const hp = (id) => w.dummies.find((d) => d.id === id).hp;
+    assert.equal(1000 - hp('first'), c.weapon.damage, `${h}: 첫 표적 피해 ${1000 - hp('first')}`);
+    assert.equal(hp('second'), 1000, `${h}: 탄이 첫 표적을 관통해 뒤 표적에 피해`);
+    assert.equal(HK.getHitboxes(w).length, 0, `${h}: 명중 후에도 탄 판정이 남아 있음`);
+  }
+});
+
 // ───────────────────────── 7. 교대(Swap) ─────────────────────────
 test('swap: 교대 시 발 위치 유지, 쿨다운 동안 재교대 불가', () => {
   const w = world('ethan');
