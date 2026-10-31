@@ -32,4 +32,3 @@ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/pixel-asse
 ```
 
 The manifest is the runtime source of dimensions, pivots, durations and tile cells. Tests are kept unchanged. Detailed execution results and remaining visual review are recorded in WORK_LOG and the implementation PR. Passing palette/grid checks does not certify likeness or animation quality.
-
