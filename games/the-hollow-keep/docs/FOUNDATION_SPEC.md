@@ -60,6 +60,7 @@ HKSim.CONFIG = {
              maxFall,                // 최대 낙하 속도(px/틱)
              coyoteTicks,            // 발판을 벗어난 뒤 점프 허용 틱
              jumpBufferTicks,        // 착지 전 미리 누른 점프를 기억하는 틱
+             airControlSpeed,        // 제자리 점프 후 공중에서 낼 수 있는 최대 수평 속도(px/틱, 0 < 값 < runSpeed)
              weapon: { kind: 'melee'|'projectile', damage, range, cooldownTicks, ... } },
     noah:  { ...같은 키... }
   }
@@ -77,7 +78,8 @@ const events = HKSim.step(world, { left, right, up, down, jump, attack, swap });
 // events: 이번 틱에 일어난 일
 //   {type:'jump'} {type:'land'} {type:'attack', hero} {type:'hit', target, damage} {type:'swap', from, to}
 
-HKSim.getPlayer(world)   // { x, y, w, h, vx, vy, onGround, face(1|-1) } — 현재 조작 중인 주인공
+HKSim.getPlayer(world)   // { x, y, w, h, vx, vy, onGround, face(1|-1), jumpKind } — 현재 조작 중인 주인공
+                         // jumpKind: 공중에 있는 동안 'running' | 'standing' (지상에서는 null 권장)
 HKSim.getHitboxes(world) // [{x,y,w,h}, ...] — 이번 틱에 살아 있는 플레이어 공격 판정(근접·투사체)
 HKSim.snapshot(world)    // JSON으로 저장 가능한 전체 상태
 world.active             // 'ethan' | 'noah'
@@ -85,6 +87,23 @@ world.dummies            // 표적 목록(hp 확인용)
 ```
 
 - 좌표: px, 왼쪽 위 원점, y는 아래로 증가. 속도 단위: px/틱.
+
+### 4-1. 공중 조작 규칙 (2026-10-31 사용자 결정)
+
+"점프 중 어느 정도 좌우 조작은 의도한 것이지만, 처음부터 앞으로 뛴 점프와 제자리에서 뛴 뒤 앞으로 간 것은 다르게 표현되어야 한다. 공중에서 키를 떼면 수직으로 떨어지는 것은 괜찮다."
+
+- **도약 속도 기록**: 점프가 시작되는 틱(코요테·버퍼 점프 포함)의 수평 속도를 기록합니다.
+- **점프 종류**: |도약 속도| ≥ `runSpeed`의 50%이면 `jumpKind = 'running'`, 아니면 `'standing'`입니다. 착지할 때까지 바뀌지 않습니다.
+- **공중 최대 속도**
+  - 도약 방향으로 누르면: `max(airControlSpeed, |도약 속도|)`까지
+  - 반대 방향으로 누르면: `airControlSpeed`까지
+- **결과**
+  - 달리며 뛴 점프는 도약 속도를 공중에서 유지해 멀리 갑니다.
+  - 제자리 점프 후 앞으로 누르면 `airControlSpeed`까지만 움직여 짧게 갑니다.
+  - 달리며 뛴 점프 중 반대 방향을 누르면 감속·후진하되 `airControlSpeed`를 넘지 않습니다.
+- **키를 뗐을 때**: 지금처럼 `stopTicks` 안에 수평 속도 0이 되어 수직으로 떨어집니다(사용자 승인).
+- **화면 표시**: 렌더러는 `jumpKind`에 따라 자세를 다르게 그립니다. 예를 들어 running은 앞으로 기운 도약 자세, standing은 곧게 선 자세입니다. 현재는 임시 도형이라 기울기 정도의 구분이면 충분합니다. 정식 자세 그림은 아트 단계에서 다룹니다.
+- **조절 패널**: 디버그 조절 패널에 `airControlSpeed`를 추가합니다. 초기값은 `runSpeed`의 40~50%를 권장하며, 최종값은 사용자가 시험 방에서 정합니다.
 - `CONFIG`에 위에 없는 키(가속, 공중 제어, 히트스톱, 넉백, 콤보 등)는 자유롭게 추가합니다.
 - 테스트용 `room`은 실제 게임 방 데이터와 같은 형식을 쓰는 것을 권장합니다.
 
@@ -99,10 +118,11 @@ world.dummies            // 표적 목록(hp 확인용)
 | 충돌 | 벽 통과 없음(점프 중 포함), 천장에 부딪히면 통과 없이 낙하 |
 | 점프 | 최고 높이 = `jumpHeight`(±8%), 짧은 점프 = `minJumpHeight`(±15%), 누르고 있어도 연속 점프 없음, 공중 재점프 없음, 코요테 타임, 점프 버퍼 |
 | 무기 | 앞 표적 명중, 1회 공격 = 1회 피해(`damage`), 등 뒤 표적 무피해, 판정은 바라보는 쪽, 누르고 있어도 자동 연사 없음, 연타해도 `cooldownTicks`보다 빠르지 않음, **투사체는 첫 표적 명중 시 소멸(관통 없음)** |
+| 공중 조작 | 달리며 뛴 점프는 공중 속도 유지(`runSpeed`의 95% 이상), 제자리 점프 후 앞으로는 `airControlSpeed` 이하이며 이동 거리가 달리며 뛴 점프의 (`airControlSpeed/runSpeed` + 15%) 이하, 반대 방향은 `airControlSpeed` 이하, 키를 떼면 `stopTicks` 안에 수직 낙하, `jumpKind` 표시 |
 | 교대 | 발 위치 유지, `swapCooldownTicks` 동안 재교대 불가, 교대 후 그 주인공의 수치로 움직임 |
 
 테스트는 손맛 수치를 정하지 않습니다. 수치를 정하는 것은 사용자의 플레이 판단입니다.
-이 테스트는 Claude Code가 저장소 밖의 임시 참조 구현으로 전 항목이 통과 가능함을 확인했습니다(2026-10-31, 처음 40개 + 관통 금지 1개 = 41개). 참조 구현은 커밋하지 않았습니다.
+이 테스트는 Claude Code가 저장소 밖의 임시 참조 구현으로 전 항목이 통과 가능함을 확인했습니다(2026-10-31, 처음 40개 + 관통 금지 1개 + 공중 조작 10개 = 51개). 참조 구현은 커밋하지 않았습니다.
 
 ## 6. 테스트 파일 변경 규칙
 

@@ -97,9 +97,10 @@ test('contract: API와 CONFIG 필수 항목', () => {
   for (const h of HEROES) {
     const c = cfg(h);
     assert.ok(c, `CONFIG.heroes.${h}가 필요합니다`);
-    for (const k of ['width', 'height', 'runSpeed', 'jumpHeight', 'maxFall', 'coyoteTicks', 'jumpBufferTicks', 'stopTicks']) {
+    for (const k of ['width', 'height', 'runSpeed', 'jumpHeight', 'maxFall', 'coyoteTicks', 'jumpBufferTicks', 'stopTicks', 'airControlSpeed']) {
       assert.equal(typeof c[k], 'number', `CONFIG.heroes.${h}.${k}(number)가 필요합니다`);
     }
+    assert.ok(c.airControlSpeed > 0 && c.airControlSpeed < c.runSpeed, `${h}.airControlSpeed는 0보다 크고 runSpeed보다 작아야 합니다`);
     assert.equal(typeof c.variableJump, 'boolean', `CONFIG.heroes.${h}.variableJump(boolean)가 필요합니다`);
     if (c.variableJump) assert.equal(typeof c.minJumpHeight, 'number', `${h}.variableJump=true이면 minJumpHeight가 필요합니다`);
     const wp = c.weapon;
@@ -408,6 +409,70 @@ test('weapon[projectile]: 투사체는 첫 표적에 명중하면 사라짐(관�
     assert.equal(HK.getHitboxes(w).length, 0, `${h}: 명중 후에도 탄 판정이 남아 있음`);
   }
 });
+
+// ───────────────────────── 6-1. 공중 조작(2026-10-31 사용자 결정) ─────────────────────────
+// 달리며 뛴 점프와 제자리 점프 후 앞으로 간 것은 다르게 움직이고(속도), 다르게 표시된다(jumpKind).
+// 공중에서 키를 떼면 수직으로 떨어지는 것은 사용자 승인 동작이다.
+function airJump(h, { running, air }) {
+  const w = world(h, flatRoom({ width: 4000, solids: [{ x: -100, y: FLOOR_Y, w: 5000, h: 40 }] }));
+  if (running) for (let i = 0; i < 90; i++) step(w, input({ right: true }));
+  else settle(w, 10);
+  const x0 = P(w).x;
+  const takeoff = step(w, input({ right: running, jump: true }));
+  assert.ok(takeoff.some((e) => e.type === 'jump'), '점프가 시작되어야 합니다');
+  const trace = [], kinds = new Set();
+  for (let t = 1; t < 300; t++) {
+    const ev = step(w, Object.assign(input({ jump: true }), air(t)));
+    if (ev.some((e) => e.type === 'land')) break;
+    trace.push(P(w).vx);
+    if (P(w).jumpKind !== undefined) kinds.add(P(w).jumpKind);
+  }
+  return { distance: P(w).x - x0, trace, kinds: [...kinds] };
+}
+
+for (const h of HEROES) {
+  test(`air[${h}]: 달리며 뛴 점프는 도약 속도를 공중에서 유지`, () => {
+    const c = cfg(h);
+    const r = airJump(h, { running: true, air: () => ({ right: true }) });
+    const slowest = Math.min(...r.trace);
+    assert.ok(slowest >= c.runSpeed * 0.95, `공중 최저 속도 ${slowest.toFixed(2)} < runSpeed ${c.runSpeed}의 95%`);
+  });
+
+  test(`air[${h}]: 제자리 점프 후 앞으로 누르면 airControlSpeed까지만 이동`, () => {
+    const c = cfg(h);
+    const run = airJump(h, { running: true, air: () => ({ right: true }) });
+    const stand = airJump(h, { running: false, air: () => ({ right: true }) });
+    const fastest = Math.max(...stand.trace.map(Math.abs));
+    assert.ok(fastest <= c.airControlSpeed * 1.05 + 1e-9, `공중 최고 속도 ${fastest.toFixed(2)} > airControlSpeed ${c.airControlSpeed}`);
+    assert.ok(fastest >= c.airControlSpeed * 0.5, `공중 조작이 거의 없음(최고 ${fastest.toFixed(2)})`);
+    const limit = c.airControlSpeed / c.runSpeed + 0.15;
+    assert.ok(stand.distance <= run.distance * limit,
+      `제자리 점프 후 이동 ${stand.distance.toFixed(0)}px가 달리며 뛴 점프 ${run.distance.toFixed(0)}px의 ${Math.round(limit * 100)}%를 넘음`);
+  });
+
+  test(`air[${h}]: 달리며 뛴 점프 중 반대 방향은 airControlSpeed까지만`, () => {
+    const c = cfg(h);
+    const r = airJump(h, { running: true, air: (t) => (t >= 3 ? { left: true } : { right: true }) });
+    const lowest = Math.min(...r.trace);
+    assert.ok(lowest >= -c.airControlSpeed * 1.05 - 1e-9, `반대 방향 속도 ${lowest.toFixed(2)} < -airControlSpeed ${c.airControlSpeed}`);
+    assert.ok(lowest < c.runSpeed * 0.9, '반대 방향 입력이 공중 속도에 전혀 영향을 주지 않음');
+  });
+
+  test(`air[${h}]: 공중에서 방향키를 떼면 stopTicks 안에 수직 낙하(사용자 승인 동작)`, () => {
+    const c = cfg(h);
+    const r = airJump(h, { running: true, air: (t) => (t < 3 ? { right: true } : {}) });
+    const after = r.trace.slice(2 + c.stopTicks);
+    assert.ok(after.length > 0, '공중 시간이 너무 짧아 검사할 수 없음');
+    assert.ok(after.every((v) => Math.abs(v) < 0.05), `키를 뗀 뒤 stopTicks(${c.stopTicks}) 후에도 수평 속도 남음: ${after[0].toFixed(3)}`);
+  });
+
+  test(`air[${h}]: 점프 종류 표시 getPlayer().jumpKind (running / standing)`, () => {
+    const run = airJump(h, { running: true, air: () => ({ right: true }) });
+    const stand = airJump(h, { running: false, air: () => ({ right: true }) });
+    assert.deepEqual(run.kinds, ['running'], `달리며 뛴 점프의 jumpKind: ${JSON.stringify(run.kinds)}`);
+    assert.deepEqual(stand.kinds, ['standing'], `제자리 점프의 jumpKind(앞으로 눌러도 유지): ${JSON.stringify(stand.kinds)}`);
+  });
+}
 
 // ───────────────────────── 7. 교대(Swap) ─────────────────────────
 test('swap: 교대 시 발 위치 유지, 쿨다운 동안 재교대 불가', () => {
