@@ -98,3 +98,29 @@
 - **사용자 재요청 횟수**: 0회
 - **미해결 문제**: THE HOLLOW KEEP의 장기 기획 문서(목표 범위, 이후 챕터, 플랫폼)가 저장소에 없음
 - **다음 AI에게 전달할 사항**: THE HOLLOW KEEP 작업 전 사용자에게 개발 방향을 확인하고, 확인된 내용은 `games/the-hollow-keep/` 아래 문서로 남길 것
+
+### WL-0003 · 2026-10-31 · Claude Code · THE HOLLOW KEEP (게임 코드 변경 없음)
+
+- **수정 전·후 버전**: 변경 없음
+- **수정 목적 및 요청 배경**: 사용자가 역할 분담 시범 대상으로 THE HOLLOW KEEP을 지정하고 방향을 확정(마성전설2의 플레이 감각, 고딕 아트, 처음부터 재구축, 1차는 설정·이동·무기·움직임 확인). Claude Code는 분석·규격·검증 기준을 만들고, 구현은 Codex가 맡음.
+- **변경한 파일과 주요 내용** (브랜치 `claude/hollow-keep-foundation-spec`, 모두 새 파일):
+  - `games/the-hollow-keep/docs/DESIGN_DIRECTION.md` — 확정 방향, 참고 범위(장르 감각만 참고하고 원작 요소는 복제 금지), 미정 사항
+  - `games/the-hollow-keep/docs/BASELINE_ANALYSIS.md` — 현재 구현 구조 문제(로직·DOM 결합, 가변 시간 간격), 현재 이동·무기 수치
+  - `games/the-hollow-keep/docs/FOUNDATION_SPEC.md` — `next/` 새 기반 규격, `sim.js` 계약, 시험 방·디버그 패널
+  - `games/the-hollow-keep/docs/CODEX_TASK_01.md` — Codex 지시문
+  - `games/the-hollow-keep/next/tests/foundation-contract.cjs` — 인수 테스트 40개
+- **테스트 방법 및 결과**:
+  - 자동: 저장소 밖 임시 참조 구현(커밋 안 함)으로 인수 테스트 40/40 통과. 결함을 넣은 변형 4종(방향 미갱신, 자동 연사, 다중 피격, 비결정성)은 실패로 검출됨
+  - 이 브랜치 자체에서는 `next/sim.js`가 없어 테스트가 "불러오지 못함"으로 실패(구현 전 예상 결과)
+  - 기존 게임 파일 변경 없음(`git diff --stat` 확인)
+- **Git 커밋 또는 PR 참조**: 브랜치 `claude/hollow-keep-foundation-spec`, PR #3 (https://github.com/kirakein-gif/PLAYVAULT/pull/3)
+- **검토 담당 / 검토에서 발견된 문제 수**: 사용자 검토 대기
+- **사용자 재요청 횟수**: 0회
+- **미해결 문제**:
+  - 관리 문서 PR #1(Claude Code)과 PR #2(`docs/ai-collaboration-handoff`)가 같은 파일(`AGENTS.md`, `CLAUDE.md`, `CHANGELOG.md`, `docs/STATUS.md`, `docs/WORK_LOG.md`, `README.md`)을 각각 만들어 충돌. 사용자 선택 필요
+  - 사용자가 정리한 캐릭터 설정이 저장소에 없음
+  - 보조 무기·성장 방식·새 기반 버전 번호 미정
+- **다음 AI에게 전달할 사항**:
+  - Codex: `games/the-hollow-keep/docs/CODEX_TASK_01.md`의 지시문대로 `codex/hollow-keep-foundation` 브랜치에서 구현
+  - 인수 테스트를 약하게 바꾸지 말 것. 규격 문제는 PR 본문에 기록
+  - 구현 PR이 올라오면 Claude Code가 검토(테스트 재실행, 브라우저 자동 조작 확인)

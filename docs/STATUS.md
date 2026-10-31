@@ -11,7 +11,7 @@
 | 마지막 확인 `main` 커밋 | `41f7517` docs(worlds-greatest-game): add docs/CODEX_HANDOFF.md (2026-10-19) |
 | 확인한 이력 범위 | `main` 전체 233커밋 (`3deefb5` Initialize PLAYVAULT, 2026-10-05 ~ `41f7517`, 2026-10-19). 작성자 표기: kirakein-gif 195, Codex 38 |
 | 원격 브랜치 | `main`, `polish/eclipse-art-audio`(헤드 `8ce4d02`, `main`에 포함됨), `codex/wgg-action-prototype`(헤드 `e7b28cf`, **미병합**) |
-| 열린 PR | 없음 (2026-10-31 확인. 과거 PR도 조회되지 않음) |
+| 열린 PR | #1 관리 문서(Claude Code), #2 관리 문서(대안, #1과 충돌), #3 THE HOLLOW KEEP 기반 규격 — 2026-10-31 기준 |
 | 공용 영역 | `index.html`(런처), `assets/`(공용 캐릭터·적·유물·아트·오디오), `tests/`, `tools/` |
 | 배포 | 배포 설정 파일(예: GitHub Actions, Pages 설정)은 저장소에서 확인되지 않음. 실제 배포 여부·주소 **미확인** |
 | 비고(로컬 미반영 작업) | **미확인** — 사용자가 PC에만 있는 작업을 알고 있다면 여기에 적어 주세요. |
@@ -24,6 +24,8 @@
 |---|---|---|---|---|---|
 | 세계 최고의 게임 | Codex | `codex/wgg-action-prototype` / PR 없음 | 2026-10-19 (커밋 기준) | `games/worlds-greatest-game/` 아래 `prototype/` 신규 경로 | **미병합 상태로 정지. 계속 진행 중인지 미확인** — 사용자 확인 필요 |
 | 저장소 공통 문서 | Claude Code | `claude/playvault-ai-collaboration-system-3ia07z` | 2026-10-31 | 관리 문서만 (게임 코드 변경 없음) | PR 제출 후 사용자 검토 대기 |
+| THE HOLLOW KEEP 기반 규격 | Claude Code | `claude/hollow-keep-foundation-spec` / PR #3 | 2026-10-31 | `games/the-hollow-keep/docs/`, `next/tests/` 새 파일만 | PR 제출, 사용자 검토 대기. 다음: Codex 구현(`CODEX_TASK_01.md`) |
+| 관리 문서(대안) | 미확인(작성자 표기 Daehyun Na) | `docs/ai-collaboration-handoff` / PR #2 | 2026-10-31 | PR #1과 같은 관리 문서 6개 | **PR #1과 충돌** — 사용자 선택 필요 |
 
 ---
 
@@ -74,12 +76,15 @@
 
 **미해결 오류와 알려진 문제**: **미확인**(이슈·버그 문서 없음)
 
-**진행 중인 작업**: 없음(원격 브랜치 기준)
+**개발 방향(2026-10-31 사용자 확인)**: 마성전설2의 플레이 감각을 장르 수준에서 참고, 고딕 아트, 처음부터 재구축. 상세: `games/the-hollow-keep/docs/DESIGN_DIRECTION.md` (PR #3)
+
+**진행 중인 작업**: 기반 규격·인수 테스트 작성 완료(Claude Code, PR #3). 구현은 아직 시작 전
 
 **다음 작업 우선순위**
-1. 사용자 지정(2026-10-31): `AGENTS.md` §9 역할 분담의 **시범 운영 대상**
-2. 착수 전 사용자에게 개발 방향(목표 범위, 이후 챕터, 플랫폼, 아트 방향)을 확인하고 게임별 기획 문서로 남김 — 현재 저장소에는 이 게임의 기획 문서가 없음
-3. 구체 작업 항목: **미확인**(사용자 지시 대기)
+1. 사용자: PR #3 검토, 관리 문서 PR #1/#2 선택
+2. Codex: `games/the-hollow-keep/docs/CODEX_TASK_01.md`에 따라 `games/the-hollow-keep/next/`에 1단계 기반(이동·점프·무기·교대·시험 방) 구현
+3. Claude Code: 구현 PR 검토(인수 테스트 40개 재실행, 브라우저 조작 확인)
+4. 사용자: 시험 방에서 손맛 판단 후 CONFIG 수치 확정
 
 **테스트 및 배포 상태**
 - 자동 테스트: 저장소에서 확인되지 않음
