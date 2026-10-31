@@ -33,9 +33,9 @@ const url = process.env.HK_URL || 'http://127.0.0.1:8765/games/the-hollow-keep/n
       await reset(page);const y=(await snap(page)).player.y;await page.keyboard.down('Space');await ticks(page,10);
       assert.ok((await snap(page)).player.y<y-30);await ticks(page,80);assert.ok((await snap(page)).player.onGround);await page.keyboard.up('Space');
     });
-    await check('X attack hits near and far targets with damage feedback',async()=>{
+    await check('X shot stops at the near target and leaves the far target untouched',async()=>{
       await reset(page);await page.keyboard.press('KeyX');await ticks(page,90);const w=await snap(page);
-      assert.equal(w.dummies[0].hp,978);assert.equal(w.dummies[1].hp,978);assert.match(await page.locator('#notice').textContent(),/피해 22/);
+      assert.equal(w.dummies[0].hp,978);assert.equal(w.dummies[1].hp,1000);assert.ok(!w.attacks.some(a=>a.life>0));assert.match(await page.locator('#notice').textContent(),/피해 22/);
     });
     await check('Q swaps hero and updates visible HUD',async()=>{
       await page.keyboard.press('KeyQ');await ticks(page,3);assert.equal((await snap(page)).active,'noah');assert.match(await page.locator('#hero-name').textContent(),/NOAH/);
@@ -68,7 +68,21 @@ const url = process.env.HK_URL || 'http://127.0.0.1:8765/games/the-hollow-keep/n
     await check('mobile landscape fits stage and controls',async()=>{
       assert.equal(await touch.locator('#rotate').isVisible(),false);
       for(const action of ['left','right','jump','attack','swap']) {const b=await touch.locator(`[data-action="${action}"]`).boundingBox();assert.ok(b.x>=0&&b.y>=0&&b.x+b.width<=844&&b.y+b.height<=390);}
+      const canvasBox=await touch.locator('canvas').boundingBox();
+      assert.ok(canvasBox.x>=0&&canvasBox.y>=0&&canvasBox.x+canvasBox.width<=844&&canvasBox.y+canvasBox.height<=390);
+      for(const action of ['left','right','jump','attack','swap']) {
+        const b=await touch.locator(`[data-action="${action}"]`).boundingBox();
+        assert.ok(b.y>=canvasBox.y+canvasBox.height,action+' must be below the canvas');
+      }
       assert.ok(await touch.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    });
+    await check('starting hero is visible with no controls covering the play area',async()=>{
+      const w=await snap(touch),b=await touch.locator('canvas').boundingBox();
+      assert.equal(w.active,'ethan');assert.equal(w.player.x,35);
+      const center={x:b.x+(w.player.x+w.player.w/2)*b.width/960,y:b.y+(w.player.y+w.player.h/2)*b.height/540};
+      assert.ok(center.x>b.x&&center.x<b.x+b.width&&center.y>b.y&&center.y<b.y+b.height);
+      assert.equal(await touch.evaluate(p=>document.elementFromPoint(p.x,p.y).id,center),'game');
+      await touch.screenshot({path:'/tmp/hollow-keep-mobile-start.png'});
     });
     await check('real multitouch right + jump moves and jumps',async()=>{
       const before=await snap(touch),points=[await point('right',1),await point('jump',2)];
@@ -90,6 +104,6 @@ const url = process.env.HK_URL || 'http://127.0.0.1:8765/games/the-hollow-keep/n
       await touch.setViewportSize({width:844,height:390});await ticks(touch,5);assert.equal(await touch.locator('#rotate').isVisible(),false);assert.equal((await snap(touch)).player.vx,0);
     });
     await check('no page errors or missing resources',async()=>{assert.deepEqual(errors,[]);assert.deepEqual(failures,[]);});
-    console.log(`${checks}/${checks} browser checks passed; screenshots: /tmp/hollow-keep-{desktop,mobile}.png`);
+    console.log(`${checks}/${checks} browser checks passed; screenshots: /tmp/hollow-keep-{desktop,mobile,mobile-start}.png`);
   } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

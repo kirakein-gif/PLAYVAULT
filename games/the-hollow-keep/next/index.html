@@ -6,7 +6,7 @@
 <title>THE HOLLOW KEEP · 시험 방</title>
 <link rel="stylesheet" href="style.css">
 <script defer src="sim.js"></script><script defer src="input.js"></script>
-<script defer src="render.js"></script><script defer src="app.js"></script>
+<script defer src="room.js"></script><script defer src="render.js"></script><script defer src="app.js"></script>
 </head>
 <body>
 <main>
@@ -14,10 +14,10 @@
 <div class="stage">
 <canvas id="game" width="960" height="540" tabindex="0" aria-label="이동·점프·공격·교대 시험 방"></canvas>
 <div class="hud"><strong id="hero-name">ETHAN · 빛 / 룬탄</strong><span id="notice" role="status">점프 높이와 두 무기의 거리를 비교해 보세요.</span></div>
+</div>
 <div class="touch-controls" aria-label="터치 조작">
 <div><button data-action="left" aria-label="왼쪽 이동">◀</button><button data-action="right" aria-label="오른쪽 이동">▶</button></div>
 <div><button data-action="swap">교대</button><button data-action="attack">공격</button><button data-action="jump">점프</button></div>
-</div>
 </div>
 <p class="help">A/D · ←/→ 이동　 Space/K/Z 점프　 J/X 공격　 Q/Tab 교대 <span>· 구덩이에 빠지면 방이 초기화됩니다.</span></p>
 <section id="debug" hidden aria-label="디버그와 수치 조절">

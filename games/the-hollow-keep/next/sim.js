@@ -78,7 +78,21 @@
     if (edge('swap') && !w.swapCooldown) {
       const from = w.active, to = from === 'ethan' ? 'noah' : 'ethan', c = CONFIG.heroes[to];
       const candidate = { x: p.x + (p.w - c.width) / 2, y: p.y + p.h - c.height, w: c.width, h: c.height };
-      if (!w.room.solids.some(s => overlap(candidate, s))) {
+      const blocked = body => w.room.solids.some(s => overlap(body, s));
+      if (blocked(candidate)) {
+        // Widening at a wall may overlap by half the width difference. Try only
+        // nearby solid boundaries, in order of the smallest sideways correction.
+        const limit = Math.abs(c.width - p.w), centeredX = candidate.x;
+        const offsets = w.room.solids.filter(s => vertical(candidate, s))
+          .flatMap(s => [s.x - candidate.w - centeredX, s.x + s.w - centeredX])
+          .filter(dx => Math.abs(dx) > 0 && Math.abs(dx) <= limit)
+          .sort((a, b) => Math.abs(a) - Math.abs(b) || a - b);
+        for (const dx of offsets) {
+          const shifted = { ...candidate, x: centeredX + dx };
+          if (!blocked(shifted)) { candidate.x = shifted.x; break; }
+        }
+      }
+      if (!blocked(candidate)) {
         Object.assign(p, candidate); p.vx *= CONFIG.swapVelocityScale; p.vy *= CONFIG.swapVelocityScale;
         w.active = to; w.swapCooldown = CONFIG.swapCooldownTicks;
         w.attacks = w.attacks.filter(a => a.kind === 'projectile');
@@ -136,9 +150,24 @@
         a.x += distance * a.face; a.traveled += distance;
       }
       const hitbox = a.sweep || a;
-      // Solids absorb a projectile before targets behind them can be hit.
-      if (a.kind === 'projectile' && w.room.solids.some(s => overlap(hitbox, s))) { a.life = 0; continue; }
-      for (const d of w.dummies) if (d.hp > 0 && !a.hit.includes(d.id) && overlap(hitbox, d)) {
+      // Resolve a swept shot by spatial order, independent of room array order.
+      // At the same distance a solid wins, so a target inside a wall is protected.
+      const distanceTo = box => a.face > 0 ? box.x - hitbox.x : hitbox.x + hitbox.w - (box.x + box.w);
+      const targets = w.dummies.filter(d => d.hp > 0 && !a.hit.includes(d.id) && overlap(hitbox, d));
+      if (a.kind === 'projectile') {
+        const contacts = [
+          ...w.room.solids.filter(s => overlap(hitbox, s)).map(box => ({ box, solid: true })),
+          ...targets.map(box => ({ box, solid: false }))
+        ].sort((one, two) => Math.max(0, distanceTo(one.box)) - Math.max(0, distanceTo(two.box)) || Number(two.solid) - Number(one.solid));
+        const first = contacts[0];
+        if (first) {
+          if (!first.solid) {
+            first.box.hp = Math.max(0, first.box.hp - a.damage);
+            ev.push({ type: 'hit', target: first.box.id, damage: a.damage });
+          }
+          a.life = 0; delete a.sweep; continue;
+        }
+      } else for (const d of targets) {
         a.hit.push(d.id); d.hp = Math.max(0, d.hp - a.damage);
         ev.push({ type: 'hit', target: d.id, damage: a.damage });
       }

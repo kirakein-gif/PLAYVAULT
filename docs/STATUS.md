@@ -2,13 +2,13 @@
 
 확인일: **2026-10-31 (Asia/Seoul)** / 확인 AI: **Codex**.
 
-## PR #4 검토 반영 진행
+## PR #4 검토 반영 완료 · 재검토 대기
 
-Codex / `codex/hollow-keep-foundation` / 2026-10-31 (Asia/Seoul). 사용자 요청으로 검토 담당 Claude Code의 발견 문제 3건과 룬탄 비관통 결정 1건을 수정한다. 기준 구현 `766630e`, 최신 규격 `c6a31bf`를 cherry-pick한 `9f862bc`. 범위는 `next/`와 관리 문서이며 원본 41개 인수 테스트·기존 게임 파일·공중 감속은 보존한다. Noah 콤보는 사용자 결정으로 보류한다. 다음 담당은 Claude Code 재검토.
+Codex / `codex/hollow-keep-foundation` / 2026-10-31 (Asia/Seoul). **검토 담당 Claude Code / 발견 문제 3건 + 결정 반영 1건** 수정 완료. 기준 구현 `766630e`, 최신 규격 `c6a31bf`를 cherry-pick한 `9f862bc`, 착수 공유 `fd91385`; 수정 커밋은 PR #4 head 참조. 좌우 벽 교대 보정, 85px 구덩이, 캔버스 밖 모바일 버튼, 첫 명중 즉시 소멸하는 비관통 룬탄을 반영했다. **Noah 3단 콤보는 사용자 결정으로 보류**, 공중 감속은 기존 그대로다. 다음 담당은 Claude Code 재검토.
 
 ## 이번 Foundation 작업의 최신 확인
 
-2026-10-31 (Asia/Seoul), GitHub API와 인증 정상. 열린 PR #1·#2·#3 및 작업 PR [#4](https://github.com/kirakein-gif/PLAYVAULT/pull/4)를 확인했다. 아래 과거 문서 작업의 API 차단 보고는 당시 기록이며 현재 연결 상태와 구분한다. 사용자가 기존 브랜치 재개와 PR #2 규칙 적용을 승인했다. PC의 미푸시 작업은 직접 확인하지 않았다.
+2026-10-31 (Asia/Seoul), GitHub API와 인증 정상. 열린 PR #2·#3·#5 및 작업 PR [#4](https://github.com/kirakein-gif/PLAYVAULT/pull/4)를 확인했다. 아래 과거 문서 작업의 API 차단 보고는 당시 기록이며 현재 연결 상태와 구분한다. 사용자가 기존 브랜치 재개와 PR #2 규칙 적용을 승인했다. PR #1은 닫혔고 PR #5는 PR #2로 관리 기록을 이관하는 별도 작업이다. WORK_LOG 끝부분 충돌 시 두 기록을 시간순으로 보존해야 한다. PC의 미푸시 작업은 직접 확인하지 않았다.
 
 ## 확인 기준과 한계
 
@@ -39,12 +39,12 @@ Codex / `codex/hollow-keep-foundation` / 2026-10-31 (Asia/Seoul). 사용자 요�
 | --- | --- |
 | 기존 게임·버전 | 기존 `index.html`, `core.js`, `art.js`, `game.css`, `assets/` 그대로 보존. 기존 버전 미확인, 캐시 16/15/13 보존. 새 기반 번호는 미정이며 올리지 않음 |
 | 새 기반 경로·구조 | `games/the-hollow-keep/next/`: DOM 없는 `sim.js`, 입력/렌더/고정 1/60 루프 분리, 시험 방, 수치 패널 |
-| 기준·마지막 확인 | 규격 PR #3 `bcf7a09018cf1141290d99fd80ec008f5f565b43`, 기존 착수 `5175afdfdf24987d8965c3dc612501db149a0737`, 관리 문서 도입 `5cf5748`. 최종 구현은 PR #4 head 커밋 참조 |
-| 구현·담당 | Codex / `codex/hollow-keep-foundation` / [PR #4](https://github.com/kirakein-gif/PLAYVAULT/pull/4). Ethan 원거리 룬탄, Noah 단일 근접 참격, 이동·점프·교대, 키보드/모바일 터치, debug/CONFIG 복사 구현. 공용 자산/런처/다른 게임/원본 인수 테스트 변경 없음 |
-| 테스트 | 원본 인수 40/40, 추가 경계 7/7, PC·모바일 가로 Chromium 브라우저 14/14, 기존 ECLIPSE Node 회귀 3종 통과. 스크린샷 육안 확인. 자세한 재현은 `next/README.md`, 이번 결과는 WORK_LOG 참조 |
-| 한계·미확인 | 기존 Noah 3단 콤보/히트스톱/넉백은 새 기반에 미포함. 실기기·타 브라우저·장시간 플레이·사용자 조작감 평가 미확인. 캐릭터 상세 설정 미제공 |
-| 다음 우선순위 | Claude Code가 인수/회귀 재실행, 독립 브라우저 조작 및 규격 검토. 사용자가 점프·무기 거리·교대 감각 판단. PR #2/#3과 중복되는 문서의 병합 순서 조율 |
-| 종료 상태·배포 | 구현 제출 / **Claude Code / 검토 대기**. 병합·배포 없음. 정식 버전 번호·기존 구현 대체는 사용자 결정 대기 |
+| 기준·마지막 확인 | 규격 PR #3 최신 `c6a31bf` (적용 `9f862bc`), 기존 착수 `5175afdfdf24987d8965c3dc612501db149a0737`, 관리 문서 도입 `5cf5748`. 최종 구현은 PR #4 head 커밋 참조 |
+| 구현·담당 | Codex / `codex/hollow-keep-foundation` / [PR #4](https://github.com/kirakein-gif/PLAYVAULT/pull/4). Ethan 원거리 비관통 룬탄(첫 표적 명중 시 소멸), Noah 단일 근접 참격, 이동·점프·교대, 키보드/모바일 터치, debug/CONFIG 복사 구현. 공용 자산/런처/다른 게임/원본 인수 테스트 변경 없음 |
+| 테스트 | 최신 원본 인수 41/41, 추가 경계 12/12, 실제 방 통과 4/4, PC·모바일 가로 Chromium 브라우저 15/15, 기존 ECLIPSE Node 회귀 3종 통과. 스크린샷 육안 확인. 자세한 재현은 `next/README.md`, 이번 결과는 WORK_LOG 참조 |
+| 한계·미확인 | Noah 3단 콤보는 사용자 결정으로 추후 진행. 공중 감속은 현재대로 유지. 히트스톱/넉백 미포함. 실기기·타 브라우저·장시간 플레이·사용자 조작감 평가 미확인. 캐릭터 상세 설정 미제공 |
+| 다음 우선순위 | Claude Code가 이번 4건을 재검토: 41개 인수/경계/통과/브라우저/기존 회귀 재실행 및 독립 조작 확인. 사용자가 점프·무기 거리·교대 감각 판단. PR #2/#3과 중복되는 문서의 병합 순서 조율 |
+| 종료 상태·배포 | 수정 제출 / **Claude Code / 재검토 대기**. 병합·수동 배포 명령 없음. GitHub 연동 Cloudflare 미리보기 자동 배포 댓글은 확인됨. 정식 버전 번호·기존 구현 대체는 사용자 결정 대기 |
 
 ## 세계 최고의 게임 · THE WORLD'S GREATEST GAME
 

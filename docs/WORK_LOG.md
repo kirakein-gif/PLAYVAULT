@@ -448,3 +448,21 @@
 - 미해결·미확인: 사용자 캐릭터 상세 설정 미제공, 사용자 조작감 평가·실제 휴대전화·Safari/Firefox·장시간 플레이 미확인. 수치를 바꿔도 시험 방 지형은 자동 조정되지 않음. 프레임 지연 초과분은 버리고 렌더 보간은 미구현. 정식 아트/음향·적 AI·방 연결·장치·체력/사망·저장은 범위 밖.
 - 다음 AI: PR #4 head에서 원본 인수/추가/기존 회귀를 재실행하고 로컬 HTTP 브라우저 조작으로 독립 검토. 사용자와 점프·무기 거리·교대 감각 평가. PR #2/#3과 관리 문서 중복의 병합 순서 조율.
 - 종료 상태: 구현 제출 / **Claude Code / 검토 대기**. 자동 검사 통과를 조작감 완성으로 표현하지 않음. 병합·배포하지 않음.
+
+
+### 2026-10-31 (Asia/Seoul) · PR #4 검토 반영 — 4건 수정
+
+- 담당 AI: Codex / 사용자 요청으로 같은 `codex/hollow-keep-foundation` 브랜치 재개.
+- **검토 담당 Claude Code / 발견 문제 3건 + 결정 반영 1건 / 수정 내역**: 아래 1~4 반영, Claude Code 재검토 대기.
+- 기준: 기존 PR #4 head `766630edd93a388af34edae3c7870ad67868249e`. 최신 규격 `c6a31bf1d9d7eadbbad62bbbb6a5da73b56b3cb4`를 먼저 cherry-pick(`9f862bc`)하고 담당·범위를 STATUS에 공유(`fd91385`). PR #4의 Claude Code 리뷰 및 보충 댓글을 직접 읽음. 열린 PR #2/#3/#4/#5 확인, 닫힌 PR #1 확인. PR #5 관리 기록은 이번 범위 밖이며 향후 충돌 시 두 WORK_LOG 항목을 보존해 시간순 정리.
+- 범위/버전: `games/the-hollow-keep/next/` 및 관리 문서. 기존 게임·공용 자산·루트 런처·다른 게임·기존 회귀 테스트 보존. 게임 버전/캐시 표기 변경 없음. 41개 인수 테스트는 `c6a31bf` 원본 그대로이며 직접 수정하지 않음.
+- 1. 교대 벽 끼임: 중심 후보가 겹치면 폭 차이 이내의 고체 경계 후보를 수평 보정 거리순으로 재검사. 좌/우 벽 Noah→Ethan 모두 성공, 발 위치 보존. Ethan보다 좁은 통로와 낮은 천장은 계속 거절. CONFIG와 공중 감속 코드는 변경하지 않음.
+- 2. Ethan 구덩이: 145px → 85px(왼쪽 끝 470, 오른쪽 시작 555), 라벨도 85px. `room.js`에 실제 방을 공유해 앱/테스트가 같은 데이터를 사용. `room-traversal.cjs`에서 x=320부터 달려 x=450 부근에 점프, Ethan x=543.08 / Noah x=630.04 착지 후 몸 전체가 오른쪽 바닥으로 이동함을 확인. 이전 145px 비교(점프 입력 기준 x=390..500, 1px 간격 111개)는 Ethan 0/111, Noah 89/111 통과. 첫 발판 뒤의 바닥 구간부터 측정한 정해진 입력 시나리오이며 사용자 손맛 평가는 아님.
+- 3. 모바일 가림: 버튼을 캔버스 아래의 별도 영역으로 옮기고 가로 화면 높이에서 조작 영역을 확보. 844×390/DPR2에서 모든 버튼과 캔버스가 화면 내에 있고 서로 겹치지 않음. 시작 Ethan x=35의 화면 좌표가 캔버스에 노출됨을 검사하고 `/tmp/hollow-keep-mobile-start.png` 캡처 육안 확인. 기존 멀티터치/가로·세로 전환 검사도 유지.
+- 4. 룬탄 관통 제거: 이동 방향상 가장 먼저 닿은 표적 1개만 피해 후 즉시 소멸. 빠른 탄에서 표적 배열 순서와 무관하게 접촉 순서를 처리하고 고체에 가려진 뒤 표적은 무피해. README 및 브라우저 기대값을 가까운 표적 978 HP / 먼 표적 1000 HP로 갱신. Noah 단일 참격 유지, **3단 콤보는 사용자 결정으로 보류**.
+- 변경 파일: `next/{sim.js,room.js,app.js,index.html,style.css,README.md}`, `next/tests/{foundation-edge.cjs,room-traversal.cjs,browser-playtest.cjs}`, `docs/{WORK_LOG.md,STATUS.md}`, `CHANGELOG.md`. 규격·원본 인수 테스트 변경은 Claude Code 커밋을 그대로 적용한 것뿐임.
+- 이번 검증: `node games/the-hollow-keep/next/tests/foundation-contract.cjs` **41/41**, `foundation-edge.cjs` **12/12**, `room-traversal.cjs` **4/4**, `browser-playtest.cjs` **15/15 통과**. 브라우저는 로컬 HTTP 서버 + Playwright/시스템 Chromium, PC 1280×900 / 모바일 가로 844×390/DPR2. 콘솔 오류/자산 실패 없음. 인수 원본은 규격 적용 직후 관통 1개만 실패(40/41)했고 수정 후 41/41 통과.
+- 기존 회귀 재실행: `node tests/polish-regression.cjs`, `node tests/audio-regression.cjs`, `node tests/audio-wind-regression.cjs` **3종 통과**. audio 404 경고는 의도적인 실패 경로. ECLIPSE 회귀 통과를 HOLLOW KEEP 전체 게임 검증으로 확대하지 않음.
+- 5개 관리 문서 검토: WORK_LOG 누적, STATUS/CHANGELOG 갱신. AGENTS/CLAUDE는 절차 변경이 없어 해당 항목 변경 없음. 과거 WORK_LOG는 수정하지 않음.
+- 제출/인계: 같은 PR #4에 푸시하며 수정 커밋은 PR head 참조. 다음 검토 담당 **Claude Code / 재검토 대기**. 독립 테스트 재실행·브라우저 조작·이번 네 수정 확인 요청. 병합·수동 배포 명령 없음. 저장소 GitHub 연동 Cloudflare 미리보기 자동 배포 댓글은 별도 관찰로 구분.
+- 미확인: 실기기·Safari/Firefox·장시간 플레이·사용자 손맛 승인. 자동 통과를 조작감 완성으로 표현하지 않음. 원격 밖 PC 로컬 작업은 미확인.
