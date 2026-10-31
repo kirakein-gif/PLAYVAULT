@@ -7,6 +7,8 @@
  *   python3 -m http.server 8765 --bind 127.0.0.1
  *   node games/the-hollow-keep/next/tests/pixel-render.cjs
  * 환경 변수: HK_URL, CHROMIUM_PATH, HK_SHOT_DIR(지정하면 점프 자세 캡처 저장)
+ * 그림 밀도: HKPlaytest.artStatus().scale(1 또는 2, 없으면 1). 실제 해상도는 (960×scale)의 정수 배여야 한다.
+ * 시험본 비교: HK_URL에 ?art=trial-x1 / ?art=trial-x2 처럼 시험본 주소를 붙여 같은 검사를 돌린다.
  */
 'use strict';
 const assert = require('node:assert/strict');
@@ -44,14 +46,17 @@ const VIEWS = [
   const measure = (page) => page.evaluate(() => {
     const c = document.querySelector('canvas'), r = c.getBoundingClientRect();
     return { bw: c.width, bh: c.height, cw: r.width, dpr: devicePixelRatio, smooth: c.getContext('2d').imageSmoothingEnabled,
-      art: typeof HKPlaytest.artStatus === 'function' ? HKPlaytest.artStatus() : null };
+      art: typeof HKPlaytest.artStatus === 'function' ? HKPlaytest.artStatus() : null,
+      scale: (typeof HKPlaytest.artStatus === 'function' && HKPlaytest.artStatus().scale) || 1 };
   });
   const assertBacking = (m) => {
-    assert.equal(m.bw % 960, 0, `캔버스 실제 폭 ${m.bw}이 960의 정수 배가 아님`);
-    assert.equal(m.bh * 960, m.bw * 540, `캔버스 비율 ${m.bw}×${m.bh}이 16:9(960×540의 정수 배)가 아님`);
+    const unit = 960 * m.scale;
+    assert.ok(m.scale === 1 || m.scale === 2, `artStatus().scale은 1 또는 2(현재 ${m.scale})`);
+    assert.equal(m.bw % unit, 0, `캔버스 실제 폭 ${m.bw}이 ${unit}(960×scale)의 정수 배가 아님`);
+    assert.equal(m.bh * 960, m.bw * 540, `캔버스 비율 ${m.bw}×${m.bh}이 16:9가 아님`);
     const need = m.cw * m.dpr;
     assert.ok(m.bw >= need - 0.5, `실제 폭 ${m.bw} < 표시 폭×DPR ${need.toFixed(0)} (확대 시 흐려짐)`);
-    assert.ok(m.bw - 960 < need - 0.5 || m.bw === 960, `실제 폭 ${m.bw}이 필요한 가장 작은 정수 배보다 큼(표시 ${need.toFixed(0)})`);
+    assert.ok(m.bw - unit < need - 0.5 || m.bw === unit, `실제 폭 ${m.bw}이 필요한 가장 작은 정수 배보다 큼(표시 ${need.toFixed(0)}, 단위 ${unit})`);
     assert.equal(m.smooth, false, 'imageSmoothingEnabled가 false가 아님');
   };
 
