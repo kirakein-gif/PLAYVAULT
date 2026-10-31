@@ -9,6 +9,10 @@
 사용자 결정(2026-10-31): 다음 단계는 **아트 기준부터**. 콘셉트는 **픽셀아트 HD**(게임 좌표 1단위 = 그림 1픽셀, 그림 해상도 960×540), 고딕 방향 유지. 아트 기준·검사는 Claude Code, 그림 제작·적용은 Codex(역할 분담).
 
 
+### 진행 중 · THE HOLLOW KEEP 픽셀아트 HD 제작·적용
+
+Codex / `codex/hollow-keep-pixel-art` / 기준 PR #7 `d8c6a21` (main `af58238` 기반). 사용자 CODEX_TASK_02.md 실행 요청. 범위: `next/assets/pixel/` 주인공 12개 동작 시트·30px 타일·팔레트/manifest/PROVENANCE 및 next 렌더러/DPR 적용, 관리 문서. 시뮬레이션·기존 게임·공용 자산·검사 원본은 보존. 다음 담당 Claude Code / 검토 예정. 외형·완성도는 사용자 판단 대기.
+
 ### 진행 중 · THE HOLLOW KEEP 픽셀아트 HD 아트 기준
 
 Claude Code / `claude/hollow-keep-pixel-art-spec` / 2026-10-31 시작 / 범위: `games/the-hollow-keep/docs/ART_DIRECTION.md`, `CODEX_TASK_02.md`, `next/tests/pixel-assets.cjs`, `next/tests/pixel-render.cjs`(새 파일만, 게임 코드 변경 없음). 다음 담당: Codex(`codex/hollow-keep-pixel-art`, 스프라이트·타일 제작과 렌더러 적용).
