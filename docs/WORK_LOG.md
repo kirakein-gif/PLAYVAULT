@@ -19,6 +19,8 @@
 - Git 커밋 또는 PR 참조(확인된 것만; 미제출이면 그 상태와 이유):
 - 미해결 문제·미확인 사항:
 - 다음 AI에게 전달할 사항·다음 우선순위:
+- 검토 담당 / 검토에서 발견된 문제 수(검토 전이면 "검토 대기"):
+- 사용자 재요청 횟수(같은 요청을 다시 받은 횟수):
 - 종료 상태 / 다음 담당(검토 대기·차단·인계 완료 등을 구분):
 ```
 
@@ -426,3 +428,163 @@
 - 다음 AI/사용자: `api.github.com` 허용 적용 후 기존 PR을 조회하고 제출한다. API 인증의 실제 가용성은 접근 차단 해소 전 확인 불가이며 토큰을 임의 요구/교체하지 않는다. [비교·PR 작성 화면](https://github.com/kirakein-gif/PLAYVAULT/compare/main...docs/ai-collaboration-handoff?expand=1)은 생성된 PR 주소가 아니다.
 - 확인 불가: 과거 정확한 담당 AI·요청 전문·모든 버전의 실제 테스트/출시·PC 로컬 작업. 다음 기능 작업 전 담당과 대상 브랜치를 확인하고 5개 문서 지속 갱신 규칙을 따른다.
 - 종료 상태: 문서와 원격 브랜치 준비 완료, PR 제출은 API 네트워크 차단. 다음 담당 확인 불가.
+
+### 2026-10-31 (Asia/Seoul) · Claude Code 관리 문서 대안(PR #1) 작성과 종료 — 사후 이관 기록
+
+- 담당 AI: Claude Code. 이 항목은 PR #1에만 있던 기록을 PR #2 형식으로 옮긴 것이다.
+- 대상: 공통 관리 문서. 게임 코드·자산 변경 없음.
+- 기준 / 브랜치: main `41f7517` / `claude/playvault-ai-collaboration-system-3ia07z`.
+- 버전: 모든 게임 변경 없음.
+- 목적·배경: 사용자가 AI 공동 개발 규칙 구축을 요청. 같은 요청을 다른 도구가 동시에 처리해 PR #2가 생겼고, 두 PR이 같은 파일(`AGENTS.md`, `CLAUDE.md`, `CHANGELOG.md`, `docs/STATUS.md`, `docs/WORK_LOG.md`, `README.md`)을 각각 만들어 충돌했다.
+- 변경: PR #1에서 관리 문서 6종 작성, 이어서 사용자 승인으로 역할 분담 규칙과 WORK_LOG 평가 칸(검토 발견 문제 수·재요청 횟수)을 추가.
+- 테스트: 문서 작업. `git diff --check` 통과. ABYSSFALL Node 회귀 3종을 main `41f7517`에서 실행해 통과.
+- Git/PR: [PR #1](https://github.com/kirakein-gif/PLAYVAULT/pull/1) 커밋 `1efb63a`, `e31bf75`, `95f1bff`. GitHub 쓰기 권한 문제로 첫 푸시가 403으로 실패했다가 사용자 권한 승인 후 제출됨.
+- 결과: 사용자가 PR #2 문서 채택을 승인하여 PR #1은 병합하지 않고 닫는다. PR #1에만 있던 역할 분담 규칙, WORK_LOG 평가 칸, 작업 이력은 이번 이관 PR에서 PR #2 형식으로 옮긴다.
+- 검토 담당 / 발견 문제 수: 사용자 / 해당 없음(PR #2 채택으로 종료).
+- 사용자 재요청 횟수: 0회.
+- 종료 상태: PR #1 종료, 내용 이관.
+
+### 2026-10-31 (Asia/Seoul) · THE HOLLOW KEEP 방향·기준선 분석·기반 규격·인수 테스트
+
+- 담당 AI: Claude Code(규격·검증 기준). 구현 담당: Codex.
+- 대상: `games/the-hollow-keep/docs/`, `games/the-hollow-keep/next/tests/` 새 파일. 기존 게임 파일 변경 없음.
+- 기준 / 브랜치: main `41f7517` / `claude/hollow-keep-foundation-spec`.
+- 버전: 변경 없음(새 기반의 번호 체계는 사용자 결정 사항).
+- 목적·배경: 사용자가 역할 분담 시범 대상으로 THE HOLLOW KEEP을 지정. 방향: 마성전설2의 **플레이 감각**을 장르 수준에서 참고(원작의 맵·캐릭터·스프라이트·음악 등은 복제하지 않음), 고딕 아트, 처음부터 재구축, 1단계는 설정·이동·무기·움직임 확인.
+- 변경:
+  - `DESIGN_DIRECTION.md` — 확정 방향, 참고 범위, 미정 사항
+  - `BASELINE_ANALYSIS.md` — 기존 구현의 구조 문제(로직·DOM 결합, 가변 시간 간격)와 이동·무기 기준 수치
+  - `FOUNDATION_SPEC.md` — `next/` 새 기반, 고정 1/60 틱, DOM 없는 `sim.js` 계약, 시험 방·디버그 패널
+  - `CODEX_TASK_01.md` — Codex 지시문
+  - `next/tests/foundation-contract.cjs` — 인수 테스트 40개
+- 테스트: 저장소 밖 임시 참조 구현(커밋 안 함)으로 40/40 통과. 결함을 넣은 변형 4종(방향 미갱신, 자동 연사, 다중 피격, 비결정성)이 실패로 검출됨을 확인.
+- Git/PR: [PR #3](https://github.com/kirakein-gif/PLAYVAULT/pull/3), 커밋 `bcf7a09`.
+- 검토 담당 / 발견 문제 수: Codex가 구현하며 규격 사용(규격 결함 보고 없음).
+- 사용자 재요청 횟수: 0회.
+- 종료 상태: 규격 제출, Codex 구현으로 인계(PR #4).
+
+### 2026-10-31 (Asia/Seoul) · PR #4 교차 검토와 사용자 결정 반영
+
+- 담당 AI: Claude Code(검토). 구현 담당: Codex.
+- 대상: PR #4 `codex/hollow-keep-foundation` head `766630e`. 검토 담당은 구현 브랜치를 수정하지 않음.
+- 버전: 변경 없음.
+- 테스트(Claude Code 환경에서 재실행): 인수 40/40, Codex 경계 7/7, 브라우저 14/14(`CHROMIUM_PATH=/opt/pw-browsers/chromium`), ABYSSFALL 회귀 3종 통과. 추가로 시뮬레이션 전수 측정과 화면 캡처 확인.
+- 발견 문제 **3건**(수정 요청):
+  1. Noah가 벽에 붙으면 Ethan으로 교대 불가 — 몸 폭 차이(42/39px)로 중심 기준 후보가 벽과 1.5px 겹쳐 `swapBlocked`
+  2. 시험 방의 145px 구덩이는 Ethan이 어떤 타이밍으로도 건널 수 없음(최대 수평 점프 약 91px) — 규격 권장과 다르고, Ethan으로 오른쪽 구역을 시험할 수 없음
+  3. 모바일 가로 화면에서 터치 버튼이 플레이 영역 아래쪽을 덮어 시작 위치의 주인공이 가려짐
+- 사용자 결정(2026-10-31): **룬탄은 관통하지 않음**(첫 명중 시 소멸, 기존 구현과 같음). **Noah 3단 콤보는 나중에 진행**. 공중 감속은 시험 방에서 판단(미정).
+- 결정 반영: PR #3에 결정 사항과 "투사체 첫 명중 후 소멸" 인수 테스트 1개 추가(커밋 `c6a31bf`, 총 41개). 임시 참조 구현에서 41/41, PR #4 head `766630e`에서는 이 항목만 실패(현재 관통 구현이므로 예상 결과).
+- Git/PR: [PR #4 리뷰](https://github.com/kirakein-gif/PLAYVAULT/pull/4) (COMMENT, 승인 아님).
+- 검토 담당 / 발견 문제 수: Claude Code / 3건(+ 사용자 결정에 따른 동작 변경 1건: 관통 제거).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #3의 최신 커밋을 받아 문제 3건과 관통 제거를 수정하고, 인수 41/41을 확인한 뒤 같은 PR에 푸시. Claude Code가 재검토.
+- 종료 상태: 수정 대기(Codex).
+
+### 2026-10-31 (Asia/Seoul) · PR #1 내용을 PR #2 문서로 이관
+
+- 담당 AI: Claude Code. 사용자 지시: "PR #1 닫고 PR #2로 옮기기".
+- 대상: `AGENTS.md`, `CLAUDE.md`, `docs/WORK_LOG.md`. 게임 코드·자산 변경 없음.
+- 기준 / 브랜치: `docs/ai-collaboration-handoff` `86f28ec` / `claude/port-pr1-into-pr2`(PR #2 브랜치 대상 PR).
+- 버전: 변경 없음.
+- 변경:
+  - `AGENTS.md` — "역할 분담(시범 운영)" 절 추가(PR #1의 §9 내용을 PR #2 문체로 정리, 인수 테스트 약화 금지 포함)
+  - `CLAUDE.md` — Claude Code 환경 전용 사항 4줄 추가(공통 규칙은 복제하지 않음)
+  - `docs/WORK_LOG.md` — 양식에 "검토 담당 / 발견 문제 수", "사용자 재요청 횟수" 추가, PR #1 이력과 THE HOLLOW KEEP 규격·검토 기록을 이 형식으로 추가
+  - `docs/STATUS.md`, `CHANGELOG.md` — 검토만 하고 변경하지 않음. PR #4가 STATUS를 크게 수정 중이어서 충돌을 피함. THE HOLLOW KEEP 현황·결정 반영은 PR #4 수정 시 Codex가 갱신
+- 테스트: `git diff --check` 통과, 변경 경로 3개 한정 확인.
+- 병합 시 주의: PR #4도 이 WORK_LOG의 같은 위치(파일 끝)에 항목을 추가했으므로, 둘 중 나중에 병합되는 쪽에서 WORK_LOG 충돌이 난다. 두 항목을 모두 남기고 시간순(Codex PR #4 구현 → Claude Code 검토)으로 정렬하면 된다.
+- 검토 담당 / 발견 문제 수: 사용자 검토 대기.
+- 사용자 재요청 횟수: 0회.
+- 종료 상태: 이관 PR 제출, PR #1 종료.
+
+### 2026-10-31 (Asia/Seoul) · PR #4 재검토(수정 4건 확인)
+
+- 담당 AI: Claude Code(검토). 구현 담당: Codex. 검토 담당은 구현 브랜치를 수정하지 않음.
+- 대상: PR #4 `codex/hollow-keep-foundation` head `229a50c`.
+- 버전: 변경 없음.
+- 규칙 준수 확인: 원본 인수 테스트와 규격 문서 4종이 `c6a31bf`와 파일 내용 동일(cherry-pick `9f862bc`). `main` 대비 기존 게임 파일·루트 런처·공용 자산·다른 게임 변경 없음. 3단 콤보 미추가, 공중 감속 유지(사용자 결정과 일치).
+- 테스트(Claude Code 환경 재실행): 인수 41/41, 경계 12/12, 구덩이 4/4, 브라우저 15/15, ABYSSFALL 회귀 3종 통과.
+- 독립 확인:
+  - 벽 교대: 1차 재현 스크립트로 Noah 벽 밀착 → Ethan 교대 성공
+  - 85px 구덩이: 점프 시점 전수 측정 — Ethan 59개 시점 통과·착지 x=543(약 12px 걸침), Noah 74개 시점·착지 x=630
+  - 모바일: 시작 화면 주인공 노출 확인
+  - 룬탄: 가까운 표적만 피해(978/1000)
+- 개선 제안(차단 아님): 모바일 캔버스가 가로 폭의 약 절반으로 작아 라벨이 작음(버튼 좌우 배치 제안), 상단 안내 문구 줄바꿈.
+- 미확인: Cloudflare 미리보기(`https://codex-hollow-keep-foundation.kirakein-playvault.pages.dev/games/the-hollow-keep/next/`)는 이 환경 네트워크 정책으로 접속 불가. 실기기·Safari/Firefox·손맛 평가 미확인.
+- Git/PR: [PR #4 재검토 리뷰](https://github.com/kirakein-gif/PLAYVAULT/pull/4) (COMMENT).
+- 검토 담당 / 발견 문제 수: Claude Code / 신규 0건(개선 제안 2건). 1차 3건 + 결정 반영 1건 모두 해결.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자가 시험 방에서 손맛·공중 감속 판단, PR #5 → #2 → #3 → #4 순 병합 결정.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-10-31 (Asia/Seoul) · THE HOLLOW KEEP 모바일 화면 크기 — 사용자 실기기 발견과 기준 추가
+
+- 담당 AI: Claude Code(기준·검사 작성). 구현 담당: Codex.
+- 배경: 사용자가 Cloudflare 미리보기(`codex-hollow-keep-foundation.kirakein-playvault.pages.dev`)를 실제 휴대전화로 열어 "너무 작아 확인 불가"를 보고. 측정 결과 PR #4 `229a50c`에서 780×330 기준 캔버스 293×165(원래 크기의 31%). 원인: 상단 제목줄 52px + 캔버스 아래 버튼 줄 69px + 실제 브라우저 주소창.
+- **검토 누락 기록**: Claude Code는 PR #4 재검토에서 "캔버스가 가로 폭의 약 절반"을 보고도 선택 제안으로 분류했고, 크기 기준과 실기기에 가까운 낮은 화면(740×320, 780×330) 검사를 두지 않았다. 사용자가 발견한 문제로 집계한다.
+- 변경(PR #3 `fa33f01`): `FOUNDATION_SPEC.md` §7-1 모바일 가로 배치 기준, `next/tests/mobile-layout.cjs`(4개 화면 × 5항목 = 20개 검사).
+- 테스트: PR #4 `229a50c`에서 12/20(캔버스 크기 4개 화면 모두 실패, 방 초기화 버튼 32px 실패). 임시 CSS(커밋 안 함)로 좌우 여백 배치를 적용하면 20/20 통과 — 달성 가능 확인.
+- Git/PR: PR #3 `fa33f01`, [PR #4 수정 요청 댓글](https://github.com/kirakein-gif/PLAYVAULT/pull/4).
+- 검토 담당 / 발견 문제 수: Claude Code 검토 누락 1건(사용자 발견).
+- 사용자 재요청 횟수: 0회(새 문제 보고).
+- 다음: Codex가 `fa33f01`을 반영하고 좌우 여백 배치로 수정, mobile-layout 20/20 확인 후 같은 PR에 푸시. Claude Code 재검토 시 실제 휴대전화와 비슷한 화면 크기 캡처를 함께 확인.
+- 종료 상태: 수정 대기(Codex).
+
+### 2026-10-31 (Asia/Seoul) · THE HOLLOW KEEP 모바일 가로 전체 화면 기준 추가
+
+- 담당 AI: Claude Code(기준·검사 작성). 구현 담당: Codex.
+- 배경: 사용자 요청 "모바일에선 가로 모드에 풀스크린이 가능하게". 브라우저 주소창·상태바가 차지하는 세로 공간 문제(앞 항목)와 연결.
+- 변경(PR #3 `44bd915`): `FOUNDATION_SPEC.md` §7-2(가로 화면 전체 화면 버튼, 세로 회전 안내 안의 전체 화면 버튼, 사용자 조작 시 `requestFullscreen` + `screen.orientation.lock('landscape')`, 거절·미지원 시 오류 없음, 자동 진입 금지), `next/tests/mobile-fullscreen.cjs` 6개 검사. §7-1의 전체 화면 "권장"을 §7-2 "필수"로 변경.
+- 테스트: PR #4 `229a50c`에서 1/6(버튼 없음). 임시 구현(커밋 안 함)에서 6/6, 배치 검사 20/20 동시 통과. 결함 변형 2종(가로 고정 요청 누락, 거절 미처리) 검출 확인. headless에서는 실제 회전 불가 — 실기기 확인 필요.
+- Git/PR: PR #3 `44bd915`, [PR #4 수정 요청 댓글](https://github.com/kirakein-gif/PLAYVAULT/pull/4).
+- 검토 담당 / 발견 문제 수: 해당 없음(신규 요구).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 `fa33f01`·`44bd915` 반영 후 배치·전체 화면을 구현, 같은 PR에 푸시. Claude Code 재검토, 사용자 실기기 확인.
+- 종료 상태: 수정 대기(Codex).
+
+### 2026-10-31 (Asia/Seoul) · PR #4 재검토(모바일 배치·가로 전체 화면)
+
+- 담당 AI: Claude Code(검토). 구현 담당: Codex. 검토 담당은 구현 브랜치를 수정하지 않음.
+- 대상: PR #4 head `9b39ace`.
+- 버전: 변경 없음.
+- 규칙 준수: 검사 원본 3종·규격 문서가 `44bd915`와 파일 내용 동일(cherry-pick `462f363`, `d304724`). `main` 대비 기존 게임·공용 영역 변경 없음.
+- 테스트(Claude Code 환경, `git archive` head를 로컬 서버로 실행): 인수 41/41, 경계 12/12, 구덩이 4/4, 모바일 배치 20/20, 모바일 전체 화면 6/6, 브라우저 18/18, ABYSSFALL 회귀 3종 통과.
+- 화면 확인: 780×330에서 캔버스가 세로를 채움(587px, 이전 293px). 왼쪽 위 도구·왼쪽 아래 조이스틱·오른쪽 동작 버튼 배치, 겹침 없음. 세로 화면 회전 안내에 "가로 전체 화면" 버튼.
+- 발견 문제: **경미 1건(차단 아님)** — 조이스틱을 누른 채 `resize`/`fullscreenchange`가 일어나면 `input.clear()`로 조이스틱 포인터가 해제되어, 손을 뗐다가 다시 누를 때까지 이동이 멈춤(CDP 터치로 재현).
+- Git/PR: [PR #4 재검토 리뷰](https://github.com/kirakein-gif/PLAYVAULT/pull/4) (COMMENT).
+- 검토 담당 / 발견 문제 수: Claude Code / 경미 1건.
+- 사용자 재요청 횟수: 0회.
+- 미확인: 실제 가로 회전, 전체 화면에서 주소창 사라짐, 조이스틱 이동 폭(약 28px) 손맛 — 사용자 실기기 확인 필요.
+- 종료 상태: 재검토 완료, 사용자 실기기 확인 대기.
+
+### 2026-10-31 (Asia/Seoul) · THE HOLLOW KEEP 사용자 실기기 확인과 공중 조작 기준 추가
+
+- 담당 AI: Claude Code(기준·검사 작성). 구현 담당: Codex.
+- 사용자 실기기 확인(PR #4 `9b39ace` 미리보기): 시험 방 크기·배치 "적당함". 공중에서 키를 떼면 수직 낙하 — 유지 승인.
+- 사용자 결정: 점프 중 좌우 조작은 의도. 단 **처음부터 앞으로 뛴 점프와 제자리 점프 후 앞으로 간 것은 다르게 표현**.
+- 측정(`9b39ace`): 제자리 점프 후 앞으로 누르면 공중에서 `runSpeed`까지 가속 → 달리며 뛴 점프 거리의 85%(Ethan)·95%(Noah)로 거의 같음.
+- 해석(사용자에게 알림): ① 속도 — 도약 속도 유지 vs `airControlSpeed` 제한, ② 표시 — `jumpKind`(running/standing)에 따른 자세 구분(임시 도형은 기울기, 정식 그림은 아트 단계).
+- 변경(PR #3 `6ce2654`): `FOUNDATION_SPEC.md` §4-1 공중 조작 규칙, CONFIG `airControlSpeed`, `getPlayer().jumpKind`; `DESIGN_DIRECTION.md` 결정 표 갱신; `foundation-contract.cjs` 공중 조작 10개 추가(총 51).
+- 테스트: 임시 참조 구현(커밋 안 함) 51/51. PR #4 `9b39ace`는 7개 실패(새 CONFIG·jumpKind 없음), 달리며 뛴 점프 속도 유지·수직 낙하는 통과.
+- Git/PR: PR #3 `6ce2654`, [PR #4 요청 댓글](https://github.com/kirakein-gif/PLAYVAULT/pull/4).
+- 검토 담당 / 발견 문제 수: 해당 없음(사용자 결정에 따른 신규 요구).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 §4-1 구현(경미 1건 조이스틱 resize 함께 권장), 인수 51/51 확인 후 같은 PR에 푸시. Claude Code 재검토, 사용자 시험 방에서 `airControlSpeed` 수치 판단.
+- 종료 상태: 수정 대기(Codex).
+
+### 2026-10-31 (Asia/Seoul) · PR #4 재검토(공중 조작·조이스틱 유지)
+
+- 담당 AI: Claude Code(검토). 구현 담당: Codex. 검토 담당은 구현 브랜치를 수정하지 않음.
+- 대상: PR #4 head `4d6ecc8`.
+- 버전: 변경 없음.
+- 규칙 준수: 검사 원본 3종·규격 문서가 `6ce2654`와 파일 내용 동일(cherry-pick `805e903`). `main` 대비 기존 게임·공용 영역 변경 없음.
+- 테스트(Claude Code 환경, `git archive` head 로컬 서버): 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, ABYSSFALL 회귀 3종 통과.
+- 독립 측정: 제자리 점프 후 앞으로 이동 거리 / 달리며 뛴 점프 — Ethan 35/91px(38%, 이전 85%), Noah 75/177px(42%, 이전 95%). 초기 `airControlSpeed` = `runSpeed`의 45%(1.33 / 1.73).
+- 조이스틱: CDP 터치로 누른 채 크기 변경 시 오른쪽 입력 유지, 손 떼면 해제 확인. (측정 중 두 번 "멈춤"으로 나온 것은 시험 방 벽·발판에 막힌 위치 측정이었으며, 입력 기록으로 다시 확인함 — 검토 쪽 측정 방법 오류.)
+- 발견 문제: 신규 0건. 앞선 경미 1건 해결.
+- Git/PR: [PR #4 재검토 리뷰](https://github.com/kirakein-gif/PLAYVAULT/pull/4) (COMMENT).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건.
+- 사용자 재요청 횟수: 0회.
+- 미확인: 공중 조작 손맛(사용자 실기기).
+- 종료 상태: 재검토 완료, 사용자 손맛 평가·병합 결정 대기.
