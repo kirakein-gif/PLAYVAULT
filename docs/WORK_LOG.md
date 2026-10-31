@@ -463,6 +463,27 @@
 - 사용자 재요청 횟수: 0회.
 - 종료 상태: 규격 제출, Codex 구현으로 인계(PR #4).
 
+### 2026-10-31 (Asia/Seoul) · THE HOLLOW KEEP 1단계 기반 구현 및 PR #4
+
+- 담당 AI / 인계받은 담당: Codex / 사용자가 PR #3 지시문 실행 및 기존 작업 브랜치 재개를 승인. PR #2 규칙·문서 적용 승인. 다른 AI에게 메시지를 발송하지 않음.
+- 검토 담당: **Claude Code / 검토 대기**.
+- 작업 대상: `games/the-hollow-keep/next/`와 승인된 관리 문서. 기존 게임·루트 런처·공용 자산·다른 게임·원본 인수 테스트는 수정하지 않음.
+- 기준: 규격 `claude/hollow-keep-foundation-spec`의 `bcf7a09018cf1141290d99fd80ec008f5f565b43`, 재개 `codex/hollow-keep-foundation`의 `5175afdfdf24987d8965c3dc612501db149a0737`. `git fetch origin --prune`로 전체 원격 브랜치, 열린 PR #1/#2/#3, 실제 기존 게임 소스를 확인. 기존 작업 브랜치 발견 후 사용자의 이어서 진행 승인을 받음. PC 로컬 미푸시 작업은 미확인.
+- 수정 전 → 후 버전: 기존 게임·캐시 표기 변경 없음. 새 기반 번호 미정·미부여.
+- 목적: 기존 게임과 비교 가능한 고정 1/60 틱 기반을 만들고 사용자 손맛 조정과 Claude Code 독립 검토를 준비.
+- 관리 문서: PR #2의 AGENTS/CLAUDE/CHANGELOG/STATUS/WORK_LOG 원문을 보존하여 도입(`5cf5748`)한 뒤 해당 게임 현황·새 이력·변경 내역만 갱신. 5개 문서 검토, AGENTS/CLAUDE 규칙 변경 없음. 루트 README는 읽기만 함.
+- 구현 파일: `next/sim.js`(DOM/시계/난수 없는 규칙·CONFIG·snapshot), `input.js`(키보드/멀티터치·프레임 사이 입력 큐·초점 해제), `render.js`(기존 고딕 배경/임시 도형/피해 숫자), `app.js`(누적 고정 틱·최대 8틱·시험 방·CONFIG 조절/복사), `index.html`, `style.css`, `README.md`, 추가 검사 `tests/foundation-edge.cjs`, `tests/browser-playtest.cjs`.
+- 원본 테스트: `node games/the-hollow-keep/next/tests/foundation-contract.cjs` **40/40 통과**. 기준 PR #3 대비 원본 파일 diff 없음. 테스트 약화·건너뛰기 없음.
+- 추가 검사: `node games/the-hollow-keep/next/tests/foundation-edge.cjs` **7/7 통과**. 버퍼 0 설정의 즉시 점프, 낮은 천장 교대 거절, 교대 시 공격 수명, 고속 탄/얇은 벽, 왼쪽 공격, snapshot/입력 방 데이터 격리, 공중 정지 상한.
+- 기존 회귀: `node tests/polish-regression.cjs`, `node tests/audio-regression.cjs`, `node tests/audio-wind-regression.cjs` **3종 통과**. audio 404 로그는 의도적인 실패 경로 테스트. 이 결과는 기존 ECLIPSE 회귀이며 HOLLOW KEEP 전체 플레이 인증은 아님.
+- 브라우저: 저장소 루트 로컬 HTTP 서버 + Playwright/시스템 Chromium, PC 1280×900 및 모바일 844×390/DPR2 에뮬레이션. `node games/the-hollow-keep/next/tests/browser-playtest.cjs` **14/14 통과**. 실제 키보드 이동/점프/공격/교대, debug 기본 숨김, 수치 입력/복사·복원, 입력란 포커스 격리, blur, 가로 터치 버튼 크기, CDP 멀티터치 이동+점프, 터치 공격/교대, 세로 정지/가로 복귀, 페이지 오류·자산 실패 없음 확인.
+- 발견·수정: 첫 브라우저 실행은 앞 3검사 후 짧은 X 입력이 틱 사이에서 사라져 표적 무피해로 실패. 입력 전환을 틱 큐에 보존하도록 수정 후 동일 검사를 14/14 통과. 스크린샷에서 발견한 터치 버튼 글자 줄바꿈도 수정. 최종 스크린샷 `/tmp/hollow-keep-desktop.png`, `/tmp/hollow-keep-mobile.png` 육안 확인. 브라우저 검사 초안은 최종 체크아웃에서 재실행 가능하도록 포함.
+- 수치·범위 차이: 기존 속도/중력/몸 크기/가속/마찰/코요테/버퍼/룬탄을 출발점으로 삼음. 고정 틱 목표 점프 80/145px, 짧은 점프 34/56px, 정지 상한 감속을 적용. Noah는 22 피해/66px 단일 참격이며 기존 3단 콤보·전진·히트스톱·넉백은 미포함(규격의 추가 선택 항목). Ethan의 장거리 관통 룬탄 유지. 발 위치·중심 보존 교대, 공간 부족 시 거절.
+- Git/PR: 착수 기록 `5175afd`를 이어 관리 문서 담당 선언 `5cf5748`을 푸시하고 Draft [PR #4](https://github.com/kirakein-gif/PLAYVAULT/pull/4)를 구현 전에 개설. 최종 구현 커밋은 PR head 참조. 완료 후 Ready로 전환하여 검토 요청 상태로 인계. main 대상 diff에는 미병합 PR #2 관리 문서 및 #3 규격/원본 테스트가 포함되며 자동 병합하지 않음.
+- 미해결·미확인: 사용자 캐릭터 상세 설정 미제공, 사용자 조작감 평가·실제 휴대전화·Safari/Firefox·장시간 플레이 미확인. 수치를 바꿔도 시험 방 지형은 자동 조정되지 않음. 프레임 지연 초과분은 버리고 렌더 보간은 미구현. 정식 아트/음향·적 AI·방 연결·장치·체력/사망·저장은 범위 밖.
+- 다음 AI: PR #4 head에서 원본 인수/추가/기존 회귀를 재실행하고 로컬 HTTP 브라우저 조작으로 독립 검토. 사용자와 점프·무기 거리·교대 감각 평가. PR #2/#3과 관리 문서 중복의 병합 순서 조율.
+- 종료 상태: 구현 제출 / **Claude Code / 검토 대기**. 자동 검사 통과를 조작감 완성으로 표현하지 않음. 병합·배포하지 않음.
+
 ### 2026-10-31 (Asia/Seoul) · PR #4 교차 검토와 사용자 결정 반영
 
 - 담당 AI: Claude Code(검토). 구현 담당: Codex.
@@ -497,6 +518,23 @@
 - 검토 담당 / 발견 문제 수: 사용자 검토 대기.
 - 사용자 재요청 횟수: 0회.
 - 종료 상태: 이관 PR 제출, PR #1 종료.
+
+### 2026-10-31 (Asia/Seoul) · PR #4 검토 반영 — 4건 수정
+
+- 담당 AI: Codex / 사용자 요청으로 같은 `codex/hollow-keep-foundation` 브랜치 재개.
+- **검토 담당 Claude Code / 발견 문제 3건 + 결정 반영 1건 / 수정 내역**: 아래 1~4 반영, Claude Code 재검토 대기.
+- 기준: 기존 PR #4 head `766630edd93a388af34edae3c7870ad67868249e`. 최신 규격 `c6a31bf1d9d7eadbbad62bbbb6a5da73b56b3cb4`를 먼저 cherry-pick(`9f862bc`)하고 담당·범위를 STATUS에 공유(`fd91385`). PR #4의 Claude Code 리뷰 및 보충 댓글을 직접 읽음. 열린 PR #2/#3/#4/#5 확인, 닫힌 PR #1 확인. PR #5 관리 기록은 이번 범위 밖이며 향후 충돌 시 두 WORK_LOG 항목을 보존해 시간순 정리.
+- 범위/버전: `games/the-hollow-keep/next/` 및 관리 문서. 기존 게임·공용 자산·루트 런처·다른 게임·기존 회귀 테스트 보존. 게임 버전/캐시 표기 변경 없음. 41개 인수 테스트는 `c6a31bf` 원본 그대로이며 직접 수정하지 않음.
+- 1. 교대 벽 끼임: 중심 후보가 겹치면 폭 차이 이내의 고체 경계 후보를 수평 보정 거리순으로 재검사. 좌/우 벽 Noah→Ethan 모두 성공, 발 위치 보존. Ethan보다 좁은 통로와 낮은 천장은 계속 거절. CONFIG와 공중 감속 코드는 변경하지 않음.
+- 2. Ethan 구덩이: 145px → 85px(왼쪽 끝 470, 오른쪽 시작 555), 라벨도 85px. `room.js`에 실제 방을 공유해 앱/테스트가 같은 데이터를 사용. `room-traversal.cjs`에서 x=320부터 달려 x=450 부근에 점프, Ethan x=543.08 / Noah x=630.04 착지 후 몸 전체가 오른쪽 바닥으로 이동함을 확인. 이전 145px 비교(점프 입력 기준 x=390..500, 1px 간격 111개)는 Ethan 0/111, Noah 89/111 통과. 첫 발판 뒤의 바닥 구간부터 측정한 정해진 입력 시나리오이며 사용자 손맛 평가는 아님.
+- 3. 모바일 가림: 버튼을 캔버스 아래의 별도 영역으로 옮기고 가로 화면 높이에서 조작 영역을 확보. 844×390/DPR2에서 모든 버튼과 캔버스가 화면 내에 있고 서로 겹치지 않음. 시작 Ethan x=35의 화면 좌표가 캔버스에 노출됨을 검사하고 `/tmp/hollow-keep-mobile-start.png` 캡처 육안 확인. 기존 멀티터치/가로·세로 전환 검사도 유지.
+- 4. 룬탄 관통 제거: 이동 방향상 가장 먼저 닿은 표적 1개만 피해 후 즉시 소멸. 빠른 탄에서 표적 배열 순서와 무관하게 접촉 순서를 처리하고 고체에 가려진 뒤 표적은 무피해. README 및 브라우저 기대값을 가까운 표적 978 HP / 먼 표적 1000 HP로 갱신. Noah 단일 참격 유지, **3단 콤보는 사용자 결정으로 보류**.
+- 변경 파일: `next/{sim.js,room.js,app.js,index.html,style.css,README.md}`, `next/tests/{foundation-edge.cjs,room-traversal.cjs,browser-playtest.cjs}`, `docs/{WORK_LOG.md,STATUS.md}`, `CHANGELOG.md`. 규격·원본 인수 테스트 변경은 Claude Code 커밋을 그대로 적용한 것뿐임.
+- 이번 검증: `node games/the-hollow-keep/next/tests/foundation-contract.cjs` **41/41**, `foundation-edge.cjs` **12/12**, `room-traversal.cjs` **4/4**, `browser-playtest.cjs` **15/15 통과**. 브라우저는 로컬 HTTP 서버 + Playwright/시스템 Chromium, PC 1280×900 / 모바일 가로 844×390/DPR2. 콘솔 오류/자산 실패 없음. 인수 원본은 규격 적용 직후 관통 1개만 실패(40/41)했고 수정 후 41/41 통과.
+- 기존 회귀 재실행: `node tests/polish-regression.cjs`, `node tests/audio-regression.cjs`, `node tests/audio-wind-regression.cjs` **3종 통과**. audio 404 경고는 의도적인 실패 경로. ECLIPSE 회귀 통과를 HOLLOW KEEP 전체 게임 검증으로 확대하지 않음.
+- 5개 관리 문서 검토: WORK_LOG 누적, STATUS/CHANGELOG 갱신. AGENTS/CLAUDE는 절차 변경이 없어 해당 항목 변경 없음. 과거 WORK_LOG는 수정하지 않음.
+- 제출/인계: 같은 PR #4에 푸시하며 수정 커밋은 PR head 참조. 다음 검토 담당 **Claude Code / 재검토 대기**. 독립 테스트 재실행·브라우저 조작·이번 네 수정 확인 요청. 병합·수동 배포 명령 없음. 저장소 GitHub 연동 Cloudflare 미리보기 자동 배포 댓글은 별도 관찰로 구분.
+- 미확인: 실기기·Safari/Firefox·장시간 플레이·사용자 손맛 승인. 자동 통과를 조작감 완성으로 표현하지 않음. 원격 밖 PC 로컬 작업은 미확인.
 
 ### 2026-10-31 (Asia/Seoul) · PR #4 재검토(수정 4건 확인)
 
@@ -543,6 +581,23 @@
 - 다음: Codex가 `fa33f01`·`44bd915` 반영 후 배치·전체 화면을 구현, 같은 PR에 푸시. Claude Code 재검토, 사용자 실기기 확인.
 - 종료 상태: 수정 대기(Codex).
 
+### 2026-10-31 (Asia/Seoul) · PR #4 추가 수정 — 모바일 화면 크기 + 가로 전체 화면
+
+- 담당 Codex / 검토 담당 **Claude Code / 재검토 대기**. 사용자가 실제 휴대전화에서 게임 화면이 너무 작다고 확인한 뒤 모바일 확대·전체 화면 구현을 요청.
+- 기준: `codex/hollow-keep-foundation`의 `229a50ca6f9e5b667afd2fa7d47b099243a21d89`. 원격 전체 브랜치 fetch 후 PR #4의 “모바일 화면이 너무 작음”, “모바일 가로 전체 화면” 댓글과 규격 §7-1/§7-2, 최신 원본 검사 두 파일을 직접 읽음. `fa33f01`과 `44bd915`를 순서대로 cherry-pick(`462f363`, `d304724`)하고 담당·범위를 STATUS에 기록/원격 공유(`018654f`).
+- 범위/버전: `next/`의 입력·배치·전체 화면 및 관리 문서. 기존 게임·공용 자산·다른 게임·루트 런처·기존 회귀·sim.js/CONFIG/공중 감속은 변경하지 않음. 룬탄 비관통과 Noah 콤보 보류 유지. 게임/캐시 버전 변경 없음.
+- 배치: 모바일 가로 제목줄/아래 조작줄을 없애고 좌우 72px 이상 여백을 제외한 최대 16:9 캔버스를 사용. 740×320→약 569×320, 780×330→587×330, 844×390→693×390, 915×412→732×412. 스크롤 없음. 도구는 여백 상단, 한 축 조이스틱은 왼쪽, 교대/공격/점프는 오른쪽. 조작 44px 이상, 도구/전체 화면 36px 이상이며 캔버스/서로를 가리지 않음. 수치 패널은 사용자가 열 때 별도 스크롤 영역으로 표시.
+- 입력: `data-control="move"` 한 축 조이스틱에 포인터 캡처·중앙 데드존·좌우 전환·손 떼기/취소/초점 해제 처리를 추가. 조이스틱+점프 멀티터치 유지. 시뮬레이션의 기존 속도를 그대로 사용하고 새 이동 수치를 부여하지 않음.
+- 전체 화면: 새 `fullscreen.js`에서 가로 `[data-fullscreen]`과 `#rotate` 안 버튼을 연결. 클릭 순간 `document.documentElement.requestFullscreen({navigationUI:'hide'})` 호출 후 `screen.orientation.lock('landscape')`. 가로 고정 거절 시 전체 화면 유지+안내, 전체 화면 거절/미지원 시 안내 및 처리되지 않은 Promise 거절 없음. 재클릭 해제 및 잠금 해제 시도. 자동 진입 없음. resize/fullscreenchange에 동적 CSS 재배치와 입력/누적 시간 초기화, 캔버스 포커스 복원.
+- 변경 파일: `next/{index.html,style.css,input.js,app.js,fullscreen.js,README.md}`, `next/tests/browser-playtest.cjs`, `docs/{WORK_LOG.md,STATUS.md}`, `CHANGELOG.md`. 원본 `foundation-contract.cjs`, `mobile-layout.cjs`, `mobile-fullscreen.cjs`는 최신 규격 커밋 원본과 동일하며 직접 수정/약화하지 않음.
+- 이번 검사: `mobile-layout.cjs` **20/20**, `mobile-fullscreen.cjs` **6/6**, `foundation-contract.cjs` **41/41**, `foundation-edge.cjs` **12/12**, `room-traversal.cjs` **4/4**, `browser-playtest.cjs` **18/18 통과**. 기존 `tests/polish-regression.cjs`, `tests/audio-regression.cjs`, `tests/audio-wind-regression.cjs` **3종 통과**. 오디오 404는 의도적인 실패 경로 로그. 검사 원본·보호 경로·기존 이력 보존, JS 구문, diff 검사도 수행.
+- 환경/재현: 저장소 루트 HTTP 서버 127.0.0.1:8766, `HK_URL=http://127.0.0.1:8766/games/the-hollow-keep/next/`, `CHROMIUM_PATH=/usr/bin/chromium`, Playwright/시스템 Chromium. 배치는 4개 가로 크기/DPR2. 기존 브라우저 검사의 터치 위치를 조이스틱으로 변경하고, 좌우 전환/취소·자동 진입 없음·전체 화면 거절 후 조작 유지·전체 화면 중 780×330→915×412 재배치도 검사.
+- 중간 실패: 기존 8765 HTTP 서버가 ERR_EMPTY_RESPONSE를 반환해 8766의 새 로컬 서버로 검증. 초기 고정 위치 도구는 offsetParent 기준 가시성 검사에 걸려 배치 16/20·전체 화면 4/6이었고, main 내부 절대 위치로 바꾸어 최종 20/20·6/6 통과. 검사 파일을 고치지 않고 구현을 수정.
+- 캡처: `HK_SHOT_DIR=/tmp`의 `/tmp/hk-mobile-{740x320,780x330,844x390,915x412}.png` 및 `/tmp/hollow-keep-mobile-start.png`, `/tmp/hollow-keep-mobile-fullscreen.png`. 가로 780×330/844×390 및 전체 화면 캡처 육안 확인. 시작 주인공과 바닥/표적/라벨이 보이고 조작은 여백에 있음.
+- 5개 관리 문서 검토: WORK_LOG 누적, STATUS/CHANGELOG 갱신, AGENTS/CLAUDE는 절차 변경이 없어 해당 항목 변경 없음. 과거 WORK_LOG 보존. README에 배치/전체 화면 사용법·미지원 안내·검증 명령·한계 갱신.
+- 한계: **실제 화면 회전은 실기기 확인 필요**. headless 검사는 전체 화면 진입/해제와 가로 고정 요청 및 거절 대응을 확인하며, 실제 Android 회전/주소창·노치/iPhone Safari 설치 모드/터치 손맛을 검증한 것은 아님. 실기기·타 브라우저·장시간 플레이·사용자 손맛 평가는 미확인.
+- 제출/인계: 같은 PR #4에 푸시, 수정 커밋은 PR head 참조. Claude Code가 원본 검사 전체 재실행·독립 브라우저·실기기 확인 항목 검토. 병합·수동 배포 명령 없음. GitHub 연동 미리보기는 별도 자동 작업으로 구분.
+
 ### 2026-10-31 (Asia/Seoul) · PR #4 재검토(모바일 배치·가로 전체 화면)
 
 - 담당 AI: Claude Code(검토). 구현 담당: Codex. 검토 담당은 구현 브랜치를 수정하지 않음.
@@ -573,6 +628,23 @@
 - 다음: Codex가 §4-1 구현(경미 1건 조이스틱 resize 함께 권장), 인수 51/51 확인 후 같은 PR에 푸시. Claude Code 재검토, 사용자 시험 방에서 `airControlSpeed` 수치 판단.
 - 종료 상태: 수정 대기(Codex).
 
+### 2026-10-31 (Asia/Seoul) · PR #4 추가 수정 — 공중 조작 사용자 결정
+
+- 담당 Codex / 검토 담당 **Claude Code / 재검토 대기**. 사용자는 시험 방 크기/배치와 키를 놓을 때 수직 낙하를 승인하고, 달리며 뛴 점프와 제자리 점프 후 이동의 구분을 요청.
+- 기준 `codex/hollow-keep-foundation`의 `9b39ace1d63952ddf610eba66c02a169a1e5c69f`. 전체 원격 fetch/열린 PR #2/#3/#4/#5 확인 및 PR #4 “공중 조작” 댓글·규격 §4-1·51개 원본 인수 검사를 읽음. `6ce2654`를 먼저 cherry-pick(`805e903`)하고 담당·범위 STATUS 기록/원격 공유(`4174aa0`).
+- 범위/버전: `next/` 시뮬레이션/렌더/패널/입력/검사와 관리 문서. 기존 게임·공용 자산·루트 런처·다른 게임·기존 회귀 보존. 51개 인수 및 모바일 배치/전체 화면 검사 원본 그대로. 게임/캐시 버전 변경 없음. Noah 콤보 보류, 룬탄 비관통 유지.
+- 시뮬레이션: 점프 시작 틱의 `takeoffVx`를 기록(코요테·착지 버퍼 포함), 절댓값이 runSpeed의 50% 이상이면 running, 미만이면 standing. `getPlayer()`로 두 값을 노출하고 착지 전까지 유지. 착지 시 null/0 초기화. 도약 방향 상한 `max(airControlSpeed,abs(takeoffVx))`, 반대 방향 상한 airControlSpeed. 걷다가 가장자리에서 떨어질 때는 코요테 도약 전 관성을 유지. 기존 무입력 감속/stopTicks 블록은 그대로 보존.
+- CONFIG/표시: Ethan 1.33, Noah 1.73 px/틱(각 달리기 속도의 약 45%). 패널에 공중 조작 속도 추가, 0보다 크고 runSpeed보다 작게 검증. runSpeed를 낮춰 상한이 깨지면 약 45%로 조정. running 자세는 도약 방향으로 약 9° 기울고 standing은 곧게 표시, 판정 상자는 그대로. 디버그에 종류·도약 속도 표시.
+- 경미 문제: resize/fullscreenchange는 누적 시간만 초기화하고 유효한 포인터/방향을 유지. 조이스틱 손잡이는 정규화된 축 값으로 재배치. 도구 포커스에서는 키보드만 해제해 다른 손가락의 터치 입력을 보존. 실제 blur/숨김/세로 전환 및 손 떼기·취소·캡처 해제에서는 기존 입력 해제 유지. 전체 화면 버튼은 멀티터치 중에도 touch pointerup의 사용자 활성화에서 동작하고 호환 click 중복은 억제.
+- 변경 파일: `next/{sim.js,render.js,app.js,input.js,fullscreen.js,README.md}`, `next/tests/{foundation-edge.cjs,browser-playtest.cjs}`, `docs/{STATUS.md,WORK_LOG.md}`, `CHANGELOG.md`. 지형·모바일 CSS·무기·기존 점프 높이/중력 등 수치는 변경하지 않음(공중 조작 값만 추가).
+- 이번 검사: 원본 `foundation-contract.cjs` **51/51**, `foundation-edge.cjs` **16/16**, `room-traversal.cjs` **4/4**, `mobile-layout.cjs` **20/20**, `mobile-fullscreen.cjs` **6/6**, `browser-playtest.cjs` **20/20 통과**. 기존 회귀 `node tests/polish-regression.cjs`, `node tests/audio-regression.cjs`, `node tests/audio-wind-regression.cjs` **3종 통과**. audio 404는 의도적인 실패 경로 로그.
+- 구덩이 재확인: 실제 85px 지형에서 Ethan x=451.63 도약 → x=543.08 착지 후 몸 전체 통과, Noah x=452.94 → x=630.04 통과. 이전 145px 비교는 Ethan 0/111, Noah 89/111로 유지. 자동 검사 결과이며 손맛 승인이 아님.
+- 추가 경계: 두 주인공의 코요테 도약 속도/방향 전환 중 종류 고정, 착지 버퍼의 실제 도약 속도와 착지 초기화를 추가. 브라우저는 실제 키보드로 종류/속도 및 CONFIG 적용, 두 자세 캡처, 실제 CDP 멀티터치로 조이스틱을 누른 채 다른 손가락의 전체 화면 버튼→resize→손 떼기를 검증.
+- 중간 검사 수정: 기존 브라우저의 동시 이동+제자리 점프는 새 상한에서 15px 이동 기대값에 못 미쳤으므로 기대값을 airControlSpeed와 실제 틱 수에 따른 상·하한 및 standing 종류 검사로 변경. 최초 멀티터치 전체 화면 검사는 CDP touchEnd에 잘못된 손가락 ID를 보내 대기 시간 초과였고, 전체 화면 손가락 ID를 해제하도록 수정 후 통과. 보호된 인수 검사 세 파일은 수정하지 않음.
+- 환경/캡처: 로컬 HTTP 127.0.0.1:8766, HK_URL 해당 next 경로, CHROMIUM_PATH=/usr/bin/chromium, Playwright/Chromium. PC 1280×900, 모바일 844×390/DPR2 및 배치 4개 크기, 전체 화면 resize 780×330/915×412. `/tmp/hollow-keep-standing-jump.png`, `/tmp/hollow-keep-running-jump.png` 육안 확인. 실제 화면 회전은 **실기기 확인 필요**, 실제 휴대전화 새 공중 손맛·타 브라우저·장시간 플레이는 미확인.
+- 5개 관리 문서 검토: WORK_LOG 누적, STATUS/CHANGELOG 갱신, AGENTS/CLAUDE는 절차 변경이 없어 해당 항목 변경 없음. README의 규칙·수치·캡처/검사 결과 및 입력 유지 설명 갱신. 과거 WORK_LOG 보존.
+- 제출/인계: 같은 PR #4에 푸시, 수정 커밋은 PR head 참조. Claude Code가 인수/경계/구덩이/모바일/전체 화면/브라우저/기존 회귀 재실행과 독립 조작 확인. 병합·수동 배포 명령 없음. 사용자 손맛 평가는 별도 대기.
+
 ### 2026-10-31 (Asia/Seoul) · PR #4 재검토(공중 조작·조이스틱 유지)
 
 - 담당 AI: Claude Code(검토). 구현 담당: Codex. 검토 담당은 구현 브랜치를 수정하지 않음.
@@ -588,3 +660,17 @@
 - 사용자 재요청 횟수: 0회.
 - 미확인: 공중 조작 손맛(사용자 실기기).
 - 종료 상태: 재검토 완료, 사용자 손맛 평가·병합 결정 대기.
+
+### 2026-10-31 (Asia/Seoul) · PR #2·#3·#4·#5 병합과 문서 충돌 정리
+
+- 담당 AI: Claude Code. 사용자 승인(“지금 병합”).
+- 대상: 저장소 공통 문서, THE HOLLOW KEEP `next/`(코드 변경 없음, 병합만).
+- 병합 순서: PR #5 → PR #2 브랜치(`7c347bb`), PR #3 → main(`526d917`), PR #2 → main(`71f2dcb`), PR #4 → 통합 브랜치 `claude/merge-pr4-foundation`(`ecdcfd1`) → main. 계획은 #5→#2→#3→#4였으나 병합 요청을 동시에 보내 #3이 #2보다 먼저 병합됨 — 두 PR은 서로 다른 파일만 다뤄 영향 없음(작업 방식 실수로 기록). PR #2는 GitHub 병합 가능 계산 지연으로 1회 실패 후 재시도.
+- PR #4 충돌(add/add): `AGENTS.md`·`CLAUDE.md`는 PR #4 쪽이 PR #2 원본과 같아 main 유지, `CHANGELOG.md`·`docs/STATUS.md`는 main 쪽이 PR #2 원본과 같아 PR #4 유지, `docs/WORK_LOG.md`는 main 양식 + 양측 14개 항목을 커밋 시각 순으로 원문 보존(스크립트로 원문 포함 확인).
+- 테스트(병합 결과): 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, ABYSSFALL 회귀 3종 통과. `git diff --check` 통과.
+- STATUS: 병합 결과·다음 단계(픽셀아트 HD 아트 기준) 반영, “재검토 대기” 표기를 완료로 갱신.
+- 사용자 결정: 다음 단계는 아트 기준부터, 콘셉트 **픽셀아트 HD**(1단위 = 1픽셀, 960×540), 고딕 방향 유지.
+- 검토 담당 / 발견 문제 수: 해당 없음(병합 작업).
+- 사용자 재요청 횟수: 0회.
+- 다음: Claude Code가 픽셀아트 HD 아트 기준·자동 검사 작성, Codex가 그림 제작·적용.
+- 종료 상태: 병합 완료.
