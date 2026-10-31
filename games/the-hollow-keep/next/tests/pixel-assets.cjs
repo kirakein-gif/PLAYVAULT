@@ -5,6 +5,8 @@
  *
  * 실행: node games/the-hollow-keep/next/tests/pixel-assets.cjs
  * 환경 변수: HK_ART_DIR(자산 폴더, 기본 next/assets/pixel), CHROMIUM_PATH
+ *   HK_ART_REQUIRE  시험본 모드. 예: "ethan:idle,run;noah:idle" — 적힌 동작만 필수로 검사하고 타일·배경은 건너뜀
+ * 그림 밀도: manifest.scale(1 또는 2, 기본 1) = 게임 1단위당 그림 픽셀 수. 타일·배경·몸 높이 기준이 scale배가 됨
  * HTTP 서버가 필요 없다. PNG는 Chromium으로 색 변환 없이 해석한다.
  */
 'use strict';
@@ -16,9 +18,20 @@ const { chromium } = require('playwright');
 const NEXT = path.join(__dirname, '..');
 const DIR = path.resolve(process.env.HK_ART_DIR || path.join(NEXT, 'assets', 'pixel'));
 const SIM = require(path.join(NEXT, 'sim.js'));
-const TILE = 30;
+const BASE_TILE = 30;
+let SCALE = 1, TILE = BASE_TILE;
 const MAX_COLORS = 64;
-const REQUIRED = { idle: 4, run: 6, 'jump-standing': 3, 'jump-running': 3, land: 2, attack: 4 };
+const FULL = { idle: 4, run: 6, 'jump-standing': 3, 'jump-running': 3, land: 2, attack: 4 };
+const TRIAL = process.env.HK_ART_REQUIRE || '';
+const REQUIRE_BY_HERO = { ethan: FULL, noah: FULL };
+if (TRIAL) {
+  for (const h of Object.keys(REQUIRE_BY_HERO)) REQUIRE_BY_HERO[h] = {};
+  for (const part of TRIAL.split(';').filter(Boolean)) {
+    const [h, list] = part.split(':');
+    REQUIRE_BY_HERO[h.trim()] = Object.fromEntries(list.split(',').map((n) => n.trim()).filter((n) => n in FULL).map((n) => [n, FULL[n]]));
+  }
+}
+const REQUIRED = FULL; // 시트 분석 대상 이름 목록
 const OPTIONAL_FX = { 'fx-rune': 2, 'fx-slash': 3 };
 const GROUNDED = ['idle', 'run', 'land'];
 const PNG_SIG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
@@ -106,13 +119,17 @@ async function analyze(page, file, opts) {
 (async () => {
   // ── 매니페스트·팔레트 ──
   let manifest = null, palette = null;
-  check('manifest.json이 있고 형식이 맞음(version 1, tileSize 30)', () => {
+  check('manifest.json이 있고 형식이 맞음(version 1, scale 1|2, tileSize 30×scale)', () => {
     const p = path.join(DIR, 'manifest.json');
     assert.ok(fs.existsSync(p), `${p} 없음`);
     manifest = JSON.parse(fs.readFileSync(p, 'utf8'));
     assert.equal(manifest.version, 1, 'version은 1');
-    assert.equal(manifest.tileSize, TILE, `tileSize는 ${TILE}`);
+    SCALE = manifest.scale === undefined ? 1 : manifest.scale;
+    assert.ok(SCALE === 1 || SCALE === 2, `scale은 1 또는 2(현재 ${manifest.scale})`);
+    TILE = BASE_TILE * SCALE;
+    assert.equal(manifest.tileSize, TILE, `tileSize는 ${TILE}(30×scale)`);
   });
+  if (TRIAL) console.log(`(시험본 모드: ${TRIAL} — 타일·배경 검사 생략)`);
   if (!manifest) { console.log(`\n0/${results.length} passed`); process.exit(1); }
   check(`palette.json: 1~${MAX_COLORS}색, #rrggbb, 중복 없음`, () => {
     const p = path.join(DIR, manifest.palette || 'palette.json');
@@ -126,7 +143,8 @@ async function analyze(page, file, opts) {
   if (!palette) palette = [];
 
   const heroes = manifest.heroes || {};
-  for (const hero of ['ethan', 'noah']) {
+  const HEROES = Object.keys(REQUIRE_BY_HERO).filter((h) => Object.keys(REQUIRE_BY_HERO[h]).length);
+  for (const hero of HEROES) {
     check(`${hero}: body가 sim.js CONFIG와 같음`, () => {
       const h = heroes[hero]; assert.ok(h, `heroes.${hero} 없음`);
       const c = SIM.CONFIG.heroes[hero];
@@ -134,7 +152,7 @@ async function analyze(page, file, opts) {
     });
     check(`${hero}: 필수 동작과 최소 프레임 수, 기준점·시간 형식`, () => {
       const anims = (heroes[hero] || {}).animations || {};
-      for (const [name, min] of Object.entries(REQUIRED)) {
+      for (const [name, min] of Object.entries(REQUIRE_BY_HERO[hero])) {
         const a = anims[name]; assert.ok(a, `${name} 없음`);
         assert.ok(isInt(a.frames) && a.frames >= min, `${name} 프레임 ${a.frames} < ${min}`);
         assert.ok(isInt(a.frameW) && isInt(a.frameH), `${name} frameW/frameH`);
@@ -154,7 +172,7 @@ async function analyze(page, file, opts) {
   const page = await browser.newPage();
   await page.setContent('<!doctype html><title>pixel</title>');
   const sheets = [];
-  for (const hero of ['ethan', 'noah']) {
+  for (const hero of HEROES) {
     const anims = (heroes[hero] || {}).animations || {};
     for (const [name, a] of Object.entries(anims)) {
       if (!(name in REQUIRED) && !(name in OPTIONAL_FX)) continue;
@@ -202,13 +220,14 @@ async function analyze(page, file, opts) {
         check(`${s.label}: 몸 크기가 판정 상자와 맞음(높이 ±15%, 가로 중심)`, () => {
           const c = SIM.CONFIG.heroes[s.hero], b = r.boxes[0];
           const h = b.maxY - b.minY + 1;
-          assert.ok(Math.abs(h - c.height) <= c.height * 0.15, `idle 높이 ${h}px, 판정 ${c.height}px`);
+          const H = c.height * SCALE, Wd = c.width * SCALE;
+          assert.ok(Math.abs(h - H) <= H * 0.15, `idle 높이 ${h}px, 판정 ${c.height}×scale ${SCALE} = ${H}px`);
           const cx = (b.minX + b.maxX) / 2;
-          assert.ok(Math.abs(cx - s.a.pivot.x) <= c.width / 2, `몸 가로 중심 ${cx}가 pivot.x ${s.a.pivot.x}에서 ${c.width / 2}px 넘게 벗어남`);
+          assert.ok(Math.abs(cx - s.a.pivot.x) <= Wd / 2, `몸 가로 중심 ${cx}가 pivot.x ${s.a.pivot.x}에서 ${Wd / 2}px 넘게 벗어남`);
         });
       }
     }
-    for (const hero of ['ethan', 'noah']) {
+    for (const hero of HEROES.filter((h) => 'jump-running' in REQUIRE_BY_HERO[h] || 'jump-standing' in REQUIRE_BY_HERO[h])) {
       check(`${hero}: jump-running 그림이 jump-standing과 다름`, () => {
         const a = results2[`${hero}/jump-running`], b = results2[`${hero}/jump-standing`];
         assert.ok(a && b, '두 시트가 모두 있어야 함');
@@ -216,8 +235,9 @@ async function analyze(page, file, opts) {
       });
     }
 
-    // ── 타일셋 ──
-    const t = manifest.tiles || {};
+    // ── 타일셋 (시험본 모드에서는 생략) ──
+    const t = TRIAL ? {} : (manifest.tiles || {});
+    if (!TRIAL) {
     const tfile = path.join(DIR, t.file || 'tiles.png');
     check('tiles: PNG 파일과 필수 칸(floor-top, wall-fill, ledge)', () => {
       assert.ok(fs.existsSync(tfile), `${t.file || 'tiles.png'} 없음`);
@@ -244,17 +264,18 @@ async function analyze(page, file, opts) {
         assert.equal(r.cells['floor-top'][TILE - 1], TILE, 'floor-top 아랫줄이 꽉 차야 wall-fill과 이어짐');
         const ledge = r.cells.ledge;
         assert.ok(ledge[0] > 0, 'ledge 맨 윗줄이 비어 있음');
-        assert.ok(ledge.slice(16).every((c) => c === 0), 'ledge는 위 16px 아래가 투명해야 함(발판 두께 16)');
+        assert.ok(ledge.slice(16 * SCALE).every((c) => c === 0), `ledge는 위 ${16 * SCALE}px 아래가 투명해야 함(발판 두께 16×scale)`);
       });
+    }
     }
 
     // ── 배경(선택) ──
-    for (const f of fs.existsSync(DIR) ? fs.readdirSync(DIR).filter((n) => /^bg-.*\.png$/.test(n)) : []) {
+    for (const f of !TRIAL && fs.existsSync(DIR) ? fs.readdirSync(DIR).filter((n) => /^bg-.*\.png$/.test(n)) : []) {
       let r;
       try { r = await analyze(page, path.join(DIR, f), { palette }); }
       catch (e) { check(`${f}: 이미지 해석`, () => assert.fail(`해석 실패: ${e.message.split('\n')[0]}`)); continue; }
-      check(`${f}: 960×540·투명도·팔레트·원래 해상도`, () => {
-        assert.ok(r.W === 960 && r.H === 540, `크기 ${r.W}×${r.H}`);
+      check(`${f}: (960×540)×scale·투명도·팔레트·원래 해상도`, () => {
+        assert.ok(r.W === 960 * SCALE && r.H === 540 * SCALE, `크기 ${r.W}×${r.H}, 기준 ${960 * SCALE}×${540 * SCALE}`);
         assert.equal(r.alphaMid, 0); assert.equal(r.off, 0, `팔레트 밖 색 ${r.off}`);
         assert.deepEqual(r.upscaled, [], '확대 저장된 이미지로 보임');
       });
