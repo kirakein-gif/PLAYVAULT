@@ -148,3 +148,11 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 ## 이번 관리 문서 작업
 
 게임 버전 변경 없음. 2026-10-31의 공동 규칙 구축과 전체 이력 복원은 [WORK_LOG](docs/WORK_LOG.md)에 기록한다. 앞으로 제품 변경은 해당 게임 표에 버전·날짜·커밋/PR·검증/배포 상태를 추가하고, 기존 행의 오류는 근거를 붙여 정정한다.
+
+
+## THE HOLLOW KEEP · 새 기반 구현 (2026-10-31, Asia/Seoul)
+
+- [PR #4](https://github.com/kirakein-gif/PLAYVAULT/pull/4), 작업 `codex/hollow-keep-foundation`. 기준 규격 `bcf7a09`, 재개 `5175afd`, 관리 문서 도입 `5cf5748`; 구현 커밋은 PR head 참조.
+- 기존 구현을 보존하고 `next/`에 DOM 없는 고정 틱 시뮬레이션, Ethan 룬탄/Noah 단일 참격, 점프·충돌·교대, 시험 방, 키보드/터치, 수치 패널과 CONFIG 복사를 추가.
+- 인수 40/40, 경계 7/7, Chromium 브라우저 14/14 및 기존 회귀 3종 통과. 사용자 손맛·실기기 평가는 미확인.
+- 기존 게임 버전과 캐시 표기 보존, 새 번호 미부여. 검토 대기이며 병합·배포 없음. 상세 결과·한계는 WORK_LOG 및 `next/README.md` 참조.

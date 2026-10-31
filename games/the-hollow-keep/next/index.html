@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>THE HOLLOW KEEP · 시험 방</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="sim.js"></script><script defer src="input.js"></script>
+<script defer src="render.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+<main>
+<header><div><small>THE HOLLOW KEEP</small><h1>빛과 그림자의 시험 방</h1></div><div class="tools"><button id="reset">방 초기화</button><button id="debug-toggle" aria-expanded="false" aria-controls="debug">수치 조절 · F2</button></div></header>
+<div class="stage">
+<canvas id="game" width="960" height="540" tabindex="0" aria-label="이동·점프·공격·교대 시험 방"></canvas>
+<div class="hud"><strong id="hero-name">ETHAN · 빛 / 룬탄</strong><span id="notice" role="status">점프 높이와 두 무기의 거리를 비교해 보세요.</span></div>
+<div class="touch-controls" aria-label="터치 조작">
+<div><button data-action="left" aria-label="왼쪽 이동">◀</button><button data-action="right" aria-label="오른쪽 이동">▶</button></div>
+<div><button data-action="swap">교대</button><button data-action="attack">공격</button><button data-action="jump">점프</button></div>
+</div>
+</div>
+<p class="help">A/D · ←/→ 이동　 Space/K/Z 점프　 J/X 공격　 Q/Tab 교대 <span>· 구덩이에 빠지면 방이 초기화됩니다.</span></p>
+<section id="debug" hidden aria-label="디버그와 수치 조절">
+<div class="debug-heading"><h2>움직임 조절</h2><button id="copy-config">현재 CONFIG 복사</button><button id="default-config">기본값 복원</button></div>
+<output id="telemetry"></output><p>값을 변경하면 현재 주인공으로 방을 다시 시작합니다. 점프 높이는 고정 틱 궤적으로 계산합니다.</p>
+<div id="config-fields"></div><textarea id="config-export" readonly aria-label="현재 CONFIG JSON" hidden></textarea><p id="config-message" role="status"></p>
+</section>
+</main>
+<div id="rotate" role="status">기기를 가로로 돌려 주세요.<br><small>가로 화면에서 시험 방이 이어집니다.</small></div>
+</body>
+</html>

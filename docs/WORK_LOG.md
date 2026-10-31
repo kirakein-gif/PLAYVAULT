@@ -426,3 +426,25 @@
 - 다음 AI/사용자: `api.github.com` 허용 적용 후 기존 PR을 조회하고 제출한다. API 인증의 실제 가용성은 접근 차단 해소 전 확인 불가이며 토큰을 임의 요구/교체하지 않는다. [비교·PR 작성 화면](https://github.com/kirakein-gif/PLAYVAULT/compare/main...docs/ai-collaboration-handoff?expand=1)은 생성된 PR 주소가 아니다.
 - 확인 불가: 과거 정확한 담당 AI·요청 전문·모든 버전의 실제 테스트/출시·PC 로컬 작업. 다음 기능 작업 전 담당과 대상 브랜치를 확인하고 5개 문서 지속 갱신 규칙을 따른다.
 - 종료 상태: 문서와 원격 브랜치 준비 완료, PR 제출은 API 네트워크 차단. 다음 담당 확인 불가.
+
+
+### 2026-10-31 (Asia/Seoul) · THE HOLLOW KEEP 1단계 기반 구현 및 PR #4
+
+- 담당 AI / 인계받은 담당: Codex / 사용자가 PR #3 지시문 실행 및 기존 작업 브랜치 재개를 승인. PR #2 규칙·문서 적용 승인. 다른 AI에게 메시지를 발송하지 않음.
+- 검토 담당: **Claude Code / 검토 대기**.
+- 작업 대상: `games/the-hollow-keep/next/`와 승인된 관리 문서. 기존 게임·루트 런처·공용 자산·다른 게임·원본 인수 테스트는 수정하지 않음.
+- 기준: 규격 `claude/hollow-keep-foundation-spec`의 `bcf7a09018cf1141290d99fd80ec008f5f565b43`, 재개 `codex/hollow-keep-foundation`의 `5175afdfdf24987d8965c3dc612501db149a0737`. `git fetch origin --prune`로 전체 원격 브랜치, 열린 PR #1/#2/#3, 실제 기존 게임 소스를 확인. 기존 작업 브랜치 발견 후 사용자의 이어서 진행 승인을 받음. PC 로컬 미푸시 작업은 미확인.
+- 수정 전 → 후 버전: 기존 게임·캐시 표기 변경 없음. 새 기반 번호 미정·미부여.
+- 목적: 기존 게임과 비교 가능한 고정 1/60 틱 기반을 만들고 사용자 손맛 조정과 Claude Code 독립 검토를 준비.
+- 관리 문서: PR #2의 AGENTS/CLAUDE/CHANGELOG/STATUS/WORK_LOG 원문을 보존하여 도입(`5cf5748`)한 뒤 해당 게임 현황·새 이력·변경 내역만 갱신. 5개 문서 검토, AGENTS/CLAUDE 규칙 변경 없음. 루트 README는 읽기만 함.
+- 구현 파일: `next/sim.js`(DOM/시계/난수 없는 규칙·CONFIG·snapshot), `input.js`(키보드/멀티터치·프레임 사이 입력 큐·초점 해제), `render.js`(기존 고딕 배경/임시 도형/피해 숫자), `app.js`(누적 고정 틱·최대 8틱·시험 방·CONFIG 조절/복사), `index.html`, `style.css`, `README.md`, 추가 검사 `tests/foundation-edge.cjs`, `tests/browser-playtest.cjs`.
+- 원본 테스트: `node games/the-hollow-keep/next/tests/foundation-contract.cjs` **40/40 통과**. 기준 PR #3 대비 원본 파일 diff 없음. 테스트 약화·건너뛰기 없음.
+- 추가 검사: `node games/the-hollow-keep/next/tests/foundation-edge.cjs` **7/7 통과**. 버퍼 0 설정의 즉시 점프, 낮은 천장 교대 거절, 교대 시 공격 수명, 고속 탄/얇은 벽, 왼쪽 공격, snapshot/입력 방 데이터 격리, 공중 정지 상한.
+- 기존 회귀: `node tests/polish-regression.cjs`, `node tests/audio-regression.cjs`, `node tests/audio-wind-regression.cjs` **3종 통과**. audio 404 로그는 의도적인 실패 경로 테스트. 이 결과는 기존 ECLIPSE 회귀이며 HOLLOW KEEP 전체 플레이 인증은 아님.
+- 브라우저: 저장소 루트 로컬 HTTP 서버 + Playwright/시스템 Chromium, PC 1280×900 및 모바일 844×390/DPR2 에뮬레이션. `node games/the-hollow-keep/next/tests/browser-playtest.cjs` **14/14 통과**. 실제 키보드 이동/점프/공격/교대, debug 기본 숨김, 수치 입력/복사·복원, 입력란 포커스 격리, blur, 가로 터치 버튼 크기, CDP 멀티터치 이동+점프, 터치 공격/교대, 세로 정지/가로 복귀, 페이지 오류·자산 실패 없음 확인.
+- 발견·수정: 첫 브라우저 실행은 앞 3검사 후 짧은 X 입력이 틱 사이에서 사라져 표적 무피해로 실패. 입력 전환을 틱 큐에 보존하도록 수정 후 동일 검사를 14/14 통과. 스크린샷에서 발견한 터치 버튼 글자 줄바꿈도 수정. 최종 스크린샷 `/tmp/hollow-keep-desktop.png`, `/tmp/hollow-keep-mobile.png` 육안 확인. 브라우저 검사 초안은 최종 체크아웃에서 재실행 가능하도록 포함.
+- 수치·범위 차이: 기존 속도/중력/몸 크기/가속/마찰/코요테/버퍼/룬탄을 출발점으로 삼음. 고정 틱 목표 점프 80/145px, 짧은 점프 34/56px, 정지 상한 감속을 적용. Noah는 22 피해/66px 단일 참격이며 기존 3단 콤보·전진·히트스톱·넉백은 미포함(규격의 추가 선택 항목). Ethan의 장거리 관통 룬탄 유지. 발 위치·중심 보존 교대, 공간 부족 시 거절.
+- Git/PR: 착수 기록 `5175afd`를 이어 관리 문서 담당 선언 `5cf5748`을 푸시하고 Draft [PR #4](https://github.com/kirakein-gif/PLAYVAULT/pull/4)를 구현 전에 개설. 최종 구현 커밋은 PR head 참조. 완료 후 Ready로 전환하여 검토 요청 상태로 인계. main 대상 diff에는 미병합 PR #2 관리 문서 및 #3 규격/원본 테스트가 포함되며 자동 병합하지 않음.
+- 미해결·미확인: 사용자 캐릭터 상세 설정 미제공, 사용자 조작감 평가·실제 휴대전화·Safari/Firefox·장시간 플레이 미확인. 수치를 바꿔도 시험 방 지형은 자동 조정되지 않음. 프레임 지연 초과분은 버리고 렌더 보간은 미구현. 정식 아트/음향·적 AI·방 연결·장치·체력/사망·저장은 범위 밖.
+- 다음 AI: PR #4 head에서 원본 인수/추가/기존 회귀를 재실행하고 로컬 HTTP 브라우저 조작으로 독립 검토. 사용자와 점프·무기 거리·교대 감각 평가. PR #2/#3과 관리 문서 중복의 병합 순서 조율.
+- 종료 상태: 구현 제출 / **Claude Code / 검토 대기**. 자동 검사 통과를 조작감 완성으로 표현하지 않음. 병합·배포하지 않음.

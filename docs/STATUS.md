@@ -2,6 +2,10 @@
 
 확인일: **2026-10-31 (Asia/Seoul)** / 확인 AI: **Codex**.
 
+## 이번 Foundation 작업의 최신 확인
+
+2026-10-31 (Asia/Seoul), GitHub API와 인증 정상. 열린 PR #1·#2·#3 및 작업 PR [#4](https://github.com/kirakein-gif/PLAYVAULT/pull/4)를 확인했다. 아래 과거 문서 작업의 API 차단 보고는 당시 기록이며 현재 연결 상태와 구분한다. 사용자가 기존 브랜치 재개와 PR #2 규칙 적용을 승인했다. PC의 미푸시 작업은 직접 확인하지 않았다.
+
 ## 확인 기준과 한계
 
 - GitHub `kirakein-gif/PLAYVAULT`의 `main`: [`41f7517a24822f73c9b0732996bb78661e47a284`](https://github.com/kirakein-gif/PLAYVAULT/commit/41f7517a24822f73c9b0732996bb78661e47a284), Git 기록 날짜 2026-10-19. 이번 문서 작업의 게임 소스 기준이다.
@@ -29,14 +33,14 @@
 
 | 항목 | 확인된 상태 |
 | --- | --- |
-| 경로·구조 | `games/the-hollow-keep/`: `index.html`, `game.css`, `core.js`, `art.js`, 로컬 `assets/` |
-| 현재 확인된 버전 | **단일 최신 게임 버전은 확인 불가(미확인)**. README는 prototype 및 v4–v7, Git 이력에는 `75a2317`의 v8 표현이 있음. 현재 HTML은 CSS `?v=16`, art `?v=15`, core `?v=13`으로 서로 다름. 이를 v16 정식판으로 추정하지 않음 |
-| 마지막 확인 커밋 | main SHA에서 확인. 게임 경로 최종 변경: [`d9a9859063204cb5a770a5ad47fd2eb4f74a0e83`](https://github.com/kirakein-gif/PLAYVAULT/commit/d9a9859063204cb5a770a5ad47fd2eb4f74a0e83), 2026-10-08 |
-| 구현 완료 기능(소스 확인) | 고정 방 정의 30개, Ethan/Noah 별도 HP·이동·점프·공격·교대, 장치·레버·승강기·체크포인트·지도, 보스/종/중앙홀 복귀와 Chapter I 종료 처리, 터치 버튼과 모바일 세로 화면 차단 |
-| 미해결 오류·알려진 문제 | 소스 주석상 Chapter I는 축소된 첫 경로이며 나머지 방은 후속 장을 위해 비활성 경로로 남음. 30개 방 정의가 모두 현재 플레이 경로로 검증되었다는 뜻은 아님. 잔여 버그와 전체 진행 가능성은 **미확인** |
-| 진행 중·담당 AI | Codex / `codex/hollow-keep-foundation` / 사용자 인계 승인. 기준 `bcf7a09`, 재개 `5175afd`. 범위: `next/`와 관리 문서. 2026-10-31 착수, Claude Code 검토 예정 |
-| 다음 우선순위 | 제안(미승인): 담당·로컬 변경 확인 → 현재 첫 경로/보스/복귀·가로 터치 흐름 재검증 → 필요 작업을 사용자와 결정 |
-| 테스트·배포 | 이 대화의 이전 온보딩에서 데스크톱 Chromium 게임 시작 확인. 이번 문서 작업에서 전체 플레이 테스트는 미실행. 전용 자동 회귀 테스트는 main의 `tests/`에서 확인하지 못함. 실제 배포 버전·실기기 품질은 **미확인**; 배포하지 않음 |
+| 기존 게임·버전 | 기존 `index.html`, `core.js`, `art.js`, `game.css`, `assets/` 그대로 보존. 기존 버전 미확인, 캐시 16/15/13 보존. 새 기반 번호는 미정이며 올리지 않음 |
+| 새 기반 경로·구조 | `games/the-hollow-keep/next/`: DOM 없는 `sim.js`, 입력/렌더/고정 1/60 루프 분리, 시험 방, 수치 패널 |
+| 기준·마지막 확인 | 규격 PR #3 `bcf7a09018cf1141290d99fd80ec008f5f565b43`, 기존 착수 `5175afdfdf24987d8965c3dc612501db149a0737`, 관리 문서 도입 `5cf5748`. 최종 구현은 PR #4 head 커밋 참조 |
+| 구현·담당 | Codex / `codex/hollow-keep-foundation` / [PR #4](https://github.com/kirakein-gif/PLAYVAULT/pull/4). Ethan 원거리 룬탄, Noah 단일 근접 참격, 이동·점프·교대, 키보드/모바일 터치, debug/CONFIG 복사 구현. 공용 자산/런처/다른 게임/원본 인수 테스트 변경 없음 |
+| 테스트 | 원본 인수 40/40, 추가 경계 7/7, PC·모바일 가로 Chromium 브라우저 14/14, 기존 ECLIPSE Node 회귀 3종 통과. 스크린샷 육안 확인. 자세한 재현은 `next/README.md`, 이번 결과는 WORK_LOG 참조 |
+| 한계·미확인 | 기존 Noah 3단 콤보/히트스톱/넉백은 새 기반에 미포함. 실기기·타 브라우저·장시간 플레이·사용자 조작감 평가 미확인. 캐릭터 상세 설정 미제공 |
+| 다음 우선순위 | Claude Code가 인수/회귀 재실행, 독립 브라우저 조작 및 규격 검토. 사용자가 점프·무기 거리·교대 감각 판단. PR #2/#3과 중복되는 문서의 병합 순서 조율 |
+| 종료 상태·배포 | 구현 제출 / **Claude Code / 검토 대기**. 병합·배포 없음. 정식 버전 번호·기존 구현 대체는 사용자 결정 대기 |
 
 ## 세계 최고의 게임 · THE WORLD'S GREATEST GAME
 
