@@ -19,6 +19,8 @@
 - Git 커밋 또는 PR 참조(확인된 것만; 미제출이면 그 상태와 이유):
 - 미해결 문제·미확인 사항:
 - 다음 AI에게 전달할 사항·다음 우선순위:
+- 검토 담당 / 검토에서 발견된 문제 수(검토 전이면 "검토 대기"):
+- 사용자 재요청 횟수(같은 요청을 다시 받은 횟수):
 - 종료 상태 / 다음 담당(검토 대기·차단·인계 완료 등을 구분):
 ```
 
@@ -426,3 +428,72 @@
 - 다음 AI/사용자: `api.github.com` 허용 적용 후 기존 PR을 조회하고 제출한다. API 인증의 실제 가용성은 접근 차단 해소 전 확인 불가이며 토큰을 임의 요구/교체하지 않는다. [비교·PR 작성 화면](https://github.com/kirakein-gif/PLAYVAULT/compare/main...docs/ai-collaboration-handoff?expand=1)은 생성된 PR 주소가 아니다.
 - 확인 불가: 과거 정확한 담당 AI·요청 전문·모든 버전의 실제 테스트/출시·PC 로컬 작업. 다음 기능 작업 전 담당과 대상 브랜치를 확인하고 5개 문서 지속 갱신 규칙을 따른다.
 - 종료 상태: 문서와 원격 브랜치 준비 완료, PR 제출은 API 네트워크 차단. 다음 담당 확인 불가.
+
+### 2026-10-31 (Asia/Seoul) · Claude Code 관리 문서 대안(PR #1) 작성과 종료 — 사후 이관 기록
+
+- 담당 AI: Claude Code. 이 항목은 PR #1에만 있던 기록을 PR #2 형식으로 옮긴 것이다.
+- 대상: 공통 관리 문서. 게임 코드·자산 변경 없음.
+- 기준 / 브랜치: main `41f7517` / `claude/playvault-ai-collaboration-system-3ia07z`.
+- 버전: 모든 게임 변경 없음.
+- 목적·배경: 사용자가 AI 공동 개발 규칙 구축을 요청. 같은 요청을 다른 도구가 동시에 처리해 PR #2가 생겼고, 두 PR이 같은 파일(`AGENTS.md`, `CLAUDE.md`, `CHANGELOG.md`, `docs/STATUS.md`, `docs/WORK_LOG.md`, `README.md`)을 각각 만들어 충돌했다.
+- 변경: PR #1에서 관리 문서 6종 작성, 이어서 사용자 승인으로 역할 분담 규칙과 WORK_LOG 평가 칸(검토 발견 문제 수·재요청 횟수)을 추가.
+- 테스트: 문서 작업. `git diff --check` 통과. ABYSSFALL Node 회귀 3종을 main `41f7517`에서 실행해 통과.
+- Git/PR: [PR #1](https://github.com/kirakein-gif/PLAYVAULT/pull/1) 커밋 `1efb63a`, `e31bf75`, `95f1bff`. GitHub 쓰기 권한 문제로 첫 푸시가 403으로 실패했다가 사용자 권한 승인 후 제출됨.
+- 결과: 사용자가 PR #2 문서 채택을 승인하여 PR #1은 병합하지 않고 닫는다. PR #1에만 있던 역할 분담 규칙, WORK_LOG 평가 칸, 작업 이력은 이번 이관 PR에서 PR #2 형식으로 옮긴다.
+- 검토 담당 / 발견 문제 수: 사용자 / 해당 없음(PR #2 채택으로 종료).
+- 사용자 재요청 횟수: 0회.
+- 종료 상태: PR #1 종료, 내용 이관.
+
+### 2026-10-31 (Asia/Seoul) · THE HOLLOW KEEP 방향·기준선 분석·기반 규격·인수 테스트
+
+- 담당 AI: Claude Code(규격·검증 기준). 구현 담당: Codex.
+- 대상: `games/the-hollow-keep/docs/`, `games/the-hollow-keep/next/tests/` 새 파일. 기존 게임 파일 변경 없음.
+- 기준 / 브랜치: main `41f7517` / `claude/hollow-keep-foundation-spec`.
+- 버전: 변경 없음(새 기반의 번호 체계는 사용자 결정 사항).
+- 목적·배경: 사용자가 역할 분담 시범 대상으로 THE HOLLOW KEEP을 지정. 방향: 마성전설2의 **플레이 감각**을 장르 수준에서 참고(원작의 맵·캐릭터·스프라이트·음악 등은 복제하지 않음), 고딕 아트, 처음부터 재구축, 1단계는 설정·이동·무기·움직임 확인.
+- 변경:
+  - `DESIGN_DIRECTION.md` — 확정 방향, 참고 범위, 미정 사항
+  - `BASELINE_ANALYSIS.md` — 기존 구현의 구조 문제(로직·DOM 결합, 가변 시간 간격)와 이동·무기 기준 수치
+  - `FOUNDATION_SPEC.md` — `next/` 새 기반, 고정 1/60 틱, DOM 없는 `sim.js` 계약, 시험 방·디버그 패널
+  - `CODEX_TASK_01.md` — Codex 지시문
+  - `next/tests/foundation-contract.cjs` — 인수 테스트 40개
+- 테스트: 저장소 밖 임시 참조 구현(커밋 안 함)으로 40/40 통과. 결함을 넣은 변형 4종(방향 미갱신, 자동 연사, 다중 피격, 비결정성)이 실패로 검출됨을 확인.
+- Git/PR: [PR #3](https://github.com/kirakein-gif/PLAYVAULT/pull/3), 커밋 `bcf7a09`.
+- 검토 담당 / 발견 문제 수: Codex가 구현하며 규격 사용(규격 결함 보고 없음).
+- 사용자 재요청 횟수: 0회.
+- 종료 상태: 규격 제출, Codex 구현으로 인계(PR #4).
+
+### 2026-10-31 (Asia/Seoul) · PR #4 교차 검토와 사용자 결정 반영
+
+- 담당 AI: Claude Code(검토). 구현 담당: Codex.
+- 대상: PR #4 `codex/hollow-keep-foundation` head `766630e`. 검토 담당은 구현 브랜치를 수정하지 않음.
+- 버전: 변경 없음.
+- 테스트(Claude Code 환경에서 재실행): 인수 40/40, Codex 경계 7/7, 브라우저 14/14(`CHROMIUM_PATH=/opt/pw-browsers/chromium`), ABYSSFALL 회귀 3종 통과. 추가로 시뮬레이션 전수 측정과 화면 캡처 확인.
+- 발견 문제 **3건**(수정 요청):
+  1. Noah가 벽에 붙으면 Ethan으로 교대 불가 — 몸 폭 차이(42/39px)로 중심 기준 후보가 벽과 1.5px 겹쳐 `swapBlocked`
+  2. 시험 방의 145px 구덩이는 Ethan이 어떤 타이밍으로도 건널 수 없음(최대 수평 점프 약 91px) — 규격 권장과 다르고, Ethan으로 오른쪽 구역을 시험할 수 없음
+  3. 모바일 가로 화면에서 터치 버튼이 플레이 영역 아래쪽을 덮어 시작 위치의 주인공이 가려짐
+- 사용자 결정(2026-10-31): **룬탄은 관통하지 않음**(첫 명중 시 소멸, 기존 구현과 같음). **Noah 3단 콤보는 나중에 진행**. 공중 감속은 시험 방에서 판단(미정).
+- 결정 반영: PR #3에 결정 사항과 "투사체 첫 명중 후 소멸" 인수 테스트 1개 추가(커밋 `c6a31bf`, 총 41개). 임시 참조 구현에서 41/41, PR #4 head `766630e`에서는 이 항목만 실패(현재 관통 구현이므로 예상 결과).
+- Git/PR: [PR #4 리뷰](https://github.com/kirakein-gif/PLAYVAULT/pull/4) (COMMENT, 승인 아님).
+- 검토 담당 / 발견 문제 수: Claude Code / 3건(+ 사용자 결정에 따른 동작 변경 1건: 관통 제거).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #3의 최신 커밋을 받아 문제 3건과 관통 제거를 수정하고, 인수 41/41을 확인한 뒤 같은 PR에 푸시. Claude Code가 재검토.
+- 종료 상태: 수정 대기(Codex).
+
+### 2026-10-31 (Asia/Seoul) · PR #1 내용을 PR #2 문서로 이관
+
+- 담당 AI: Claude Code. 사용자 지시: "PR #1 닫고 PR #2로 옮기기".
+- 대상: `AGENTS.md`, `CLAUDE.md`, `docs/WORK_LOG.md`. 게임 코드·자산 변경 없음.
+- 기준 / 브랜치: `docs/ai-collaboration-handoff` `86f28ec` / `claude/port-pr1-into-pr2`(PR #2 브랜치 대상 PR).
+- 버전: 변경 없음.
+- 변경:
+  - `AGENTS.md` — "역할 분담(시범 운영)" 절 추가(PR #1의 §9 내용을 PR #2 문체로 정리, 인수 테스트 약화 금지 포함)
+  - `CLAUDE.md` — Claude Code 환경 전용 사항 4줄 추가(공통 규칙은 복제하지 않음)
+  - `docs/WORK_LOG.md` — 양식에 "검토 담당 / 발견 문제 수", "사용자 재요청 횟수" 추가, PR #1 이력과 THE HOLLOW KEEP 규격·검토 기록을 이 형식으로 추가
+  - `docs/STATUS.md`, `CHANGELOG.md` — 검토만 하고 변경하지 않음. PR #4가 STATUS를 크게 수정 중이어서 충돌을 피함. THE HOLLOW KEEP 현황·결정 반영은 PR #4 수정 시 Codex가 갱신
+- 테스트: `git diff --check` 통과, 변경 경로 3개 한정 확인.
+- 병합 시 주의: PR #4도 이 WORK_LOG의 같은 위치(파일 끝)에 항목을 추가했으므로, 둘 중 나중에 병합되는 쪽에서 WORK_LOG 충돌이 난다. 두 항목을 모두 남기고 시간순(Codex PR #4 구현 → Claude Code 검토)으로 정렬하면 된다.
+- 검토 담당 / 발견 문제 수: 사용자 검토 대기.
+- 사용자 재요청 횟수: 0회.
+- 종료 상태: 이관 PR 제출, PR #1 종료.
