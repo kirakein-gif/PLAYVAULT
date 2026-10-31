@@ -416,3 +416,13 @@
 | 18 | 2026-10-19 | [dfc75d0](https://github.com/kirakein-gif/PLAYVAULT/commit/dfc75d03bf96ecc24683cc128ca5ff63df8f0680) | WGG | Aim mallet strikes at crowns and replace points with energy bars |
 | 19 | 2026-10-19 | [b5c3c5b](https://github.com/kirakein-gif/PLAYVAULT/commit/b5c3c5b8b8510b0d029b70b62482d480405f0804) | WGG | Add repeating 3-2-1 rounds with queued hands and visual QA fixes |
 | 20 | 2026-10-19 | [e7b28cf](https://github.com/kirakein-gif/PLAYVAULT/commit/e7b28cfc1ce4e595cc7e8abfc6f55845543ca795) | WGG | Level the table horizontally and remove strike camera zoom |
+
+### 2026-10-31 (Asia/Seoul) · 이력 복원 원격 제출 및 최종 인계
+
+- 담당/대상: Codex / 공통 관리 문서 5개 검토·갱신 완료. 게임 버전/소스/자산 변경 없음.
+- 커밋: [`56ae994`](https://github.com/kirakein-gif/PLAYVAULT/commit/56ae994) — 전체 이력 복원 보강, 기존 `docs/ai-collaboration-handoff` 브랜치에 푸시 성공. 이 최종 기록도 같은 브랜치에 제출한다.
+- 검증 결과: 위 복원 항목의 문서·커밋·색인·보존·변경 범위 검사 모두 통과. 이번 최종 변경은 STATUS/WORK_LOG의 제출 상태뿐이며 `git diff --check`와 링크 검사를 확인한다.
+- PR 제출: 완성된 PR 본문으로 `gh pr create`를 실행했으나 `Post https://api.github.com/graphql: Forbidden`으로 실패. PR 생성은 확인되지 않았고 유효한 PR 번호/주소가 없다. 기본 브랜치 병합·배포 없음.
+- 다음 AI/사용자: `api.github.com` 허용 적용 후 기존 PR을 조회하고 제출한다. API 인증의 실제 가용성은 접근 차단 해소 전 확인 불가이며 토큰을 임의 요구/교체하지 않는다. [비교·PR 작성 화면](https://github.com/kirakein-gif/PLAYVAULT/compare/main...docs/ai-collaboration-handoff?expand=1)은 생성된 PR 주소가 아니다.
+- 확인 불가: 과거 정확한 담당 AI·요청 전문·모든 버전의 실제 테스트/출시·PC 로컬 작업. 다음 기능 작업 전 담당과 대상 브랜치를 확인하고 5개 문서 지속 갱신 규칙을 따른다.
+- 종료 상태: 문서와 원격 브랜치 준비 완료, PR 제출은 API 네트워크 차단. 다음 담당 확인 불가.

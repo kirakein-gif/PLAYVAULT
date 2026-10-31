@@ -67,7 +67,7 @@
 
 | 대상 | 담당 | 브랜치·기준 | 현재 상태 | 다음 단계 |
 | --- | --- | --- | --- | --- |
-| 루트 공동 개발 문서, `docs/STATUS.md`, `docs/WORK_LOG.md`, README 안내 링크 | Codex | `docs/ai-collaboration-handoff`, 기준 main `41f7517` | 초기 문서 원격 제출 `5f09367`/`f43b8d4` 이후 이력 복원 44개 이정표·253커밋 색인 보강 및 문서 검사 완료. 원격 제출 갱신 진행, PR 미제출(API Forbidden 재확인). 게임 소스 수정 없음 | WORK_LOG의 제출 기록 확인; PR 검토·병합은 사용자 승인 필요 |
+| 루트 공동 개발 문서, `docs/STATUS.md`, `docs/WORK_LOG.md`, README 안내 링크 | Codex | `docs/ai-collaboration-handoff`, 기준 main `41f7517` | 이력 복원 커밋 `56ae994` 원격 제출 완료(초기 문서 `5f09367`/`f43b8d4` 포함). 44개 이정표·253커밋 색인 및 문서 검사 완료. PR 생성 실패(API Forbidden). 게임 소스 수정 없음 | WORK_LOG의 제출 기록 확인; PR 검토·병합은 사용자 승인 필요 |
 | 각 게임·공용 자산의 기능 개발 | **미확인** | 위 게임별 참조 | 이번 요청 범위 밖 | 변경 전 담당 및 PC 로컬/미병합 작업 확인 |
 
 새 작업자는 날짜·기준 SHA·테스트 결과·담당/브랜치·남은 문제를 갱신하고, 완료 이력은 [WORK_LOG](WORK_LOG.md)에 누적한다. 이 현황표 자체는 작업권 잠금을 제공하지 않는다.
