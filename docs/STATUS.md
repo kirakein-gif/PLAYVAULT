@@ -9,6 +9,10 @@
 사용자 결정(2026-10-31): 다음 단계는 **아트 기준부터**. 콘셉트는 **픽셀아트 HD**(게임 좌표 1단위 = 그림 1픽셀, 그림 해상도 960×540), 고딕 방향 유지. 아트 기준·검사는 Claude Code, 그림 제작·적용은 Codex(역할 분담).
 
 
+### 진행 중 · CODEX_TASK_03 목표 외형 밀도 시험
+
+Codex / 같은 `codex/hollow-keep-pixel-art`, PR #8 / 기준 `e82b5f2`, 규격 `89453ef` 및 앞선 보완 커밋 반영(`0e1b23d`, `5525153`, `b99a679`). 사용자가 지정한 목표 자세 보드 원본 PNG를 경로 A 밑그림으로 사용해 x1(Ethan68/Noah64)·x2(Ethan136/Noah128) 시험본(Ethan idle/run, Noah idle)과 비교 캡처, scale 렌더 전환을 제작한다. 전체 스프라이트/베기 효과 재제작은 사용자 밀도 선택 후로 보류. 어느 밀도가 나은지는 판단하지 않음. 다음 담당 Claude Code / 검토 예정.
+
 ### 제작·적용 제출 · THE HOLLOW KEEP 픽셀아트 HD · 검토 대기
 
 Codex / `codex/hollow-keep-pixel-art` / 기준 PR #7 `d8c6a21` (main `af58238` 기반), 착수 `e6efc15`, [구현 PR #8](https://github.com/kirakein-gif/PLAYVAULT/pull/8). 46색 네이티브 PNG: 주인공 동작 시트 12개(idle/run/두 점프/land/attack), 효과 2개, 30px 타일과 960×540 배경, palette/manifest/PROVENANCE·재작성 도구. 최소 정수 k의 960k×540k backing, 보간 끔, 정수 출력/좌우 반전/이벤트 기반 프레임·개별 실패 도형 대체 구현. 픽셀 자산 49/49, 픽셀 렌더 5/5, 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, 기존 회귀 3종 통과. 시뮬레이션·기존 게임·공용 자산·검사 원본 보존, 버전 변경 없음. 다음 담당 **Claude Code / 검토 대기**. 외형·미적 완성도·움직임은 사용자 판단 대기. 실제 화면 회전은 실기기 확인 필요.
