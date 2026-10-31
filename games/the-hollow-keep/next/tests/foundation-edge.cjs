@@ -4,6 +4,26 @@ const S = require('../sim.js');
 const room = {width:960,height:540,solids:[{x:0,y:500,w:960,h:40}],dummies:[]};
 const create = (hero='ethan',custom=room,spawn={x:200,y:500-S.CONFIG.heroes[hero].height}) => S.createWorld({hero,room:custom,spawn});
 const tests = [
+  ...['ethan','noah'].map(hero=>[`${hero} records coyote jump speed and keeps kind through reversal`,()=>{
+    const c=S.CONFIG.heroes[hero],ledge={x:0,y:380,w:300,h:120};
+    const w=create(hero,{...room,solids:[...room.solids,ledge]},{x:200,y:380-c.height});
+    while(w.player.onGround)S.step(w,{right:true});
+    S.step(w,{right:true});const vx=w.player.vx;
+    assert.ok(S.step(w,{right:true,jump:true}).some(e=>e.type==='jump'));
+    assert.equal(w.player.takeoffVx,vx);assert.equal(w.player.jumpKind,'running');
+    for(let i=0;i<8;i++){S.step(w,{left:true,jump:true});assert.equal(w.player.takeoffVx,vx);assert.equal(w.player.jumpKind,'running');}
+  }]),
+  ...['ethan','noah'].map(hero=>[`${hero} records buffered takeoff and clears kind at landing`,()=>{
+    const c=S.CONFIG.heroes[hero],spawn={x:200,y:500-c.height-100};
+    const probe=create(hero,room,spawn);let land=0;while(!probe.player.onGround&&land<100){S.step(probe,{right:true});land++;}
+    const w=create(hero,room,spawn);let jumped=false;
+    for(let i=1;i<=land;i++){
+      const events=S.step(w,{right:true,jump:i===land-1});
+      if(events.some(e=>e.type==='jump')){jumped=true;assert.equal(w.player.takeoffVx,w.player.vx);assert.equal(w.player.jumpKind,Math.abs(w.player.takeoffVx)>=c.runSpeed*.5?'running':'standing');}
+    }
+    assert.ok(jumped);for(let i=0;i<120&&!w.player.onGround;i++)S.step(w,{right:true});
+    assert.equal(w.player.jumpKind,null);assert.equal(w.player.takeoffVx,0);
+  }]),
   ...['left','right'].map(side => [`Noah can swap to Ethan against the ${side} wall`,()=>{
     const walls=[{x:-40,y:0,w:40,h:500},{x:600,y:0,w:40,h:500}];
     const w=create('noah',{...room,solids:[...room.solids,...walls]});

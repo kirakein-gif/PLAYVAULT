@@ -33,6 +33,15 @@ const url = process.env.HK_URL || 'http://127.0.0.1:8765/games/the-hollow-keep/n
       await reset(page);const y=(await snap(page)).player.y;await page.keyboard.down('Space');await ticks(page,10);
       assert.ok((await snap(page)).player.y<y-30);await ticks(page,80);assert.ok((await snap(page)).player.onGround);await page.keyboard.up('Space');
     });
+    await check('standing and running jumps expose takeoff state and render distinct poses',async()=>{
+      await reset(page);await page.keyboard.down('Space');await ticks(page,8);
+      const standing=await snap(page);assert.equal(standing.player.jumpKind,'standing');assert.equal(standing.player.takeoffVx,0);
+      await page.screenshot({path:'/tmp/hollow-keep-standing-jump.png'});await page.keyboard.up('Space');
+      await reset(page);await page.keyboard.down('KeyD');await ticks(page,10);await page.keyboard.down('Space');await ticks(page,8);
+      const running=await snap(page);assert.equal(running.player.jumpKind,'running');
+      assert.ok(running.player.takeoffVx>=1.475);await page.screenshot({path:'/tmp/hollow-keep-running-jump.png'});
+      await page.keyboard.up('KeyD');await page.keyboard.up('Space');await reset(page);
+    });
     await check('X shot stops at the near target and leaves the far target untouched',async()=>{
       await reset(page);await page.keyboard.press('KeyX');await ticks(page,90);const w=await snap(page);
       assert.equal(w.dummies[0].hp,978);assert.equal(w.dummies[1].hp,1000);assert.ok(!w.attacks.some(a=>a.life>0));assert.match(await page.locator('#notice').textContent(),/피해 22/);
@@ -48,6 +57,8 @@ const url = process.env.HK_URL || 'http://127.0.0.1:8765/games/the-hollow-keep/n
       await page.keyboard.press('F2');assert.equal(await page.locator('#debug').isVisible(),true);
       const control=page.locator('[data-key="NOAH.runSpeed"]');await control.fill('4.2');await control.press('Tab');
       assert.equal(await page.evaluate(()=>HKSim.CONFIG.heroes.noah.runSpeed),4.2);
+      const air=page.locator('[data-key="NOAH.airControlSpeed"]');await air.fill('1.5');await air.press('Tab');
+      assert.equal(await page.evaluate(()=>HKSim.CONFIG.heroes.noah.airControlSpeed),1.5);
       const cooldown=page.locator('[data-key="NOAH 무기.cooldownTicks"]');await cooldown.fill('20');await cooldown.press('Tab');
       assert.equal(await page.evaluate(()=>HKSim.CONFIG.heroes.noah.weapon.cooldownTicks),20);
       await page.locator('#copy-config').click();assert.equal(JSON.parse(await page.locator('#config-export').inputValue()).heroes.noah.runSpeed,4.2);
@@ -94,7 +105,11 @@ const url = process.env.HK_URL || 'http://127.0.0.1:8765/games/the-hollow-keep/n
     await check('real multitouch right + jump moves and jumps',async()=>{
       const before=await snap(touch),points=[await point('right',1),await point('jump',2)];
       await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points});await ticks(touch,12);
-      const after=await snap(touch);assert.ok(after.player.x>before.player.x+15);assert.ok(after.player.y<before.player.y-30);
+      const after=await snap(touch),air=await touch.evaluate(()=>HKSim.CONFIG.heroes.ethan.airControlSpeed);
+      const dx=after.player.x-before.player.x;
+      assert.ok(dx>air*6&&dx<=air*(after.tick-before.tick)+.01);
+      assert.ok(Math.abs(after.player.vx)<=air+.01);assert.equal(after.player.jumpKind,'standing');
+      assert.ok(after.player.y<before.player.y-30);
       await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await ticks(touch,65);
       assert.ok((await snap(touch)).player.onGround);assert.equal((await snap(touch)).player.vx,0);
     });
@@ -135,6 +150,21 @@ const url = process.env.HK_URL || 'http://127.0.0.1:8765/games/the-hollow-keep/n
       assert.ok((await snap(touch)).player.x>45);
       await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await ticks(touch,10);
       await touch.screenshot({path:'/tmp/hollow-keep-mobile-fullscreen.png'});
+      await touch.locator('#fullscreen-toggle').tap();await touch.waitForFunction(()=>!document.fullscreenElement);
+      await touch.setViewportSize({width:844,height:390});await ticks(touch,3);
+    });
+    await check('held joystick survives fullscreen entry and resize until touch release',async()=>{
+      await reset(touch);const move=await point('right',1);
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[move]});await ticks(touch,5);
+      const fs=await touch.locator('#fullscreen-toggle').boundingBox(),fsPoint={x:fs.x+fs.width/2,y:fs.y+fs.height/2,id:2};
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[move,fsPoint]});
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[fsPoint]});
+      await touch.waitForFunction(()=>!!document.fullscreenElement);await ticks(touch,5);
+      assert.ok((await snap(touch)).player.vx>0);assert.equal(await touch.locator('[data-control="move"].pressed').count(),1);
+      const x=(await snap(touch)).player.x;await touch.setViewportSize({width:915,height:412});await ticks(touch,5);
+      assert.ok((await snap(touch)).player.x>x+5);assert.ok((await snap(touch)).player.vx>0);
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await ticks(touch,10);
+      assert.equal((await snap(touch)).player.vx,0);assert.equal(await touch.locator('[data-control="move"].pressed').count(),0);
       await touch.locator('#fullscreen-toggle').tap();await touch.waitForFunction(()=>!document.fullscreenElement);
       await touch.setViewportSize({width:844,height:390});await ticks(touch,3);
     });

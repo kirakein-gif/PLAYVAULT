@@ -484,3 +484,21 @@
 - 5개 관리 문서 검토: WORK_LOG 누적, STATUS/CHANGELOG 갱신, AGENTS/CLAUDE는 절차 변경이 없어 해당 항목 변경 없음. 과거 WORK_LOG 보존. README에 배치/전체 화면 사용법·미지원 안내·검증 명령·한계 갱신.
 - 한계: **실제 화면 회전은 실기기 확인 필요**. headless 검사는 전체 화면 진입/해제와 가로 고정 요청 및 거절 대응을 확인하며, 실제 Android 회전/주소창·노치/iPhone Safari 설치 모드/터치 손맛을 검증한 것은 아님. 실기기·타 브라우저·장시간 플레이·사용자 손맛 평가는 미확인.
 - 제출/인계: 같은 PR #4에 푸시, 수정 커밋은 PR head 참조. Claude Code가 원본 검사 전체 재실행·독립 브라우저·실기기 확인 항목 검토. 병합·수동 배포 명령 없음. GitHub 연동 미리보기는 별도 자동 작업으로 구분.
+
+
+### 2026-10-31 (Asia/Seoul) · PR #4 추가 수정 — 공중 조작 사용자 결정
+
+- 담당 Codex / 검토 담당 **Claude Code / 재검토 대기**. 사용자는 시험 방 크기/배치와 키를 놓을 때 수직 낙하를 승인하고, 달리며 뛴 점프와 제자리 점프 후 이동의 구분을 요청.
+- 기준 `codex/hollow-keep-foundation`의 `9b39ace1d63952ddf610eba66c02a169a1e5c69f`. 전체 원격 fetch/열린 PR #2/#3/#4/#5 확인 및 PR #4 “공중 조작” 댓글·규격 §4-1·51개 원본 인수 검사를 읽음. `6ce2654`를 먼저 cherry-pick(`805e903`)하고 담당·범위 STATUS 기록/원격 공유(`4174aa0`).
+- 범위/버전: `next/` 시뮬레이션/렌더/패널/입력/검사와 관리 문서. 기존 게임·공용 자산·루트 런처·다른 게임·기존 회귀 보존. 51개 인수 및 모바일 배치/전체 화면 검사 원본 그대로. 게임/캐시 버전 변경 없음. Noah 콤보 보류, 룬탄 비관통 유지.
+- 시뮬레이션: 점프 시작 틱의 `takeoffVx`를 기록(코요테·착지 버퍼 포함), 절댓값이 runSpeed의 50% 이상이면 running, 미만이면 standing. `getPlayer()`로 두 값을 노출하고 착지 전까지 유지. 착지 시 null/0 초기화. 도약 방향 상한 `max(airControlSpeed,abs(takeoffVx))`, 반대 방향 상한 airControlSpeed. 걷다가 가장자리에서 떨어질 때는 코요테 도약 전 관성을 유지. 기존 무입력 감속/stopTicks 블록은 그대로 보존.
+- CONFIG/표시: Ethan 1.33, Noah 1.73 px/틱(각 달리기 속도의 약 45%). 패널에 공중 조작 속도 추가, 0보다 크고 runSpeed보다 작게 검증. runSpeed를 낮춰 상한이 깨지면 약 45%로 조정. running 자세는 도약 방향으로 약 9° 기울고 standing은 곧게 표시, 판정 상자는 그대로. 디버그에 종류·도약 속도 표시.
+- 경미 문제: resize/fullscreenchange는 누적 시간만 초기화하고 유효한 포인터/방향을 유지. 조이스틱 손잡이는 정규화된 축 값으로 재배치. 도구 포커스에서는 키보드만 해제해 다른 손가락의 터치 입력을 보존. 실제 blur/숨김/세로 전환 및 손 떼기·취소·캡처 해제에서는 기존 입력 해제 유지. 전체 화면 버튼은 멀티터치 중에도 touch pointerup의 사용자 활성화에서 동작하고 호환 click 중복은 억제.
+- 변경 파일: `next/{sim.js,render.js,app.js,input.js,fullscreen.js,README.md}`, `next/tests/{foundation-edge.cjs,browser-playtest.cjs}`, `docs/{STATUS.md,WORK_LOG.md}`, `CHANGELOG.md`. 지형·모바일 CSS·무기·기존 점프 높이/중력 등 수치는 변경하지 않음(공중 조작 값만 추가).
+- 이번 검사: 원본 `foundation-contract.cjs` **51/51**, `foundation-edge.cjs` **16/16**, `room-traversal.cjs` **4/4**, `mobile-layout.cjs` **20/20**, `mobile-fullscreen.cjs` **6/6**, `browser-playtest.cjs` **20/20 통과**. 기존 회귀 `node tests/polish-regression.cjs`, `node tests/audio-regression.cjs`, `node tests/audio-wind-regression.cjs` **3종 통과**. audio 404는 의도적인 실패 경로 로그.
+- 구덩이 재확인: 실제 85px 지형에서 Ethan x=451.63 도약 → x=543.08 착지 후 몸 전체 통과, Noah x=452.94 → x=630.04 통과. 이전 145px 비교는 Ethan 0/111, Noah 89/111로 유지. 자동 검사 결과이며 손맛 승인이 아님.
+- 추가 경계: 두 주인공의 코요테 도약 속도/방향 전환 중 종류 고정, 착지 버퍼의 실제 도약 속도와 착지 초기화를 추가. 브라우저는 실제 키보드로 종류/속도 및 CONFIG 적용, 두 자세 캡처, 실제 CDP 멀티터치로 조이스틱을 누른 채 다른 손가락의 전체 화면 버튼→resize→손 떼기를 검증.
+- 중간 검사 수정: 기존 브라우저의 동시 이동+제자리 점프는 새 상한에서 15px 이동 기대값에 못 미쳤으므로 기대값을 airControlSpeed와 실제 틱 수에 따른 상·하한 및 standing 종류 검사로 변경. 최초 멀티터치 전체 화면 검사는 CDP touchEnd에 잘못된 손가락 ID를 보내 대기 시간 초과였고, 전체 화면 손가락 ID를 해제하도록 수정 후 통과. 보호된 인수 검사 세 파일은 수정하지 않음.
+- 환경/캡처: 로컬 HTTP 127.0.0.1:8766, HK_URL 해당 next 경로, CHROMIUM_PATH=/usr/bin/chromium, Playwright/Chromium. PC 1280×900, 모바일 844×390/DPR2 및 배치 4개 크기, 전체 화면 resize 780×330/915×412. `/tmp/hollow-keep-standing-jump.png`, `/tmp/hollow-keep-running-jump.png` 육안 확인. 실제 화면 회전은 **실기기 확인 필요**, 실제 휴대전화 새 공중 손맛·타 브라우저·장시간 플레이는 미확인.
+- 5개 관리 문서 검토: WORK_LOG 누적, STATUS/CHANGELOG 갱신, AGENTS/CLAUDE는 절차 변경이 없어 해당 항목 변경 없음. README의 규칙·수치·캡처/검사 결과 및 입력 유지 설명 갱신. 과거 WORK_LOG 보존.
+- 제출/인계: 같은 PR #4에 푸시, 수정 커밋은 PR head 참조. Claude Code가 인수/경계/구덩이/모바일/전체 화면/브라우저/기존 회귀 재실행과 독립 조작 확인. 병합·수동 배포 명령 없음. 사용자 손맛 평가는 별도 대기.

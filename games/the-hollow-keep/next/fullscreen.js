@@ -40,7 +40,20 @@
       if (!matchMedia('(orientation:portrait) and (pointer:coarse)').matches) canvas.focus({ preventScroll: true });
     }
   }
-  buttons.forEach(button => button.addEventListener('click', toggle));
+  buttons.forEach(button => {
+    let handledTouch = false;
+    button.addEventListener('pointerdown', () => { handledTouch = false; });
+    button.addEventListener('pointerup', event => {
+      if (event.pointerType !== 'touch') return;
+      event.preventDefault(); handledTouch = true; toggle();
+    });
+    button.addEventListener('click', event => {
+      // Touch pointerup is a user activation even while another finger holds
+      // the joystick. Avoid toggling a second time on its compatibility click.
+      if (handledTouch && event.detail !== 0) { handledTouch = false; return; }
+      handledTouch = false; toggle();
+    });
+  });
   document.addEventListener('fullscreenchange', refresh);
   refresh();
 })();

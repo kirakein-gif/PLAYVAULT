@@ -5,7 +5,7 @@
   window.HKInput = function (canvas) {
     const keys = new Set(), pointers = new Map();
     const stick = document.querySelector('[data-control="move"]');
-    let stickPointer = null;
+    let stickPointer = null, stickAxis = 0;
     let physical = {}, sampled = {}, pending = {};
     function sync() {
       const next = {};
@@ -20,7 +20,7 @@
     function clear() {
       keys.clear(); pointers.clear(); physical = {}; sampled = {}; pending = {};
       document.querySelectorAll('[data-action],[data-control="move"]').forEach(b => b.classList.remove('pressed'));
-      stickPointer = null; if (stick) stick.style.setProperty('--stick-x', '0px');
+      stickPointer = null; stickAxis = 0; if (stick) stick.style.setProperty('--stick-x', '0px');
     }
     window.addEventListener('keydown', e => {
       if (editable(e.target)) return;
@@ -32,7 +32,7 @@
     });
     window.addEventListener('blur', clear);
     document.addEventListener('visibilitychange', clear);
-    document.addEventListener('focusin', e => { if (editable(e.target)) clear(); });
+    document.addEventListener('focusin', e => { if (editable(e.target)) { keys.clear(); sync(); } });
     canvas.addEventListener('pointerdown', () => canvas.focus({ preventScroll:true }));
     document.querySelectorAll('[data-action]').forEach(button => {
       button.addEventListener('pointerdown', e => {
@@ -54,6 +54,7 @@
         const box = stick.getBoundingClientRect();
         const reach = Math.max(1, (box.width - 24) / 2);
         const delta = Math.max(-reach, Math.min(reach, e.clientX - (box.x + box.width / 2)));
+        stickAxis = delta / reach;
         stick.style.setProperty('--stick-x', delta + 'px');
         if (Math.abs(delta) < Math.min(6, reach * .35)) pointers.delete(e.pointerId);
         else pointers.set(e.pointerId, delta < 0 ? 'left' : 'right');
@@ -68,13 +69,19 @@
       stick.addEventListener('pointermove', e => { if (e.pointerId === stickPointer) steer(e); });
       const release = e => {
         if (e.pointerId !== stickPointer) return;
-        pointers.delete(e.pointerId); sync(); stickPointer = null;
+        pointers.delete(e.pointerId); sync(); stickPointer = null; stickAxis = 0;
         stick.style.setProperty('--stick-x', '0px'); stick.classList.remove('pressed');
       };
       for (const event of ['pointerup','pointercancel','lostpointercapture']) stick.addEventListener(event, release);
       stick.addEventListener('contextmenu', e => e.preventDefault());
     }
-    return { clear, sample() {
+    function relayout() {
+      if (stick && stickPointer !== null) {
+        const reach = Math.max(1, (stick.getBoundingClientRect().width - 24) / 2);
+        stick.style.setProperty('--stick-x', stickAxis * reach + 'px');
+      }
+    }
+    return { clear, relayout, sample() {
       // Preserve a press/release between frames, one transition per action per tick.
       for (const [action, queue] of Object.entries(pending)) {
         if (queue.length) sampled[action] = queue.shift();

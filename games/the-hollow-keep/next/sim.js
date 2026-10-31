@@ -8,13 +8,13 @@
   const CONFIG = {
     swapCooldownTicks: 11, swapVelocityScale: .82,
     heroes: {
-      ethan: { width: 42, height: 68, runSpeed: 2.95, stopTicks: 8,
+      ethan: { width: 42, height: 68, runSpeed: 2.95, airControlSpeed: 1.33, stopTicks: 8,
         accelerationGround: .42, accelerationAir: .22, friction: .82,
         gravity: .70, jumpHeight: 80, variableJump: true, minJumpHeight: 34,
         maxFall: 13.5, coyoteTicks: 6, jumpBufferTicks: 7,
         weapon: { kind: 'projectile', damage: 22, range: 1017.6, cooldownTicks: 29,
           speed: 10.6, width: 18, height: 12, activeTicks: 96 } },
-      noah: { width: 39, height: 64, runSpeed: 3.85, stopTicks: 5,
+      noah: { width: 39, height: 64, runSpeed: 3.85, airControlSpeed: 1.73, stopTicks: 5,
         accelerationGround: .68, accelerationAir: .40, friction: .60,
         gravity: .57, jumpHeight: 145, variableJump: true, minJumpHeight: 56,
         maxFall: 13.8, coyoteTicks: 8, jumpBufferTicks: 8,
@@ -47,7 +47,7 @@
     r.solids = r.solids || []; r.dummies = r.dummies || [];
     const player = { x: spawn.x, y: spawn.y, w: c.width, h: c.height,
       vx: 0, vy: 0, face: 1, onGround: false, coyote: 0, jumpBuffer: 0,
-      jumpStartFeet: null, jumpCut: false };
+      jumpStartFeet: null, jumpCut: false, takeoffVx: 0, jumpKind: null };
     player.onGround = supported(player, r.solids);
     return { tick: 0, active: hero, room: r, player, dummies: r.dummies,
       previous: {}, swapCooldown: 0, attackCooldowns: { ethan: 0, noah: 0 }, attacks: [], nextAttackId: 1 };
@@ -104,6 +104,8 @@
     p.coyote = wasGround ? c.coyoteTicks : Math.max(0, p.coyote - 1);
     p.jumpBuffer = edge('jump') ? c.jumpBufferTicks : Math.max(0, p.jumpBuffer - 1);
     const jump = () => {
+      p.takeoffVx = p.vx;
+      p.jumpKind = Math.abs(p.takeoffVx) >= c.runSpeed * .5 ? 'running' : 'standing';
       p.vy = -launchSpeed(c.jumpHeight, c.gravity); p.jumpStartFeet = p.y + p.h;
       p.jumpCut = false; p.onGround = false; p.coyote = 0; p.jumpBuffer = 0;
       ev.push({ type: 'jump' });
@@ -116,7 +118,15 @@
     const dir = Number(!!held.right) - Number(!!held.left);
     if (dir) p.face = dir;
     const accel = p.onGround ? c.accelerationGround : c.accelerationAir;
-    p.vx += (dir * c.runSpeed - p.vx) * accel;
+    const launchDir = Math.sign(p.takeoffVx);
+    const forwardCap = Math.max(c.airControlSpeed, Math.abs(p.takeoffVx));
+    const cap = p.onGround ? c.runSpeed : dir && dir === launchDir ? forwardCap : c.airControlSpeed;
+    p.vx += (dir * cap - p.vx) * accel;
+    if (!p.onGround && dir) {
+      const leftCap = launchDir < 0 ? forwardCap : c.airControlSpeed;
+      const rightCap = launchDir > 0 ? forwardCap : c.airControlSpeed;
+      p.vx = Math.max(-leftCap, Math.min(rightCap, p.vx));
+    }
     if (!dir) {
       p.vx *= c.friction;
       // This linear cap guarantees the declared maximum stopping time even in air.
@@ -124,6 +134,8 @@
     }
     p.vy = Math.min(c.maxFall, p.vy + c.gravity);
     move(p, w.room.solids);
+    if (p.onGround) { p.jumpKind = null; p.takeoffVx = 0; }
+    else if (wasGround && p.jumpKind === null) p.takeoffVx = p.vx; // Preserve ledge momentum until a coyote jump records its own speed.
     if (!wasGround && p.onGround) {
       ev.push({ type: 'land' });
       if (p.jumpBuffer > 0) jump();

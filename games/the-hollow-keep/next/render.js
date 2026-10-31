@@ -34,6 +34,7 @@
       const light = world.active === 'ethan';
       // Temporary geometric silhouettes, authored here; no new image assets.
       ctx.save();ctx.translate(p.x + p.w / 2, p.y + p.h);ctx.scale(p.face,1);
+      if (!p.onGround && p.jumpKind === 'running') ctx.rotate(.16 * Math.sign(p.takeoffVx) * p.face);
       ctx.fillStyle = light ? '#bfb7a8' : '#524566';
       ctx.beginPath();ctx.moveTo(-p.w*.42,-p.h*.7);ctx.lineTo(p.w*.3,-p.h*.7);ctx.lineTo(p.w*.5,-8);ctx.lineTo(-p.w*.5,-8);ctx.closePath();ctx.fill();
       ctx.fillStyle = '#222539';ctx.fillRect(-12,-12,9,12);ctx.fillRect(6,-12,9,12);
@@ -50,7 +51,7 @@
         ctx.lineWidth=1;ctx.strokeStyle='#72e9ba';ctx.strokeRect(p.x,p.y,p.w,p.h);
         ctx.strokeStyle='#fa88b5';for(const b of HKSim.getHitboxes(world))ctx.strokeRect(b.x,b.y,b.w,b.h);
         text(`x ${p.x.toFixed(1)}  y ${p.y.toFixed(1)}  vx ${p.vx.toFixed(2)}  vy ${p.vy.toFixed(2)}`,20,72,'#9ee9dc');
-        text(`ground ${p.onGround}  coyote ${p.coyote}  buffer ${p.jumpBuffer}  tick ${world.tick}`,20,90,'#9ee9dc');
+        text(`ground ${p.onGround}  coyote ${p.coyote}  buffer ${p.jumpBuffer}  ${p.jumpKind || 'ground'} takeoff ${p.takeoffVx.toFixed(2)}  tick ${world.tick}`,20,90,'#9ee9dc');
       }
     };
   };
