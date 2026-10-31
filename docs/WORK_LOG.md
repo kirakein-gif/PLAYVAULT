@@ -38,3 +38,16 @@
 - 미해결·미확인: 다른 AI 담당/PC 미푸시 작업, 열린 PR, 배포 상태, HOLLOW KEEP 단일 최신 게임 버전. GitHub API 허용 도메인 `api.github.com` 추가가 필요하나 환경 초안 편집이 게시 후 제한되어 자동 저장 실패.
 - 인계: 게임 수정 전 STATUS의 브랜치 구분과 기존 게임 인계 문서를 읽고 담당 확인. 특히 세계 최고의 게임은 main만 보고 직접 조작 기능이 전혀 개발되지 않았다고 단정하지 않는다. prototype 브랜치와 PC 로컬 변경을 대조하고 사용자 요청으로 다음 작업을 결정한다.
 - 종료 상태: 문서 검증 완료. 커밋/원격 제출 진행, PR은 API 접근 차단. 병합·배포는 하지 않는다.
+
+### 2026-10-31 (Asia/Seoul) · 문서 원격 제출 결과 및 PR 차단 인계
+
+- 담당 AI / 대상: Codex / 공통 관리 문서.
+- 기준·브랜치: main `41f7517a24822f73c9b0732996bb78661e47a284` / `docs/ai-collaboration-handoff`.
+- 버전: 모든 게임 표기 변경 없음.
+- 목적·변경: 앞 항목의 제출 진행 상태를 확정된 원격 결과로 보충. STATUS의 공통 문서 작업 상태 갱신.
+- Git 참조: 초기 문서 커밋 [`5f09367b415113727a06204a42a4fef5f6f58b02`](https://github.com/kirakein-gif/PLAYVAULT/commit/5f09367b415113727a06204a42a4fef5f6f58b02)를 원격 문서 브랜치에 푸시하고 `git ls-remote`로 확인했다. 이 후속 기록도 같은 브랜치에 제출한다.
+- 검증: 앞 항목의 문서 및 Node 검사 통과. 원격 main은 기준 SHA 그대로임을 확인했다. 후속 변경은 STATUS/WORK_LOG 문서만이며 링크·diff 검사를 다시 수행한다.
+- PR: `gh pr create --repo kirakein-gif/PLAYVAULT --base main --head docs/ai-collaboration-handoff` 실행이 `https://api.github.com/graphql`의 Forbidden으로 실패. **PR은 생성되지 않았으며 번호/주소가 없다.** 환경 설정의 API 허용 도메인 초안 저장도 게시 후 편집 제한으로 실패하여 현재 네트워크는 바뀌지 않았다.
+- 다음 AI: `api.github.com` 허용이 적용되면 기존 인증으로 PR 제출을 재시도한다. 토큰을 추가 요구하기 전에 실제 API 응답을 확인한다. 또는 사용자가 [GitHub PR 작성 화면](https://github.com/kirakein-gif/PLAYVAULT/compare/main...docs/ai-collaboration-handoff?expand=1)에서 제출할 수 있다. 이 링크는 생성된 PR이 아니다. 먼저 원격 PR 목록을 확인하여 중복 제출하지 않는다.
+- 미해결: PR 제출, 사용자 검토·승인. 게임 담당/PC 로컬 작업/배포 상태는 계속 미확인. 공통 문서 편집은 마쳤으나 제출 인계는 남아 있다.
+- 종료 상태: 원격 문서 브랜치 제출, PR 차단 인계. 기본 브랜치 병합·게임 배포 없음. 다음 담당 미확인.
