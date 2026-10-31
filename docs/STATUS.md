@@ -9,11 +9,11 @@
 사용자 결정(2026-10-31): 다음 단계는 **아트 기준부터**. 콘셉트는 **픽셀아트 HD**(게임 좌표 1단위 = 그림 1픽셀, 그림 해상도 960×540), 고딕 방향 유지. 아트 기준·검사는 Claude Code, 그림 제작·적용은 Codex(역할 분담).
 
 
-### 진행 중 · THE HOLLOW KEEP 픽셀아트 HD 제작·적용
+### 제작·적용 제출 · THE HOLLOW KEEP 픽셀아트 HD · 검토 대기
 
-Codex / `codex/hollow-keep-pixel-art` / 기준 PR #7 `d8c6a21` (main `af58238` 기반). 사용자 CODEX_TASK_02.md 실행 요청. 범위: `next/assets/pixel/` 주인공 12개 동작 시트·30px 타일·팔레트/manifest/PROVENANCE 및 next 렌더러/DPR 적용, 관리 문서. 시뮬레이션·기존 게임·공용 자산·검사 원본은 보존. 다음 담당 Claude Code / 검토 예정. 외형·완성도는 사용자 판단 대기.
+Codex / `codex/hollow-keep-pixel-art` / 기준 PR #7 `d8c6a21` (main `af58238` 기반), 착수 `e6efc15`, [구현 PR #8](https://github.com/kirakein-gif/PLAYVAULT/pull/8). 46색 네이티브 PNG: 주인공 동작 시트 12개(idle/run/두 점프/land/attack), 효과 2개, 30px 타일과 960×540 배경, palette/manifest/PROVENANCE·재작성 도구. 최소 정수 k의 960k×540k backing, 보간 끔, 정수 출력/좌우 반전/이벤트 기반 프레임·개별 실패 도형 대체 구현. 픽셀 자산 49/49, 픽셀 렌더 5/5, 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, 기존 회귀 3종 통과. 시뮬레이션·기존 게임·공용 자산·검사 원본 보존, 버전 변경 없음. 다음 담당 **Claude Code / 검토 대기**. 외형·미적 완성도·움직임은 사용자 판단 대기. 실제 화면 회전은 실기기 확인 필요.
 
-### 진행 중 · THE HOLLOW KEEP 픽셀아트 HD 아트 기준
+### 제출됨 · THE HOLLOW KEEP 픽셀아트 HD 아트 기준 (PR #7)
 
 Claude Code / `claude/hollow-keep-pixel-art-spec` / 2026-10-31 시작 / 범위: `games/the-hollow-keep/docs/ART_DIRECTION.md`, `CODEX_TASK_02.md`, `next/tests/pixel-assets.cjs`, `next/tests/pixel-render.cjs`(새 파일만, 게임 코드 변경 없음). 다음 담당: Codex(`codex/hollow-keep-pixel-art`, 스프라이트·타일 제작과 렌더러 적용).
 

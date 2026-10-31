@@ -691,3 +691,21 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: 사용자 PR 검토·병합 → Codex가 `CODEX_TASK_02.md`로 제작·적용 → Claude Code 검토 → 사용자 실기기·외형 판단.
 - 종료 상태: 기준 제출.
+
+
+### 2026-10-31 (Asia/Seoul) · CODEX_TASK_02 — 픽셀아트 HD 주인공·타일 제작과 적용
+
+- 담당 Codex / **검토 담당 Claude Code / 검토 대기**. 발견 문제 수 미확정(아직 교차 검토 전). 사용자 재요청 횟수 0회(이번 지시서 첫 제작 요청).
+- 기준/브랜치: main `af58238`에서 PR #4 기반이 병합된 것을 확인. 지시서가 main에 아직 없어 허용된 기준 `claude/hollow-keep-pixel-art-spec`의 `d8c6a21`에서 새 `codex/hollow-keep-pixel-art` 생성. 열린 PR은 기준 PR #7뿐이며 다른 미병합 구현 충돌 없음. STATUS의 Claude Code→Codex 인계 확인 후 담당 범위를 첫 커밋 `e6efc15`로 공유하고 Draft PR #8을 제작 전에 개설.
+- 읽기: 최신 AGENTS 역할 분담·CLAUDE·STATUS·WORK_LOG 최근 검토/병합 기록·CHANGELOG·실제 next 소스, ART_DIRECTION/DESIGN_DIRECTION/FOUNDATION_SPEC 및 CODEX_TASK_02, 원본 pixel-assets/pixel-render 검사. 두 타이틀 키아트(Ethan/Noah hd-v2)를 열어 인물 외형 확인.
+- 대상/버전: `games/the-hollow-keep/next/` 픽셀 자산·로더/렌더러·도구/README, 관리 문서. 시뮬레이션 sim.js·CONFIG·입력/지형·기존 게임·공용 자산·런처·다른 게임·인수 검사 원본 보존. 게임/캐시 버전 변경 없음.
+- 제작: image_gen으로 두 키아트를 외형 참고한 투명 자세 보드 생성(원본을 런타임 그림으로 축소하지 않음). 전체 지시문·도구·로컬 출력 경로를 `assets/pixel/PROVENANCE.md`에 기록. 특정 게임·작가 이름의 모방 지시 없음. Python/Pillow로 최종 격자에 실루엣/관절/머리·후드·코트·장비·무기·명암 클러스터를 독립적으로 다시 그림. 빌더는 참고 이미지를 읽지 않음.
+- 자산: 46색 palette.json, manifest.json, Ethan/Noah 각각 idle 4·run 6·jump-standing 3·jump-running 3·land 2·attack 4 프레임. 네이티브 96×96(attack 128×96), pivot(48,95), idle 높이 68/64px. 선택 효과 룬탄2/참격3, 30px floor-top/wall-fill/ledge 타일, 960×540 bg-chapel. RGBA PNG·alpha0/255·팔레트 제한·원래 해상도. 시트/발 기준/두 점프 차이/타일 두께를 검사하고 컨택트 시트 육안 확인.
+- 도구/손질: `next/tools/build-pixel-art.py` 정수 좌표 재작성, 팔레트 최근접 remap·알파 이진 정리·투명 RGB 정규화. 외곽/접지·윤곽/강조점 손질을 좌표에 반영. 재실행 전후 PNG 해시 동일(바이트 단위 재현) 확인. 참고 보드 `/workspace/generated_images/exec-01f1b4a9-1527-49a1-abd8-6eba010c48a7.png`는 로컬 참고용, 최종 자산으로 쓰지 않음.
+- 적용: `pixel-art.js` manifest/PNG 로드와 loaded/failed 상태, `HKPlaytest.artStatus()` 노출. `render.js`는 표시×DPR 이상인 최소 정수 k의 960k×540k backing, setTransform(k), 보간 끔, PNG 정수 좌표 출력·좌우 뒤집기. 두 점프는 jumpKind/vy, 공격/착지는 시뮬레이션 이벤트를 받아 프레임 선택. 타일은 기존 비격자 지형에 잘라 적용. 개별 파일 실패 시 기존 해당 도형으로 대체하고 정상 그림/게임은 계속 동작. app 변경은 렌더 이벤트 전달과 artStatus뿐, 게임 규칙 변경 없음.
+- 이번 검증: `CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/pixel-assets.cjs` **49/49**, 로컬 HTTP의 `pixel-render.cjs` **5/5** 통과. PC 1280×900/DPR1, 모바일 780×330/DPR2, 915×412/DPR2.625에서 최소 backing/보간/로드·크기 변경·ethan-idle 404 후 이동 유지 검사. 첫 자산 검사는 제작 기록 작성 전이어서 PROVENANCE 없음 1건 실패(48/49), 기록 추가 후49/49.
+- 기존 전체 재실행: foundation-contract **51/51**, foundation-edge **16/16**, room-traversal **4/4**, mobile-layout **20/20**, mobile-fullscreen **6/6**, browser-playtest **20/20**, ABYSSFALL polish/audio/audio-wind **3종 통과**. audio404는 의도적인 실패 경로 로그. 기준 브랜치의 검사 파일 수정/약화/건너뛰기 없음.
+- 환경/캡처: Python3/Pillow12.3.0, Playwright/시스템 Chromium, 로컬 HTTP 127.0.0.1:8766/HK_URL 지정. HK_SHOT_DIR=/tmp로 `/tmp/hk-pixel-jump-standing.png`, `/tmp/hk-pixel-jump-running.png`, 모바일 `/tmp/hk-mobile-780x330.png` 등 저장/육안 확인. PC·모바일에서 native 픽셀 클러스터와 서로 다른 점프 실루엣, 타일 윗면을 확인. 거친 확대 블록이나 혼합 크기 픽셀은 관찰하지 못했지만 모바일 축소 경계에는 약한 브라우저 필터링이 있을 수 있음. 선명도는 해당 캡처의 육안 관찰이며 전체 실기기 보증이 아님.
+- 5개 관리 문서: WORK_LOG 누적·STATUS/CHANGELOG 갱신. AGENTS/CLAUDE는 역할/절차 변경이 없어 해당 항목 변경 없음. README에 자산 구조/프레임/원래 크기 재작성/검사·대체 표시·한계 추가. 과거 이력 보존.
+- 한계/판단 대기: 외형이 닮았는지·보기 좋은지·동작이 자연스러운지는 자동 검사로 확인 불가, **사용자 판단 대기**. 실기기·실제 회전·타 브라우저·장시간 플레이 미확인. 타깃/레이블/디버그는 기존 벡터·시스템 글꼴 유지(이번 범위 밖). 적·보스·음향·추가 방·Noah 콤보는 범위 밖.
+- 제출/인계: [PR #8](https://github.com/kirakein-gif/PLAYVAULT/pull/8), 구현 커밋은 PR head 참조. 완료 후 Ready로 전환하여 Claude Code의 독립 자산/렌더·기반 전체 검사와 외형/픽셀 선명도 검토 요청. PR #7 미병합이므로 main diff에 규격·원본 검사도 포함됨. 병합·수동 배포 명령 없음.

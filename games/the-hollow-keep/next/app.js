@@ -78,6 +78,7 @@
       let processed=0;
       while(accumulator>=S.TICK && processed<MAX_TICKS){
         for(const event of S.step(world,input.sample())){
+          draw.event(event,world);
           if(event.type==='swap'){name.textContent=world.active==='ethan'?'ETHAN · 빛 / 룬탄':'NOAH · 그림자 / 참격';notice.textContent='교대 · '+world.active.toUpperCase();}
           if(event.type==='swapBlocked')notice.textContent='공간이 좁아 교대할 수 없습니다.';
           if(event.type==='hit'){const d=world.dummies.find(d=>d.id===event.target);effects.push({x:d.x,y:d.y,damage:event.damage,life:40});notice.textContent=`${event.target==='near'?'가까운':'먼'} 표적 · 피해 ${event.damage}`;}
@@ -92,5 +93,5 @@
   }
   reset();fields();setDebug(debug);requestAnimationFrame(frame);
   // Read-only copy for browser diagnostics and recorded-input review.
-  window.HKPlaytest={snapshot:()=>S.snapshot(world)};
+  window.HKPlaytest={snapshot:()=>S.snapshot(world),artStatus:()=>HKPixel.status()};
 })();
