@@ -2,6 +2,10 @@
 
 확인일: **2026-10-31 (Asia/Seoul)** / 확인 AI: **Codex**.
 
+## PR #4 검토 반영 진행
+
+Codex / `codex/hollow-keep-foundation` / 2026-10-31 (Asia/Seoul). 사용자 요청으로 검토 담당 Claude Code의 발견 문제 3건과 룬탄 비관통 결정 1건을 수정한다. 기준 구현 `766630e`, 최신 규격 `c6a31bf`를 cherry-pick한 `9f862bc`. 범위는 `next/`와 관리 문서이며 원본 41개 인수 테스트·기존 게임 파일·공중 감속은 보존한다. Noah 콤보는 사용자 결정으로 보류한다. 다음 담당은 Claude Code 재검토.
+
 ## 이번 Foundation 작업의 최신 확인
 
 2026-10-31 (Asia/Seoul), GitHub API와 인증 정상. 열린 PR #1·#2·#3 및 작업 PR [#4](https://github.com/kirakein-gif/PLAYVAULT/pull/4)를 확인했다. 아래 과거 문서 작업의 API 차단 보고는 당시 기록이며 현재 연결 상태와 구분한다. 사용자가 기존 브랜치 재개와 PR #2 규칙 적용을 승인했다. PC의 미푸시 작업은 직접 확인하지 않았다.
