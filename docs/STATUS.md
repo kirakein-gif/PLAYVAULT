@@ -9,6 +9,10 @@
 사용자 결정(2026-10-31): 다음 단계는 **아트 기준부터**. 콘셉트는 **픽셀아트 HD**(게임 좌표 1단위 = 그림 1픽셀, 그림 해상도 960×540), 고딕 방향 유지. 아트 기준·검사는 Claude Code, 그림 제작·적용은 Codex(역할 분담).
 
 
+### 진행 중 · THE HOLLOW KEEP 픽셀아트 HD 아트 기준
+
+Claude Code / `claude/hollow-keep-pixel-art-spec` / 2026-10-31 시작 / 범위: `games/the-hollow-keep/docs/ART_DIRECTION.md`, `CODEX_TASK_02.md`, `next/tests/pixel-assets.cjs`, `next/tests/pixel-render.cjs`(새 파일만, 게임 코드 변경 없음). 다음 담당: Codex(`codex/hollow-keep-pixel-art`, 스프라이트·타일 제작과 렌더러 적용).
+
 ## PR #4 공중 조작 완료 · 재검토 완료(문제 0건)·병합됨
 
 Codex / `codex/hollow-keep-foundation` / 기준 `9b39ace`. 사용자 결정 규격 `6ce2654`를 cherry-pick(`805e903`)하고 착수 공유(`4174aa0`) 후 구현. `takeoffVx`와 `jumpKind` 기록·노출, 도약/반대 방향별 공중 속도 상한, 공중 조작 속도(Ethan 1.33 / Noah 1.73, 약 45%) 패널과 점프 자세 구분을 추가. 키를 놓을 때의 수직 낙하는 유지. 조이스틱을 누른 채 전체 화면에 진입하고 resize해도 방향 유지, 손 떼기·취소·실제 초점 이탈 시 해제. 인수 51/51, 경계 16/16, 실제 방 통과 4/4(Ethan 85px 달리기 점프 포함), 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, 기존 회귀 3종 통과. 원본 검사/기존 게임 보존. 다음 담당 **Claude Code / 재검토 대기**. 실제 화면 회전은 실기기 확인 필요.

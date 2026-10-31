@@ -674,3 +674,20 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Claude Code가 픽셀아트 HD 아트 기준·자동 검사 작성, Codex가 그림 제작·적용.
 - 종료 상태: 병합 완료.
+
+### 2026-10-31 (Asia/Seoul) · THE HOLLOW KEEP 픽셀아트 HD 아트 기준과 자동 검사
+
+- 담당 AI: Claude Code(아트 기준·검사). 구현 담당: Codex(그림 제작·적용).
+- 대상: `games/the-hollow-keep/docs/ART_DIRECTION.md`, `CODEX_TASK_02.md`, `next/tests/pixel-assets.cjs`, `next/tests/pixel-render.cjs` 새 파일. 게임 코드·자산 변경 없음.
+- 기준 / 브랜치: main `af58238` / `claude/hollow-keep-pixel-art-spec`.
+- 버전: 변경 없음.
+- 사용자 결정: 픽셀아트 HD(1단위 = 1픽셀, 960×540, 주인공 약 64~68px), 고딕, 아트 기준 먼저.
+- 내용: 그림체(빛 2종·왼쪽 위 광원·선택적 윤곽·명암 3~5단계), 주인공 외형(기존 타이틀 키아트 기준), 타일 30×30(32×18칸), PNG·투명도 0/255·팔레트 64색 이하·원래 해상도, 오른쪽 방향·발 기준점·idle 높이 판정 ±15%, 필수 동작(idle 4, run 6, jump-standing 3, jump-running 3, land 2, attack 4), 타일 3종, manifest 형식, 화면 확대(960k 정수 배 + 보간 끔 + 정수 좌표 + 브라우저 축소), 자산 실패 시 도형 대체, 이미지 생성 → 원래 해상도 재작성 → 팔레트 → 손질 → 기록 과정, 특정 게임·작가 이름 지시문 금지.
+- 테스트:
+  - `pixel-assets.cjs`: 합성 자산 세트(저장소 밖, 커밋 안 함) 52/52 통과. 결함 10종(중간 투명도, 팔레트 밖 색, 2배 확대 저장, 발 뜸, 몸 크기 불일치, 두 점프 동일, ledge 두께, PNG 아님, 동작 누락, body 불일치) 모두 검출. 현재 main은 자산 없음으로 실패(예상).
+  - `pixel-render.cjs`: 현재 main 0/5(예상). 기준대로 동작하는 임시 스크립트 5/5. 결함 2종(보간 켬, 해상도 1920 고정 — DPR 2.625에서 부족) 검출.
+- Git/PR: 브랜치 `claude/hollow-keep-pixel-art-spec`(PR 번호는 PR 본문 참조).
+- 검토 담당 / 발견 문제 수: 사용자 검토 대기.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 PR 검토·병합 → Codex가 `CODEX_TASK_02.md`로 제작·적용 → Claude Code 검토 → 사용자 실기기·외형 판단.
+- 종료 상태: 기준 제출.
