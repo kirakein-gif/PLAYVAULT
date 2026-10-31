@@ -2,6 +2,10 @@
 
 확인일: **2026-10-31 (Asia/Seoul)** / 확인 AI: **Codex**.
 
+## PR #4 모바일 화면 크기·전체 화면 작업 진행
+
+Codex / `codex/hollow-keep-foundation` / 기준 `229a50c`. 사용자 요청의 규격 `fa33f01`, `44bd915`를 순서대로 cherry-pick(`462f363`, `d304724`). 범위: `next/` 모바일 배치·한 축 이동·명시적 전체 화면 및 관리 문서. 세 원본 인수 검사 파일 보존, 기존 게임/CONFIG/공중 감속/콤보 변경 없음. 다음 담당 Claude Code 재검토. 실제 화면 회전은 실기기 확인 필요.
+
 ## PR #4 검토 반영 완료 · 재검토 대기
 
 Codex / `codex/hollow-keep-foundation` / 2026-10-31 (Asia/Seoul). **검토 담당 Claude Code / 발견 문제 3건 + 결정 반영 1건** 수정 완료. 기준 구현 `766630e`, 최신 규격 `c6a31bf`를 cherry-pick한 `9f862bc`, 착수 공유 `fd91385`; 수정 커밋은 PR #4 head 참조. 좌우 벽 교대 보정, 85px 구덩이, 캔버스 밖 모바일 버튼, 첫 명중 즉시 소멸하는 비관통 룬탄을 반영했다. **Noah 3단 콤보는 사용자 결정으로 보류**, 공중 감속은 기존 그대로다. 다음 담당은 Claude Code 재검토.
