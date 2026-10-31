@@ -1,5 +1,7 @@
 # PLAYVAULT
 
+> **AI 공동 개발 안내** — 작업 전 [`AGENTS.md`](AGENTS.md)(공통 규칙), [`docs/STATUS.md`](docs/STATUS.md)(현재 상태), [`docs/WORK_LOG.md`](docs/WORK_LOG.md)(작업 이력), [`CHANGELOG.md`](CHANGELOG.md)(버전 변경)를 확인하세요. Claude Code 전용: [`CLAUDE.md`](CLAUDE.md).
+
 ## Eclipse art/audio polish (v30)
 
 - Stable sprite scale, authored torso/foot pivots, DPR capped at 2, nearest-pixel presentation; gameplay coordinates remain unchanged.
