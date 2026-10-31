@@ -557,3 +557,18 @@
 - 사용자 재요청 횟수: 0회.
 - 미확인: 실제 가로 회전, 전체 화면에서 주소창 사라짐, 조이스틱 이동 폭(약 28px) 손맛 — 사용자 실기기 확인 필요.
 - 종료 상태: 재검토 완료, 사용자 실기기 확인 대기.
+
+### 2026-10-31 (Asia/Seoul) · THE HOLLOW KEEP 사용자 실기기 확인과 공중 조작 기준 추가
+
+- 담당 AI: Claude Code(기준·검사 작성). 구현 담당: Codex.
+- 사용자 실기기 확인(PR #4 `9b39ace` 미리보기): 시험 방 크기·배치 "적당함". 공중에서 키를 떼면 수직 낙하 — 유지 승인.
+- 사용자 결정: 점프 중 좌우 조작은 의도. 단 **처음부터 앞으로 뛴 점프와 제자리 점프 후 앞으로 간 것은 다르게 표현**.
+- 측정(`9b39ace`): 제자리 점프 후 앞으로 누르면 공중에서 `runSpeed`까지 가속 → 달리며 뛴 점프 거리의 85%(Ethan)·95%(Noah)로 거의 같음.
+- 해석(사용자에게 알림): ① 속도 — 도약 속도 유지 vs `airControlSpeed` 제한, ② 표시 — `jumpKind`(running/standing)에 따른 자세 구분(임시 도형은 기울기, 정식 그림은 아트 단계).
+- 변경(PR #3 `6ce2654`): `FOUNDATION_SPEC.md` §4-1 공중 조작 규칙, CONFIG `airControlSpeed`, `getPlayer().jumpKind`; `DESIGN_DIRECTION.md` 결정 표 갱신; `foundation-contract.cjs` 공중 조작 10개 추가(총 51).
+- 테스트: 임시 참조 구현(커밋 안 함) 51/51. PR #4 `9b39ace`는 7개 실패(새 CONFIG·jumpKind 없음), 달리며 뛴 점프 속도 유지·수직 낙하는 통과.
+- Git/PR: PR #3 `6ce2654`, [PR #4 요청 댓글](https://github.com/kirakein-gif/PLAYVAULT/pull/4).
+- 검토 담당 / 발견 문제 수: 해당 없음(사용자 결정에 따른 신규 요구).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 §4-1 구현(경미 1건 조이스틱 resize 함께 권장), 인수 51/51 확인 후 같은 PR에 푸시. Claude Code 재검토, 사용자 시험 방에서 `airControlSpeed` 수치 판단.
+- 종료 상태: 수정 대기(Codex).
