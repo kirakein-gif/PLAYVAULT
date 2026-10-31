@@ -88,7 +88,18 @@ async function analyze(page, file, opts) {
       cells[name] = rowOpaque;
     }
     let h = 0; for (let i = 0; i < d.length; i++) h = (h * 31 + d[i]) >>> 0;
-    return { W, H, alphaMid, off, offSample, upscaled, boxes, cells, hash: h };
+    const frameHashes = [];
+    if (opts.frameW) {
+      for (let f = 0; f < Math.floor(W / opts.frameW); f++) {
+        let fh = 0;
+        for (let y = 0; y < Math.min(H, opts.frameH); y++) for (let x = 0; x < opts.frameW; x++) {
+          const i = (y * W + f * opts.frameW + x) * 4;
+          fh = (fh * 31 + d[i] + d[i + 1] * 7 + d[i + 2] * 13 + d[i + 3] * 17) >>> 0;
+        }
+        frameHashes.push(fh);
+      }
+    }
+    return { W, H, alphaMid, off, offSample, upscaled, boxes, cells, hash: h, frameHashes };
   }, { b64, opts });
 }
 
@@ -173,6 +184,13 @@ async function analyze(page, file, opts) {
         assert.equal(empty, -1, `${empty}번 프레임이 비어 있음`);
         if (s.name in OPTIONAL_FX) assert.ok(s.a.frames >= OPTIONAL_FX[s.name], `${s.name} 프레임 ${s.a.frames} < ${OPTIONAL_FX[s.name]}`);
       });
+      if (s.name in OPTIONAL_FX) {
+        const once = s.name === 'fx-slash'; // 베기는 한 번, 날아가는 룬탄은 반복 허용
+        check(`${s.label}: 이웃 프레임 그림이 다름${once ? '·한 번만 재생(loop가 true가 아님)' : ''}`, () => {
+          if (once) assert.notEqual(s.a.loop, true, `${s.name}.loop가 true(같은 효과가 반복 재생됨)`);
+          r.frameHashes.forEach((hsh, i) => { if (i) assert.notEqual(hsh, r.frameHashes[i - 1], `${i - 1}·${i}번 프레임이 같은 그림`); });
+        });
+      }
       if (GROUNDED.includes(s.name)) {
         check(`${s.label}: 모든 프레임의 발이 기준선(pivot.y-2 ~ pivot.y)에 있음`, () => {
           r.boxes.forEach((b, i) => {
