@@ -715,3 +715,17 @@
 
 - 담당 Codex / 검토 담당 Claude Code / 검토 대기. 구현 커밋 `d6052ba`를 `codex/hollow-keep-pixel-art`에 푸시 완료, PR #8. 마지막 정리는 PROVENANCE 끝의 빈 줄 제거와 이 제출 기록뿐이며 코드/PNG/검사 결과는 동일함.
 - 자산 49/49, 렌더 5/5와 위 기반 전체 검사 통과. 범위/원본 보존 및 전체 PR diff 검사를 최종 확인 후 Ready로 전환. 병합·수동 배포 없음. 사용자 외형·동작 판단 대기.
+
+### 2026-10-31 (Asia/Seoul) · PR #8 검토(픽셀아트 HD 주인공·타일·렌더러)와 팔레트 결정
+
+- 담당 AI: Claude Code(검토). 구현 담당: Codex. 검토 담당은 구현 브랜치를 수정하지 않음.
+- 대상: PR #8 `codex/hollow-keep-pixel-art` head `e82b5f2`.
+- 사용자 결정: 팔레트 **64색 이하** 확정 → `ART_DIRECTION.md` §1에 기록. PR #8은 46색.
+- 규칙 준수: 검사 원본 5종·규격이 `d8c6a21`과 동일. `main` 대비 기존 게임·공용 자산·런처·다른 게임·`sim.js` 변경 없음. PROVENANCE: 이미지 생성은 참고용, 최종 스프라이트는 `tools/build-pixel-art.py`가 원래 해상도 격자에 직접 그림(축소·잘라 쓰기 없음), 특정 게임·작가 이름 지시문 없음.
+- 테스트(Claude Code 환경, `git archive` head 로컬 서버): pixel-assets 49/49(효과·배경 수에 따라 항목 수가 달라지며 약화 아님), pixel-render 5/5, 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, ABYSSFALL 회귀 3종 통과.
+- 외형·움직임 관찰(차단 아님, 사용자 판단): ① 두 인물 옆얼굴 코가 부리처럼 튀어나옴 ② Noah 자세가 구부정해 키아트의 날렵한 인상이 약함 ③ Ethan `jump-running` 상체가 곧아 앞으로 기운 느낌 약함, `jump-standing`이 idle과 비슷 ④ `land` 웅크림 약함 ⑤ Ethan 달리기 다리가 코트에 가려 보폭이 잘 안 읽힘. 배경·타일·색 대비는 양호.
+- Git/PR: [PR #8 검토 리뷰](https://github.com/kirakein-gif/PLAYVAULT/pull/8) (COMMENT).
+- 검토 담당 / 발견 문제 수: Claude Code / 기술 0건, 외형 관찰 5건(사용자 판단).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자가 미리보기로 외형·움직임 판단 → 수정 여부 결정. PR #7 → PR #8 순 병합.
+- 종료 상태: 검토 완료, 사용자 판단 대기.
