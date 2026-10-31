@@ -86,7 +86,7 @@ const VIEWS = [
     });
 
     await test('그림 파일을 못 불러와도 도형으로 대신 그리고 게임은 계속 동작', async () => {
-      const { ctx, page, errors } = await open(VIEWS[0], (p) => p.route(/assets\/pixel\/ethan-idle\.png/, (r) => r.fulfill({ status: 404, body: '' })));
+      const { ctx, page, errors } = await open(VIEWS[0], (p) => p.route(/assets\/(?:pixel|pixel-trial\/x[12])\/ethan-idle\.png/, (r) => r.fulfill({ status: 404, body: '' })));
       const m = await measure(page);
       assert.ok(m.art, 'HKPlaytest.artStatus()가 없음');
       assert.ok(m.art.failed.some((f) => /ethan-idle\.png/.test(f)), `failed에 ethan-idle.png가 기록되지 않음: ${JSON.stringify(m.art)}`);
