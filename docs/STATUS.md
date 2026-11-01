@@ -6,10 +6,11 @@
 
 Claude Code / `claude/hollow-keep-exploration-refine` / 기준: PR #11 `fc7befd` + PR #10 브랜치 병합(`1670f40`) / 2026-11-01. 사용자 결정: "문"을 출입문(들어가면 다른 곳)과 봉쇄물(잠기면 못 지나감)로 구분, 조사 버튼 유지, 방 밀도 추가, 막히지 않은 길도 둠. 범위: `EXPLORATION_REFINE_SPEC.md`, `CODEX_TASK_06.md`, `tests/entrance-contract.cjs`(새 9개), `area-data.cjs`(출입문 배치·봉쇄물 모양·D1~D6·완주 출입문 조건), `pixel-assets.cjs`(물건 그림 이름 변경), DESIGN_DIRECTION·EXPLORATION_SPEC 안내. 게임 코드·그림 변경 없음.
 - 현재 PR #11 구현 기준 예상 실패: entrance-contract 0/9, area-data 10/17(밀도·봉쇄물 모양·출입문·숨은 곳·Noah 레버 높이), pixel-assets 53/54(새 그림 이름). Codex가 `CODEX_TASK_06.md`로 구현하면 통과해야 한다.
-- 병합 순서 제안: PR #10 → PR #11 → 이 보완 규격 PR → Codex 보완 구현 PR. 사용자 승인 전 병합 없음.
+- 병합(사용자 승인 "병합 진행해 주세요"): PR #10 → main `d8d1b03`, PR #11 → 통합 PR #13(`1670f40`, WORK_LOG 충돌 정리) → main `022754e`, 이 보완 규격 PR #12 → main. 다음: Codex가 main 기준으로 `CODEX_TASK_06.md` 구현.
+- 주의: 병합 후 main에서 entrance-contract 0/9, area-data 10/17, pixel-assets 53/54는 Codex 보완 구현 전까지 예상된 실패.
 - PR #11 검토: 막는 문제 0건, 사소한 지적 2건(browser-playtest 기본 주소, 검토 캡처 용량). 미리보기 `https://78040d2c.kirakein-playvault.pages.dev/games/the-hollow-keep/next/`.
 
-## 구현 제출 · CODEX_TASK_05 탐험 시범 구역 / Claude Code 검토 대기
+## 병합됨 · CODEX_TASK_05 탐험 시범 구역 (PR #11, 2026-11-01)
 
 Codex / `codex/hollow-keep-exploration` / [PR #11](https://github.com/kirakein-gif/PLAYVAULT/pull/11) / 기준 PR #10 `f6b8be1`(main `d532537`) / 착수 `11ba9d0` / 마지막 구현·검증 SHA **`c14f876`**, 2026-11-01. 기본 시작은8방 시범 구역, 1단계 시험 방은`?room=test`. 상하좌우 이동·사다리·한쪽 발판·스위치/열쇠/처치 문·전용 장치·부서지는 벽·지도/조사·두 축 조이스틱·상태 유지. 완주 입력 기록3602틱/60.0초, 두 주인공 교대2회, 모든 조건 충족 후 시작 방 복귀. 새 사다리와물건9종, 기존64색/scale2/0·255알파. 매달림은 허용된idle대체 자세.
 

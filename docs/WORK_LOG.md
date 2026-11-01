@@ -955,3 +955,13 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: 사용자 확인 → 병합 순서 결정(PR #10 → #11 → 보완 규격) → Codex `CODEX_TASK_06.md` 구현 → Claude Code 검토.
 - 종료 상태: 규격 제출.
+
+### 2026-11-01 (Asia/Seoul) · PR #10·#11·#12 병합
+
+- 담당 AI: Claude Code. 사용자 지시: "병합 진행해 주세요".
+- 순서: PR #10(`cbf8d1d`) → main `d8d1b03`. PR #11은 `docs/WORK_LOG.md` 충돌(양쪽 추가)을 정리한 `1670f40`(fc7befd + PR #10 브랜치)을 통합 브랜치 `claude/merge-pr11-exploration`로 올려 PR #13으로 병합 → main `022754e`(PR #11 병합 처리 확인). PR #12는 기준을 main으로 바꾸고 main을 병합(충돌 없음) 후 병합.
+- 병합 결과 확인(PR #12 브랜치 + main): foundation-contract 51/51, exploration-contract 14/14, exploration-edge 8/8, foundation-edge 16/16. entrance-contract 0/9, area-data 10/17은 Codex 보완 구현 전 예상 실패.
+- 검토 담당 / 발견 문제 수: 해당 없음(병합 작업).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex `CODEX_TASK_06.md`(기준 main) → Claude Code 검토.
+- 종료 상태: 병합 완료.
