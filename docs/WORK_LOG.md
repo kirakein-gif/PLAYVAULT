@@ -793,3 +793,16 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex가 `fx-slash`를 한 획(칼날 선에 붙은 가늘어지는 꼬리)으로 수정 → Claude Code 재검토.
 - 종료 상태: 수정 대기(Codex).
+
+### 2026-11-01 (Asia/Seoul) · PR #8 재검토(Noah 베기 효과 한 획)
+
+- 담당 AI: Claude Code(검토). 구현 담당: Codex. 검토 담당은 구현 브랜치를 수정하지 않음.
+- 대상: PR #8 head `980f4dc`.
+- 규칙 준수: 검사·규격 원본이 `db1679b`(cherry-pick `ef92a4a`)와 동일. `main` 대비 기존 게임·공용 영역·`sim.js` 변경 없음.
+- 테스트(Claude Code 환경): 기본 자산 51/51(한 획 검사 포함), 시험본 x1·x2 18/18, 화면 적용 기본·trial-x1·trial-x2 각 7/7, density-trial 10/10, 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, ABYSSFALL 회귀 3종 통과.
+- 직접 확인: 효과 3프레임이 칼날 선에 붙은 가늘어지는 꼬리로 이루어진 한 획(평행선 없음). 그리기 기록상 공격 1~3번 프레임에서만 한 번씩 그려짐.
+- Git/PR: [PR #8 재검토 리뷰](https://github.com/kirakein-gif/PLAYVAULT/pull/8) (COMMENT). 미리보기 `https://94dbd3f1.kirakein-playvault.pages.dev/games/the-hollow-keep/next/`.
+- 검토 담당 / 발견 문제 수: Claude Code / 0건.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 화면 확인 → 승인 시 PR #7 → PR #8 병합, 시험본·검토 캡처 폴더 정리 여부 결정.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
