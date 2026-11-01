@@ -283,6 +283,17 @@ async function analyze(page, file, opts) {
         assert.equal(r.off, 0, `팔레트 밖 색 ${r.off} (예: ${r.offSample.join(', ')})`);
         assert.deepEqual(r.upscaled, [], '확대 저장된 이미지로 보임');
       });
+      const MOSAIC = ['back-1', 'back-2', 'back-3', 'wall-fill-2', 'wall-bottom', 'wall-left', 'wall-right',
+        'window-top', 'window-mid', 'window-bottom', 'pillar-top', 'pillar-mid', 'pillar-base', 'banner-top', 'banner-mid', 'banner-bottom', 'candle'];
+      check(`tiles: 모자이크 조각 ${MOSAIC.length}종(TILE_MOSAIC_SPEC §3)이 있고 뒷벽·벽 조각은 꽉 참`, () => {
+        const missing = MOSAIC.filter((n) => !(Array.isArray(t.cells[n]) && t.cells[n].length === 2));
+        assert.deepEqual(missing, [], `빠진 조각: ${missing.join(', ')}`);
+        const full = (rows) => rows && rows.every((c) => c === TILE);
+        const holes = ['back-1', 'back-2', 'back-3', 'wall-fill-2', 'wall-bottom', 'wall-left', 'wall-right'].filter((n) => !full(r.cells[n]));
+        assert.deepEqual(holes, [], `투명 픽셀이 있는 조각(이어 붙이면 구멍): ${holes.join(', ')}`);
+        const dup = new Set(['back-1', 'back-2', 'back-3'].map((n) => String(t.cells[n])));
+        assert.equal(dup.size, 3, 'back-1~3이 같은 칸을 가리킴(변형이 아님)');
+      });
       check('tiles: wall-fill은 꽉 참, floor-top은 아랫줄이 꽉 참, ledge는 위 16px만', () => {
         const full = (rows) => rows.every((c) => c === TILE);
         assert.ok(full(r.cells['wall-fill']), 'wall-fill에 투명 픽셀이 있음(이어 붙이면 구멍)');

@@ -229,3 +229,8 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 - [e8e041e](https://github.com/kirakein-gif/PLAYVAULT/commit/e8e041e) / PR #14, 기준main1588a46. 지시서에main 우선 정정 한 줄 추가. 출입문2쌍/잠금, 봉쇄물 반복 격자와 방법 기호,8방 세 층과 D1~D6, 숨은 열쇠/막히지 않은 우회로를 적용했습니다.
 - 완주 입력3671틱·교대2회. 출입문9/9·구역17/17·그림55/55 및 요청 검사 전체 통과, 자체경계11/11·탐험브라우저5/5. 사다리/단단한 바닥 경계의↓+점프 겹침 수정 후 무작위60000틱에서 겹침 없음.
 - 28장 무손실 캡처·재현·이력 제출. 기존 수치·크기·그림/타일과 인수 검사 원본 보존, 버전 번호 변경 없음. Claude Code 검토 및 사용자 재미/난이도/외형 판단 대기. 병합·배포 없음.
+
+## THE HOLLOW KEEP · 타일 모자이크 규격·방 이동 겹침 수정 지시 (2026-11-01, Asia/Seoul)
+
+- 규격·검사만(게임 코드·그림·버전 변경 없음). 사용자 결정: 반복 조각 모자이크로 화면·방 다양성, 봉인 통과 수정.
+- `TILE_MOSAIC_SPEC.md`, `CODEX_TASK_07.md`, `tile-mosaic-render.cjs`(7), exploration-contract +2, area-data·pixel-assets 보강. PR #14 위에서 Codex 구현 대기.
