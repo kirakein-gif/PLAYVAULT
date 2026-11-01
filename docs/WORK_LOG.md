@@ -849,3 +849,16 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex가 `fx-slash`를 한 획(칼날 선에 붙은 가늘어지는 꼬리)으로 수정 → Claude Code 재검토.
 - 종료 상태: 수정 대기(Codex).
+
+### 2026-11-01 (Asia/Seoul) · PR #8 Noah 베기 두 줄 수정 제출
+
+- 담당 Codex / 검토 담당 Claude Code(재검토 대기). 사용자 요청 및 PR #8 "Noah 베기 효과가 두 줄로 보임" 댓글 확인. 기준 head71b7fe7, 같은 `codex/hollow-keep-pixel-art`. 시작 전 원격 fetch·main af58238·PR #7/#8·실제 코드/관리 문서 확인, 착수 cb78e82 원격 공유. 게임 버전 전후: foundation 시험 방(번호 없음) 유지.
+- 규격 반영: 앞선559c722(활성 자산 기준 렌더 검사·직전 검토 기록)→7aa2def, 요청db1679b(한 획 규칙·연결 덩어리 검사)→ef92a4a. WORK_LOG 충돌은 HEAD의 task04 제출 기록과 규격 브랜치의 새 검토 기록을 모두 보존해 해결. pixel-assets/pixel-render 원본은 db1679b와 바이트 동일, 이후 변경하지 않았다. 기타 검사도 변경 없음.
+- 원인 재현: 새 pixel-assets를 기존 효과에 실행하면50/51, 0번 프레임의6px 이상 덩어리2개로 실패. 단일 그리기 호출 문제가 아니라 밝은 호와 떨어진 어두운 평행선의 그림 문제.
+- 수정: image_gen으로 기존 투명3프레임을 한 획으로 편집한 밑그림 생성(`tools/art-source/noah-slash-single-stroke-source.png`). 재현 빌더에서 연결된3개 호를 분리하고 종전 네이티브 위치/크기에 맞춰 축소·기존64색·알파0/255로 정리, 떨어진 축소 잔점 제거. 밝은 칼날 바로 안쪽에 붙은 어두운 꼬리, 끝은 가늘게. 떨어진 평행선을 만들던 별도 inner arc 코드는 제거. 효과 frame112×144/pivot(0,72)/각2틱/loopfalse 유지, 렌더러·게임 수치 변경 없음. PROVENANCE 전문 지시문/정리 절차 갱신.
+- 이번 실행: pixel-assets **51/51**, pixel-render **7/7**, foundation-contract **51/51**, foundation-edge **16/16**, room-traversal **4/4**, mobile-layout **20/20**, mobile-fullscreen **6/6**, browser-playtest **20/20**, density-trial **10/10**, ABYSSFALL polish/audio/audio-wind **3종 통과**. 추가 시험 자산 x1/x2 각각18/18, 각 시험 렌더7/7. audio404 경고는 기존 실패 복구 검사에서 예상됨. 로그 `/tmp/hk-slash-*.log`(before의50/51은 수정 전 재현).
+- 재현: 저장소 루트 HTTP8766, `HK_URL=http://127.0.0.1:8766/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/<name>.cjs`; trial 렌더는URL에?art=trial-x1|x2. density-trial 원본을 내용 동일 사본으로 `/tmp/hk-slash-density/tests/`에서 실행해 sibling assets 임시 출력으로 격리(시험본 비교 파일 보존), cmp 동일 확인. 원본 판정·검사 코드는 변경하지 않음. 기존 회귀는 `node tests/<name>.cjs`.
+- PNG 검증: 효과3프레임의8방향 연결 덩어리는 각각1개(302/581/288px), 기존 색상4개 사용. 다른 런타임 PNG15개는71b7fe7 기준 SHA256 동일. 전체 PNG16개 재생성 해시 동일. manifest·palette·sim.js·render.js·pixel-trial·기존 게임·공용 자산·런처 변경 없음.
+- 캡처: 새 `capture-noah-single-stroke.cjs`에서 Playwright 브라우저 시계를 제어하고 실제 키보드 입력/기존 루프를 사용, pose/world 주입 없음. 좌우 실제 공격 나이0~11 모든 틱을 확인 후 연속 캡처 저장. `pixel-review/noah-single-stroke/README.md` 및 개별 PNG/연속 strip. 준비0~1 효과없음,2~7 단발3프레임,8이후 효과없음. 이전 task04 캡처는 이력으로 보존하고 새 수정 링크를 우선 안내.
+- 5개 관리 문서 검토: STATUS·WORK_LOG·CHANGELOG 갱신, AGENTS·CLAUDE 흐름 변경 없음. 루트 README 변경 필요 없음, next README/PROVENANCE/캡처 README 갱신.
+- 검토 담당 / 발견 문제 수: Claude Code / 사용자 발견1건(직전 검토 누락 기록은 기준 커밋에서 보존), 이번 수정 재검토 전. 사용자 재요청 횟수: task04 제출 후1회(이번 두 줄 수정). 종료 상태: 같은 PR #8 푸시·재검토 대기. 외형/동작 사용자 판단 대기, 실기기 회전 확인 필요. 병합·배포하지 않음.

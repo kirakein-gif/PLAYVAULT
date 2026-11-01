@@ -141,19 +141,18 @@ for f in range(2):
  d.line([(ox+11,24),(ox+24,20),(ox+43,24),(ox+24,27),(ox+11,24)],fill=color('#6dd8dc'),width=2)
  d.line((ox+25,24,ox+44,24),fill=color('#d8fff1'),width=2);d.point((ox+7-f,19),fill=color('#a58d78'));d.point((ox+10,31+f),fill=color('#6dd8dc'))
 save(fx,'ethan-fx-rune.png');manifest['heroes']['ethan']['animations']['fx-rune']={'file':'ethan-fx-rune.png','frameW':48,'frameH':48,'frames':2,'pivot':{'x':24,'y':24},'ticks':[4,4],'loop':True}
-# Crescent arcs contain NO broad filled polygon. Local x is always >=0 from hand.
-fx=Image.new('RGBA',(112*3,144));d=ImageDraw.Draw(fx)
-for f,(lo,hi) in enumerate([(-1.22,-.25),(-1.1,.78),(.16,1.18)]):
- ox=112*f
- pts=[(ox+round(100*math.cos(t)),72+round(62*math.sin(t)))for t in np.linspace(lo,hi,160)]
- d.line(pts,fill=color('#6dd8dc'),width=2)
- d.line(pts[20:-12],fill=color('#d8fff1'),width=1)
- inner=[(ox+round(95*math.cos(t)),72+round(58*math.sin(t)))for t in np.linspace(lo+.12,hi-.08,120)]
- for i,p in enumerate(inner):
-  if f<2 or i%3:d.point(p,fill=color('#287b8b'))
- # Tapered tail and sparse decay along the blade path.
- for i,t in enumerate(np.linspace(lo,hi,24)):
-  if i%3==f%3:d.point((ox+round(105*math.cos(t)),72+round(67*math.sin(t))),fill=color('#6dd8dc'))
+# Edited raster source: bright edge and inner tail share one opaque ribbon.
+# Preserve native placement/pivots. No offset parallel arc is constructed.
+slash_sources=sorted(objects(SRC/'noah-slash-single-stroke-source.png'),key=lambda item:item[0][0])
+assert len(slash_sources)==3
+fx=Image.new('RGBA',(112*3,144))
+for f,((_,source),(x,y,w,h)) in enumerate(zip(slash_sources,[(34,14,65,44),(45,17,56,100),(38,82,62,49)])):
+ source=source.crop(source.getchannel('A').point(lambda a:255 if a>=128 else 0).getbbox())
+ native=mapped(source.resize((w,h),Image.Resampling.BOX))
+ a=np.array(native);labs,n=label(a[:,:,3]>0,structure=np.ones((3,3)));sizes=np.bincount(labs.ravel());sizes[0]=0
+ # Remove detached resampling specks; never bridge separated parallel lines.
+ a[labs!=sizes.argmax()]=0
+ fx.paste(Image.fromarray(a),(f*112+x,y))
 save(fx,'noah-fx-slash.png');manifest['heroes']['noah']['animations']['fx-slash']={'file':'noah-fx-slash.png','frameW':112,'frameH':144,'frames':3,'pivot':{'x':0,'y':72},'ticks':[2,2,2],'loop':False}
 (OUT/'palette.json').write_text(json.dumps({'colors':palette},indent=2)+'\n');(OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 # Full six-pose target | final comparisons. Reference crops are from the selected

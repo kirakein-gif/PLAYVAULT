@@ -9,9 +9,11 @@
 사용자 결정(2026-10-31): 다음 단계는 **아트 기준부터**. 콘셉트는 **픽셀아트 HD**(게임 좌표 1단위 = 그림 1픽셀, 그림 해상도 960×540), 고딕 방향 유지. 아트 기준·검사는 Claude Code, 그림 제작·적용은 Codex(역할 분담).
 
 
-### 진행 중 · PR #8 Noah 베기 한 획 수정
+### 수정 제출 · PR #8 Noah 베기 한 획 / Claude Code 재검토 대기
 
-Codex / `codex/hollow-keep-pixel-art` / 기준 `71b7fe7` / 2026-11-01. 사용자 요청과 PR 댓글 확인, 규격 `db1679b` 반영 예정. 범위: 기본 noah-fx-slash.png·재생성 도구·공격 비교 캡처·PROVENANCE/README·관리 문서. 검사 원본은 기준 커밋 반영 후 그대로 유지, sim.js·trial·기존 게임 보존. 다음 Claude Code 재검토 / 병합·배포 금지.
+Codex / `codex/hollow-keep-pixel-art` / 기준 `71b7fe7` / 착수 `cb78e82` / 2026-11-01. 사용자 요청과 PR 댓글 확인. 규격 앞선 `559c722` 및 `db1679b`를 `7aa2def`·`ef92a4a`로 반영(양측 WORK_LOG 기록 보존). 기본 noah-fx-slash.png 3프레임을 밝은 칼날에 어두운 꼬리가 붙은 한 획으로 교체. 크기·pivot·타이밍·렌더러·sim.js 및 다른 런타임 PNG15개·trial 그대로. 검사 원본은 규격과 바이트 동일, 수정 없음. 구현 SHA는 이 항목을 갱신한 같은 PR #8 커밋 참조.
+
+이번 검사: pixel-assets51/51, pixel-render 기본·trial-x1·trial-x2 각7/7, 시험 자산 각18/18, foundation51/51·edge16/16·room4/4·배치20/20·전체화면6/6·browser20/20·density10/10·ABYSSFALL 회귀3종 통과. 효과 덩어리 프레임별1개(302/581/288px). 좌우 실제 공격0~11틱 연속 캡처: `next/assets/pixel-review/noah-single-stroke/README.md`. 재생성 PNG16개 해시 일치. 다음 Claude Code 재검토·사용자 외형 판단, 실제 기기 회전 확인 필요. 병합·배포 없음. 아래는 직전 task04 제출 이력.
 
 ### 구현 제출 · CODEX_TASK_04 x2 전체 제작 / Claude Code 재검토·사용자 외형 판단 대기
 

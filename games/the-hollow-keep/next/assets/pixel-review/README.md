@@ -2,6 +2,8 @@
 
 Default scale2 runtime. Likeness and motion quality await user review; automated checks only establish the stated technical conditions.
 
+**Latest Noah slash correction (db1679b):** [single-stroke left/right consecutive attack captures](noah-single-stroke/README.md). The Noah attack strip below is the earlier task04 submission, retained as history.
+
 - [Ethan target six poses | x2](ethan-reference-poses.png)
 - [Noah target six poses | x2](noah-reference-poses.png)
 - [Ethan actual attack sequence](ethan-attack-sequence.png)
