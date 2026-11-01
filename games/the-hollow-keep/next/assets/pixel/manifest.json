@@ -1,0 +1,309 @@
+{
+  "version": 1,
+  "scale": 2,
+  "tileSize": 60,
+  "palette": "palette.json",
+  "heroes": {
+    "ethan": {
+      "body": {
+        "w": 42,
+        "h": 68
+      },
+      "animations": {
+        "idle": {
+          "file": "ethan-idle.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 4,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            12,
+            12,
+            12,
+            12
+          ],
+          "loop": true
+        },
+        "run": {
+          "file": "ethan-run.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 6,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            6,
+            6,
+            6,
+            6,
+            6,
+            6
+          ],
+          "loop": true
+        },
+        "jump-standing": {
+          "file": "ethan-jump-standing.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 3,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            6,
+            6,
+            6
+          ],
+          "loop": false
+        },
+        "jump-running": {
+          "file": "ethan-jump-running.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 3,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            6,
+            6,
+            6
+          ],
+          "loop": false
+        },
+        "land": {
+          "file": "ethan-land.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 2,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            4,
+            4
+          ],
+          "loop": false
+        },
+        "attack": {
+          "file": "ethan-attack.png",
+          "frameW": 320,
+          "frameH": 224,
+          "frames": 4,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            2,
+            2,
+            3,
+            5
+          ],
+          "loop": false,
+          "hands": [
+            {
+              "x": 152,
+              "y": 116
+            },
+            {
+              "x": 186,
+              "y": 88
+            },
+            {
+              "x": 171,
+              "y": 118
+            },
+            {
+              "x": 154,
+              "y": 120
+            }
+          ]
+        },
+        "fx-rune": {
+          "file": "ethan-fx-rune.png",
+          "frameW": 48,
+          "frameH": 48,
+          "frames": 2,
+          "pivot": {
+            "x": 24,
+            "y": 24
+          },
+          "ticks": [
+            4,
+            4
+          ],
+          "loop": true
+        }
+      }
+    },
+    "noah": {
+      "body": {
+        "w": 39,
+        "h": 64
+      },
+      "animations": {
+        "idle": {
+          "file": "noah-idle.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 4,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            12,
+            12,
+            12,
+            12
+          ],
+          "loop": true
+        },
+        "run": {
+          "file": "noah-run.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 6,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            6,
+            6,
+            6,
+            6,
+            6,
+            6
+          ],
+          "loop": true
+        },
+        "jump-standing": {
+          "file": "noah-jump-standing.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 3,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            6,
+            6,
+            6
+          ],
+          "loop": false
+        },
+        "jump-running": {
+          "file": "noah-jump-running.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 3,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            6,
+            6,
+            6
+          ],
+          "loop": false
+        },
+        "land": {
+          "file": "noah-land.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 2,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            4,
+            4
+          ],
+          "loop": false
+        },
+        "attack": {
+          "file": "noah-attack.png",
+          "frameW": 320,
+          "frameH": 224,
+          "frames": 4,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            2,
+            2,
+            2,
+            3
+          ],
+          "loop": false,
+          "hands": [
+            {
+              "x": 152,
+              "y": 116
+            },
+            {
+              "x": 188,
+              "y": 90
+            },
+            {
+              "x": 160,
+              "y": 130
+            },
+            {
+              "x": 154,
+              "y": 120
+            }
+          ]
+        },
+        "fx-slash": {
+          "file": "noah-fx-slash.png",
+          "frameW": 112,
+          "frameH": 144,
+          "frames": 3,
+          "pivot": {
+            "x": 0,
+            "y": 72
+          },
+          "ticks": [
+            2,
+            2,
+            2
+          ],
+          "loop": false
+        }
+      }
+    }
+  },
+  "tiles": {
+    "file": "tiles.png",
+    "cells": {
+      "floor-top": [
+        0,
+        0
+      ],
+      "wall-fill": [
+        1,
+        0
+      ],
+      "ledge": [
+        2,
+        0
+      ]
+    }
+  },
+  "background": "bg-chapel.png"
+}

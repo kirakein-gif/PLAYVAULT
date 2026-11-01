@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "scale": 2,
+  "tileSize": 60,
+  "palette": "palette.json",
+  "trial": true,
+  "heroes": {
+    "ethan": {
+      "body": {
+        "w": 42,
+        "h": 68
+      },
+      "animations": {
+        "idle": {
+          "file": "ethan-idle.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 4,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            12,
+            12,
+            12,
+            12
+          ],
+          "loop": true
+        },
+        "run": {
+          "file": "ethan-run.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 6,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            6,
+            6,
+            6,
+            6,
+            6,
+            6
+          ],
+          "loop": true
+        }
+      }
+    },
+    "noah": {
+      "body": {
+        "w": 39,
+        "h": 64
+      },
+      "animations": {
+        "idle": {
+          "file": "noah-idle.png",
+          "frameW": 256,
+          "frameH": 192,
+          "frames": 4,
+          "pivot": {
+            "x": 128,
+            "y": 190
+          },
+          "ticks": [
+            12,
+            12,
+            12,
+            12
+          ],
+          "loop": true
+        }
+      }
+    }
+  }
+}
