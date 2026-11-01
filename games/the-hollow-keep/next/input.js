@@ -1,17 +1,18 @@
 (function () {
   'use strict';
   const bindings = { KeyA:'left', ArrowLeft:'left', KeyD:'right', ArrowRight:'right',
+    KeyW:'up', ArrowUp:'up', KeyS:'down', ArrowDown:'down', KeyE:'interact',
     Space:'jump', KeyK:'jump', KeyZ:'jump', KeyJ:'attack', KeyX:'attack', KeyQ:'swap', Tab:'swap' };
   window.HKInput = function (canvas) {
     const keys = new Set(), pointers = new Map();
     const stick = document.querySelector('[data-control="move"]');
-    let stickPointer = null, stickAxis = 0;
+    let stickPointer = null, stickAxis = 0, stickVertical = 0;
     let physical = {}, sampled = {}, pending = {};
     function sync() {
       const next = {};
       for (const code of keys) next[bindings[code]] = true;
-      for (const action of pointers.values()) next[action] = true;
-      for (const action of ['left','right','jump','attack','swap']) {
+      for (const value of pointers.values()) for (const action of [].concat(value)) next[action] = true;
+      for (const action of ['left','right','up','down','jump','attack','swap','interact']) {
         if (!!next[action] !== !!physical[action]) (pending[action] ||= []).push(!!next[action]);
       }
       physical = next;
@@ -20,7 +21,7 @@
     function clear() {
       keys.clear(); pointers.clear(); physical = {}; sampled = {}; pending = {};
       document.querySelectorAll('[data-action],[data-control="move"]').forEach(b => b.classList.remove('pressed'));
-      stickPointer = null; stickAxis = 0; if (stick) stick.style.setProperty('--stick-x', '0px');
+      stickPointer = null; stickAxis = 0; if (stick) {stick.style.setProperty('--stick-x', '0px');stick.style.setProperty('--stick-y', '0px');}
     }
     window.addEventListener('keydown', e => {
       if (editable(e.target)) return;
@@ -54,10 +55,12 @@
         const box = stick.getBoundingClientRect();
         const reach = Math.max(1, (box.width - 24) / 2);
         const delta = Math.max(-reach, Math.min(reach, e.clientX - (box.x + box.width / 2)));
-        stickAxis = delta / reach;
+        const reachY=Math.max(1,(box.height-24)/2),dy=Math.max(-reachY,Math.min(reachY,e.clientY-(box.y+box.height/2)));
+        stickAxis = delta / reach;stickVertical=dy/reachY;
         stick.style.setProperty('--stick-x', delta + 'px');
-        if (Math.abs(delta) < Math.min(6, reach * .35)) pointers.delete(e.pointerId);
-        else pointers.set(e.pointerId, delta < 0 ? 'left' : 'right');
+        stick.style.setProperty('--stick-y',dy+'px');
+        const actions=[];if(Math.abs(stickAxis)>.25)actions.push(stickAxis<0?'left':'right');if(Math.abs(stickVertical)>.25)actions.push(stickVertical<0?'up':'down');
+        if(actions.length)pointers.set(e.pointerId,actions);else pointers.delete(e.pointerId);
         sync();
       }
       stick.addEventListener('pointerdown', e => {
@@ -70,7 +73,7 @@
       const release = e => {
         if (e.pointerId !== stickPointer) return;
         pointers.delete(e.pointerId); sync(); stickPointer = null; stickAxis = 0;
-        stick.style.setProperty('--stick-x', '0px'); stick.classList.remove('pressed');
+        stickVertical=0;stick.style.setProperty('--stick-y','0px');stick.style.setProperty('--stick-x', '0px'); stick.classList.remove('pressed');
       };
       for (const event of ['pointerup','pointercancel','lostpointercapture']) stick.addEventListener(event, release);
       stick.addEventListener('contextmenu', e => e.preventDefault());
@@ -79,6 +82,7 @@
       if (stick && stickPointer !== null) {
         const reach = Math.max(1, (stick.getBoundingClientRect().width - 24) / 2);
         stick.style.setProperty('--stick-x', stickAxis * reach + 'px');
+        stick.style.setProperty('--stick-y',stickVertical*Math.max(1,(stick.getBoundingClientRect().height-24)/2)+'px');
       }
     }
     return { clear, relayout, sample() {

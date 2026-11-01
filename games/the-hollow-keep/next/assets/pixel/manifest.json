@@ -302,8 +302,77 @@
       "ledge": [
         2,
         0
+      ],
+      "ladder": [
+        3,
+        0
       ]
     }
   },
-  "background": "bg-chapel.png"
+  "background": "bg-chapel.png",
+  "objects": {
+    "door-closed": {
+      "file": "objects.png",
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 180
+    },
+    "door-open": {
+      "file": "objects.png",
+      "x": 120,
+      "y": 0,
+      "w": 120,
+      "h": 180
+    },
+    "lever-off": {
+      "file": "objects.png",
+      "x": 240,
+      "y": 0,
+      "w": 120,
+      "h": 180
+    },
+    "lever-on": {
+      "file": "objects.png",
+      "x": 360,
+      "y": 0,
+      "w": 120,
+      "h": 180
+    },
+    "light-off": {
+      "file": "objects.png",
+      "x": 480,
+      "y": 0,
+      "w": 120,
+      "h": 180
+    },
+    "light-on": {
+      "file": "objects.png",
+      "x": 600,
+      "y": 0,
+      "w": 120,
+      "h": 180
+    },
+    "key": {
+      "file": "objects.png",
+      "x": 720,
+      "y": 0,
+      "w": 120,
+      "h": 180
+    },
+    "breakable": {
+      "file": "objects.png",
+      "x": 840,
+      "y": 0,
+      "w": 120,
+      "h": 180
+    },
+    "locked-door": {
+      "file": "objects.png",
+      "x": 960,
+      "y": 0,
+      "w": 120,
+      "h": 180
+    }
+  }
 }

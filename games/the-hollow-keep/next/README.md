@@ -1,3 +1,61 @@
+# THE HOLLOW KEEP · 잔광의 성채 탐험 시범 구역
+
+기본 주소는 2단계 탐험 구역입니다. 기존 1단계 시험 방은 **[?room=test](?room=test)** 로 보존했습니다. 게임 버전 번호는 부여하지 않았습니다. 적 AI·주인공 체력/사망·저장/불러오기·콤보는 추가하지 않았습니다.
+
+## 구역과 조작
+
+8방을 상하좌우로 연결했습니다. 지하의 부서지는 벽 뒤에서 청동 열쇠를 얻어 되돌아오고, 표적 두 개를 쓰러뜨린 뒤 종탑으로 오릅니다. Noah가 높은 레버를 켜고 Ethan이 빛 장치를 켜면 다락으로 이어집니다. 다락의 레버는 시작 방의 봉인을 풀어 귀환 지름길을 만듭니다. 지도는 방문한 방만 표시하고 실제 연결 방향과 현재 방을 강조합니다. 모든 방·물건을 확인하고 성문으로 돌아오면 안내가 표시됩니다. 재미와 난이도는 사용자 판단 대기입니다.
+
+- A/D·←/→ 이동, Space/K/Z 점프, J/X 공격, Q/Tab 교대.
+- ↑/W·↓/S 사다리, E 조사, M 지도(닫기M/Esc). 사다리는 입력을 떼면 매달린 채 멈추고, 점프로 떨어집니다. 꼭대기에서↓로 내려갑니다.
+- 한쪽 발판은 아래에서 통과하고 위에 설 수 있으며, ↓+점프로 내려갑니다.
+- 모바일은 두 축 조이스틱과 점프·공격·교대·조사, 지도 버튼입니다. 버튼은 캔버스 밖 여백에 둡니다. 전체 화면은 사용자가 누를 때만 요청하며 실제 회전은 기기 확인이 필요합니다.
+- 지도 중에는 시뮬레이션이 멈춥니다. 구역 초기화·수치 변경·새로고침은 탐험 상태를 처음으로 되돌립니다. 방을 이동하는 동안에는 스위치·문·열쇠·부서진 벽·표적HP가 유지됩니다.
+- 사다리 속도는 패널의climbSpeed(Ethan2.0/Noah2.4)로 조절합니다. 기존 움직임·무기 수치는 바꾸지 않았습니다.
+
+| 위치 | 방 | 역할 |
+| --- | --- | --- |
+| 0,0 | 잔광의 성문 | 시작·되돌아오는 지름길 |
+| 0,1 | 침묵의 서고 | 지하 진입·사다리 |
+| 1,1 | 금 간 보관실 | 벽·열쇠 |
+| 1,0 | 봉인 회랑 | 열쇠 문 |
+| 2,0 | 잿빛 맹세의 홀 | 표적 처치 문 |
+| 2,-1 | 기울어진 종탑 | Noah 높은 레버 |
+| 1,-1 | 달빛 프리즘실 | Ethan 빛 장치 |
+| 0,-1 | 귀환의 다락 | 성문의 봉인 해제 |
+
+## 데이터·그림·완주 재현
+
+`areas/area1.json`은32×18칸(30단위)의8방입니다. `area1.walkthrough.json`은 두 주인공으로 모든 조건을 충족하고 시작 방에 돌아오는 **입력만의 기록**입니다(3602틱/60.0초, 교대2회). 이 시간은 스크립트 재생 시간이며 사람의 플레이 시간/난이도 평가는 아닙니다. 완주 기록은 공개 시뮬레이터에 입력을 주어 생성하며 좌표나 상태를 주입하지 않습니다.
+
+```sh
+node games/the-hollow-keep/next/tools/build-area1.cjs
+node games/the-hollow-keep/next/tools/record-area1.cjs
+python games/the-hollow-keep/next/tools/build-full-x2.py
+python games/the-hollow-keep/next/tools/build-exploration-art.py
+```
+
+그림 재생성은 위 순서로 실행합니다. 새 사다리60px칸과 `objects.png`의 문·레버·빛 장치·열쇠·부서지는 벽·잠긴 문9종을 기존64색/scale2/알파0·255에 맞췄습니다. 새 생성 원본을 밑그림으로 축소·팔레트·경계/이음새를 정리한 경로A입니다. 지시문 전문은[PROVENANCE](assets/pixel/PROVENANCE.md), 사다리 매달림은 허용된idle 대체 자세입니다. 기존 주인공/효과/배경 PNG15개와 앞3개 타일 칸은 그대로입니다.
+
+## 실행과 검증
+
+저장소 루트에서 `python -m http.server 8766 --bind 127.0.0.1` 후 `/games/the-hollow-keep/next/`를 엽니다.
+
+```sh
+node games/the-hollow-keep/next/tests/exploration-contract.cjs
+node games/the-hollow-keep/next/tests/area-data.cjs
+node games/the-hollow-keep/next/tests/exploration-edge.cjs
+CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/pixel-assets.cjs
+HK_URL=http://127.0.0.1:8766/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/exploration-browser.cjs
+HK_URL='http://127.0.0.1:8766/games/the-hollow-keep/next/?room=test' CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/browser-playtest.cjs
+```
+
+이번 결과: 탐험14/14·구역 데이터/완주8/8·추가경계8/8·그림53/53·픽셀렌더 기본/시험방 각7/7·모바일배치20/20·전체화면6/6·탐험브라우저4/4·기존시험방브라우저20/20·기존인수51/51·경계16/16·구덩이4/4·ABYSSFALL 회귀3종 통과. 원본 검사는 변경하지 않았습니다. 새 탐험브라우저 검사는 실제 앱에서 완주·방문 지도·정지·모바일입력을 확인합니다. [방별PC·지도·사다리·장치·모바일 캡처](assets/exploration-review/README.md)를 PR에 첨부합니다. Claude Code 검토·사용자 재미/난이도 및 외형 판단 대기, 실제 기기 회전 확인 필요입니다. 병합·배포하지 않았습니다.
+
+아래는 1단계/아트 제작 당시 기록이며, 수치와 대기 상태도 그 당시를 가리킵니다.
+
+---
+
 # THE HOLLOW KEEP · Foundation 시험 방
 
 픽셀아트 HD 주인공·타일 위에서 이동·점프·무기·교대를 비교하는 독립 시험 방입니다. 리뷰의 4건 수정과 모바일 화면 확대·가로 전체 화면과 도약 종류별 공중 조작 요구를 반영했으며 사용자 조작감 평가와 Claude Code 재검토를 기다립니다. 게임 버전 번호는 부여하지 않았습니다. 기존 게임과 루트 런처는 그대로입니다.
