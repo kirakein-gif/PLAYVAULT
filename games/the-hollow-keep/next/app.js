@@ -109,6 +109,7 @@
           if(event.type==='swapBlocked')notice.textContent='공간이 좁아 교대할 수 없습니다.';
           if(event.type==='hit'){const d=world.dummies.find(d=>d.id===event.target);if(d)effects.push({x:d.x,y:d.y,damage:event.damage,life:40});notice.textContent=area?`시험 표적 · 피해 ${event.damage}`:`${event.target==='near'?'가까운':'먼'} 표적 · 피해 ${event.damage}`;}
           if(event.type==='room'){effects=[];notice.textContent=area.rooms[world.roomId].hint;}
+          if(event.type==='roomBlocked')notice.textContent='건너편 통로가 막혀 있습니다. 연결된 장치를 찾아보세요.';
           if(event.type==='switch')notice.textContent='장치가 켜졌습니다. 연결된 봉쇄물이 열립니다.';
           if(event.type==='denied'){const object=world.room.objects.find(o=>o.id===event.id);notice.textContent=object?.type==='entrance'?'잠긴 출입문입니다. 인장 열쇠가 필요합니다.':'이 장치는 다른 주인공의 능력이 필요합니다.';}
           if(event.type==='pickup')notice.textContent=event.name==='sigil'?'출입문에 쓰는 인장 열쇠를 얻었습니다.':'봉쇄물에 쓰는 청동 열쇠를 얻었습니다.';

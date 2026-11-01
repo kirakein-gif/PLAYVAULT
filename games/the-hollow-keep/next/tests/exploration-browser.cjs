@@ -24,6 +24,7 @@ const codes={left:'ArrowLeft',right:'ArrowRight',up:'ArrowUp',down:'ArrowDown',j
    Object.defineProperty(window,'HKSim',{configurable:true,set(sim){const step=sim.step;sim.step=function(w,input){const ev=step(w,input);window.__simTick=w.tick;window.__roomId=w.roomId;
     const add=label=>{if(!window.__seen[label]){window.__seen[label]=true;window.__pending.push(label);}};
     const p=w.player;if(p.x>=0&&p.x+p.w<=w.room.width&&p.y>=0&&p.y+p.h<=w.room.height)add('room-'+w.roomId);
+    if(w.roomId==='nave'&&p.onGround&&p.y+p.h<200)add('upper-gallery');
     if(w.player.climbing&&input.up)add('ladder-up');if(w.player.climbing&&input.down)add('ladder-down');
     if(p.x>=0&&p.x+p.w<=w.room.width&&p.y>=0&&p.y+p.h<=w.room.height)for(const o of w.room.objects)if(o.type==='door')add((w.flags.doors[o.id]?'open-':'closed-')+o.id);
     for(const e of ev)if(e.type==='enter'&&!window.__seen['before-enter-'+e.id]){window.__seen['before-enter-'+e.id]=true;window.__captures.push({label:'before-enter-'+e.id,data:document.querySelector('canvas').toDataURL()});}
@@ -45,7 +46,7 @@ const codes={left:'ArrowLeft',right:'ArrowRight',up:'ArrowUp',down:'ArrowDown',j
    await page.keyboard.press('KeyM');await page.locator('canvas').focus();
   });
   // Return to the initial world using the actual reset button, then reproduce every tick.
-  await page.locator('#reset').click();await page.locator('canvas').focus();
+  await page.locator('#reset').click();await page.evaluate(()=>window.__simTick=HKPlaytest.snapshot().tick);await page.locator('canvas').focus();
   let previous=[];
   await check('all recorded inputs complete the real browser area without state injection',async()=>{
    for(const segment of walk.inputs){const next=segment.keys.split(',').filter(Boolean);for(const key of previous)if(!next.includes(key))await page.keyboard.up(codes[key]);for(const key of next)if(!previous.includes(key))await page.keyboard.down(codes[key]);await ticks(page,segment.ticks);previous=next;}
@@ -64,6 +65,25 @@ const codes={left:'ArrowLeft',right:'ArrowRight',up:'ArrowUp',down:'ArrowDown',j
   });
   const captures=await page.evaluate(()=>window.__captures);for(const {label,data}of captures)fs.writeFileSync(path.join(output,label+'.png'),Buffer.from(data.split(',')[1],'base64'));
   assert.equal(captures.filter(c=>c.label.startsWith('room-')).length,8);
+  await check('actual loft descent stays above the unopened seal, then passes after its lever',async()=>{
+   await page.locator('#reset').click();await page.evaluate(()=>window.__simTick=HKPlaytest.snapshot().tick);await page.locator('canvas').focus();let held=[];
+   for(const segment of walk.inputs){
+    const next=segment.keys.split(',').filter(Boolean);for(const key of held)if(!next.includes(key))await page.keyboard.up(codes[key]);for(const key of next)if(!held.includes(key))await page.keyboard.down(codes[key]);await ticks(page,segment.ticks);held=next;
+    if(await page.evaluate(()=>HKPlaytest.snapshot().roomId==='loft'))break;
+   }
+   for(const key of held)await page.keyboard.up(codes[key]);await ticks(page,12);
+   assert.equal(await page.evaluate(()=>!!HKPlaytest.flags().doors['return-seal']),false);
+   async function moveTo(x){let state=await page.evaluate(()=>HKPlaytest.snapshot());const direction=state.player.x+state.player.w/2<x?'right':'left';await page.keyboard.down(codes[direction]);let reached=false;
+    for(let i=0;i<800;i++){await ticks(page,1);state=await page.evaluate(()=>HKPlaytest.snapshot());if(Math.abs(state.player.x+state.player.w/2-x)<4){reached=true;break;}}
+    await page.keyboard.up(codes[direction]);await ticks(page,12);assert.ok(reached,'move to '+x);
+   }
+   await moveTo(195);await press(page,'ArrowDown',200);
+   assert.equal(await page.evaluate(()=>HKPlaytest.snapshot().roomId),'loft');assert.equal(await page.evaluate(()=>!!HKPlaytest.flags().doors['return-seal']),false);
+   await page.screenshot({path:path.join(output,'sealed-ladder-blocked.png')});
+   await page.keyboard.down('ArrowRight');await press(page,'Space',40);await page.keyboard.up('ArrowRight');await ticks(page,60);
+   await moveTo(495);await press(page,'KeyE',1);await ticks(page,2);assert.equal(await page.evaluate(()=>HKPlaytest.flags().doors['return-seal']),true);
+   await moveTo(195);await press(page,'ArrowDown',100);assert.equal(await page.evaluate(()=>HKPlaytest.snapshot().roomId),'gate');await page.screenshot({path:path.join(output,'sealed-ladder-open.png')});
+  });
   await context.close();
   const mobile=await open(true);await ticks(mobile.page,1);
   await check('780x330 mobile map button and two-axis joystick/interact buttons reach simulation',async()=>{

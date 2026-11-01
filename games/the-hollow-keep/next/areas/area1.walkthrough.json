@@ -119,7 +119,47 @@
     },
     {
       "keys": "right",
-      "ticks": 435
+      "ticks": 143
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "up",
+      "ticks": 180
+    },
+    {
+      "keys": "right",
+      "ticks": 145
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "right",
+      "ticks": 43
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "down",
+      "ticks": 75
+    },
+    {
+      "keys": "left",
+      "ticks": 92
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "right",
+      "ticks": 196
     },
     {
       "keys": "",
@@ -143,7 +183,7 @@
     },
     {
       "keys": "right",
-      "ticks": 199
+      "ticks": 200
     },
     {
       "keys": "",
