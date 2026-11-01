@@ -234,3 +234,7 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 
 - 규격·검사만(게임 코드·그림·버전 변경 없음). 사용자 결정: 반복 조각 모자이크로 화면·방 다양성, 봉인 통과 수정.
 - `TILE_MOSAIC_SPEC.md`, `CODEX_TASK_07.md`, `tile-mosaic-render.cjs`(7), exploration-contract +2, area-data·pixel-assets 보강. PR #14 위에서 Codex 구현 대기.
+
+## THE HOLLOW KEEP · 사다리 위 행동·오르기 동작 규격 (2026-11-01, Asia/Seoul)
+
+- 규격·검사만. 점프 후 재매달림 금지, 옆 바닥으로 내리기, 매달린 채 공격 방향, climb 동작. `LADDER_ACTIONS_SPEC.md`, `CODEX_TASK_08.md`, `ladder-actions.cjs`(8), `ladder-render.cjs`(7). Codex 구현 대기.

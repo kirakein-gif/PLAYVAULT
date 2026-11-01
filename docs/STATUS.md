@@ -3,6 +3,10 @@
 확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Codex**(CODEX_TASK_06 구현 제출).
 
 
+## 제출 · THE HOLLOW KEEP 사다리 위 행동·오르기 동작 규격 / Codex 구현 대기
+
+Claude Code / `claude/hollow-keep-tile-mosaic`(PR #15) / 2026-11-01. 사용자 의견: 사다리에서 점프·공격·옆 층 이동 불가, 오르기 동작 필요. 범위: `LADDER_ACTIONS_SPEC.md`, `CODEX_TASK_08.md`, `tests/ladder-actions.cjs`(8), `tests/ladder-render.cjs`(7), `pixel-assets.cjs`(climb). PR #14 현재 구현 기준 ladder-actions 0/8, ladder-render 3/7, pixel-assets climb 없음(예상). PR #14 모자이크 재검토는 통과(관찰 3건), 병합 대기.
+
 ## 제출 · THE HOLLOW KEEP 타일 모자이크 규격 + 봉인 통과 수정 지시 / Codex 구현 대기
 
 Claude Code / `claude/hollow-keep-tile-mosaic` / 기준: PR #14 `193149a` / 2026-11-01. 사용자 결정: 봉인 통과는 Codex 수정, 다양성은 픽셀 스타일의 반복 조각 모자이크. 범위: `TILE_MOSAIC_SPEC.md`, `CODEX_TASK_07.md`, `tests/tile-mosaic-render.cjs`(새 7개), `exploration-contract.cjs`(방 이동 겹침 금지 2개 추가 → 16개), `area-data.cjs`(back 격자·V1~V4), `pixel-assets.cjs`(모자이크 조각 17종), DESIGN_DIRECTION. 게임 코드·그림 변경 없음.

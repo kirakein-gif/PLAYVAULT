@@ -1033,3 +1033,16 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: 사용자 미리보기 확인 → 승인 시 PR #15 → PR #14 병합.
 - 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-01 (Asia/Seoul) · 사다리 위 행동·오르기 동작 규격
+
+- 담당 AI: Claude Code(규격·검사). 구현 담당: Codex.
+- 사용자 의견(PR #14 미리보기): 사다리에서 점프·공격 등이 안 됨, 옆 층으로 넘어갈 수 있어야 함, 오르기 동작 필요.
+- 원인 확인(PR #14 `sim.js`): 점프 자체는 되지만 ↑(조이스틱 위)를 누른 채면 다음 틱에 다시 매달림(20틱 내내 매달림 확인). 매달린 동안 ←/→ 무시(바닥 높이에서도 내리지 못함), 공격 판정은 생기나 방향 전환 불가. 그림은 idle 대체(2단계 규격이 허용했던 것 — 규격 측 한계).
+- 변경(`claude/hollow-keep-tile-mosaic`, PR #15): `LADDER_ACTIONS_SPEC.md`(L1 점프 후 16틱 재매달림 금지, L2 옆 바닥·한쪽 발판으로 내리기, L3 매달린 채 공격·방향, climb 4프레임 이상·오른 거리로 프레임), `CODEX_TASK_08.md`, `tests/ladder-actions.cjs`(8), `tests/ladder-render.cjs`(7), `pixel-assets.cjs`(climb 필수·loop·프레임 다름), DESIGN_DIRECTION.
+- 검증(저장소 밖 참조 구현, 커밋 안 함): PR #14 `sim.js`에 L1~L3을 넣은 참조에서 ladder-actions 8/8, exploration-contract 16/16, foundation 51/51, entrance 9/9. 결함 변형 7종 모두 검출(재매달림 금지 없음·8틱, 내리기 없음, 방향 전환 없음, 높이 무관 내리기, 한쪽 발판 무시, 공격 시 떨어짐). ladder-render: 참조 렌더러(climb 시트·거리 기반 프레임)에서 7/7, 시간 기반 프레임·고정 프레임 변형 검출. PR #14 현재 구현은 ladder-actions 0/8, ladder-render 3/7.
+- 작성 중 바로잡은 검사 결함(Claude Code): ① L1에서 점프를 떼어 짧은 점프(34)가 되는데 40 상승을 요구 → 점프를 누르고 있게 수정 ② 결함 변형 하나가 다른 위치(createArea)를 바꿔 무효 → 대상 줄로 수정 ③ 합성 climb 시트가 idle과 같은 파일이라 구분 불가 → 별도 파일로.
+- 검토 담당 / 발견 문제 수: 사용자 발견 3건(점프 재매달림, 옆 이동 불가, 오르기 동작 없음).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex `CODEX_TASK_08.md`(PR #14) → Claude Code 검토 → 승인 시 PR #15 → PR #14 병합.
+- 종료 상태: 규격 제출.
