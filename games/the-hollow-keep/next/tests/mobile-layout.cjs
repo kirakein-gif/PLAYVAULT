@@ -62,8 +62,9 @@ const area = (a, b) => Math.max(0, Math.min(a.right, b.right) - Math.max(a.left,
       // 이동은 좌/우 버튼([data-action=left|right]) 또는 한 축 조이스틱([data-control=move]) 중 하나
       const moveStick = m.move.find((x) => x.visible);
       const controls = [...m.buttons.filter((b) => b.visible), ...(moveStick ? [moveStick] : [])];
-      check('조작(이동·점프·공격·교대)이 보이고 화면 안에 있으며 최소 44px', () => {
-        const need = moveStick ? ['move', 'jump', 'attack', 'swap'] : ['left', 'right', 'jump', 'attack', 'swap'];
+      check('조작(이동·점프·공격·교대·조사)이 보이고 화면 안에 있으며 최소 44px', () => {
+        // interact(조사): EXPLORATION_SPEC §5
+        const need = moveStick ? ['move', 'jump', 'attack', 'swap', 'interact'] : ['left', 'right', 'jump', 'attack', 'swap', 'interact'];
         for (const a of need) {
           const b = controls.find((x) => x.action === a);
           assert.ok(b, `${a} 조작이 보이지 않음`);

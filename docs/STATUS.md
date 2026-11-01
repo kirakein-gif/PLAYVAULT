@@ -8,7 +8,9 @@
 - 현재 기본 자산: `games/the-hollow-keep/next/assets/pixel/` scale 2(136px), 타일 60px, 64색, Ethan·Noah 동작 6종, 룬탄·베기 효과(한 획), 배경 1920×1080.
 - 시험본 삭제: `assets/pixel-trial/`, `?art=trial-x1|x2` 전환, `tests/density-trial.cjs`, `tools/build-density-trial.py`. `build-full-x2.py`가 출발점으로 쓰는 x2 재료만 `tools/art-source/density-trial-x2/`로 옮김. 옮긴 뒤 생성 스크립트 결과가 커밋된 자산과 바이트 단위로 동일함을 확인. 검토 캡처 `assets/pixel-review/`는 유지(사용자 지시 범위 밖).
 - 병합 결과 검사: pixel-assets 51/51, pixel-render 7/7, 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, ABYSSFALL 회귀 3종 통과.
-- 진행 중 작업: 없음. 다음 후보: 2단계 탐험 구조(방 연결·지도·장치, 30칸 격자), Noah 3단 콤보(보류). 사용자 결정 대기.
+- 진행 중 작업: **2단계 탐험 구조 규격** — Claude Code / `claude/hollow-keep-exploration-spec` / 2026-11-01 / `games/the-hollow-keep/docs/EXPLORATION_SPEC.md`·`CODEX_TASK_05.md`, `next/tests/exploration-contract.cjs`·`area-data.cjs`, `pixel-assets.cjs`·`mobile-layout.cjs` 보강(게임 코드 변경 없음). 다음 담당: Codex(`codex/hollow-keep-exploration`).
+- 2단계 사용자 결정(2026-11-01): 상하좌우 4방향, 길 여는 방법 전부(+특정 적 처치 → 이번에는 시험 표적), 시범 구역 8~12방, 적 없음.
+- 주의: 이 규격 PR이 병합되면 Codex 구현 전까지 `pixel-assets`(ladder·objects)와 `mobile-layout`(조사 버튼)이 실패한다. 1단계·픽셀 기준 PR과 같은 방식으로, 구현 PR과 함께 병합하는 것을 권장.
 
 
 ## PR #2·#3·#4·#5 병합 완료 · 다음: THE HOLLOW KEEP 픽셀아트 HD 아트 기준

@@ -889,3 +889,22 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: 사용자 결정 — 2단계 탐험 구조 또는 Noah 3단 콤보.
 - 종료 상태: 병합 PR 제출 후 병합.
+
+### 2026-11-01 (Asia/Seoul) · THE HOLLOW KEEP 2단계 탐험 구조 규격과 자동 검사
+
+- 담당 AI: Claude Code(규격·검사). 구현 담당: Codex.
+- 사용자 결정: 상하좌우 4방향, 길 여는 방법 전부 + "특정 적 처치"(적이 없으므로 시험 표적으로 대신, 3단계에서 교체), 시범 구역 8~12방, 적 없음.
+- 기준 / 브랜치: main `d532537` / `claude/hollow-keep-exploration-spec`. 게임 코드 변경 없음, 버전 변경 없음.
+- 변경:
+  - `EXPLORATION_SPEC.md`: 32×18칸 격자(. # - H), 4방향 방 이동, 사다리(climbSpeed), 한쪽 발판, 물건(door/switch/key/breakable/target)과 문 조건(switch/key/cleared), 캐릭터 전용 스위치, 상태 유지, 입력(up/down/interact, 두 축 조이스틱, 조사·지도), 계약(getMap/getFlags/이벤트), 구역 데이터 형식, 시범 구역 필수 요소, 완주 기록, 그림 요구(사다리 칸·물건 9종)
+  - `exploration-contract.cjs`(14개), `area-data.cjs`(형식·연결·시작 위치·물건·필수 요소·완주 재생), `pixel-assets.cjs`(ladder 칸·objects 9종), `mobile-layout.cjs`(조사 버튼), `CODEX_TASK_05.md`, `DESIGN_DIRECTION.md`·STATUS 갱신
+- 검증(저장소 밖 임시 참조 구현 — 실제 `sim.js`를 감싼 것, 커밋 안 함):
+  - exploration-contract 14/14, 같은 구현에서 foundation-contract 51/51(한 방 모드 호환)
+  - 결함 변형 9종 모두 검출: 전용 장치 제한 없음, 열쇠 미소모, 한쪽 발판이 아래에서 막힘, 매달려도 중력, 방 이동 시 문 상태 초기화, 표적 하나로 열림, 방 이동 이벤트 없음, ↓+점프 내려가기 없음
+  - area-data: 2방 합성 구역을 스크립트로 플레이하며 입력을 기록한 완주 기록이 6/6(재생 920틱). 결함 8종(기록이 시작 방으로 안 돌아옴, 교대 없음, 이웃 없는 열린 가장자리, 한쪽만 열린 칸, 잘못된 문자, 벽과 겹친 시작 위치, 없는 스위치 참조, id 중복) 및 필수 요소 누락 검출
+  - pixel-assets: 합성 scale 2 자산 + 사다리·물건 58/58, 팔레트 밖 색·그림 누락 검출. 현재 main 자산은 50/52(ladder·objects 없음, 예상)
+- 작성 중 바로잡은 검사 결함(Claude Code): ① 오른쪽 이동 검사가 구멍에 먼저 빠지는 배치 → 출발 위치 변경 ② 한쪽 발판 검사가 머리와 이미 겹친 높이라 '아래에서 막힘' 결함을 못 잡음 → 13행으로 이동 ③ 세로 연결 판정 괄호 누락 ④ 표적 처치를 스냅샷 문자열에서 정규식으로 찾던 방식 → `getFlags().cleared` 계약으로 교체.
+- 검토 담당 / 발견 문제 수: 사용자 검토 대기.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 PR 확인 → Codex가 `CODEX_TASK_05.md`로 구현 → Claude Code 검토.
+- 종료 상태: 규격 제출.
