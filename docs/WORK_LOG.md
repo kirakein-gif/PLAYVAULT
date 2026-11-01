@@ -965,3 +965,16 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex `CODEX_TASK_06.md`(기준 main) → Claude Code 검토.
 - 종료 상태: 병합 완료.
+
+### 2026-11-01 (Asia/Seoul) · Codex 2단계 보완 구현(PR #14) 검토
+
+- 담당 AI: Claude Code(검토). 구현: Codex `codex/hollow-keep-exploration-refine` `193149a`.
+- 범위: 검사·규격 원본은 main과 동일. exploration-edge·exploration-browser는 새 구역에 맞게 위치를 데이터에서 읽도록 고쳤고 확인 항목은 늘었음(약화 없음). 기존 게임·공용 자산 변경 없음.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): entrance-contract 9/9, area-data 17/17(완주 3671틱·교대 2회), pixel-assets 55/55, exploration-contract 14/14, exploration-edge 11/11, foundation-contract 51/51, foundation-edge 16/16, room-traversal 4/4, pixel-render 구역·시험 방 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 5/5, browser-playtest(`?room=test`) 20/20, ABYSSFALL 회귀 3종 통과.
+- 무작위 입력 검사(시작 346곳, 51.9만 틱): 1건. loft 사다리로 내려가면 닫힌 `return-seal`(gate 1행)을 통과. 방 이동 직후 몸이 봉인과 이미 겹치고, `move()`는 처음부터 겹친 물체를 막지 않음. PR #11(봉인 3행)에는 없던 문제. 방 이동 직후 겹침 검사로 고치도록 제안.
+- 관찰(사용자 판단): 8방이 같은 3층 뼈대와 같은 사다리 열을 씀. 다양성 기준이 규격에 없던 것은 Claude Code의 규격 누락. 배경 창이 벽 띠에 잘림. 원본 그림 1.8MB·캡처 824KB 추가.
+- Git/PR: [PR #14 검토](https://github.com/kirakein-gif/PLAYVAULT/pull/14) (COMMENT). 미리보기 `https://8aa93ab3.kirakein-playvault.pages.dev/games/the-hollow-keep/next/`.
+- 검토 담당 / 발견 문제 수: Claude Code / 1건(봉쇄물 통과) + 관찰 3건.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 미리보기 확인 → 봉인 통과 수정(Codex) 여부·방 다양성 기준 추가 여부 결정.
+- 종료 상태: 검토 완료, 사용자 판단 대기.
