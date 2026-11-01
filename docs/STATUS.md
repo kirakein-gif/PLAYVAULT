@@ -2,6 +2,10 @@
 
 확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Codex**(CODEX_TASK_06 구현 제출).
 
+## 진행 중 · CODEX_TASK_07 봉인 이동 겹침·타일 모자이크·사다리
+
+Codex / `codex/hollow-keep-exploration-refine` / 같은 PR #14 / 기준193149a + 규격origin/claude/hollow-keep-tile-mosaic(0bc593d) / 2026-11-01. 범위: next/ 이동 겹침 수정, 모자이크 타일·사다리·렌더러,8방 V1~V4/완주·자체 검사/캡처, README·관리 문서. 요청된 규격 브랜치를 병합하고 PR을Draft로 전환. 1단계 수치·크기·원본 인수 검사·기존 게임/공용 자산 보존. 다음 Claude Code 검토, 사용자 재미/외형 판단. 병합·배포 없음.
+
 ## 구현 제출 · CODEX_TASK_06 / Claude Code 검토 대기
 
 Codex / `codex/hollow-keep-exploration-refine` / [PR #14](https://github.com/kirakein-gif/PLAYVAULT/pull/14) / 기준 **main1588a46**, 착수8b3654c, 마지막 구현·검증 SHA **e8e041e** / 2026-11-01. 지시서에도 main 우선 정정 한 줄을 추가했습니다. 출입문 두 쌍(먼 방 연결·잠금 포함), 봉쇄물 반복 격자와 방법 기호, 8방 세 층/밀도 D1~D6, 숨은 열쇠·막히지 않은 우회로를 구현했습니다. 입력 완주는3671틱/61.2초·61구간·교대2회입니다. 기존 시험 방은?room=test, CONFIG·캐릭터 크기·화면 크기는 그대로입니다.
