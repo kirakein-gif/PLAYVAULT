@@ -21,7 +21,7 @@ const SIM = require(path.join(NEXT, 'sim.js'));
 const BASE_TILE = 30;
 let SCALE = 1, TILE = BASE_TILE;
 const MAX_COLORS = 64;
-const FULL = { idle: 4, run: 6, 'jump-standing': 3, 'jump-running': 3, land: 2, attack: 4 };
+const FULL = { idle: 4, run: 6, 'jump-standing': 3, 'jump-running': 3, land: 2, attack: 4, climb: 4 }; // climb: LADDER_ACTIONS_SPEC §3
 const TRIAL = process.env.HK_ART_REQUIRE || '';
 const REQUIRE_BY_HERO = { ethan: FULL, noah: FULL };
 if (TRIAL) {
@@ -184,7 +184,7 @@ async function analyze(page, file, opts) {
         if (!name.startsWith('jump-') || a.ticks !== undefined) {
           assert.ok(Array.isArray(a.ticks) && a.ticks.length === a.frames && a.ticks.every(isInt), `${name} ticks는 프레임 수만큼의 양의 정수`);
         }
-        if (name === 'idle' || name === 'run') assert.equal(a.loop, true, `${name}.loop는 true`);
+        if (name === 'idle' || name === 'run' || name === 'climb') assert.equal(a.loop, true, `${name}.loop는 true`);
         if (name === 'attack') assert.ok(a.ticks[0] <= 2, `attack 첫(준비) 프레임 ${a.ticks[0]}틱 > 2틱 — 판정은 누르는 즉시 생기므로 휘두르기 전에 피해가 먼저 보임`);
         assert.ok(/\.png$/i.test(a.file || ''), `${name} 파일은 .png`);
       }
@@ -233,6 +233,12 @@ async function analyze(page, file, opts) {
           if (once) assert.notEqual(s.a.loop, true, `${s.name}.loop가 true(같은 효과가 반복 재생됨)`);
           if (once) r.parts.forEach((n, i) => assert.equal(n, 1, `${i}번 프레임이 한 획이 아님: 6픽셀 이상 덩어리 ${n}개(떨어진 평행선·조각은 두 줄로 보임)`));
           r.frameHashes.forEach((hsh, i) => { if (i) assert.notEqual(hsh, r.frameHashes[i - 1], `${i - 1}·${i}번 프레임이 같은 그림`); });
+        });
+      }
+      if (s.name === 'climb') {
+        check(`${s.label}: 이웃 프레임 그림이 다름(손발이 번갈아 움직이는 오르기 동작)`, () => {
+          r.frameHashes.forEach((hsh, i) => { if (i) assert.notEqual(hsh, r.frameHashes[i - 1], `${i - 1}·${i}번 프레임이 같은 그림`); });
+          assert.notEqual(r.frameHashes[0], r.frameHashes[r.frameHashes.length - 1], '첫·마지막 프레임이 같아 반복할 때 멈춰 보임');
         });
       }
       if (GROUNDED.includes(s.name)) {

@@ -1,8 +1,17 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Codex**(CODEX_TASK_07 수정 제출).
+확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #15·#14 병합, 사다리 작업 새 브랜치 지시).
 
-## 수정 제출 · CODEX_TASK_07 모자이크·봉인·사다리 / Claude Code 재검토 대기
+## 병합 완료 · PR #15 → PR #14 (2026-11-01) / 다음: Codex 사다리 작업(새 브랜치)
+
+사용자 승인("지금 병합하고 새 브랜치로 진행해 주세요"). PR #14를 main에 병합(`27f6110`, PR #15 규격 `0bc593d`까지 포함). PR #15는 그 head가 PR #14에 먼저 병합되어 이미 닫혀 있었으므로, 이후 커밋(사다리 행동 규격·검사, 재검토 기록)은 `claude/hollow-keep-tile-mosaic` 새 PR로 main에 병합. 사다리 행동·climb 동작은 새 브랜치 `codex/hollow-keep-ladder-actions`(기준 main)에서 `CODEX_TASK_08.md`로 진행.
+- 주의: main에서 ladder-actions 0/8, ladder-render 3/7, pixel-assets climb 없음은 Codex 구현 전까지 예상된 실패.
+
+## 제출 · THE HOLLOW KEEP 사다리 위 행동·오르기 동작 규격 / Codex 구현 대기(새 브랜치)
+
+Claude Code / `claude/hollow-keep-tile-mosaic`(PR #15) / 2026-11-01. 사용자 의견: 사다리에서 점프·공격·옆 층 이동 불가, 오르기 동작 필요. 범위: `LADDER_ACTIONS_SPEC.md`, `CODEX_TASK_08.md`, `tests/ladder-actions.cjs`(8), `tests/ladder-render.cjs`(7), `pixel-assets.cjs`(climb). PR #14 현재 구현 기준 ladder-actions 0/8, ladder-render 3/7, pixel-assets climb 없음(예상). PR #14 모자이크 재검토 통과(관찰 3건) 후 병합됨.
+
+## 병합됨 · CODEX_TASK_07 모자이크·봉인·사다리 (PR #14)
 
 Codex / `codex/hollow-keep-exploration-refine` / 같은 [PR #14](https://github.com/kirakein-gif/PLAYVAULT/pull/14) / 기준193149a, 착수880ce32, 요청 규격0bc593d 병합76bb9c6 / 마지막 구현·검증 SHA **f40d0f1**, 2026-11-01. PR을Draft로 돌린 뒤 봉인 이동 겹침·60px 모자이크·8방 모양/장식·밝은 사다리를 함께 보완했습니다. 닫힌 출구는 이전 방 경계에서 안정적으로 멈추며, 레버를 켜면 통과합니다. 사다리는 가로대3개/7·7·6px/뒷벽 대비8.11:1. 방 쌍의 벽 위치 차이는 최소73칸, 사다리 열 조합은8개 모두 다릅니다.
 

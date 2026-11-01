@@ -1038,3 +1038,42 @@
 - 제출캡처:17장, 실제8방·모바일780×330·봉인 막힘/열림·새 상층·지도·사다리. 원본PNG와RGBA 바이트 동일한 무손실WebP 총1629520바이트. 이전 캡처는 보존했습니다. 새 캡처와재현은next/assets/tile-mosaic-review/README.md 및pack-mosaic-review.py.
 - 5개관리문서 검토: STATUS/WORK_LOG/CHANGELOG 갱신, AGENTS/CLAUDE 규칙 변경 없음. 루트README 변경 필요 없음, nextREADME/PROVENANCE 갱신. 기존 게임·공용자산·런처·다른게임·CONFIG·캐릭터크기/화면크기·1단계 시험방 원본은 변경하지 않았습니다.
 - 검토 담당/발견 문제 수: Claude Code / 이번 재검토 전 미확인. 직전PR14의 봉인 통과 지적1건과 사용자의 사다리 읽힘 지적을 함께 반영했습니다. 사용자 재요청: task07 착수 후0회(이번은task06 제출 후 보완 요청). 다음: 같은PR14 Ready→Claude Code재검토→사용자 재미/외형 판단. 실기기 회전 확인 필요. main/PR 병합·배포하지 않음.
+
+### 2026-11-01 (Asia/Seoul) · Codex 모자이크·봉인 수정·사다리(PR #14 `6fdcc52`) 재검토
+
+- 담당 AI: Claude Code(검토). 구현: Codex `f40d0f1`(+기록 `6fdcc52`), PR #15 규격 `0bc593d` 병합 포함.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): exploration-contract 16/16, entrance 9/9, foundation-contract 51/51, area-data 22/22(완주 4159틱·교대 2회), pixel-assets 57/57, tile-mosaic-render 7/7, pixel-render 구역·시험 방 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest(`?room=test`) 20/20, foundation-edge 16/16, room-traversal 4/4, exploration-edge 13/13, ABYSSFALL 회귀 3종 통과. 검사 원본 변경 없음.
+- 무작위 입력(시작 314곳, 47.1만 틱): 겹침 0건(이전 1건 해결).
+- 화면: 사다리 가로대 식별 가능(Codex 측정 가로대 3개·대비 8.11:1). 벽 가장자리·장식 조각·방마다 다른 모양 확인.
+- 관찰(차단 아님): 종탑 한쪽 발판이 어두운 틈처럼 보이고 장식이 발판 뒤로 이어짐(가독성 확인 필요). 장식 배치가 두 종 나란히 붙은 같은 패턴. 캡처 1.6MB·원본 그림 1.8MB 추가.
+- Git/PR: [PR #14 재검토](https://github.com/kirakein-gif/PLAYVAULT/pull/14) (COMMENT). 미리보기 `https://463bfd68.kirakein-playvault.pages.dev/games/the-hollow-keep/next/`.
+- 검토 담당 / 발견 문제 수: Claude Code / 0건(관찰 3건).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 미리보기 확인 → 승인 시 PR #15 → PR #14 병합.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-01 (Asia/Seoul) · 사다리 위 행동·오르기 동작 규격
+
+- 담당 AI: Claude Code(규격·검사). 구현 담당: Codex.
+- 사용자 의견(PR #14 미리보기): 사다리에서 점프·공격 등이 안 됨, 옆 층으로 넘어갈 수 있어야 함, 오르기 동작 필요.
+- 원인 확인(PR #14 `sim.js`): 점프 자체는 되지만 ↑(조이스틱 위)를 누른 채면 다음 틱에 다시 매달림(20틱 내내 매달림 확인). 매달린 동안 ←/→ 무시(바닥 높이에서도 내리지 못함), 공격 판정은 생기나 방향 전환 불가. 그림은 idle 대체(2단계 규격이 허용했던 것 — 규격 측 한계).
+- 변경(`claude/hollow-keep-tile-mosaic`, PR #15): `LADDER_ACTIONS_SPEC.md`(L1 점프 후 16틱 재매달림 금지, L2 옆 바닥·한쪽 발판으로 내리기, L3 매달린 채 공격·방향, climb 4프레임 이상·오른 거리로 프레임), `CODEX_TASK_08.md`, `tests/ladder-actions.cjs`(8), `tests/ladder-render.cjs`(7), `pixel-assets.cjs`(climb 필수·loop·프레임 다름), DESIGN_DIRECTION.
+- 검증(저장소 밖 참조 구현, 커밋 안 함): PR #14 `sim.js`에 L1~L3을 넣은 참조에서 ladder-actions 8/8, exploration-contract 16/16, foundation 51/51, entrance 9/9. 결함 변형 7종 모두 검출(재매달림 금지 없음·8틱, 내리기 없음, 방향 전환 없음, 높이 무관 내리기, 한쪽 발판 무시, 공격 시 떨어짐). ladder-render: 참조 렌더러(climb 시트·거리 기반 프레임)에서 7/7, 시간 기반 프레임·고정 프레임 변형 검출. PR #14 현재 구현은 ladder-actions 0/8, ladder-render 3/7.
+- 작성 중 바로잡은 검사 결함(Claude Code): ① L1에서 점프를 떼어 짧은 점프(34)가 되는데 40 상승을 요구 → 점프를 누르고 있게 수정 ② 결함 변형 하나가 다른 위치(createArea)를 바꿔 무효 → 대상 줄로 수정 ③ 합성 climb 시트가 idle과 같은 파일이라 구분 불가 → 별도 파일로.
+- 검토 담당 / 발견 문제 수: 사용자 발견 3건(점프 재매달림, 옆 이동 불가, 오르기 동작 없음).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex `CODEX_TASK_08.md`(PR #14) → Claude Code 검토 → 승인 시 PR #15 → PR #14 병합.
+- 종료 상태: 규격 제출.
+
+### 2026-11-01 (Asia/Seoul) · PR #15·#14 병합, 사다리 작업 새 브랜치
+
+- 담당 AI: Claude Code. 사용자 지시: "지금 병합하고 새 브랜치로 진행해 주세요".
+- 순서: PR #15 브랜치에 PR #14 head `6fdcc52`를 병합해 관리 문서 충돌(STATUS·WORK_LOG·CHANGELOG, 양쪽 추가)을 시간순으로 정리 → PR #15 병합 시도 → PR #14를 main에 병합(`27f6110`) → 이 브랜치를 새 PR로 main에 병합.
+- **확인된 일:** PR #15는 Codex가 그 head(`0bc593d`)를 PR #14 브랜치에 병합한 시점(`76bb9c6`)에 GitHub가 이미 병합된 것으로 닫아 두었다. 그래서 병합 요청이 성공으로 응답했지만 그 뒤 커밋(재검토 기록·사다리 규격·병합 정리)은 PR #14 브랜치에 들어가지 않았다. 브랜치 이력으로 확인 후 새 PR로 보냄. 이후 규격 PR을 구현 브랜치가 먼저 병합하는 경우, 추가 커밋은 새 PR로 보낸다.
+- 정리 원칙: WORK_LOG·CHANGELOG는 Codex CODEX_TASK_07 제출 → Claude Code 재검토 → 사다리 규격 순. STATUS는 최신(병합·사다리 다음 작업)을 위에, Codex 제출 내용은 "병합됨" 절로 보존.
+- `CODEX_TASK_08.md`: 작업 브랜치를 PR #14 대신 main 기준 새 브랜치 `codex/hollow-keep-ladder-actions`로 변경.
+- 병합 전 확인(통합 트리): exploration-contract 16/16, entrance 9/9, foundation-contract 51/51, area-data 22/22, exploration-edge 13/13, foundation-edge 16/16, tile-mosaic-render 7/7, pixel-render 7/7, mobile-layout 20/20, mobile-fullscreen 6/6. 예상 실패: ladder-actions 0/8, ladder-render 3/7, pixel-assets 55/57(climb 없음) — CODEX_TASK_08 대상.
+- 검토 담당 / 발견 문제 수: 해당 없음(병합 작업).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex `CODEX_TASK_08.md`(새 브랜치) → Claude Code 검토.
+- 종료 상태: 병합 진행.
