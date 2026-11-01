@@ -1068,7 +1068,8 @@
 ### 2026-11-01 (Asia/Seoul) · PR #15·#14 병합, 사다리 작업 새 브랜치
 
 - 담당 AI: Claude Code. 사용자 지시: "지금 병합하고 새 브랜치로 진행해 주세요".
-- 순서: PR #15 브랜치에 PR #14 head `6fdcc52`를 병합해 관리 문서 충돌(STATUS·WORK_LOG·CHANGELOG, 양쪽 추가)을 시간순으로 정리 → PR #15를 PR #14 브랜치에 병합 → PR #14를 main에 병합.
+- 순서: PR #15 브랜치에 PR #14 head `6fdcc52`를 병합해 관리 문서 충돌(STATUS·WORK_LOG·CHANGELOG, 양쪽 추가)을 시간순으로 정리 → PR #15 병합 시도 → PR #14를 main에 병합(`27f6110`) → 이 브랜치를 새 PR로 main에 병합.
+- **확인된 일:** PR #15는 Codex가 그 head(`0bc593d`)를 PR #14 브랜치에 병합한 시점(`76bb9c6`)에 GitHub가 이미 병합된 것으로 닫아 두었다. 그래서 병합 요청이 성공으로 응답했지만 그 뒤 커밋(재검토 기록·사다리 규격·병합 정리)은 PR #14 브랜치에 들어가지 않았다. 브랜치 이력으로 확인 후 새 PR로 보냄. 이후 규격 PR을 구현 브랜치가 먼저 병합하는 경우, 추가 커밋은 새 PR로 보낸다.
 - 정리 원칙: WORK_LOG·CHANGELOG는 Codex CODEX_TASK_07 제출 → Claude Code 재검토 → 사다리 규격 순. STATUS는 최신(병합·사다리 다음 작업)을 위에, Codex 제출 내용은 "병합됨" 절로 보존.
 - `CODEX_TASK_08.md`: 작업 브랜치를 PR #14 대신 main 기준 새 브랜치 `codex/hollow-keep-ladder-actions`로 변경.
 - 병합 전 확인(통합 트리): exploration-contract 16/16, entrance 9/9, foundation-contract 51/51, area-data 22/22, exploration-edge 13/13, foundation-edge 16/16, tile-mosaic-render 7/7, pixel-render 7/7, mobile-layout 20/20, mobile-fullscreen 6/6. 예상 실패: ladder-actions 0/8, ladder-render 3/7, pixel-assets 55/57(climb 없음) — CODEX_TASK_08 대상.

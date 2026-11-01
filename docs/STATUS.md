@@ -4,7 +4,7 @@
 
 ## 병합 완료 · PR #15 → PR #14 (2026-11-01) / 다음: Codex 사다리 작업(새 브랜치)
 
-사용자 승인("지금 병합하고 새 브랜치로 진행해 주세요"). PR #15(규격·검사: 모자이크, 방 이동 겹침, 사다리 읽힘, 사다리 행동)를 PR #14 브랜치에 병합한 뒤 PR #14를 main에 병합. 사다리 행동·climb 동작은 새 브랜치 `codex/hollow-keep-ladder-actions`(기준 main)에서 `CODEX_TASK_08.md`로 진행.
+사용자 승인("지금 병합하고 새 브랜치로 진행해 주세요"). PR #14를 main에 병합(`27f6110`, PR #15 규격 `0bc593d`까지 포함). PR #15는 그 head가 PR #14에 먼저 병합되어 이미 닫혀 있었으므로, 이후 커밋(사다리 행동 규격·검사, 재검토 기록)은 `claude/hollow-keep-tile-mosaic` 새 PR로 main에 병합. 사다리 행동·climb 동작은 새 브랜치 `codex/hollow-keep-ladder-actions`(기준 main)에서 `CODEX_TASK_08.md`로 진행.
 - 주의: main에서 ladder-actions 0/8, ladder-render 3/7, pixel-assets climb 없음은 Codex 구현 전까지 예상된 실패.
 
 ## 제출 · THE HOLLOW KEEP 사다리 위 행동·오르기 동작 규격 / Codex 구현 대기(새 브랜치)
