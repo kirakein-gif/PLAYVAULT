@@ -2,6 +2,10 @@
 
 확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #7·#8 병합, 시험본 정리).
 
+## 진행 중 · CODEX_TASK_05 탐험 구조 구현
+
+Codex / `codex/hollow-keep-exploration` / 시작2026-11-01 / 기준 PR #10 `f6b8be1`(main `d532537`). 담당 범위: `games/the-hollow-keep/next/` 구역 규칙·입력/UI·8~12방 데이터/완주 기록·사다리/물건 그림·캡처, README·STATUS·WORK_LOG·CHANGELOG. 원본 검사 보존(browser-playtest는 동등 조건으로 구역/시험방 분리 가능), 기존 게임·공용 자산·런처·1단계 수치 보존. 시험방 `?room=test` 유지. 검증: 탐험14개·구역 완주·그림·모바일·브라우저·인수51개 및 기존 회귀. 다음 Claude Code 검토·사용자 재미/난이도 판단. 병합·배포 없음.
+
 ## PR #7·#8 병합 완료 · THE HOLLOW KEEP 픽셀아트 HD(scale 2) 적용
 
 사용자 승인("좋아요. 병합하고 시험본 폴더는 지워 주세요")으로 PR #7(아트 기준·검사) → PR #8(그림·렌더러) 순서로 병합했다. PR #8은 통합 브랜치 `claude/merge-pr8-pixel-art`에서 `docs/WORK_LOG.md` 충돌(양쪽 추가)을 시간순으로 정리해 병합했다(양쪽 41개 항목 보존 확인).
