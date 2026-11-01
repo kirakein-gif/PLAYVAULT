@@ -7,19 +7,23 @@
     },
     {
       "keys": "right",
-      "ticks": 232
+      "ticks": 85
     },
     {
       "keys": "",
       "ticks": 12
     },
     {
-      "keys": "down",
-      "ticks": 204
+      "keys": "interact",
+      "ticks": 1
+    },
+    {
+      "keys": "",
+      "ticks": 1
     },
     {
       "keys": "right",
-      "ticks": 97
+      "ticks": 82
     },
     {
       "keys": "",
@@ -35,7 +39,7 @@
     },
     {
       "keys": "right",
-      "ticks": 149
+      "ticks": 97
     },
     {
       "keys": "",
@@ -43,7 +47,7 @@
     },
     {
       "keys": "left",
-      "ticks": 245
+      "ticks": 178
     },
     {
       "keys": "",
@@ -51,11 +55,71 @@
     },
     {
       "keys": "up",
-      "ticks": 330
+      "ticks": 1
+    },
+    {
+      "keys": "",
+      "ticks": 1
     },
     {
       "keys": "right",
-      "ticks": 445
+      "ticks": 148
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "down",
+      "ticks": 197
+    },
+    {
+      "keys": "left",
+      "ticks": 117
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "interact",
+      "ticks": 1
+    },
+    {
+      "keys": "",
+      "ticks": 6
+    },
+    {
+      "keys": "up",
+      "ticks": 1
+    },
+    {
+      "keys": "",
+      "ticks": 1
+    },
+    {
+      "keys": "right",
+      "ticks": 117
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "up",
+      "ticks": 275
+    },
+    {
+      "keys": "jump,right",
+      "ticks": 32
+    },
+    {
+      "keys": "",
+      "ticks": 8
+    },
+    {
+      "keys": "right",
+      "ticks": 435
     },
     {
       "keys": "",
@@ -87,15 +151,19 @@
     },
     {
       "keys": "up",
-      "ticks": 345
+      "ticks": 275
+    },
+    {
+      "keys": "jump,left",
+      "ticks": 32
     },
     {
       "keys": "left",
-      "ticks": 102
+      "ticks": 92
     },
     {
       "keys": "",
-      "ticks": 13
+      "ticks": 12
     },
     {
       "keys": "swap",

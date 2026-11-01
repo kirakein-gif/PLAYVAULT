@@ -45,16 +45,30 @@
     }
     function areaObjects(world) {
       const flags=HKSim.getFlags(world),objects=HKPixel.manifest()?.objects||{};
+      function prop(name,x,y,w,h){const art=objects[name],image=art&&HKPixel.image(art.file);if(!image)return false;ctx.drawImage(image,art.x,art.y,art.w,art.h,x,y,w,h);return true;}
       for(const o of world.room.objects){
         if(o.type==='target'||o.type==='key'&&flags.picked[o.id]||o.type==='breakable'&&flags.broken[o.id])continue;
-        const key=o.type==='switch'?(o.kind==='light'?'light':'lever')+'-'+(flags.switches[o.id]?'on':'off'):o.type==='door'?(flags.doors[o.id]?'door-open':o.open.key?'locked-door':'door-closed'):o.type;
-        const art=objects[key],image=art&&HKPixel.image(art.file);
-        if(o.type==='breakable'&&image){
-          for(let y=0;y<o.h;y+=30)for(let x=0;x<o.w;x+=30)ctx.drawImage(image,art.x,art.y,art.w,art.h,o.x+x,o.y+y,30,30);
-        }else if(image){
-          const h=o.type==='door'?o.h:45,w=o.type==='door'?o.w:30;
-          ctx.drawImage(image,art.x,art.y,art.w,art.h,o.x,o.y+o.h-h,w,h);
-        }else{ctx.fillStyle=o.type==='key'?'#e9c779':'#68798c';ctx.fillRect(o.x,o.y,o.w,o.h);}
+        if(o.type==='door'){
+          if(flags.doors[o.id])continue;
+          const g=world.room.grid,c=o.cellX,r=o.cellY,cols=o.w/30;
+          const vertical=Array.from({length:cols},(_,i)=>i+c).every(x=>g[r-1]?.[x]==='#'&&(r+o.h/30>=18||g[r+o.h/30]?.[x]==='#'));
+          const kind=vertical?'barrier-v':'barrier-h';
+          for(let y=0;y<o.h;y+=30)for(let x=0;x<o.w;x+=30)if(!prop(kind,o.x+x,o.y+y,30,30)){ctx.fillStyle='#566579';ctx.fillRect(o.x+x,o.y+y,30,30);}
+          const source=o.open.switch&&Object.values(world.areaRooms).flatMap(room=>room.objects).find(s=>s.id===o.open.switch);
+          const mark=o.open.key?'mark-key':o.open.cleared?'mark-target':source?.kind==='light'?'mark-light':'mark-lever';
+          prop(mark,o.x+o.w/2-15,o.y+o.h/2-15,30,30);continue;
+        }
+        if(o.type==='breakable'){
+          for(let y=0;y<o.h;y+=30)for(let x=0;x<o.w;x+=30)prop('breakable',o.x+x,o.y+y,30,30);
+          continue;
+        }
+        if(o.type==='entrance'){
+          const pair=Object.values(world.areaRooms).flatMap(room=>room.objects).find(other=>other.id===o.to);
+          const locked=(o.lock||pair?.lock)&&!flags.unlocked[o.id];
+          prop(locked?'entrance-locked':'entrance',o.x,o.y,o.w,o.h);text('↑ / E',o.x+8,o.y-6,'#c2c0cf',10);continue;
+        }
+        const name=o.type==='switch'?(o.kind==='light'?'light':'lever')+'-'+(flags.switches[o.id]?'on':'off'):o.type;
+        if(!prop(name,o.x,o.y+o.h-45,30,45)){ctx.fillStyle='#68798c';ctx.fillRect(o.x,o.y,o.w,o.h);}
         if(o.type==='switch')text(o.hero?o.hero.toUpperCase()+' · E':'E',o.x-12,o.y-16,'#e4d5af',10);
       }
     }
