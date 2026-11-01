@@ -112,7 +112,30 @@ async function analyze(page, file, opts) {
         frameHashes.push(fh);
       }
     }
-    return { W, H, alphaMid, off, offSample, upscaled, boxes, cells, hash: h, frameHashes };
+    // 프레임별로 '큰 덩어리(8방향 연결, opts.minPart 픽셀 이상)' 수를 센다 — 베기 효과가 한 획인지 확인용
+    const parts = [];
+    if (opts.frameW && opts.minPart) {
+      for (let f = 0; f < Math.floor(W / opts.frameW); f++) {
+        const fw = opts.frameW, fh = Math.min(H, opts.frameH), seen = new Uint8Array(fw * fh);
+        const op = (x, y) => d[(y * W + f * fw + x) * 4 + 3] !== 0;
+        let big = 0;
+        for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+          if (seen[y * fw + x] || !op(x, y)) continue;
+          let n = 0; const st = [[x, y]]; seen[y * fw + x] = 1;
+          while (st.length) {
+            const [cx, cy] = st.pop(); n++;
+            for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+              const nx = cx + dx, ny = cy + dy;
+              if (nx < 0 || ny < 0 || nx >= fw || ny >= fh || seen[ny * fw + nx] || !op(nx, ny)) continue;
+              seen[ny * fw + nx] = 1; st.push([nx, ny]);
+            }
+          }
+          if (n >= opts.minPart) big++;
+        }
+        parts.push(big);
+      }
+    }
+    return { W, H, alphaMid, off, offSample, upscaled, boxes, cells, hash: h, frameHashes, parts };
   }, { b64, opts });
 }
 
@@ -190,7 +213,7 @@ async function analyze(page, file, opts) {
       });
       if (!fs.existsSync(file) || !fs.readFileSync(file).subarray(0, 8).equals(PNG_SIG)) continue;
       let r;
-      try { r = await analyze(page, file, { palette, frameW: s.a.frameW, frameH: s.a.frameH }); }
+      try { r = await analyze(page, file, { palette, frameW: s.a.frameW, frameH: s.a.frameH, minPart: s.name === 'fx-slash' ? 6 : 0 }); }
       catch (e) { check(`${s.label}: 이미지 해석`, () => assert.fail(`해석 실패: ${e.message.split('\n')[0]}`)); continue; }
       results2[s.label] = r;
       check(`${s.label}: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음`, () => {
@@ -205,8 +228,9 @@ async function analyze(page, file, opts) {
       });
       if (s.name in OPTIONAL_FX) {
         const once = s.name === 'fx-slash'; // 베기는 한 번, 날아가는 룬탄은 반복 허용
-        check(`${s.label}: 이웃 프레임 그림이 다름${once ? '·한 번만 재생(loop가 true가 아님)' : ''}`, () => {
+        check(`${s.label}: 이웃 프레임 그림이 다름${once ? '·한 번만 재생(loop가 true가 아님)·프레임마다 한 획' : ''}`, () => {
           if (once) assert.notEqual(s.a.loop, true, `${s.name}.loop가 true(같은 효과가 반복 재생됨)`);
+          if (once) r.parts.forEach((n, i) => assert.equal(n, 1, `${i}번 프레임이 한 획이 아님: 6픽셀 이상 덩어리 ${n}개(떨어진 평행선·조각은 두 줄로 보임)`));
           r.frameHashes.forEach((hsh, i) => { if (i) assert.notEqual(hsh, r.frameHashes[i - 1], `${i - 1}·${i}번 프레임이 같은 그림`); });
         });
       }
