@@ -306,14 +306,22 @@ async function analyze(page, file, opts) {
       });
     }
 
-    // ── 탐험 물건 그림 (EXPLORATION_SPEC §8, 시험본 모드에서는 생략) ──
+    // ── 탐험 물건 그림 (EXPLORATION_SPEC §8 → EXPLORATION_REFINE_SPEC §7, 시험본 모드에서는 생략) ──
     if (!TRIAL) {
-      const OBJ = ['door-closed', 'door-open', 'lever-off', 'lever-on', 'light-off', 'light-on', 'key', 'breakable', 'locked-door'];
+      const OBJ = ['barrier-v', 'barrier-h', 'mark-key', 'mark-lever', 'mark-light', 'mark-target', 'entrance', 'entrance-locked',
+        'lever-off', 'lever-on', 'light-off', 'light-on', 'key', 'breakable'];
       const objs = manifest.objects || {};
       check(`objects: 필수 그림 ${OBJ.length}종이 manifest에 있음`, () => {
         const missing = OBJ.filter((n) => !objs[n]);
         assert.deepEqual(missing, [], `빠진 그림: ${missing.join(', ')}`);
         for (const n of OBJ) { const o = objs[n]; assert.ok(/\.png$/i.test(o.file || '') && [o.x, o.y].every(Number.isInteger) && isInt(o.w) && isInt(o.h), `${n}: file(.png)·x·y·w·h 필요`); }
+      });
+      check('objects: 봉쇄물 한 칸·출입문 2×3칸·기호 크기(보완 §4·§7)', () => {
+        const cell = 30 * SCALE, bad = [];
+        for (const n of ['barrier-v', 'barrier-h']) if (objs[n] && (objs[n].w !== cell || objs[n].h !== cell)) bad.push(`${n} ${objs[n].w}×${objs[n].h} (기준 ${cell}×${cell})`);
+        for (const n of ['entrance', 'entrance-locked']) if (objs[n] && (objs[n].w !== 2 * cell || objs[n].h !== 3 * cell)) bad.push(`${n} ${objs[n].w}×${objs[n].h} (기준 ${2 * cell}×${3 * cell})`);
+        for (const n of ['mark-key', 'mark-lever', 'mark-light', 'mark-target']) if (objs[n] && (objs[n].w > cell || objs[n].h > cell)) bad.push(`${n} ${objs[n].w}×${objs[n].h} (최대 ${cell}×${cell})`);
+        assert.deepEqual(bad, [], bad.join(', '));
       });
       for (const file of [...new Set(OBJ.filter((n) => objs[n]).map((n) => objs[n].file))]) {
         const fp = path.join(DIR, file);

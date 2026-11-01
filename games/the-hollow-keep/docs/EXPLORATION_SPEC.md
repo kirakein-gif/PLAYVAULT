@@ -3,6 +3,8 @@
 > 작성: Claude Code, 2026-11-01. 구현 담당: Codex(AGENTS.md "역할 분담(시범 운영)").
 > 방향: [DESIGN_DIRECTION.md](DESIGN_DIRECTION.md) · 움직임: [FOUNDATION_SPEC.md](FOUNDATION_SPEC.md) · 그림: [ART_DIRECTION.md](ART_DIRECTION.md)
 > 자동 검사: `next/tests/exploration-contract.cjs`(규칙), `next/tests/area-data.cjs`(실제 구역 데이터·완주)
+>
+> **2026-11-01 보완:** 출입문(`entrance`) 추가, `door`는 **봉쇄물**로 뜻과 그림을 바꿈, 방 밀도 기준 추가 → [EXPLORATION_REFINE_SPEC.md](EXPLORATION_REFINE_SPEC.md). §4의 `door`, §8의 물건 그림 이름은 그 문서가 우선한다.
 
 ## 1. 사용자 결정 (2026-11-01)
 
