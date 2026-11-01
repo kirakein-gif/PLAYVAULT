@@ -87,18 +87,19 @@ async function analyze(page, file, opts) {
         boxes.push(maxX < 0 ? null : { minX, minY, maxX, maxY });
       }
     }
-    const cells = {};
+    const cells = {}, cellLum = {};
+    const lin = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
     for (const [name, [cx, cy]] of Object.entries(opts.cells || {})) {
-      const rowOpaque = [];
+      const rowOpaque = [], rowLum = []; let sum = 0, n = 0;
       for (let y = 0; y < opts.tile; y++) {
-        let c = 0;
+        let c = 0, ls = 0;
         for (let x = 0; x < opts.tile; x++) {
-          const X = cx * opts.tile + x, Y = cy * opts.tile + y;
-          if (X < W && Y < H && d[(Y * W + X) * 4 + 3]) c++;
+          const X = cx * opts.tile + x, Y = cy * opts.tile + y, i = (Y * W + X) * 4;
+          if (X < W && Y < H && d[i + 3]) { c++; const l = 0.2126 * lin(d[i]) + 0.7152 * lin(d[i + 1]) + 0.0722 * lin(d[i + 2]); ls += l; sum += l; n++; }
         }
-        rowOpaque.push(c);
+        rowOpaque.push(c); rowLum.push(c ? ls / c : null);
       }
-      cells[name] = rowOpaque;
+      cells[name] = rowOpaque; cellLum[name] = { mean: n ? sum / n : null, rows: rowLum };
     }
     let h = 0; for (let i = 0; i < d.length; i++) h = (h * 31 + d[i]) >>> 0;
     const frameHashes = [];
@@ -135,7 +136,7 @@ async function analyze(page, file, opts) {
         parts.push(big);
       }
     }
-    return { W, H, alphaMid, off, offSample, upscaled, boxes, cells, hash: h, frameHashes, parts };
+    return { W, H, alphaMid, off, offSample, upscaled, boxes, cells, cellLum, hash: h, frameHashes, parts };
   }, { b64, opts });
 }
 
@@ -293,6 +294,24 @@ async function analyze(page, file, opts) {
         assert.deepEqual(holes, [], `투명 픽셀이 있는 조각(이어 붙이면 구멍): ${holes.join(', ')}`);
         const dup = new Set(['back-1', 'back-2', 'back-3'].map((n) => String(t.cells[n])));
         assert.equal(dup.size, 3, 'back-1~3이 같은 칸을 가리킴(변형이 아님)');
+      });
+      check('tiles: 사다리가 사다리로 읽힘(모자이크 §7) — 가로대 2~4개·두께 2단위 이상, 뒷벽 대비 3:1 이상', () => {
+        const rows = r.cells.ladder, lum = r.cellLum.ladder;
+        assert.ok(rows && lum, 'ladder 칸 없음');
+        const max = Math.max(...rows), rung = rows.map((c) => c > 0 && c >= 0.8 * max);
+        const groups = []; let cur = null;
+        rung.forEach((v, y) => { if (v) { if (!cur) groups.push(cur = { y0: y, n: 0, lum: 0 }); cur.n++; cur.lum += lum.rows[y]; } else cur = null; });
+        // 칸 위아래 끝에 걸친 가로대는 이어 붙이면 하나이므로 합친다
+        if (groups.length > 1 && groups[0].y0 === 0 && rung[TILE - 1]) { const last = groups.pop(); groups[0].n += last.n; groups[0].lum += last.lum; }
+        assert.ok(groups.length >= 2 && groups.length <= 4, `가로대 ${groups.length}개(2~4개 필요, 가는 줄이 촘촘하면 세로줄 두 개처럼 보임)`);
+        const thin = groups.filter((g) => g.n < 2 * SCALE).map((g) => g.n);
+        assert.deepEqual(thin, [], `가로대 두께 ${thin.join(', ')}px (최소 ${2 * SCALE}px)`);
+        const backs = ['back-1', 'back-2', 'back-3'].map((n) => r.cellLum[n] && r.cellLum[n].mean).filter((v) => v !== null && v !== undefined);
+        assert.ok(backs.length, '뒷벽 조각(back-1~3)이 없어 대비를 잴 수 없음');
+        const back = backs.reduce((a, v) => a + v, 0) / backs.length;
+        const rungLum = groups.reduce((a, g) => a + g.lum, 0) / groups.reduce((a, g) => a + g.n, 0);
+        const ratio = (Math.max(rungLum, back) + 0.05) / (Math.min(rungLum, back) + 0.05);
+        assert.ok(ratio >= 3, `가로대와 뒷벽의 밝기 대비 ${ratio.toFixed(2)}:1 (3:1 이상 필요)`);
       });
       check('tiles: wall-fill은 꽉 참, floor-top은 아랫줄이 꽉 참, ledge는 위 16px만', () => {
         const full = (rows) => rows.every((c) => c === TILE);

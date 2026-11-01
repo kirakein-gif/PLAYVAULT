@@ -5,7 +5,7 @@
 > 아래 블록을 그대로 Codex에 붙여 넣으면 됩니다.
 
 ```text
-PLAYVAULT — THE HOLLOW KEEP: 방 이동 겹침 수정 + 타일 모자이크(뒷벽·장식·벽 조각) + 방 다양성
+PLAYVAULT — THE HOLLOW KEEP: 방 이동 겹침 수정 + 타일 모자이크(뒷벽·장식·벽 조각) + 방 다양성 + 사다리 다시 그리기
 
 저장소: kirakein-gif/PLAYVAULT
 작업 브랜치: codex/hollow-keep-exploration-refine (PR #14를 이어서 수정한다)
@@ -38,11 +38,12 @@ PLAYVAULT — THE HOLLOW KEEP: 방 이동 겹침 수정 + 타일 모자이크(�
 - tiles에 추가: back-1, back-2, back-3, wall-fill-2, wall-bottom, wall-left, wall-right,
   window-top/mid/bottom, pillar-top/mid/base, banner-top/mid/bottom, candle (각 60×60).
 - 뒷벽·벽 조각은 꽉 찬 칸(투명 없음). 뒷벽은 벽보다 어둡고 대비 낮게 — 서는 면과 길이 한눈에 보여야 한다.
+- ladder 다시 그리기(사용자: "사다리인 줄 몰랐어요. 그냥 줄처럼 보여서"): 가로대 한 칸에 2~4개·두께 4px 이상, 가로대와 뒷벽 밝기 대비 3:1 이상(밝은 나무·놋쇠 권장), 세로 막대 봉쇄물과 구분되게.
 - 이어 붙여도 이음새가 보이지 않게. PROVENANCE 갱신(특정 게임·작가 이름 금지). 참고 게임의 타일 모양을 옮기지 않는다.
 
 [검증 — 결과를 그대로 보고]
 1. exploration-contract 16/16 (방 이동 겹침 금지 2개 추가됨), entrance-contract 9/9, foundation-contract 51/51
-2. area-data 전부 통과(back 격자·V1~V4 포함), pixel-assets 전부 통과(모자이크 조각 포함)
+2. area-data 전부 통과(back 격자·V1~V4 포함), pixel-assets 전부 통과(모자이크 조각·사다리 읽힘 포함)
 3. 로컬 HTTP 서버 후 tile-mosaic-render 7/7, pixel-render 7/7(구역·?room=test), mobile-layout 20/20, mobile-fullscreen 6/6,
    exploration-browser, browser-playtest(?room=test), room-traversal, foundation-edge, exploration-edge, ABYSSFALL 회귀 3종
 4. 캡처: 방마다 1장(PC), 모바일 780×330, 봉인 위에서 사다리로 내려가다 막히는 장면
