@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
  * THE HOLLOW KEEP · 2단계 탐험 구조 규칙 인수 테스트
- * 규격: games/the-hollow-keep/docs/EXPLORATION_SPEC.md §2~§6
+ * 규격: games/the-hollow-keep/docs/EXPLORATION_SPEC.md §2~§6, TILE_MOSAIC_SPEC.md §6(방 이동 직후 겹침 금지)
  * 실행: node games/the-hollow-keep/next/tests/exploration-contract.cjs   (HK_SIM으로 다른 sim.js 지정 가능)
  *
  * 검사마다 작은 구역을 이 파일 안에서 만든다. 실제 시범 구역 데이터는 area-data.cjs가 검사한다.
@@ -251,6 +251,40 @@ test('결정성: 여러 방을 오가는 같은 입력 → 같은 결과', () =>
   const script = (i) => I({ right: i < 160 || (i > 400 && i < 470), left: i >= 200 && i < 330, up: i >= 330 && i < 400, jump: i % 97 < 5, attack: i % 53 === 0 });
   const go = () => { const w = world(A_MOVE); for (let i = 0; i < 600; i++) HK.step(w, script(i)); return JSON.stringify(HK.snapshot(w)); };
   assert.equal(go(), go());
+});
+
+// ── TILE_MOSAIC_SPEC §6: 방 이동 직후 겹침 금지 ──
+// a(0,0) 바닥 구멍 → b(0,1). b 1행에 구멍을 꼭 맞게 덮는 가로형 봉쇄물, 스위치는 a에.
+// 떨어지기: 3칸 구멍(10~12열). 사다리: 1칸 통로(11열, 몸보다 좁아 걸어서는 빠지지 않음)에 사다리.
+function sealArea(ladder) {
+  const cols = ladder ? [11] : [10, 11, 12], lo = cols[0] - 1, hi = cols[cols.length - 1] + 1;
+  return area({ room: 'a', ...standAt('ethan', 4) }, {
+    a: room([0, 0], { open: { bottom: cols }, set: ladder ? Array.from({ length: 8 }, (_, i) => [10 + i, 11, 'H']) : [],
+      objects: [{ type: 'switch', id: 'seal-sw', x: 4, y: 16, kind: 'lever' }] }),
+    b: room([0, 1], { open: { top: cols }, set: [[1, lo, '#'], [1, hi, '#'], ...(ladder ? [[0, 11, 'H']] : [])],
+      objects: [{ type: 'door', id: 'seal', x: cols[0], y: 1, w: cols.length, h: 1, open: { switch: 'seal-sw' } }] })
+  });
+}
+for (const mode of ['떨어지기', '사다리']) test(`방 이동 직후 겹침 금지(${mode}): 닫힌 봉쇄물 아래 방으로 넘어가지 않음 → 열면 지나감`, () => {
+  const ladder = mode === '사다리', a = sealArea(ladder), seal = a.rooms.b.objects[0];
+  const box = { x: seal.x * T, y: seal.y * T, w: seal.w * T, h: T };
+  const w = world(a), inp = ladder ? I({ down: true }) : I();
+  const go = () => { const target = 11 * T + T / 2; for (let i = 0; i < 400 && Math.abs(cx(P(w)) - target) >= 4; i++) HK.step(w, I({ [cx(P(w)) < target ? 'right' : 'left']: true })); };
+  go();
+  for (let i = 0; i < 300; i++) {
+    HK.step(w, inp);
+    const p = P(w), f = HK.getFlags(w);
+    const ov = w.roomId === 'b' && !f.doors.seal && p.x < box.x + box.w - 0.01 && p.x + p.w > box.x + 0.01 && p.y < box.y + box.h - 0.01 && p.y + p.h > box.y + 0.01;
+    assert.ok(!ov, `${i}틱: 닫힌 봉쇄물과 겹침 (y ${p.y.toFixed(1)})`);
+    assert.equal(w.roomId, 'a', `${i}틱: 닫힌 봉쇄물을 지나 ${w.roomId}로 이동 (y ${p.y.toFixed(1)})`);
+  }
+  // 빠져나와 스위치를 켜고 다시 시도
+  HK.step(w, I({ jump: true, left: true })); run(w, I({ jump: true, left: true }), 40); run(w, I(), 60);
+  walkTo(w, 4); tap(w, 'interact');
+  run(w, I(), 2);
+  assert.ok(HK.getFlags(w).doors.seal, '봉쇄물 열림');
+  go();
+  until(w, inp, (W) => W.roomId === 'b', 400);
 });
 
 const failed = results.filter((r) => !r).length;

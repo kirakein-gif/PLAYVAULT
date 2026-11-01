@@ -979,3 +979,44 @@
 - 캡처: 실제 브라우저 완주에서8방·봉쇄물5개 닫힘/열림·출입문2쌍 진입 전후·지도·모바일780×330·숨은 물건 등28장 선택. pack-refine-review.py로 무손실WebP 총779912바이트, 원본PNG와 디코딩RGBA 바이트 동일 검사. 이전 캡처는 보존. 재현/링크는next/assets/exploration-refine-review/README.md. 브라우저 시계만 제어하며world/pose/좌표 주입 없음.
 - 5개 관리 문서 검토: STATUS/WORK_LOG/CHANGELOG 갱신, AGENTS/CLAUDE 규칙 변경 없음. 루트README 변경 필요 없음, nextREADME·PROVENANCE 갱신. 기존 게임·공용 자산·런처·다른 게임·area2·1단계 시험 방은 변경하지 않았습니다.
 - 검토 담당/발견 문제 수: Claude Code / 이번 구현 검토 전 미확인. 자체 규칙 문제1건(경계 내림)과 그림 정리1건(미세 금 소실)을 위에 기록. 사용자 재요청: task06 착수 후0회. 다음: PR #14 Draft→Ready → Claude Code 전체 재실행/실제 경로 검토 → 사용자 재미·난이도·외형 판단. 실기기 회전 확인 필요. 병합·배포하지 않음.
+
+### 2026-11-01 (Asia/Seoul) · Codex 2단계 보완 구현(PR #14) 검토
+
+- 담당 AI: Claude Code(검토). 구현: Codex `codex/hollow-keep-exploration-refine` `193149a`.
+- 범위: 검사·규격 원본은 main과 동일. exploration-edge·exploration-browser는 새 구역에 맞게 위치를 데이터에서 읽도록 고쳤고 확인 항목은 늘었음(약화 없음). 기존 게임·공용 자산 변경 없음.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): entrance-contract 9/9, area-data 17/17(완주 3671틱·교대 2회), pixel-assets 55/55, exploration-contract 14/14, exploration-edge 11/11, foundation-contract 51/51, foundation-edge 16/16, room-traversal 4/4, pixel-render 구역·시험 방 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 5/5, browser-playtest(`?room=test`) 20/20, ABYSSFALL 회귀 3종 통과.
+- 무작위 입력 검사(시작 346곳, 51.9만 틱): 1건. loft 사다리로 내려가면 닫힌 `return-seal`(gate 1행)을 통과. 방 이동 직후 몸이 봉인과 이미 겹치고, `move()`는 처음부터 겹친 물체를 막지 않음. PR #11(봉인 3행)에는 없던 문제. 방 이동 직후 겹침 검사로 고치도록 제안.
+- 관찰(사용자 판단): 8방이 같은 3층 뼈대와 같은 사다리 열을 씀. 다양성 기준이 규격에 없던 것은 Claude Code의 규격 누락. 배경 창이 벽 띠에 잘림. 원본 그림 1.8MB·캡처 824KB 추가.
+- Git/PR: [PR #14 검토](https://github.com/kirakein-gif/PLAYVAULT/pull/14) (COMMENT). 미리보기 `https://8aa93ab3.kirakein-playvault.pages.dev/games/the-hollow-keep/next/`.
+- 검토 담당 / 발견 문제 수: Claude Code / 1건(봉쇄물 통과) + 관찰 3건.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 미리보기 확인 → 봉인 통과 수정(Codex) 여부·방 다양성 기준 추가 여부 결정.
+- 종료 상태: 검토 완료, 사용자 판단 대기.
+
+### 2026-11-01 (Asia/Seoul) · THE HOLLOW KEEP 타일 모자이크 규격과 방 이동 겹침 수정 지시
+
+- 담당 AI: Claude Code(규격·검사). 구현 담당: Codex.
+- 사용자 결정: 봉인 통과 문제는 Codex가 수정. 다양성은 "픽셀 스타일에 맞춰" 반복 조각을 겹쳐 연출하는 모자이크 방식(큰 그림을 통째로 그리기보다).
+- 기준 / 브랜치: PR #14 `193149a` / `claude/hollow-keep-tile-mosaic`(PR #14 검토 기록 브랜치 병합, WORK_LOG 충돌 시간순 정리). 게임 코드·그림 변경 없음.
+- 변경: `TILE_MOSAIC_SPEC.md`(60×60 조각만으로 화면 구성, 뒷벽 변형 3종·벽 가장자리 선택 규칙·back 격자 장식 w/p/b/c, 다양성 V1~V4, 방 이동 직후 겹침 금지), `CODEX_TASK_07.md`, `tests/tile-mosaic-render.cjs`(7), `exploration-contract.cjs`(+2 → 16), `area-data.cjs`(back 격자·V1~V4), `pixel-assets.cjs`(조각 17종), DESIGN_DIRECTION 결정 표, STATUS.
+- 검증(저장소 밖 참조 구현·합성 데이터, 커밋 안 함):
+  - 방 이동 겹침: PR #14 `sim.js`에 겹침 검사를 넣은 참조 구현에서 exploration-contract 16/16, entrance 9/9, foundation 51/51, exploration-edge 11/11, area-data 17/17. 무작위 입력(시작 346곳, 51.9만 틱) 문제 0건(수정 전 1건). PR #14 현재 구현은 새 2개 실패. 작성 중 사다리 1칸 통로의 경계 벽돌 예외를 놓쳐 기존 사다리 검사 2개가 깨졌던 것을 참조 구현에서 발견해 닫힌 봉쇄물만 막도록 정리.
+  - tile-mosaic-render: 참조 렌더러(PR #14 render.js에 모자이크 추가)와 합성 조각 시트에서 7/7, 결함 변형 8종 모두 검출(큰 배경 그림, 옛 벽 선택, 뒷벽 빠짐, 변형 1종, 프레임마다 무작위, 장식 없음, 장식 조각 위치 무시, 격자 어긋남).
+  - area-data: 합성 4방에서 back·V1~V4 통과, 결함 변형 7종 검출(벽 칸 장식, 한 칸 장식, 잘못된 문자, 장식 1종, 장식 과다, 같은 방 모양, back 없음). 현재 area1은 back 없음·V3(8방 중 25쌍이 58칸 미만) 실패.
+  - pixel-assets: 합성 시트에서 통과, 투명 뒷벽 검출.
+- 한계: V4(사다리 열 집합)는 열 하나만 옮겨도 통과하는 약한 기준이고 실제 다양성은 V3와 화면 검토로 본다.
+- 검토 담당 / 발견 문제 수: 사용자 확인 대기.
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex `CODEX_TASK_07.md`(PR #14 브랜치에서) → Claude Code 검토 → 승인 시 이 규격 PR과 PR #14 병합.
+- 종료 상태: 규격 제출.
+
+### 2026-11-01 (Asia/Seoul) · 사다리 읽힘 기준 추가
+
+- 담당 AI: Claude Code. 사용자 의견(PR #14 미리보기): "사다리인 줄 몰랐어요. 그냥 줄처럼 보여서".
+- 측정: PR #14 `ladder` 칸은 가로대 6개·두께 2~4px·거의 검은색(가로대 색 #07070f~#2b374b), 사다리 평균 밝기와 배경 평균의 대비 약 1.3:1.
+- 변경(`claude/hollow-keep-tile-mosaic`, PR #15): TILE_MOSAIC_SPEC §7에 사다리 기준(가로대 2~4개·두께 2단위 이상·뒷벽 대비 3:1 이상, 봉쇄물과 구분), CODEX_TASK_07에 다시 그리기 지시, `pixel-assets.cjs`에 검사 1개(analyze가 칸별 밝기도 돌려줌).
+- 검증: 합성 사다리 4종 — 기준 충족 통과, 가는 가로대·촘촘한 가로대·어두운 가로대 각각 검출. 현재 PR #14 사다리는 "가로대 6개"로 실패.
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건(사다리 식별 불가). 아트 기준에 가독성 기준이 없던 것은 Claude Code 규격 누락.
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex `CODEX_TASK_07.md`에 포함.
+- 종료 상태: 규격 보강.
