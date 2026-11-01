@@ -143,7 +143,7 @@
 - 창 크기·전체 화면이 바뀌면 k를 다시 계산한다.
 - `window.HKPlaytest.artStatus()`는 `{ loaded: boolean, failed: string[], scale: 1 | 2 }`를 반환한다(scale은 생략 시 1로 간주).
 - 게임은 `setTransform(k×scale)` 기준으로 그린다. 판정 좌표는 그대로 게임 단위다.
-- **시험본 전환:** 주소에 `?art=trial-x1` 또는 `?art=trial-x2`를 붙이면 `next/assets/pixel-trial/x1|x2/`를 불러온다. 시험본에 없는 동작은 도형으로 대신 그린다. 자산을 불러오지 못하면 현재의 도형 그림으로 대신 그리고, 게임은 계속 동작해야 한다.
+- **시험본 전환(삭제됨):** 밀도 시험에 쓰던 `?art=trial-x1|x2`와 `next/assets/pixel-trial/`은 x2 확정 뒤 2026-11-01 사용자 지시로 삭제했다. `build-full-x2.py`가 쓰는 x2 재료는 `next/tools/art-source/density-trial-x2/`에 있다.
 
 ## 5. 제작 과정 (이미지 생성 → 실제 픽셀아트)
 

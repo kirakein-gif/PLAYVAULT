@@ -2,7 +2,7 @@
 
 Date: 2026-11-01 (Asia/Seoul). Route A: generated raster pose boards, resampling, palette reduction, native pixel cleanup. Image generation tool: image_gen. Model version and seed are not exposed.
 
-Sources: tools/art-source/ethan-full-source.png and noah-full-source.png; the selected target-pose-board.png supplies Ethan's middle standing jump. Selected trial x2 Ethan idle/run and Noah idle are the starting raster images, re-quantized and cleaned here; their original source prompts remain in ../pixel-trial/x2/PROVENANCE.md. No trial files were changed.
+Sources: tools/art-source/ethan-full-source.png and noah-full-source.png; the selected target-pose-board.png supplies Ethan's middle standing jump. Selected trial x2 Ethan idle/run and Noah idle are the starting raster images, re-quantized and cleaned here; their original source prompts remain in ../../tools/art-source/density-trial-x2/PROVENANCE.md (moved there when the trial folder was deleted on 2026-11-01).
 
 ## Ethan full source prompt
 

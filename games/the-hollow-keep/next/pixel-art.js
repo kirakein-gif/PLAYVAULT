@@ -1,8 +1,6 @@
 (function () {
   'use strict';
-  const choice = new URLSearchParams(location.search).get('art');
-  const trial = choice === 'trial-x1' || choice === 'trial-x2';
-  const base = trial ? 'assets/pixel-trial/' + choice.slice(-2) + '/' : 'assets/pixel/';
+  const base = 'assets/pixel/'; // 밀도 시험본(?art=trial-x1|x2)은 2026-11-01 삭제
   const images = new Map(), failed = [];
   let manifest = null, settled = false;
   const fail = file => { if (!failed.includes(file)) failed.push(file); };
@@ -26,5 +24,5 @@
     settled = true;
   })();
   window.HKPixel = { ready, manifest: () => manifest, image: file => images.get(file),
-    status: () => ({ loaded: settled && failed.length === 0, failed: [...failed], scale: manifest?.scale || (choice === 'trial-x1' ? 1 : 2) }) };
+    status: () => ({ loaded: settled && failed.length === 0, failed: [...failed], scale: manifest?.scale || 2 }) };
 })();

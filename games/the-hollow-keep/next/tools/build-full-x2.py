@@ -43,9 +43,9 @@ sources={
 heights={('ethan','jump-standing'):[118,116,132],('ethan','jump-running'):[108,108,126],('ethan','land'):[80,108],('ethan','attack'):[136,128,126,136],('noah','run'):[124]*6,('noah','jump-standing'):[116,112,128],('noah','jump-running'):[104,104,124],('noah','land'):[76,104],('noah','attack'):[146,128,112,128]}
 frames={key:[sample(im,height,key[1]=='jump-standing')for im,height in zip(ims,heights[key])]for key,ims in sources.items()}
 # Keep selected trial idle/run silhouettes as the starting point, then clean/re-palette.
-trial=json.loads((ROOT/'assets/pixel-trial/x2/manifest.json').read_text())
+trial=json.loads((ROOT/'tools/art-source/density-trial-x2/manifest.json').read_text())
 for hero,action in [('ethan','idle'),('ethan','run'),('noah','idle')]:
- anim=trial['heroes'][hero]['animations'][action];sheet=Image.open(ROOT/'assets/pixel-trial/x2'/anim['file']).convert('RGBA')
+ anim=trial['heroes'][hero]['animations'][action];sheet=Image.open(ROOT/'tools/art-source/density-trial-x2'/anim['file']).convert('RGBA')
  frames[(hero,action)]=[sheet.crop((i*anim['frameW'],0,(i+1)*anim['frameW'],anim['frameH']))for i in range(anim['frames'])]
 # 52 source-material colors plus 12 deliberate environment/effect/skin anchors.
 samples=[]

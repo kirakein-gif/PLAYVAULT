@@ -8,8 +8,7 @@
  *   node games/the-hollow-keep/next/tests/pixel-render.cjs
  * 환경 변수: HK_URL, CHROMIUM_PATH, HK_SHOT_DIR(지정하면 점프 자세 캡처 저장)
  * 그림 밀도: HKPlaytest.artStatus().scale(1 또는 2, 없으면 1). 실제 해상도는 (960×scale)의 정수 배여야 한다.
- * 시험본 비교: HK_URL에 ?art=trial-x1 / ?art=trial-x2 처럼 시험본 주소를 붙여 같은 검사를 돌린다.
- * 베기 효과 검사는 지금 화면이 쓰는 자산(기본 또는 시험본)의 manifest에 noah attack과 fx-slash가 모두 있을 때만 판정한다.
+ * 베기 효과 검사는 기본 자산 manifest에 noah attack과 fx-slash가 모두 있을 때만 판정한다.
  */
 'use strict';
 const assert = require('node:assert/strict');
@@ -87,7 +86,7 @@ const VIEWS = [
     });
 
     await test('그림 파일을 못 불러와도 도형으로 대신 그리고 게임은 계속 동작', async () => {
-      const { ctx, page, errors } = await open(VIEWS[0], (p) => p.route(/assets\/(?:pixel|pixel-trial\/x[12])\/ethan-idle\.png/, (r) => r.fulfill({ status: 404, body: '' })));
+      const { ctx, page, errors } = await open(VIEWS[0], (p) => p.route(/assets\/pixel\/ethan-idle\.png/, (r) => r.fulfill({ status: 404, body: '' })));
       const m = await measure(page);
       assert.ok(m.art, 'HKPlaytest.artStatus()가 없음');
       assert.ok(m.art.failed.some((f) => /ethan-idle\.png/.test(f)), `failed에 ethan-idle.png가 기록되지 않음: ${JSON.stringify(m.art)}`);
@@ -122,14 +121,10 @@ const VIEWS = [
     for (const dir of ['right', 'left']) {
       await test(`Noah 베기 효과(${dir === 'right' ? '오른쪽' : '왼쪽'}): 휘두르는 프레임부터·공격 그림과 함께만·몸 앞쪽에만`, async () => {
         const { ctx, page } = await open(VIEWS[0], (p) => p.addInitScript(SLASH_HOOK));
-        // 지금 화면이 쓰는 자산(기본 또는 ?art=trial-x1|x2 시험본)의 manifest를 본다
-        const man = await page.evaluate(() => {
-          const t = /^trial-(x[12])$/.exec(new URLSearchParams(location.search).get('art') || '');
-          return fetch(t ? `assets/pixel-trial/${t[1]}/manifest.json` : 'assets/pixel/manifest.json').then((r) => r.json()).catch(() => null);
-        });
+        const man = await page.evaluate(() => fetch('assets/pixel/manifest.json').then((r) => r.json()).catch(() => null));
         const fx = man && man.heroes && man.heroes.noah && man.heroes.noah.animations['fx-slash'];
         const atk = man && man.heroes && man.heroes.noah && man.heroes.noah.animations.attack;
-        if (!atk || !fx) { await ctx.close(); return; } // 공격 그림·베기 효과가 없는 구성(예: 시험본)은 검사 대상 아님
+        if (!atk || !fx) { await ctx.close(); return; } // 공격 그림·베기 효과가 없는 구성은 검사 대상 아님
         await page.locator('canvas').focus();
         await page.keyboard.press('KeyQ'); await page.waitForTimeout(300);
         if (dir === 'left') { await page.keyboard.down('KeyA'); await page.waitForTimeout(60); await page.keyboard.up('KeyA'); }

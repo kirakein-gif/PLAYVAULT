@@ -19,27 +19,9 @@ HK_URL=http://127.0.0.1:8766/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/
 
 아래 CODEX_TASK_03·02 내용과 수치는 당시 작업 기록입니다. 현재 기본 세트 재생성에는 위 `build-full-x2.py`를 사용합니다.
 
-## 이전 목표 외형 밀도 시험 · CODEX_TASK_03
+## 이전 목표 외형 밀도 시험 · CODEX_TASK_03 (삭제됨)
 
-당시 작업은 전체 재제작 전의 **밀도 선택용 시험본**입니다. 사용자가 지정한 `docs/reference/target-pose-board-2026-10-31.jpg`의 원본 PNG를 경로 A 밑그림으로 사용했습니다. 어느 쪽이 낫다는 판단은 하지 않습니다.
-
-- `/games/the-hollow-keep/next/?art=trial-x1`: scale1, Ethan68px / Noah64px 기준.
-- `/games/the-hollow-keep/next/?art=trial-x2`: scale2, Ethan136px / Noah128px 기준.
-- 게임 속 몸 크기·조작·방은 같고, 그림의 원래 픽셀 밀도만 다릅니다. 같은 원본과 같은 64색 팔레트에서 각각 독립적으로 면적 샘플링·윤곽/얼굴/손/알파/프레임 정리를 했습니다. x2는 x1을 두 배 확대한 파일이 아닙니다.
-- 두 폴더 모두 Ethan idle4/run6, Noah idle4만 제공합니다. 빠진 점프·공격·착지/Noah run은 도형으로 대신 그립니다. `artStatus()`는 scale도 반환합니다. 전체 스프라이트·베기 효과 재제작은 사용자가 밀도를 선택한 뒤 진행합니다.
-- `assets/pixel-trial/x1|x2/`의 manifest/palette/PROVENANCE에 원래 프레임·pivot·처리 과정을 적었습니다. 원본 PNG와 새 달리기 원본은 `tools/art-source/`, 재생성은 `tools/build-density-trial.py`(Pillow/numpy/scipy)입니다. 두 밀도 모두 같은 포즈/위상으로 제작했습니다.
-- [비교 캡처 모음](assets/pixel-trial/comparison/README.md): 목표 자세 | x1 | x2를 같은 표시 높이로 나란히, PC1280×900와 모바일780×330 게임 화면에서 두 모드를 비교할 수 있습니다. 캡처는 PR #8에도 링크했습니다.
-
-```sh
-python games/the-hollow-keep/next/tools/build-density-trial.py
-HK_ART_REQUIRE="ethan:idle,run;noah:idle" HK_ART_DIR=games/the-hollow-keep/next/assets/pixel-trial/x1 CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/pixel-assets.cjs
-# x2 폴더도 같은 명령으로 검사
-CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/density-trial.cjs
-```
-
-이번 결과: x1/x2 자산 각각 **18/18**, 각 시험본과 기본 모드의 렌더 검사 **5/5**, 추가 시험본 런타임 검사 **10/10**. 원래 pixel-render를 그대로 실행했을 때는 시험본에서 각각4/5였습니다. 강제404 경로가 기본 `/assets/pixel/`로 고정되어 시험본 요청을 막지 못한 문제여서, `4917569`에서 정규식 대상에 `pixel-trial/x[12]`도 포함하는 한 줄만 보완했습니다. 기존 failed/이동/오류 판정은 모두 그대로이며 완화·건너뛰기가 아닙니다. 실제 시험 경로를 막는 추가 검사에서도 404/대체/이동을 확인했습니다. 이 원본 검사 경로 변경은 검토 담당이 별도로 확인해야 합니다.
-
-기본 자산도 새 원본 검사로 재실행해 **50/51**입니다. 알려진 `noah/fx-slash.loop=true`가 실패하며 전체/베기 재제작 보류 지시 때문에 그대로 두었습니다. 기본 pixel-render **5/5**, 인수51/51·경계16/16·구덩이4/4·배치20/20·전체 화면6/6·브라우저20/20·기존 회귀3종은 통과했습니다. 사용자 밀도 선택·외형 판단 및 실제 휴대전화 확인은 대기입니다.
+사용자가 x2(136px)를 선택한 뒤, 2026-11-01 사용자 지시로 시험본(`assets/pixel-trial/`, `?art=trial-x1|x2` 전환, `tests/density-trial.cjs`, `tools/build-density-trial.py`)을 삭제했습니다. `build-full-x2.py`가 출발점으로 쓰는 x2 재료는 `tools/art-source/density-trial-x2/`로 옮겼습니다. 시험본과 비교 캡처는 Git 이력(PR #8, 커밋 `b36f092`)에서 볼 수 있습니다.
 
 ## 이전 기본 픽셀 자산과 렌더링 (CODEX_TASK_02)
 

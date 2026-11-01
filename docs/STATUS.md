@@ -1,6 +1,15 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Codex**(x2 전체 동작 구현).
+확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #7·#8 병합, 시험본 정리).
+
+## PR #7·#8 병합 완료 · THE HOLLOW KEEP 픽셀아트 HD(scale 2) 적용
+
+사용자 승인("좋아요. 병합하고 시험본 폴더는 지워 주세요")으로 PR #7(아트 기준·검사) → PR #8(그림·렌더러) 순서로 병합했다. PR #8은 통합 브랜치 `claude/merge-pr8-pixel-art`에서 `docs/WORK_LOG.md` 충돌(양쪽 추가)을 시간순으로 정리해 병합했다(양쪽 41개 항목 보존 확인).
+- 현재 기본 자산: `games/the-hollow-keep/next/assets/pixel/` scale 2(136px), 타일 60px, 64색, Ethan·Noah 동작 6종, 룬탄·베기 효과(한 획), 배경 1920×1080.
+- 시험본 삭제: `assets/pixel-trial/`, `?art=trial-x1|x2` 전환, `tests/density-trial.cjs`, `tools/build-density-trial.py`. `build-full-x2.py`가 출발점으로 쓰는 x2 재료만 `tools/art-source/density-trial-x2/`로 옮김. 옮긴 뒤 생성 스크립트 결과가 커밋된 자산과 바이트 단위로 동일함을 확인. 검토 캡처 `assets/pixel-review/`는 유지(사용자 지시 범위 밖).
+- 병합 결과 검사: pixel-assets 51/51, pixel-render 7/7, 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, ABYSSFALL 회귀 3종 통과.
+- 진행 중 작업: 없음. 다음 후보: 2단계 탐험 구조(방 연결·지도·장치, 30칸 격자), Noah 3단 콤보(보류). 사용자 결정 대기.
+
 
 ## PR #2·#3·#4·#5 병합 완료 · 다음: THE HOLLOW KEEP 픽셀아트 HD 아트 기준
 

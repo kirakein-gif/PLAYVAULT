@@ -875,3 +875,17 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: 사용자 화면 확인 → 승인 시 PR #7 → PR #8 병합, 시험본·검토 캡처 폴더 정리 여부 결정.
 - 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-01 (Asia/Seoul) · PR #7·#8 병합과 밀도 시험본 삭제
+
+- 담당 AI: Claude Code. 사용자 지시: "좋아요. 병합하고 시험본 폴더는 지워 주세요".
+- 병합: PR #7 → main(`d62b7d5`). PR #8 → 통합 브랜치 `claude/merge-pr8-pixel-art`에서 병합(`897bb67`). 충돌은 `docs/WORK_LOG.md` 한 곳(양쪽 추가) — 앞 세 곳은 Codex 항목만, 마지막은 Codex 수정 제출 → Claude Code 재검토 순으로 정리, 양쪽 제목 41개 보존 확인.
+- 삭제: `next/assets/pixel-trial/`(x1 전체, x2 팔레트, 비교 캡처), `next/tests/density-trial.cjs`, `next/tools/build-density-trial.py`, `pixel-art.js`의 `?art=trial-*` 전환, `pixel-render.cjs`의 시험본 분기.
+- 보존: `build-full-x2.py`가 출발점으로 읽는 x2 재료(manifest, Ethan idle·run, Noah idle, PROVENANCE)를 `next/tools/art-source/density-trial-x2/`로 옮기고 스크립트 경로 2곳·`assets/pixel/PROVENANCE.md` 참조 1곳 수정. 저장소 밖 사본에서 `build-full-x2.py` 실행(이 환경에 scipy 설치 필요) → 생성 결과가 커밋된 자산과 바이트 단위로 동일. 검토 캡처 `assets/pixel-review/`는 사용자 지시 범위 밖이라 유지.
+- **작업 중 실수(Claude Code):** 시험본 전환을 지우면서 `pixel-art.js` `status()`에 남은 `choice` 참조를 놓쳐 페이지 오류 발생 → 화면 검사가 0/7·전체 화면 2/6으로 실패해 커밋 전에 발견, `manifest?.scale || 2`로 수정(기존 기본값과 동일).
+- 테스트(수정 후, 커밋 전): pixel-assets 51/51, pixel-render 7/7, 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, ABYSSFALL 회귀 3종 통과, 페이지 오류 0, `artStatus()` = `{loaded:true, failed:[], scale:2}`, 시험본 주소 404.
+- STATUS·CHANGELOG 갱신.
+- 검토 담당 / 발견 문제 수: 해당 없음(병합·정리 작업). 자체 실수 1건(커밋 전 수정).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 결정 — 2단계 탐험 구조 또는 Noah 3단 콤보.
+- 종료 상태: 병합 PR 제출 후 병합.
