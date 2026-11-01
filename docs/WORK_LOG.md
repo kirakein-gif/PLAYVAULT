@@ -908,3 +908,17 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: 사용자 PR 확인 → Codex가 `CODEX_TASK_05.md`로 구현 → Claude Code 검토.
 - 종료 상태: 규격 제출.
+
+### 2026-11-01 (Asia/Seoul) · CODEX_TASK_05 탐험 시범 구역 구현 제출
+
+- 담당 Codex / 검토 Claude Code(대기). 저장소 원격 fetch --prune·main d532537·열린PR10·STATUS/이력·실제규격과코드 교차 확인. 직전아트 PR7/8은 승인 병합 및 시험본 삭제됨을 확인, 이전 작업을 다시 적용하지 않음. 기준PR10 f6b8be1에서 `codex/hollow-keep-exploration` 생성, 첫상태커밋11ba9d0 원격 공유 후 Draft [PR #11](https://github.com/kirakein-gif/PLAYVAULT/pull/11) 개설. 구현/검증 **c14f876**. 범위next/ 및 README·관리문서, 게임버전전후:번호없는foundation시험방→번호없는2단계시범구역(버전번호변경없음).
+- 규칙: 기존한방createWorld({room,spawn}) 유지하며area모드 추가. 32×18격자, 4방향중심이동/좌표·속도유지, 사다리/꼭대기/점프이탈, 한쪽발판/↓+점프, 물건5종·문3조건, 전용스위치, 전체구역지속상태/cleared, getMap/getFlags·이벤트. 기존CONFIG 값은바이트비교상climbSpeed추가외동일(Ethan2.0/Noah2.4). 원래room.js 보존. 적AI·주인공체력/사망·콤보·저장기능추가없음.
+- 앱: 기본구역JSON로드, 시험방?room=test유지. ↑/W↓/S/E/M·두축조이스틱·조사/지도버튼, 캔버스밖44px터치조작. 지도방문방만/실제연결방향/현재방강조, 지도중정지, 모든조건후성문복귀안내. 구역초기화와수치변경은진행을초기화하며안내명시. 사다리그림과물건9종은새image_gen밑그림을축소/팔레트/알파/이음새정리한경로A; 전문PROVENANCE와빌더보존. 기존영웅/효과/배경15PNG·기존3타일칸·64색팔레트보존. 매달림은규격허용idle대체자세.
+- 구역: 잔광의성문→지하침묵의서고/금간보관실(벽과열쇠)→성문으로되돌아와봉인회랑(열쇠문)→잿빛맹세의홀(두표적)→기울어진종탑(Noah높은레버)→달빛프리즘실(Ethan빛장치)→귀환의다락(먼방에서성문봉인해제)→지름길로성문복귀. 8방, 가로·세로연결/한쪽발판 포함. 기록은실제입력만3602틱=60.0초·44구간·교대2회로 모든방/스위치/문/벽/열쇠/표적 충족, 시작방귀환. 이는스크립트시간이며사람플레이시간/재미판정이아님.
+- 이번검증: exploration-contract **14/14**, area-data **8/8**(완주재생포함), 새exploration-edge **8/8**, pixel-assets **53/53**(ladder/objects), pixel-render 구역/시험방각 **7/7**, mobile-layout **20/20**, mobile-fullscreen **6/6**, 새exploration-browser **4/4**, 기존browser-playtest 시험방 **20/20**, foundation-contract **51/51**, foundation-edge **16/16**, room-traversal **4/4**, ABYSSFALL polish/audio/audio-wind **3종 통과**. audio404 경고는의도한실패복구경로. 로그/tmp/hk05-*.log. 원본검사는f6b8be1과동일(수정/약화/건너뛰기없음); 새검사2개만추가. 기존browser검사는HK_URL에?room=test를명시해동일한20조건유지, 새4개는기본구역실제완주/지도/일시정지/모바일두축·조사를검증.
+- 자체발견/수정: ① 한칸사다리포털에서어깨가천장에걸려초기12/14→중심레인으로경계석만통과해14/14. ② 같은예외가경계문까지무시할수있음→type있는물건충돌은유지, 추가검사. ③ 종탑한쪽발판에서150px문을뛰어넘는우회→270px문으로조정, 옛배치는레버off인데prism진입함을재현했고수정후차단검사통과. 새브라우저검사작성중합성pointerdown은실제pointercapture가없어조사전달실패→CDP실제터치로수정해4/4. 원본검사변경으로해결한것없음.
+- 추가경계8개: 실제레버의Ethan미도달/Noah도달, 열쇠문바닥점프와종탑문발판점프우회차단, 방왕복표적비치명HP유지, 닫힌문뒤투사체차단, 사다리경계문충돌, flags/map/입력데이터불변, 매달린채교대/점프이탈. 새브라우저검사는실제키보드와기존앱루프만사용, 브라우저시계제어외좌표/pose/world주입없음.
+- 재현: 저장소루트HTTP8766, `HK_URL=http://127.0.0.1:8766/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/<name>.cjs`; 기존browser와시험방렌더는URL에?room=test. 순수Node검사와자산검사는HTTP불필요. `HK_SHOT_DIR=/tmp/hk05-review`로새브라우저검사캡처재생성. build-area1→record-area1, 그림은build-full-x2.py→build-exploration-art.py 순서. 새그림빌더/구역/입력기록재실행시17PNG·manifest·두JSON 해시동일.
+- 제출캡처: next/assets/exploration-review/README.md, 실제PC각8방(몸이화면안에완전히들어온뒤), 지도시작/복귀, 사다리상하, 각장치/문/벽/열쇠이벤트, 모바일780×330(DPR2). 캔버스캡처는1920×1080원본이며지도/모바일은페이지전체. 그림원본/지시문도보존.
+- 5개관리문서검토: STATUS/WORK_LOG/CHANGELOG갱신, AGENTS/CLAUDE규칙변경없음. 루트README변경필요없음, nextREADME현재구역/조작/초기화/재현/검사/한계갱신. 기존게임·공용자산·런처·다른게임변경없음.
+- 검토담당/발견문제수: Claude Code/이번PR검토전미확인(자체발견3건위기록). 사용자재요청: task05착수후0회. 다음: Draft→Ready로제출→Claude Code전체재실행/미사용지형도직접검토→사용자재미·난이도·외형판단. 실기기회전확인필요. 병합/배포하지않음. PR10규격이구현PR에포함되므로병합순서는검토자가조율.

@@ -1,10 +1,14 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #7·#8 병합, 시험본 정리).
+확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Codex**(탐험 구조 구현 제출).
 
-## 진행 중 · CODEX_TASK_05 탐험 구조 구현
+## 구현 제출 · CODEX_TASK_05 탐험 시범 구역 / Claude Code 검토 대기
 
-Codex / `codex/hollow-keep-exploration` / 시작2026-11-01 / 기준 PR #10 `f6b8be1`(main `d532537`). 담당 범위: `games/the-hollow-keep/next/` 구역 규칙·입력/UI·8~12방 데이터/완주 기록·사다리/물건 그림·캡처, README·STATUS·WORK_LOG·CHANGELOG. 원본 검사 보존(browser-playtest는 동등 조건으로 구역/시험방 분리 가능), 기존 게임·공용 자산·런처·1단계 수치 보존. 시험방 `?room=test` 유지. 검증: 탐험14개·구역 완주·그림·모바일·브라우저·인수51개 및 기존 회귀. 다음 Claude Code 검토·사용자 재미/난이도 판단. 병합·배포 없음.
+Codex / `codex/hollow-keep-exploration` / [PR #11](https://github.com/kirakein-gif/PLAYVAULT/pull/11) / 기준 PR #10 `f6b8be1`(main `d532537`) / 착수 `11ba9d0` / 마지막 구현·검증 SHA **`c14f876`**, 2026-11-01. 기본 시작은8방 시범 구역, 1단계 시험 방은`?room=test`. 상하좌우 이동·사다리·한쪽 발판·스위치/열쇠/처치 문·전용 장치·부서지는 벽·지도/조사·두 축 조이스틱·상태 유지. 완주 입력 기록3602틱/60.0초, 두 주인공 교대2회, 모든 조건 충족 후 시작 방 복귀. 새 사다리와물건9종, 기존64색/scale2/0·255알파. 매달림은 허용된idle대체 자세.
+
+검증: 탐험14/14·구역/완주8/8·추가경계8/8·자산53/53·렌더 기본/시험방 각7/7·모바일배치20/20·전체화면6/6·탐험브라우저4/4·시험방브라우저20/20·기존인수51/51·경계16/16·구덩이4/4·ABYSSFALL회귀3종 통과. 원본 검사 변경 없음. 기존CONFIG는climbSpeed추가 외 값 동일, room.js와 주인공/효과/배경15PNG·기존3타일칸 보존. 데이터/완주/새그림 재생성 해시 동일. 캡처와재현: `next/assets/exploration-review/README.md`.
+
+다음: Draft→Ready 제출 후 Claude Code가 전체 재실행·완주가 피한 지형/막힘·장치/지름길을 검토. 사용자 재미·난이도·외형 판단 대기, 실제기기회전 확인 필요. PR #10 규격이 이 PR에 포함되어 있으므로 병합순서는 검토자가 조율. 병합·배포 없음. 게임버전번호 변경 없음.
 
 ## PR #7·#8 병합 완료 · THE HOLLOW KEEP 픽셀아트 HD(scale 2) 적용
 
@@ -12,7 +16,7 @@ Codex / `codex/hollow-keep-exploration` / 시작2026-11-01 / 기준 PR #10 `f6b8
 - 현재 기본 자산: `games/the-hollow-keep/next/assets/pixel/` scale 2(136px), 타일 60px, 64색, Ethan·Noah 동작 6종, 룬탄·베기 효과(한 획), 배경 1920×1080.
 - 시험본 삭제: `assets/pixel-trial/`, `?art=trial-x1|x2` 전환, `tests/density-trial.cjs`, `tools/build-density-trial.py`. `build-full-x2.py`가 출발점으로 쓰는 x2 재료만 `tools/art-source/density-trial-x2/`로 옮김. 옮긴 뒤 생성 스크립트 결과가 커밋된 자산과 바이트 단위로 동일함을 확인. 검토 캡처 `assets/pixel-review/`는 유지(사용자 지시 범위 밖).
 - 병합 결과 검사: pixel-assets 51/51, pixel-render 7/7, 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, ABYSSFALL 회귀 3종 통과.
-- 진행 중 작업: **2단계 탐험 구조 규격** — Claude Code / `claude/hollow-keep-exploration-spec` / 2026-11-01 / `games/the-hollow-keep/docs/EXPLORATION_SPEC.md`·`CODEX_TASK_05.md`, `next/tests/exploration-contract.cjs`·`area-data.cjs`, `pixel-assets.cjs`·`mobile-layout.cjs` 보강(게임 코드 변경 없음). 다음 담당: Codex(`codex/hollow-keep-exploration`).
+- 2단계 규격은 PR #10 `f6b8be1` 제출, 구현은 위 PR #11 `c14f876`로 제출. 다음 담당 Claude Code 검토.
 - 2단계 사용자 결정(2026-11-01): 상하좌우 4방향, 길 여는 방법 전부(+특정 적 처치 → 이번에는 시험 표적), 시범 구역 8~12방, 적 없음.
 - 주의: 이 규격 PR이 병합되면 Codex 구현 전까지 `pixel-assets`(ladder·objects)와 `mobile-layout`(조사 버튼)이 실패한다. 1단계·픽셀 기준 PR과 같은 방식으로, 구현 PR과 함께 병합하는 것을 권장.
 
