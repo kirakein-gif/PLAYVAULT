@@ -235,6 +235,13 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 - 규격·검사만(게임 코드·그림·버전 변경 없음). 사용자 결정: 반복 조각 모자이크로 화면·방 다양성, 봉인 통과 수정.
 - `TILE_MOSAIC_SPEC.md`, `CODEX_TASK_07.md`, `tile-mosaic-render.cjs`(7), exploration-contract +2, area-data·pixel-assets 보강. PR #14 위에서 Codex 구현 대기.
 
+## THE HOLLOW KEEP · 타일 모자이크·사다리·봉인 이동 수정 (2026-11-01, Asia/Seoul)
+
+- [f40d0f1](https://github.com/kirakein-gif/PLAYVAULT/commit/f40d0f1) / 같은PR #14, 요청 규격0bc593d 병합76bb9c6. 방 이동 후보가 닫힌 봉쇄물/벽과 겹치면 이전 방 경계에서 멈추도록 수정했습니다. 실제 다락 사다리의 성문 봉인 통과를 두 주인공으로 검사합니다.
+- 큰 배경 대신60px 뒷벽·장식·벽면 조각17종을 합성하고,8방의 층 높이/모양/사다리 배치를 다르게 구성했습니다. 사다리는 밝은 가로대3개·7/7/6px·대비8.11:1로 재제작했습니다.
+- 새 상층을 포함한 입력 완주4159틱·교대2회. 탐험16/16·구역22/22·자산57/57·실제모자이크7/7 및 요청 검사 전체 통과,192개 출발점/172800틱 겹침 없음. 17장 캡처·이력·재현 제출.
+- 원본 인수 검사·기존 수치/크기/영웅그림·시험방 유지, 버전 번호 변경 없음. Claude Code 재검토·사용자 재미/외형 판단 대기. main 병합·배포 없음.
+
 ## THE HOLLOW KEEP · 사다리 위 행동·오르기 동작 규격 (2026-11-01, Asia/Seoul)
 
 - 규격·검사만. 점프 후 재매달림 금지, 옆 바닥으로 내리기, 매달린 채 공격 방향, climb 동작. `LADDER_ACTIONS_SPEC.md`, `CODEX_TASK_08.md`, `ladder-actions.cjs`(8), `ladder-render.cjs`(7). Codex 구현 대기.

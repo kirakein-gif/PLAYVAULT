@@ -1021,6 +1021,24 @@
 - 다음: Codex `CODEX_TASK_07.md`에 포함.
 - 종료 상태: 규격 보강.
 
+### 2026-11-01 (Asia/Seoul) · CODEX_TASK_07 봉인 이동·타일 모자이크·사다리 보완 제출
+
+- 담당 Codex / 재검토 Claude Code(대기). 사용자 요청에 따라 같은PR #14/`codex/hollow-keep-exploration-refine`을 계속 수정했습니다. 기준193149a, 원격fetch/prune·열린PR14/15 확인, AGENTS/현재상태/최근이력/그림·탐험·모자이크 규격과 실제 코드를 교차 확인. 착수880ce32를 원격 공유하고 PR14를Draft로 전환했습니다.
+- 요청된origin/claude/hollow-keep-tile-mosaic(0bc593d)를 **76bb9c6**으로 병합했습니다. STATUS 충돌은 양쪽 항목을 보존해 정리했고, WORK_LOG에는 직전Claude Code검토와 새 규격 기록이 함께 보존됐습니다. 이는 요청된 작업 브랜치 간 병합이며 main/PR 병합은 하지 않았습니다. 마지막 구현/검증 SHA **f40d0f1**. 버전 전후: 번호 없는2단계 시범 구역 유지.
+- 방 이동: 새 방의 벽/닫힌 봉쇄물/미파괴 벽과 겹칠 후보를 거부하고 이전 방 가장자리에 머뭅니다. 경계에 닿을 때 중심이 넘어갈 자세를 미리 검사해 누르고 있어도 밖으로 움직였다 되돌아 튀지 않도록 했습니다. 막힌 축 속도0, 다른 축·방 방문 상태는 유지. 부착한 사다리의 한 칸 경계 벽돌 예외는 유지하지만 물건은 예외로 두지 않습니다. roomBlocked 안내도 추가했습니다.
+- 실제구역 회귀: loft6열 사다리에서 내려가면 gate1행return-seal을 통과하던 경우를 Ethan/Noah 각각 추가했습니다. 닫힌 상태로300틱 내려가도loft에 머물고 gate방문 없음, 추가30틱에도 위치/속도가 안정적이며, 입력으로 빠져나와 실제 레버를 켠 뒤 내려가면gate에 진입합니다. 브라우저도 시작부터 입력으로 다락까지 가서 같은 막힘/해제를 확인합니다.
+- 모자이크: 구역에서bg-chapel/큰 배경을 그리지 않고,60px 뒷벽→back장식→충돌면의3층으로 그립니다. `h=열×7+행×13+방id UTF-16코드합`, back은h%3+1, 속벽은h홀수wall-fill/짝수wall-fill-2. 위/아래/왼쪽/오른쪽/속 우선순위와 방 밖=벽 규칙을 구현했습니다. 세로 장식은top/mid/bottom(p는base),c는candle. 시험 방은 기존 배경 유지.
+- 그림: 새image_gen18칸 원본을 경로A로 분리/축소·기존64색·알파0/255·반복 이음새에 맞춰17개 모자이크 조각과 사다리를 제작했습니다. 뒷벽은 어둡고 대비를 낮추고, 새 벽은 기존 차가운 회색 재질에 맞췄습니다. 사다리는 원본의 목재/놋쇠와 세 가로대를 살려 밝게 정리: 실제7/7/6px, 대비8.11:1(요구4px/3:1 이상). 원래floor-top/wall-fill/ledge·영웅/효과/배경 PNG·팔레트 보존. PROVENANCE에 전문 지시문/정리/원본/재현 도구를 기록했습니다. 네이티브 빌더의uint8 연산 경고도 정수 변환으로 제거했습니다.
+- 구역:8개 방의 층 높이·큰 공간·낙하 연결·사다리 열을 다르게 설계하고 모든 방에back을 넣었습니다. 벽 위치 차이는 최소73칸, 사다리 열 조합8개가 모두 다름. 빈칸 평균0.599826, V1~V4/D1~D6 통과. 회랑의 높이가 다른 갤러리 사이가 실제로 통과되지 않는 것을 자체경계 검사에서 발견해 열린 낙하 연결로 보완했습니다. 장식은 위/가운데/아래 공간에 나눠 배치하며 사다리를 가리지 않도록 했습니다.
+- 입력 완주를 다시 기록했습니다: **4159틱=69.3초·71구간·교대2회**. 새 회랑의 서쪽 사다리로 위층에 올라 열린 갤러리를 지나 동쪽 사다리로 내려오고, 아래 봉쇄물을 열어 전체 조건을 충족한 뒤 성문으로 복귀합니다. 스크립트 재생 시간이며 사람의 플레이 시간/재미 평가가 아닙니다.
+- 이번 검사: exploration-contract **16/16**, entrance-contract **9/9**, foundation-contract **51/51**, area-data **22/22**, pixel-assets **57/57**, tile-mosaic-render **7/7**, pixel-render 구역/시험방각 **7/7**, mobile-layout **20/20**, mobile-fullscreen **6/6**, exploration-browser **6/6**, browser-playtest(?room=test) **20/20**, room-traversal **4/4**, foundation-edge **16/16**, exploration-edge **13/13**, ABYSSFALL polish/audio/audio-wind **3종 통과**. audio404 경고는 기존 실패 복구 검사. 로그/tmp/hk07-*.log.
+- 추가 무작위 입력: check-area-overlap.cjs로8방/두주인공의 정상 설 곳에서192개 출발점을 골라900틱씩, **172800틱**의 고정시드 입력을 재생해 벽·닫힌 봉쇄물 겹침 없음. 모든 경로나 재미를 보증하는 검사는 아닙니다.
+- 검사 보존:0bc593d 대비 원본 인수 검사는 바이트 동일합니다. 자체exploration-edge는 새 회랑의 발 위치를 갱신하며 같은 통과/차단 조건을 유지하고, 실제loft봉인2건을 추가해13개입니다. 자체exploration-browser는 기존5항목을 유지하고 입력만의 봉인 왕복 검사를 더해6개입니다. 검사 시계 관측값을초기화 버튼 뒤 실제tick에서 다시 동기화해 불필요한 긴 대기를 제거했습니다. world/pose/좌표는 주입하지 않습니다.
+- 재현: 저장소루트HTTP8766 후 `HK_URL=http://127.0.0.1:8766/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/<name>.cjs`. 기존browser와시험방렌더는?room=test. 데이터build-area1→record-area1; 그림build-full-x2.py→build-exploration-art.py→build-tile-mosaic.py. 데이터/완주/그림/manifest 재생성 해시 일치. overlap 도구는Node로 실행합니다.
+- 제출캡처:17장, 실제8방·모바일780×330·봉인 막힘/열림·새 상층·지도·사다리. 원본PNG와RGBA 바이트 동일한 무손실WebP 총1629520바이트. 이전 캡처는 보존했습니다. 새 캡처와재현은next/assets/tile-mosaic-review/README.md 및pack-mosaic-review.py.
+- 5개관리문서 검토: STATUS/WORK_LOG/CHANGELOG 갱신, AGENTS/CLAUDE 규칙 변경 없음. 루트README 변경 필요 없음, nextREADME/PROVENANCE 갱신. 기존 게임·공용자산·런처·다른게임·CONFIG·캐릭터크기/화면크기·1단계 시험방 원본은 변경하지 않았습니다.
+- 검토 담당/발견 문제 수: Claude Code / 이번 재검토 전 미확인. 직전PR14의 봉인 통과 지적1건과 사용자의 사다리 읽힘 지적을 함께 반영했습니다. 사용자 재요청: task07 착수 후0회(이번은task06 제출 후 보완 요청). 다음: 같은PR14 Ready→Claude Code재검토→사용자 재미/외형 판단. 실기기 회전 확인 필요. main/PR 병합·배포하지 않음.
+
 ### 2026-11-01 (Asia/Seoul) · Codex 모자이크·봉인 수정·사다리(PR #14 `6fdcc52`) 재검토
 
 - 담당 AI: Claude Code(검토). 구현: Codex `f40d0f1`(+기록 `6fdcc52`), PR #15 규격 `0bc593d` 병합 포함.
@@ -1046,3 +1064,15 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex `CODEX_TASK_08.md`(PR #14) → Claude Code 검토 → 승인 시 PR #15 → PR #14 병합.
 - 종료 상태: 규격 제출.
+
+### 2026-11-01 (Asia/Seoul) · PR #15·#14 병합, 사다리 작업 새 브랜치
+
+- 담당 AI: Claude Code. 사용자 지시: "지금 병합하고 새 브랜치로 진행해 주세요".
+- 순서: PR #15 브랜치에 PR #14 head `6fdcc52`를 병합해 관리 문서 충돌(STATUS·WORK_LOG·CHANGELOG, 양쪽 추가)을 시간순으로 정리 → PR #15를 PR #14 브랜치에 병합 → PR #14를 main에 병합.
+- 정리 원칙: WORK_LOG·CHANGELOG는 Codex CODEX_TASK_07 제출 → Claude Code 재검토 → 사다리 규격 순. STATUS는 최신(병합·사다리 다음 작업)을 위에, Codex 제출 내용은 "병합됨" 절로 보존.
+- `CODEX_TASK_08.md`: 작업 브랜치를 PR #14 대신 main 기준 새 브랜치 `codex/hollow-keep-ladder-actions`로 변경.
+- 병합 전 확인(통합 트리): exploration-contract 16/16, entrance 9/9, foundation-contract 51/51, area-data 22/22, exploration-edge 13/13, foundation-edge 16/16, tile-mosaic-render 7/7, pixel-render 7/7, mobile-layout 20/20, mobile-fullscreen 6/6. 예상 실패: ladder-actions 0/8, ladder-render 3/7, pixel-assets 55/57(climb 없음) — CODEX_TASK_08 대상.
+- 검토 담당 / 발견 문제 수: 해당 없음(병합 작업).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex `CODEX_TASK_08.md`(새 브랜치) → Claude Code 검토.
+- 종료 상태: 병합 진행.

@@ -8,13 +8,13 @@
 PLAYVAULT — THE HOLLOW KEEP: 사다리 위 행동(점프로 떠나기·옆으로 내리기·공격 방향)과 climb 동작
 
 저장소: kirakein-gif/PLAYVAULT
-작업 브랜치: codex/hollow-keep-exploration-refine (PR #14를 이어서 수정한다)
-먼저 할 일: origin/claude/hollow-keep-tile-mosaic 를 이 브랜치에 다시 병합한다(새 규격·검사가 추가됨).
+기준 브랜치: main (PR #14·#15 병합 완료. 이 지시서와 검사가 main에 들어 있음)
+작업 브랜치: codex/hollow-keep-ladder-actions (main에서 새로 만든다)
 
 [작업 시작 전]
 1. git fetch origin --prune, 원격 브랜치·열린 PR 확인. games/the-hollow-keep/ 대상 다른 미병합 작업이 있으면 시작하지 말고 확인 요청.
 2. 읽기: AGENTS.md, docs/STATUS.md, docs/WORK_LOG.md 최근 항목, games/the-hollow-keep/docs/LADDER_ACTIONS_SPEC.md (필수)
-3. 첫 커밋으로 STATUS에 담당·범위를 적고 푸시. PR #14를 Draft로 돌린다.
+3. 첫 커밋으로 STATUS에 담당·범위를 적고 푸시, Draft PR 개설.
 
 [규칙 — §2]
 - L1: 사다리에서 점프로 떠난 뒤 16틱 동안 다시 매달리지 않는다(↑/↓를 누르고 있어도). 원인: 지금은 ↑를 누른 채 점프하면 다음 틱에 바로 다시 잡는다.

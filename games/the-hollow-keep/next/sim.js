@@ -139,14 +139,37 @@
   }
   function transition(w,ev) {
     const p=w.player,r=w.room,cx=p.x+p.w/2,cy=p.y+p.h/2;
-    const dir=cx<0?'left':cx>r.width?'right':cy<0?'up':cy>r.height?'down':null;
+    const crossed=cx<0?'left':cx>r.width?'right':cy<0?'up':cy>r.height?'down':null;
+    const dir=crossed||(p.x<0?'left':p.x+p.w>r.width?'right':p.y<0?'up':p.y+p.h>r.height?'down':null);
     if(!dir)return;
     const delta={left:[-1,0],right:[1,0],up:[0,-1],down:[0,1]}[dir];
     const pos=w.area.rooms[w.roomId].pos;
     const entry=Object.entries(w.area.rooms).find(([,next])=>next.pos[0]===pos[0]+delta[0]&&next.pos[1]===pos[1]+delta[1]);
     if(!entry)return;
-    const from=w.roomId;w.roomId=entry[0];p.x-=delta[0]*r.width;p.y-=delta[1]*r.height;
-    w.room=w.areaRooms[w.roomId];w.dummies=w.room.dummies;w.visited[w.roomId]=true;w.attacks=[];
+    const destination=w.areaRooms[entry[0]],candidate={...p,x:p.x-delta[0]*r.width,y:p.y-delta[1]*r.height};
+    // Probe the center-crossing pose as the leading edge reaches the boundary.
+    // Closed exits then hold steadily, rather than repeatedly moving out and snapping back.
+    const probe={...candidate};
+    if(!crossed){
+      if(delta[0])probe.x=delta[0]>0?-p.w/2+1e-6:r.width-p.w/2-1e-6;
+      else probe.y=delta[1]>0?-p.h/2+1e-6:r.height-p.h/2-1e-6;
+    }
+    const center=probe.x+probe.w/2;
+    const blocked=destination.solids.some(s=>{
+      // Attached shoulders may cross boundary masonry beside a one-cell ladder.
+      // Mechanisms and masonry across the center lane always block entry.
+      if(p.climbing&&delta[1]&&!s.type&&(center<=s.x||center>=s.x+s.w))return false;
+      return overlap(probe,s);
+    });
+    if(blocked){
+      ev.push({type:'roomBlocked',from:w.roomId,to:entry[0],dir});
+      if(delta[0]){p.x=delta[0]>0?r.width-p.w:0;p.vx=0;}
+      else {p.y=delta[1]>0?r.height-p.h:0;p.vy=0;if(delta[1]>0&&!p.climbing)p.onGround=true;}
+      return;
+    }
+    if(!crossed)return;
+    const from=w.roomId;w.roomId=entry[0];p.x=candidate.x;p.y=candidate.y;
+    w.room=destination;w.dummies=w.room.dummies;w.visited[w.roomId]=true;w.attacks=[];
     ev.push({type:'room',from,to:w.roomId,dir});
   }
   function move(p, solids, platforms = []) {

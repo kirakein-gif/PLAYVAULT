@@ -1,17 +1,24 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Codex**(CODEX_TASK_06 구현 제출).
+확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #15·#14 병합, 사다리 작업 새 브랜치 지시).
 
+## 병합 완료 · PR #15 → PR #14 (2026-11-01) / 다음: Codex 사다리 작업(새 브랜치)
 
-## 제출 · THE HOLLOW KEEP 사다리 위 행동·오르기 동작 규격 / Codex 구현 대기
+사용자 승인("지금 병합하고 새 브랜치로 진행해 주세요"). PR #15(규격·검사: 모자이크, 방 이동 겹침, 사다리 읽힘, 사다리 행동)를 PR #14 브랜치에 병합한 뒤 PR #14를 main에 병합. 사다리 행동·climb 동작은 새 브랜치 `codex/hollow-keep-ladder-actions`(기준 main)에서 `CODEX_TASK_08.md`로 진행.
+- 주의: main에서 ladder-actions 0/8, ladder-render 3/7, pixel-assets climb 없음은 Codex 구현 전까지 예상된 실패.
 
-Claude Code / `claude/hollow-keep-tile-mosaic`(PR #15) / 2026-11-01. 사용자 의견: 사다리에서 점프·공격·옆 층 이동 불가, 오르기 동작 필요. 범위: `LADDER_ACTIONS_SPEC.md`, `CODEX_TASK_08.md`, `tests/ladder-actions.cjs`(8), `tests/ladder-render.cjs`(7), `pixel-assets.cjs`(climb). PR #14 현재 구현 기준 ladder-actions 0/8, ladder-render 3/7, pixel-assets climb 없음(예상). PR #14 모자이크 재검토는 통과(관찰 3건), 병합 대기.
+## 제출 · THE HOLLOW KEEP 사다리 위 행동·오르기 동작 규격 / Codex 구현 대기(새 브랜치)
 
-## 제출 · THE HOLLOW KEEP 타일 모자이크 규격 + 봉인 통과 수정 지시 / Codex 구현 대기
+Claude Code / `claude/hollow-keep-tile-mosaic`(PR #15) / 2026-11-01. 사용자 의견: 사다리에서 점프·공격·옆 층 이동 불가, 오르기 동작 필요. 범위: `LADDER_ACTIONS_SPEC.md`, `CODEX_TASK_08.md`, `tests/ladder-actions.cjs`(8), `tests/ladder-render.cjs`(7), `pixel-assets.cjs`(climb). PR #14 현재 구현 기준 ladder-actions 0/8, ladder-render 3/7, pixel-assets climb 없음(예상). PR #14 모자이크 재검토 통과(관찰 3건) 후 병합됨.
 
-Claude Code / `claude/hollow-keep-tile-mosaic` / 기준: PR #14 `193149a` / 2026-11-01. 사용자 결정: 봉인 통과는 Codex 수정, 다양성은 픽셀 스타일의 반복 조각 모자이크. 범위: `TILE_MOSAIC_SPEC.md`, `CODEX_TASK_07.md`, `tests/tile-mosaic-render.cjs`(새 7개), `exploration-contract.cjs`(방 이동 겹침 금지 2개 추가 → 16개), `area-data.cjs`(back 격자·V1~V4), `pixel-assets.cjs`(모자이크 조각 17종), DESIGN_DIRECTION. 게임 코드·그림 변경 없음.
-- PR #14 현재 구현 기준 예상 실패: exploration-contract 14/16, area-data back·V1~V3, pixel-assets 조각, tile-mosaic-render. Codex가 PR #14 브랜치에서 `CODEX_TASK_07.md`로 구현.
-- PR #14 검토: 봉쇄물 통과 1건(return-seal), 관찰 3건. 미리보기 `https://8aa93ab3.kirakein-playvault.pages.dev/games/the-hollow-keep/next/`. 병합 없음.
+## 병합됨 · CODEX_TASK_07 모자이크·봉인·사다리 (PR #14)
+
+Codex / `codex/hollow-keep-exploration-refine` / 같은 [PR #14](https://github.com/kirakein-gif/PLAYVAULT/pull/14) / 기준193149a, 착수880ce32, 요청 규격0bc593d 병합76bb9c6 / 마지막 구현·검증 SHA **f40d0f1**, 2026-11-01. PR을Draft로 돌린 뒤 봉인 이동 겹침·60px 모자이크·8방 모양/장식·밝은 사다리를 함께 보완했습니다. 닫힌 출구는 이전 방 경계에서 안정적으로 멈추며, 레버를 켜면 통과합니다. 사다리는 가로대3개/7·7·6px/뒷벽 대비8.11:1. 방 쌍의 벽 위치 차이는 최소73칸, 사다리 열 조합은8개 모두 다릅니다.
+
+검증: 탐험16/16·출입문9/9·기존인수51/51·구역22/22·자산57/57·모자이크렌더7/7·픽셀렌더 구역/시험방각7/7·배치20/20·전체화면6/6·탐험브라우저6/6·시험방브라우저20/20·기존경계16/16·구덩이4/4·자체경계13/13·ABYSSFALL 회귀3종 통과. 추가192개 출발점/172800틱에서 벽·닫힌 봉쇄물 겹침 없음. 완주 재기록4159틱/69.3초·71구간·교대2회(새 회랑 상층 경로 포함). 인수 검사 원본은0bc593d와 동일, 자체 탐험 검사2개만 보강했습니다.
+
+재현/17장 무손실 캡처: `next/assets/tile-mosaic-review/README.md`(총1629520바이트, 원본RGBA 동일). 다음: 같은 PR을Ready로 제출 → Claude Code 전체 재실행·방 모양/모자이크/끼임 검토 → 사용자 재미·외형 판단. 실제 기기 회전 확인 필요. CONFIG·캐릭터/화면 크기·영웅/효과 PNG·기존 시험 방 보존. main/PR 병합·배포 없음, 게임 버전 번호 변경 없음. 아래는 이전 제출 이력입니다.
+
 ## 구현 제출 · CODEX_TASK_06 / Claude Code 검토 대기
 
 Codex / `codex/hollow-keep-exploration-refine` / [PR #14](https://github.com/kirakein-gif/PLAYVAULT/pull/14) / 기준 **main1588a46**, 착수8b3654c, 마지막 구현·검증 SHA **e8e041e** / 2026-11-01. 지시서에도 main 우선 정정 한 줄을 추가했습니다. 출입문 두 쌍(먼 방 연결·잠금 포함), 봉쇄물 반복 격자와 방법 기호, 8방 세 층/밀도 D1~D6, 숨은 열쇠·막히지 않은 우회로를 구현했습니다. 입력 완주는3671틱/61.2초·61구간·교대2회입니다. 기존 시험 방은?room=test, CONFIG·캐릭터 크기·화면 크기는 그대로입니다.

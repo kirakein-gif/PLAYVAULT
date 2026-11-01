@@ -17,7 +17,11 @@ move(300);tap('up');if(w.roomId!=='gate')throw Error('vault arch');
 move(795);room('crypt','down');until('down',()=>player().onGround);
 move(450);tap('interact');if(w.roomId!=='prism')throw Error('locked arch');run('',5);tap('up');if(w.roomId!=='crypt')throw Error('return arch');
 move(795);room('gate','up');until('up',()=>player().y+player().h<=500);until('jump,right',()=>player().onGround);run('',8);
-room('nave','right');room('reliquary','right');move(180);tap('attack');run('',65);tap('attack');run('',65);
+room('nave','right');
+// Traverse the new upper gallery before returning to unlock the lower barrier.
+move(285);until('up',()=>player().onGround&&!player().climbing);move(700);move(825);until('down',()=>player().onGround&&!player().climbing&&player().y+player().h>=510);
+move(560);if(!HK.getFlags(w).doors['bronze-door'])throw Error('bronze return route');
+room('reliquary','right');move(180);tap('attack');run('',65);tap('attack');run('',65);
 move(765);room('belfry','up');until('up',()=>player().y+player().h<=500);until('jump,left',()=>player().onGround);move(465);
 tap('swap');run('',15);until('jump',()=>player().y<330,90);tick('jump,interact');run('jump',35);until('',()=>player().onGround);
 room('prism','left');move(375);tap('swap');run('',15);tap('interact');room('loft','left');move(495);tap('interact');move(195);room('gate','down');until('down',()=>player().onGround&&!player().climbing);run('',10);

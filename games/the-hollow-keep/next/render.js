@@ -81,19 +81,34 @@
       const p = HKSim.getPlayer(world), room = world.room;
       ctx.clearRect(0, 0, 960, 540); ctx.fillStyle = '#101320'; ctx.fillRect(0, 0, 960, 540);
       const background=HKPixel.manifest()?.background,pixelBackground=background&&HKPixel.image(background);
-      if(pixelBackground)ctx.drawImage(pixelBackground,0,0,960,540);
-      else if (backdrop.complete && backdrop.naturalWidth) {
+      if(!room.grid&&pixelBackground)ctx.drawImage(pixelBackground,0,0,960,540);
+      else if (!room.grid&&backdrop.complete && backdrop.naturalWidth) {
         ctx.globalAlpha = .18; ctx.drawImage(backdrop, 0, 0, 960, 540); ctx.globalAlpha = 1;
       }
-      if(!pixelBackground)for (let x = 28; x < 960; x += 154) {
+      if(!room.grid&&!pixelBackground)for (let x = 28; x < 960; x += 154) {
         ctx.strokeStyle = '#31313e'; ctx.lineWidth = 5;
         ctx.beginPath(); ctx.moveTo(x, 480); ctx.lineTo(x, 170); ctx.quadraticCurveTo(x, 105, x + 59, 76);
         ctx.quadraticCurveTo(x + 118, 105, x + 118, 170); ctx.lineTo(x + 118, 480); ctx.stroke();
         ctx.strokeStyle = '#4b4250'; ctx.lineWidth = 1; ctx.stroke();
       }
       if(room.grid){
+        const salt=[...world.roomId].reduce((sum,ch)=>sum+ch.charCodeAt(0),0),hash=(x,y)=>x*7+y*13+salt;
+        const wall=(y,x)=>y<0||y>=18||x<0||x>=32||room.grid[y][x]==='#';
+        // Mosaic layers: dark masonry, authored ornaments, then collision surfaces.
+        room.grid.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='#')areaCell('back-'+(hash(x,y)%3+1),x*30,y*30);}));
+        const back=room.back||world.area.rooms[world.roomId].back;
+        if(back)back.forEach((row,y)=>[...row].forEach((ch,x)=>{
+          if(ch==='.'||wall(y,x))return;
+          if(ch==='c'){areaCell('candle',x*30,y*30);return;}
+          const family={w:'window',p:'pillar',b:'banner'}[ch];if(!family)return;
+          const part=back[y-1]?.[x]!==ch?'top':back[y+1]?.[x]!==ch?(ch==='p'?'base':'bottom'):'mid';
+          areaCell(family+'-'+part,x*30,y*30);
+        }));
         room.grid.forEach((row,y)=>[...row].forEach((ch,x)=>{
-          if(ch==='#')areaCell(y>0&&room.grid[y-1][x]!=='#'?'floor-top':'wall-fill',x*30,y*30);
+          if(ch==='#'){
+            const tile=!wall(y-1,x)?'floor-top':!wall(y+1,x)?'wall-bottom':!wall(y,x-1)?'wall-left':!wall(y,x+1)?'wall-right':hash(x,y)%2?'wall-fill':'wall-fill-2';
+            areaCell(tile,x*30,y*30);
+          }
           if(ch==='-')areaCell('ledge',x*30,y*30,16);
           if(ch==='H')areaCell('ladder',x*30,y*30);
         }));
