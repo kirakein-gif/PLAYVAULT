@@ -1,6 +1,7 @@
 {
   "version": 1,
-  "tileSize": 30,
+  "scale": 2,
+  "tileSize": 60,
   "palette": "palette.json",
   "heroes": {
     "ethan": {
@@ -11,12 +12,12 @@
       "animations": {
         "idle": {
           "file": "ethan-idle.png",
-          "frameW": 96,
-          "frameH": 96,
+          "frameW": 256,
+          "frameH": 192,
           "frames": 4,
           "pivot": {
-            "x": 48,
-            "y": 95
+            "x": 128,
+            "y": 190
           },
           "ticks": [
             12,
@@ -28,12 +29,12 @@
         },
         "run": {
           "file": "ethan-run.png",
-          "frameW": 96,
-          "frameH": 96,
+          "frameW": 256,
+          "frameH": 192,
           "frames": 6,
           "pivot": {
-            "x": 48,
-            "y": 95
+            "x": 128,
+            "y": 190
           },
           "ticks": [
             6,
@@ -47,12 +48,12 @@
         },
         "jump-standing": {
           "file": "ethan-jump-standing.png",
-          "frameW": 96,
-          "frameH": 96,
+          "frameW": 256,
+          "frameH": 192,
           "frames": 3,
           "pivot": {
-            "x": 48,
-            "y": 95
+            "x": 128,
+            "y": 190
           },
           "ticks": [
             6,
@@ -63,12 +64,12 @@
         },
         "jump-running": {
           "file": "ethan-jump-running.png",
-          "frameW": 96,
-          "frameH": 96,
+          "frameW": 256,
+          "frameH": 192,
           "frames": 3,
           "pivot": {
-            "x": 48,
-            "y": 95
+            "x": 128,
+            "y": 190
           },
           "ticks": [
             6,
@@ -79,12 +80,12 @@
         },
         "land": {
           "file": "ethan-land.png",
-          "frameW": 96,
-          "frameH": 96,
+          "frameW": 256,
+          "frameH": 192,
           "frames": 2,
           "pivot": {
-            "x": 48,
-            "y": 95
+            "x": 128,
+            "y": 190
           },
           "ticks": [
             4,
@@ -94,29 +95,47 @@
         },
         "attack": {
           "file": "ethan-attack.png",
-          "frameW": 128,
-          "frameH": 96,
+          "frameW": 320,
+          "frameH": 224,
           "frames": 4,
           "pivot": {
-            "x": 48,
-            "y": 95
+            "x": 128,
+            "y": 190
           },
           "ticks": [
-            5,
-            5,
-            5,
+            2,
+            2,
+            3,
             5
           ],
-          "loop": false
+          "loop": false,
+          "hands": [
+            {
+              "x": 152,
+              "y": 116
+            },
+            {
+              "x": 186,
+              "y": 88
+            },
+            {
+              "x": 171,
+              "y": 118
+            },
+            {
+              "x": 154,
+              "y": 120
+            }
+          ]
         },
         "fx-rune": {
           "file": "ethan-fx-rune.png",
-          "frameW": 32,
-          "frameH": 32,
+          "frameW": 48,
+          "frameH": 48,
           "frames": 2,
           "pivot": {
-            "x": 16,
-            "y": 16
+            "x": 24,
+            "y": 24
           },
           "ticks": [
             4,
@@ -134,12 +153,12 @@
       "animations": {
         "idle": {
           "file": "noah-idle.png",
-          "frameW": 96,
-          "frameH": 96,
+          "frameW": 256,
+          "frameH": 192,
           "frames": 4,
           "pivot": {
-            "x": 48,
-            "y": 95
+            "x": 128,
+            "y": 190
           },
           "ticks": [
             12,
@@ -151,12 +170,12 @@
         },
         "run": {
           "file": "noah-run.png",
-          "frameW": 96,
-          "frameH": 96,
+          "frameW": 256,
+          "frameH": 192,
           "frames": 6,
           "pivot": {
-            "x": 48,
-            "y": 95
+            "x": 128,
+            "y": 190
           },
           "ticks": [
             6,
@@ -170,12 +189,12 @@
         },
         "jump-standing": {
           "file": "noah-jump-standing.png",
-          "frameW": 96,
-          "frameH": 96,
+          "frameW": 256,
+          "frameH": 192,
           "frames": 3,
           "pivot": {
-            "x": 48,
-            "y": 95
+            "x": 128,
+            "y": 190
           },
           "ticks": [
             6,
@@ -186,12 +205,12 @@
         },
         "jump-running": {
           "file": "noah-jump-running.png",
-          "frameW": 96,
-          "frameH": 96,
+          "frameW": 256,
+          "frameH": 192,
           "frames": 3,
           "pivot": {
-            "x": 48,
-            "y": 95
+            "x": 128,
+            "y": 190
           },
           "ticks": [
             6,
@@ -202,12 +221,12 @@
         },
         "land": {
           "file": "noah-land.png",
-          "frameW": 96,
-          "frameH": 96,
+          "frameW": 256,
+          "frameH": 192,
           "frames": 2,
           "pivot": {
-            "x": 48,
-            "y": 95
+            "x": 128,
+            "y": 190
           },
           "ticks": [
             4,
@@ -217,36 +236,54 @@
         },
         "attack": {
           "file": "noah-attack.png",
-          "frameW": 128,
-          "frameH": 96,
+          "frameW": 320,
+          "frameH": 224,
           "frames": 4,
           "pivot": {
-            "x": 48,
-            "y": 95
+            "x": 128,
+            "y": 190
           },
           "ticks": [
-            5,
-            5,
-            5,
-            5
+            2,
+            2,
+            2,
+            3
           ],
-          "loop": false
+          "loop": false,
+          "hands": [
+            {
+              "x": 152,
+              "y": 116
+            },
+            {
+              "x": 188,
+              "y": 90
+            },
+            {
+              "x": 160,
+              "y": 130
+            },
+            {
+              "x": 154,
+              "y": 120
+            }
+          ]
         },
         "fx-slash": {
           "file": "noah-fx-slash.png",
-          "frameW": 96,
-          "frameH": 64,
+          "frameW": 112,
+          "frameH": 144,
           "frames": 3,
           "pivot": {
-            "x": 48,
-            "y": 32
+            "x": 0,
+            "y": 72
           },
           "ticks": [
-            4,
-            4,
-            4
+            2,
+            2,
+            2
           ],
-          "loop": true
+          "loop": false
         }
       }
     }

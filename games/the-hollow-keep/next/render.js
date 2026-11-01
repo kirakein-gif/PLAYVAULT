@@ -79,7 +79,9 @@
       else if(p.onGround&&state.land!==undefined&&world.tick-state.land<duration('land'))action='land';
       const age=action==='attack'?world.tick-state.attack:action==='land'?world.tick-state.land:world.tick;
       const frame=anim=>action.startsWith('jump-')?(p.vy < -1?0:p.vy > 1?2:1):timed(anim,age);
-      if(!sprite(world.active,action,frame,p.x+p.w/2,p.y+p.h,p.face)){
+      const attackIndex=action==='attack'&&anims?.attack?timed(anims.attack,age):-1;
+      const displayFace=action==='attack'?(state.attackFace??p.face):p.face;
+      if(!sprite(world.active,action,frame,p.x+p.w/2,p.y+p.h,displayFace)){
         // Preserve geometric fallback when the current animation cannot be loaded.
         ctx.save();ctx.translate(p.x + p.w / 2, p.y + p.h);ctx.scale(p.face,1);
         if (!p.onGround && p.jumpKind === 'running') ctx.rotate(.16 * Math.sign(p.takeoffVx) * p.face);
@@ -92,7 +94,23 @@
       }
       for (const a of world.attacks.filter(a => a.life > 0)) {
         const fx=a.kind==='projectile'?'fx-rune':'fx-slash';
-        if(sprite(a.hero,fx,anim=>timed(anim,world.tick),a.x+a.w/2,a.y+a.h/2,a.face))continue;
+        if(a.kind==='melee'){
+          // One arc, only during the visible attack swing, rooted at its hand.
+          // Trial sets without attack/fx keep their geometric fallback below.
+          const animation=anims?.attack,arc=anims?.['fx-slash'];
+          if(a.hero!==world.active||action!=='attack'||age<(animation?.ticks?.[0]??2))continue;
+          if(animation&&arc&&HKPixel.image(animation.file)&&HKPixel.image(arc.file)){
+            const start=animation.ticks[0],fxAge=age-start;
+            const life=arc.ticks.reduce((total,ticks)=>total+ticks,0);
+            if(a.hero!==world.active||action!=='attack'||attackIndex<1||fxAge<0||fxAge>=life)continue;
+            const hand=animation.hands?.[attackIndex]||{x:animation.pivot.x+32,y:animation.pivot.y-70};
+            const scale=HKPixel.status().scale;
+            const handX=p.x+p.w/2+(hand.x-animation.pivot.x)/scale*displayFace;
+            const handY=p.y+p.h+(hand.y-animation.pivot.y)/scale;
+            sprite(a.hero,fx,anim=>timed(anim,fxAge),handX,handY,displayFace);
+            continue;
+          }
+        }else if(sprite(a.hero,fx,anim=>timed(anim,world.tick),a.x+a.w/2,a.y+a.h/2,a.face))continue;
         ctx.fillStyle = a.kind === 'projectile' ? '#efd181' : '#8addf0';
         if (a.kind === 'projectile') {ctx.beginPath();ctx.ellipse(a.x+a.w/2,a.y+a.h/2,a.w/2,a.h/2,0,0,Math.PI*2);ctx.fill();}
         else {ctx.globalAlpha=.55;ctx.beginPath();ctx.ellipse(a.x+a.w/2,a.y+a.h/2,a.w/2,a.h/2,-a.face*.25,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
@@ -108,7 +126,7 @@
     draw.event=(event,world)=>{
       if(previousWorld!==world){visual={};previousWorld=world;}
       const state = visual[world.active] ||= {};
-      if(event.type==='attack')state.attack=world.tick;
+      if(event.type==='attack'){state.attack=world.tick;state.attackFace=world.player.face;}
       if(event.type==='land')state.land=world.tick;
     };
     return draw;

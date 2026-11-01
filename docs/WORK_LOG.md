@@ -809,3 +809,17 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex가 `CODEX_TASK_04.md`로 scale 2 전체 제작 → Claude Code 검토 → 사용자 외형 판단.
 - 종료 상태: 기준 제출.
+
+### 2026-11-01 (Asia/Seoul) · CODEX_TASK_04 선택 x2 전체 동작 구현 제출
+
+- 담당 Codex / 재검토 Claude Code(대기) / 브랜치 `codex/hollow-keep-pixel-art`, 같은 PR #8. 기준 b36f092, 시작 전 최신 원격/PR/댓글 확인. 규격 최신2a8ecc6와 앞선a89db8c를 c95a5f8/59b4dca로 반영하고 착수e06d682를 원격 공유. WORK_LOG 충돌은 양측 기존 기록을 보존해 해결했다.
+- 범위: `next/assets/pixel/`, renderer/loader, 생성 원본·재현 도구, `pixel-review/`, README·관리 문서. 게임 버전 전후: foundation 시험 방(버전 번호 없음) 유지. x2 확정으로 기본136/128px 밀도 적용, 게임 속 몸 크기와 판정 동일.
+- 경로 A: 새 Ethan/Noah 동작 원본 생성 → 각 자세 높이별 축소 → 공유64색·알파·1px 윤곽·떠 있는 점·손/옷 구멍·머리/발 정렬 정리. 선택 trial x2 idle/run 출발점 보존, Noah run 신규. Ethan 생성 보드의 제자리 점프가2개여서 목표 원본 중간 자세로 보완해3개 구성. 생성 지시문 전문·도구 정보는 기본 PROVENANCE. 각 주인공 idle4/run6/jump-standing3/jump-running3/land2/attack4.
+- 공격 준비 모두2틱; 판정/룬탄은 종전 즉시. attack 이벤트 방향을 고정하고 손 위치 metadata로 Noah 베기를 앞쪽에 배치, 준비에는 숨김, 공격 나이 기준3프레임 단발. 얇은 곡선·밝은 칼날·가늘어지는 꼬리/분산점으로 재제작. Rune2프레임 반복,60px 타일(ledge32행만 불투명),1920×1080 배경. 기본 로드 실패 시에도 scale2 backing hint.
+- 검증(이번 실행, Chromium / 로컬 HTTP8766): pixel-assets **51/51**, pixel-render **7/7**(좌/우 베기 포함), foundation-contract **51/51**, foundation-edge **16/16**, room-traversal **4/4**, mobile-layout **20/20**, mobile-fullscreen **6/6**, browser-playtest **20/20**, density-trial **10/10**. ABYSSFALL polish/audio/audio-wind **3종 통과**(audio404 경고는 의도한 실패 복구 검사). 로그 `/tmp/hk04-*.log`. 이전 기본50/51 slash.loop 실패는 이번 loopfalse로 해결.
+- 재현: 저장소 루트 HTTP 서버, `HK_URL=http://127.0.0.1:8766/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/<name>.cjs`; 자산 검사는 HTTP 불필요. 기존 회귀는 `node tests/{polish-regression,audio-regression,audio-wind-regression}.cjs` 각각 실행.
+- 검사 보존: 이번 작업은 tests 파일을 수정하지 않았다. 이전4917569의 시험 경로404 정규식 보완은 Claude Code가 이미 검토한 상태로 유지. density-trial 원본은 시험본 디렉터리에 캡처를 덮어쓰기 때문에 **내용이 동일한 사본**을 `/tmp/hk-density-check/tests/`에서 실행하고 출력도 임시 sibling assets로 격리(HK_URL 위 주소, 전역 Playwright NODE_PATH 설정). 원본 판정/경로 코드 변경·건너뛰기 없음. 이 출력 경로 제약은 검사 담당에게 인계.
+- 보존 확인: task04 착수e06d682 대비 sim.js·모든 검사·pixel-trial 전체 diff없음; trial은 b36f092 대비도 diff없음. 다른 게임·공용 자산·루트 런처 변경 없음. 원본 PNG16개 재빌드 SHA256 동일. 로컬 자산 검사에서 ledge 아래 잔점1개를 발견해 빌더 y경계 수정 후51/51 통과. 비교용 생성 도구의 참조 crop 오류/네임스페이스 오류는 정리 후 재실행.
+- 제출 캡처: `next/assets/pixel-review/README.md`, 목표6자세 동일 표시 높이 비교(각 주인공), 실제 공격 연속(실제 관찰 tick 표기, 느린 프레임 누락 가능), PC1280×900·모바일780×330/DPR2. 기술 검사 통과는 외형 유사성·움직임 품질의 증거가 아님. 사용자 판단 대기, 실제 기기 회전 확인 필요.
+- 5개 관리 문서 검토: STATUS·WORK_LOG·CHANGELOG 갱신, AGENTS·CLAUDE 규칙/흐름 변경 없음. 루트 README 관련 변경 불필요, next README 현재/과거 구분 및 재현 절차 갱신.
+- 검토 담당 / 발견 문제 수: Claude Code / 이번 구현 재검토 전으로 미확인(직전 규격 타이밍 결정 반영). 사용자 재요청 횟수: task04 구현 착수 후0회. 다음: 같은 PR #8에 푸시 → Claude Code 재검토 → 사용자 외형 판단. 병합·배포하지 않음.

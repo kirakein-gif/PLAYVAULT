@@ -2,9 +2,24 @@
 
 픽셀아트 HD 주인공·타일 위에서 이동·점프·무기·교대를 비교하는 독립 시험 방입니다. 리뷰의 4건 수정과 모바일 화면 확대·가로 전체 화면과 도약 종류별 공중 조작 요구를 반영했으며 사용자 조작감 평가와 Claude Code 재검토를 기다립니다. 게임 버전 번호는 부여하지 않았습니다. 기존 게임과 루트 런처는 그대로입니다.
 
-## 목표 외형 밀도 시험 · CODEX_TASK_03
+## 현재 기본 자산 · CODEX_TASK_04 x2 전체 동작
 
-현재 작업은 전체 재제작 전의 **밀도 선택용 시험본**입니다. 사용자가 지정한 `docs/reference/target-pose-board-2026-10-31.jpg`의 원본 PNG를 경로 A 밑그림으로 사용했습니다. 어느 쪽이 낫다는 판단은 하지 않습니다.
+사용자가 선택한 **x2(scale 2)**를 기본 `assets/pixel/`에 적용했습니다. Ethan·Noah 각각 idle4, run6, 제자리/달리기 점프 각3, 착지2, 공격4프레임입니다. 새 자세 원본을 생성한 뒤 축소·공유64색·알파/윤곽/손·발 정렬을 정리하는 경로 A로 제작했습니다. Noah 달리기도 새 원본을 사용했습니다. 생성 지시문 전문은 [PROVENANCE](assets/pixel/PROVENANCE.md)에 있습니다.
+
+일반 프레임256×192, 공격320×224, 발 pivot(128,190), 타일60px, 발판 불투명 두께32px, 배경1920×1080입니다. 게임 속 몸 크기·판정은 그대로입니다. 캔버스는 1920k×1080k, 변환은 `setTransform(k*2,0,0,k*2,0,0)`입니다. 공격 준비는 두 주인공 모두2틱, 이후 발사/베기→후속→복귀로 진행합니다. Noah 효과는 공격 나이에서 준비 시간을 뺀 시간으로 한 번 재생하고, 프레임별 손 위치에서 앞쪽으로 그립니다. 준비 자세에는 효과가 없으며 공격 방향을 유지합니다. 실제 판정·룬탄 발사 시점은 바꾸지 않았습니다.
+
+```sh
+python games/the-hollow-keep/next/tools/build-full-x2.py
+HK_URL=http://127.0.0.1:8766/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tools/capture-full-x2.cjs
+```
+
+기본 자산51/51, 렌더7/7, 인수51/51, 경계16/16, 구덩이4/4, 모바일배치20/20, 전체화면6/6, 브라우저20/20, 시험본10/10, ABYSSFALL 회귀3종 통과. [목표6자세·실제 공격 연속·PC/780×330 비교](assets/pixel-review/README.md)를 제출합니다. 시험본 디렉터리와 이번 검사 원본은 수정하지 않았습니다. 이전50/51의 slash 반복 문제는 이번 비반복 효과로 해결했습니다. **외형·동작 품질은 사용자 판단 대기, 재검토는 Claude Code**입니다. 실제 기기 회전은 확인 필요입니다.
+
+아래 CODEX_TASK_03·02 내용과 수치는 당시 작업 기록입니다. 현재 기본 세트 재생성에는 위 `build-full-x2.py`를 사용합니다.
+
+## 이전 목표 외형 밀도 시험 · CODEX_TASK_03
+
+당시 작업은 전체 재제작 전의 **밀도 선택용 시험본**입니다. 사용자가 지정한 `docs/reference/target-pose-board-2026-10-31.jpg`의 원본 PNG를 경로 A 밑그림으로 사용했습니다. 어느 쪽이 낫다는 판단은 하지 않습니다.
 
 - `/games/the-hollow-keep/next/?art=trial-x1`: scale1, Ethan68px / Noah64px 기준.
 - `/games/the-hollow-keep/next/?art=trial-x2`: scale2, Ethan136px / Noah128px 기준.

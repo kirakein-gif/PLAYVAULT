@@ -26,5 +26,5 @@
     settled = true;
   })();
   window.HKPixel = { ready, manifest: () => manifest, image: file => images.get(file),
-    status: () => ({ loaded: settled && failed.length === 0, failed: [...failed], scale: manifest?.scale || (choice === 'trial-x2' ? 2 : 1) }) };
+    status: () => ({ loaded: settled && failed.length === 0, failed: [...failed], scale: manifest?.scale || (choice === 'trial-x1' ? 1 : 2) }) };
 })();
