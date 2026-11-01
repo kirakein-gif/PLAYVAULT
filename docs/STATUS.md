@@ -9,6 +9,10 @@
 사용자 결정(2026-10-31): 다음 단계는 **아트 기준부터**. 콘셉트는 **픽셀아트 HD**(게임 좌표 1단위 = 그림 1픽셀, 그림 해상도 960×540), 고딕 방향 유지. 아트 기준·검사는 Claude Code, 그림 제작·적용은 Codex(역할 분담).
 
 
+### 진행 중 · CODEX_TASK_04 x2 전체 제작
+
+Codex / 같은 `codex/hollow-keep-pixel-art`, PR #8 / 기준 `b36f092`. 사용자 x2 확정, 규격 `2a8ecc6` 적용(`c95a5f8`, `59b4dca`). 기본 pixel 자산을 x2 전체 동작/Noah run/베기·룬탄·60px타일·1920×1080배경으로 교체하고 준비≤2틱/손기준 베기 재생을 구현. 시험본 pixel-trial·게임 규칙·검사 원본은 보존. 다음 담당 Claude Code 검토, 사용자 외형 판단 대기.
+
 ### CODEX_TASK_03 목표 외형 밀도 시험 제출 · 사용자 선택/Claude Code 검토 대기
 
 Codex / 같은 `codex/hollow-keep-pixel-art`, PR #8 / 기준 `e82b5f2`, 규격 `89453ef` 및 보완 반영(`0e1b23d`, `5525153`, `b99a679`), 착수 `5791d6c`. 원본 목표 PNG를 경로 A 밑그림으로 x1(Ethan68/Noah64)·x2(Ethan136/Noah128)의 Ethan idle4/run6, Noah idle4를 제작. 같은 원본/공유64색 팔레트, 독립 샘플링과 1px 윤곽·얼굴/손·발/정렬 정리. `?art=trial-x1|x2`, artStatus.scale, 그림 픽셀 정렬과 (960×scale)k backing 지원. 비교 자세 및 PC/780×330 캡처는 `next/assets/pixel-trial/comparison/README.md`와 PR #8.
