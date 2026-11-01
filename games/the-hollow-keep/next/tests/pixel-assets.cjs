@@ -264,10 +264,10 @@ async function analyze(page, file, opts) {
     const t = TRIAL ? {} : (manifest.tiles || {});
     if (!TRIAL) {
     const tfile = path.join(DIR, t.file || 'tiles.png');
-    check('tiles: PNG 파일과 필수 칸(floor-top, wall-fill, ledge)', () => {
+    check('tiles: PNG 파일과 필수 칸(floor-top, wall-fill, ledge, ladder — EXPLORATION_SPEC §8)', () => {
       assert.ok(fs.existsSync(tfile), `${t.file || 'tiles.png'} 없음`);
       assert.ok(fs.readFileSync(tfile).subarray(0, 8).equals(PNG_SIG), '실제 PNG가 아님');
-      for (const n of ['floor-top', 'wall-fill', 'ledge']) assert.ok(Array.isArray((t.cells || {})[n]) && t.cells[n].length === 2, `cells.${n} [열, 행] 필요`);
+      for (const n of ['floor-top', 'wall-fill', 'ledge', 'ladder']) assert.ok(Array.isArray((t.cells || {})[n]) && t.cells[n].length === 2, `cells.${n} [열, 행] 필요`);
     });
     let tr = null;
     if (fs.existsSync(tfile) && t.cells && fs.readFileSync(tfile).subarray(0, 8).equals(PNG_SIG)) {
@@ -304,6 +304,29 @@ async function analyze(page, file, opts) {
         assert.equal(r.alphaMid, 0); assert.equal(r.off, 0, `팔레트 밖 색 ${r.off}`);
         assert.deepEqual(r.upscaled, [], '확대 저장된 이미지로 보임');
       });
+    }
+
+    // ── 탐험 물건 그림 (EXPLORATION_SPEC §8, 시험본 모드에서는 생략) ──
+    if (!TRIAL) {
+      const OBJ = ['door-closed', 'door-open', 'lever-off', 'lever-on', 'light-off', 'light-on', 'key', 'breakable', 'locked-door'];
+      const objs = manifest.objects || {};
+      check(`objects: 필수 그림 ${OBJ.length}종이 manifest에 있음`, () => {
+        const missing = OBJ.filter((n) => !objs[n]);
+        assert.deepEqual(missing, [], `빠진 그림: ${missing.join(', ')}`);
+        for (const n of OBJ) { const o = objs[n]; assert.ok(/\.png$/i.test(o.file || '') && [o.x, o.y].every(Number.isInteger) && isInt(o.w) && isInt(o.h), `${n}: file(.png)·x·y·w·h 필요`); }
+      });
+      for (const file of [...new Set(OBJ.filter((n) => objs[n]).map((n) => objs[n].file))]) {
+        const fp = path.join(DIR, file);
+        if (!fs.existsSync(fp) || !fs.readFileSync(fp).subarray(0, 8).equals(PNG_SIG)) { check(`objects ${file}: PNG 파일`, () => assert.fail(`${file} 없음 또는 PNG 아님`)); continue; }
+        let r;
+        try { r = await analyze(page, fp, { palette }); } catch (e) { check(`objects ${file}: 이미지 해석`, () => assert.fail(e.message.split('\n')[0])); continue; }
+        check(`objects ${file}: 투명도 0/255·팔레트·원래 해상도·영역이 이미지 안`, () => {
+          assert.equal(r.alphaMid, 0, `중간 투명도 ${r.alphaMid}`);
+          assert.equal(r.off, 0, `팔레트 밖 색 ${r.off} (예: ${r.offSample.join(', ')})`);
+          assert.deepEqual(r.upscaled, [], '확대 저장된 이미지로 보임');
+          for (const n of OBJ.filter((k) => objs[k] && objs[k].file === file)) { const o = objs[n]; assert.ok(o.x >= 0 && o.y >= 0 && o.x + o.w <= r.W && o.y + o.h <= r.H, `${n} 영역이 이미지 밖`); }
+        });
+      }
     }
 
     check('PROVENANCE.md(도구·지시문·손질 기록)가 있음', () => {

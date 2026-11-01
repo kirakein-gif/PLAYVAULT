@@ -889,3 +889,37 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: 사용자 결정 — 2단계 탐험 구조 또는 Noah 3단 콤보.
 - 종료 상태: 병합 PR 제출 후 병합.
+
+### 2026-11-01 (Asia/Seoul) · THE HOLLOW KEEP 2단계 탐험 구조 규격과 자동 검사
+
+- 담당 AI: Claude Code(규격·검사). 구현 담당: Codex.
+- 사용자 결정: 상하좌우 4방향, 길 여는 방법 전부 + "특정 적 처치"(적이 없으므로 시험 표적으로 대신, 3단계에서 교체), 시범 구역 8~12방, 적 없음.
+- 기준 / 브랜치: main `d532537` / `claude/hollow-keep-exploration-spec`. 게임 코드 변경 없음, 버전 변경 없음.
+- 변경:
+  - `EXPLORATION_SPEC.md`: 32×18칸 격자(. # - H), 4방향 방 이동, 사다리(climbSpeed), 한쪽 발판, 물건(door/switch/key/breakable/target)과 문 조건(switch/key/cleared), 캐릭터 전용 스위치, 상태 유지, 입력(up/down/interact, 두 축 조이스틱, 조사·지도), 계약(getMap/getFlags/이벤트), 구역 데이터 형식, 시범 구역 필수 요소, 완주 기록, 그림 요구(사다리 칸·물건 9종)
+  - `exploration-contract.cjs`(14개), `area-data.cjs`(형식·연결·시작 위치·물건·필수 요소·완주 재생), `pixel-assets.cjs`(ladder 칸·objects 9종), `mobile-layout.cjs`(조사 버튼), `CODEX_TASK_05.md`, `DESIGN_DIRECTION.md`·STATUS 갱신
+- 검증(저장소 밖 임시 참조 구현 — 실제 `sim.js`를 감싼 것, 커밋 안 함):
+  - exploration-contract 14/14, 같은 구현에서 foundation-contract 51/51(한 방 모드 호환)
+  - 결함 변형 9종 모두 검출: 전용 장치 제한 없음, 열쇠 미소모, 한쪽 발판이 아래에서 막힘, 매달려도 중력, 방 이동 시 문 상태 초기화, 표적 하나로 열림, 방 이동 이벤트 없음, ↓+점프 내려가기 없음
+  - area-data: 2방 합성 구역을 스크립트로 플레이하며 입력을 기록한 완주 기록이 6/6(재생 920틱). 결함 8종(기록이 시작 방으로 안 돌아옴, 교대 없음, 이웃 없는 열린 가장자리, 한쪽만 열린 칸, 잘못된 문자, 벽과 겹친 시작 위치, 없는 스위치 참조, id 중복) 및 필수 요소 누락 검출
+  - pixel-assets: 합성 scale 2 자산 + 사다리·물건 58/58, 팔레트 밖 색·그림 누락 검출. 현재 main 자산은 50/52(ladder·objects 없음, 예상)
+- 작성 중 바로잡은 검사 결함(Claude Code): ① 오른쪽 이동 검사가 구멍에 먼저 빠지는 배치 → 출발 위치 변경 ② 한쪽 발판 검사가 머리와 이미 겹친 높이라 '아래에서 막힘' 결함을 못 잡음 → 13행으로 이동 ③ 세로 연결 판정 괄호 누락 ④ 표적 처치를 스냅샷 문자열에서 정규식으로 찾던 방식 → `getFlags().cleared` 계약으로 교체.
+- 검토 담당 / 발견 문제 수: 사용자 검토 대기.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 PR 확인 → Codex가 `CODEX_TASK_05.md`로 구현 → Claude Code 검토.
+- 종료 상태: 규격 제출.
+
+### 2026-11-01 (Asia/Seoul) · Codex 2단계 구현(PR #11) 검토
+
+- 담당 AI: Claude Code(검토). 구현: Codex `codex/hollow-keep-exploration` `fc7befd`.
+- 범위 확인: 검사·규격 원본이 PR #10(`f6b8be1`)과 바이트 동일. main 대비 기존 게임·공용 자산·런처 변경 없음.
+- 테스트(저장소 밖 `git archive` 사본, 로컬 HTTP 서버): exploration-contract 14/14, area-data 8/8(완주 재생 3602틱·교대 2회), exploration-edge 8/8, exploration-browser 4/4, pixel-assets 53/53, pixel-render 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, foundation-contract 51/51, foundation-edge 16/16, room-traversal 4/4, browser-playtest `?room=test` 20/20, ABYSSFALL 회귀 3종 통과.
+- 독립 검사: 시작 위치 104곳(문 안 8곳 제외) × 무작위 입력 총 416,000틱 → 벽·닫힌 문 겹침, 화면 밖 갇힘 0건(임시 스크립트, 커밋 안 함).
+- 화면 확인: 성문 방, 완주 후 지도(8방), 모바일 780×330.
+- 지적(차단 아님): browser-playtest 기본 `HK_URL`이 구역 화면을 가리켜 인자 없이 실행 시 4개 후 TypeError. 검토 캡처 폴더 용량.
+- 설계 관찰(사용자 판단): 방이 넓고 비어 촘촘함이 약함, 부서지는 벽이 숨은 곳보다 필수 통로로 쓰임.
+- Git/PR: [PR #11 검토](https://github.com/kirakein-gif/PLAYVAULT/pull/11) (COMMENT). 미리보기 `https://78040d2c.kirakein-playvault.pages.dev/games/the-hollow-keep/next/`.
+- 검토 담당 / 발견 문제 수: Claude Code / 사소 2건(차단 0).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 미리보기 확인 → 승인 시 PR #10 → PR #11 병합.
+- 종료 상태: 검토 완료, 사용자 판단 대기.
