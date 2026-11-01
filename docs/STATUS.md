@@ -1,6 +1,15 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-10-31 (Asia/Seoul)** / 확인 AI: **Claude Code**(병합 정리).
+확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #7·#8 병합, 시험본 정리).
+
+## PR #7·#8 병합 완료 · THE HOLLOW KEEP 픽셀아트 HD(scale 2) 적용
+
+사용자 승인("좋아요. 병합하고 시험본 폴더는 지워 주세요")으로 PR #7(아트 기준·검사) → PR #8(그림·렌더러) 순서로 병합했다. PR #8은 통합 브랜치 `claude/merge-pr8-pixel-art`에서 `docs/WORK_LOG.md` 충돌(양쪽 추가)을 시간순으로 정리해 병합했다(양쪽 41개 항목 보존 확인).
+- 현재 기본 자산: `games/the-hollow-keep/next/assets/pixel/` scale 2(136px), 타일 60px, 64색, Ethan·Noah 동작 6종, 룬탄·베기 효과(한 획), 배경 1920×1080.
+- 시험본 삭제: `assets/pixel-trial/`, `?art=trial-x1|x2` 전환, `tests/density-trial.cjs`, `tools/build-density-trial.py`. `build-full-x2.py`가 출발점으로 쓰는 x2 재료만 `tools/art-source/density-trial-x2/`로 옮김. 옮긴 뒤 생성 스크립트 결과가 커밋된 자산과 바이트 단위로 동일함을 확인. 검토 캡처 `assets/pixel-review/`는 유지(사용자 지시 범위 밖).
+- 병합 결과 검사: pixel-assets 51/51, pixel-render 7/7, 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, ABYSSFALL 회귀 3종 통과.
+- 진행 중 작업: 없음. 다음 후보: 2단계 탐험 구조(방 연결·지도·장치, 30칸 격자), Noah 3단 콤보(보류). 사용자 결정 대기.
+
 
 ## PR #2·#3·#4·#5 병합 완료 · 다음: THE HOLLOW KEEP 픽셀아트 HD 아트 기준
 
@@ -9,7 +18,29 @@
 사용자 결정(2026-10-31): 다음 단계는 **아트 기준부터**. 콘셉트는 **픽셀아트 HD**(게임 좌표 1단위 = 그림 1픽셀, 그림 해상도 960×540), 고딕 방향 유지. 아트 기준·검사는 Claude Code, 그림 제작·적용은 Codex(역할 분담).
 
 
-### 진행 중 · THE HOLLOW KEEP 픽셀아트 HD 아트 기준
+### 수정 제출 · PR #8 Noah 베기 한 획 / Claude Code 재검토 대기
+
+Codex / `codex/hollow-keep-pixel-art` / 기준 `71b7fe7` / 착수 `cb78e82` / 2026-11-01. 사용자 요청과 PR 댓글 확인. 규격 앞선 `559c722` 및 `db1679b`를 `7aa2def`·`ef92a4a`로 반영(양측 WORK_LOG 기록 보존). 기본 noah-fx-slash.png 3프레임을 밝은 칼날에 어두운 꼬리가 붙은 한 획으로 교체. 크기·pivot·타이밍·렌더러·sim.js 및 다른 런타임 PNG15개·trial 그대로. 검사 원본은 규격과 바이트 동일, 수정 없음. 구현 SHA는 이 항목을 갱신한 같은 PR #8 커밋 참조.
+
+이번 검사: pixel-assets51/51, pixel-render 기본·trial-x1·trial-x2 각7/7, 시험 자산 각18/18, foundation51/51·edge16/16·room4/4·배치20/20·전체화면6/6·browser20/20·density10/10·ABYSSFALL 회귀3종 통과. 효과 덩어리 프레임별1개(302/581/288px). 좌우 실제 공격0~11틱 연속 캡처: `next/assets/pixel-review/noah-single-stroke/README.md`. 재생성 PNG16개 해시 일치. 다음 Claude Code 재검토·사용자 외형 판단, 실제 기기 회전 확인 필요. 병합·배포 없음. 아래는 직전 task04 제출 이력.
+
+### 구현 제출 · CODEX_TASK_04 x2 전체 제작 / Claude Code 재검토·사용자 외형 판단 대기
+
+Codex / 같은 `codex/hollow-keep-pixel-art`, PR #8 / 기준 `b36f092`. 사용자 x2 확정, 규격 `2a8ecc6` 적용(`c95a5f8`, `59b4dca`). 기본 pixel 자산을 x2 전체 동작/Noah run/베기·룬탄·60px타일·1920×1080배경으로 교체하고 준비≤2틱/손기준 베기 재생을 구현. 시험본 pixel-trial·게임 규칙·이번 검사 원본은 보존. 착수 공유 `e06d682`, 최종 구현은 이 항목을 갱신한 PR #8 커밋 참조. 목표6자세 비교·실제 공격 연속·PC/780×330 캡처는 `next/assets/pixel-review/README.md`.
+
+이번 재실행: 자산51/51·렌더7/7·인수51/51·경계16/16·구덩이4/4·모바일배치20/20·전체화면6/6·브라우저20/20·시험본10/10·ABYSSFALL 회귀3종 통과. 기본 자산의 이전 slash 반복 실패 해결. 재빌드 PNG16개 해시 일치. 다음 담당 Claude Code 재검토 → 사용자 외형·동작 판단(대기). 실제 기기 회전 확인 필요. 병합·배포 없음. 이하 task03/02 수치는 당시 기록.
+
+### CODEX_TASK_03 목표 외형 밀도 시험 제출 · 사용자 선택/Claude Code 검토 대기
+
+Codex / 같은 `codex/hollow-keep-pixel-art`, PR #8 / 기준 `e82b5f2`, 규격 `89453ef` 및 보완 반영(`0e1b23d`, `5525153`, `b99a679`), 착수 `5791d6c`. 원본 목표 PNG를 경로 A 밑그림으로 x1(Ethan68/Noah64)·x2(Ethan136/Noah128)의 Ethan idle4/run6, Noah idle4를 제작. 같은 원본/공유64색 팔레트, 독립 샘플링과 1px 윤곽·얼굴/손·발/정렬 정리. `?art=trial-x1|x2`, artStatus.scale, 그림 픽셀 정렬과 (960×scale)k backing 지원. 비교 자세 및 PC/780×330 캡처는 `next/assets/pixel-trial/comparison/README.md`와 PR #8.
+
+검증: 시험 자산 각각18/18, 실제 시험 경로 404/대체/이동/반전/scale 추가 검사10/10. 시험 렌더는 각각5/5(초기4/5의 고정 경로 문제를 `4917569`의 404 대상 정규식 한 줄 확장으로 해결; 판정 조건 변경 없음, 별도 검토 필요). 기본 자산50/51(알려진 slash.loop=true, 밀도 선택 전 재제작 보류), 기본 렌더5/5·인수51/51·경계16/16·구덩이4/4·모바일배치20/20·전체화면6/6·브라우저20/20·기존 회귀3종 통과. 기본 자산/게임 규칙/기타 원본 검사 보존, 렌더 실패 주입 경로 한 줄만 보완. **밀도 우열 판단 없음, 사용자가 선택**. 전체 스프라이트/베기 재제작은 선택 이후. 다음 담당 Claude Code / 검토 대기. 실제 휴대전화·화면 회전은 확인 필요.
+
+### 제작·적용 제출 · THE HOLLOW KEEP 픽셀아트 HD · 검토 대기
+
+Codex / `codex/hollow-keep-pixel-art` / 기준 PR #7 `d8c6a21` (main `af58238` 기반), 착수 `e6efc15`, [구현 PR #8](https://github.com/kirakein-gif/PLAYVAULT/pull/8). 46색 네이티브 PNG: 주인공 동작 시트 12개(idle/run/두 점프/land/attack), 효과 2개, 30px 타일과 960×540 배경, palette/manifest/PROVENANCE·재작성 도구. 최소 정수 k의 960k×540k backing, 보간 끔, 정수 출력/좌우 반전/이벤트 기반 프레임·개별 실패 도형 대체 구현. 픽셀 자산 49/49, 픽셀 렌더 5/5, 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, 기존 회귀 3종 통과. 시뮬레이션·기존 게임·공용 자산·검사 원본 보존, 버전 변경 없음. 다음 담당 **Claude Code / 검토 대기**. 외형·미적 완성도·움직임은 사용자 판단 대기. 실제 화면 회전은 실기기 확인 필요.
+
+### 제출됨 · THE HOLLOW KEEP 픽셀아트 HD 아트 기준 (PR #7)
 
 Claude Code / `claude/hollow-keep-pixel-art-spec` / 2026-10-31 시작 / 범위: `games/the-hollow-keep/docs/ART_DIRECTION.md`, `CODEX_TASK_02.md`, `next/tests/pixel-assets.cjs`, `next/tests/pixel-render.cjs`(새 파일만, 게임 코드 변경 없음). 다음 담당: Codex(`codex/hollow-keep-pixel-art`, 스프라이트·타일 제작과 렌더러 적용).
 

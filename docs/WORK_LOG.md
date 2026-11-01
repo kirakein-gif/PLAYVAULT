@@ -692,6 +692,30 @@
 - 다음: 사용자 PR 검토·병합 → Codex가 `CODEX_TASK_02.md`로 제작·적용 → Claude Code 검토 → 사용자 실기기·외형 판단.
 - 종료 상태: 기준 제출.
 
+
+### 2026-10-31 (Asia/Seoul) · CODEX_TASK_02 — 픽셀아트 HD 주인공·타일 제작과 적용
+
+- 담당 Codex / **검토 담당 Claude Code / 검토 대기**. 발견 문제 수 미확정(아직 교차 검토 전). 사용자 재요청 횟수 0회(이번 지시서 첫 제작 요청).
+- 기준/브랜치: main `af58238`에서 PR #4 기반이 병합된 것을 확인. 지시서가 main에 아직 없어 허용된 기준 `claude/hollow-keep-pixel-art-spec`의 `d8c6a21`에서 새 `codex/hollow-keep-pixel-art` 생성. 열린 PR은 기준 PR #7뿐이며 다른 미병합 구현 충돌 없음. STATUS의 Claude Code→Codex 인계 확인 후 담당 범위를 첫 커밋 `e6efc15`로 공유하고 Draft PR #8을 제작 전에 개설.
+- 읽기: 최신 AGENTS 역할 분담·CLAUDE·STATUS·WORK_LOG 최근 검토/병합 기록·CHANGELOG·실제 next 소스, ART_DIRECTION/DESIGN_DIRECTION/FOUNDATION_SPEC 및 CODEX_TASK_02, 원본 pixel-assets/pixel-render 검사. 두 타이틀 키아트(Ethan/Noah hd-v2)를 열어 인물 외형 확인.
+- 대상/버전: `games/the-hollow-keep/next/` 픽셀 자산·로더/렌더러·도구/README, 관리 문서. 시뮬레이션 sim.js·CONFIG·입력/지형·기존 게임·공용 자산·런처·다른 게임·인수 검사 원본 보존. 게임/캐시 버전 변경 없음.
+- 제작: image_gen으로 두 키아트를 외형 참고한 투명 자세 보드 생성(원본을 런타임 그림으로 축소하지 않음). 전체 지시문·도구·로컬 출력 경로를 `assets/pixel/PROVENANCE.md`에 기록. 특정 게임·작가 이름의 모방 지시 없음. Python/Pillow로 최종 격자에 실루엣/관절/머리·후드·코트·장비·무기·명암 클러스터를 독립적으로 다시 그림. 빌더는 참고 이미지를 읽지 않음.
+- 자산: 46색 palette.json, manifest.json, Ethan/Noah 각각 idle 4·run 6·jump-standing 3·jump-running 3·land 2·attack 4 프레임. 네이티브 96×96(attack 128×96), pivot(48,95), idle 높이 68/64px. 선택 효과 룬탄2/참격3, 30px floor-top/wall-fill/ledge 타일, 960×540 bg-chapel. RGBA PNG·alpha0/255·팔레트 제한·원래 해상도. 시트/발 기준/두 점프 차이/타일 두께를 검사하고 컨택트 시트 육안 확인.
+- 도구/손질: `next/tools/build-pixel-art.py` 정수 좌표 재작성, 팔레트 최근접 remap·알파 이진 정리·투명 RGB 정규화. 외곽/접지·윤곽/강조점 손질을 좌표에 반영. 재실행 전후 PNG 해시 동일(바이트 단위 재현) 확인. 참고 보드 `/workspace/generated_images/exec-01f1b4a9-1527-49a1-abd8-6eba010c48a7.png`는 로컬 참고용, 최종 자산으로 쓰지 않음.
+- 적용: `pixel-art.js` manifest/PNG 로드와 loaded/failed 상태, `HKPlaytest.artStatus()` 노출. `render.js`는 표시×DPR 이상인 최소 정수 k의 960k×540k backing, setTransform(k), 보간 끔, PNG 정수 좌표 출력·좌우 뒤집기. 두 점프는 jumpKind/vy, 공격/착지는 시뮬레이션 이벤트를 받아 프레임 선택. 타일은 기존 비격자 지형에 잘라 적용. 개별 파일 실패 시 기존 해당 도형으로 대체하고 정상 그림/게임은 계속 동작. app 변경은 렌더 이벤트 전달과 artStatus뿐, 게임 규칙 변경 없음.
+- 이번 검증: `CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/pixel-assets.cjs` **49/49**, 로컬 HTTP의 `pixel-render.cjs` **5/5** 통과. PC 1280×900/DPR1, 모바일 780×330/DPR2, 915×412/DPR2.625에서 최소 backing/보간/로드·크기 변경·ethan-idle 404 후 이동 유지 검사. 첫 자산 검사는 제작 기록 작성 전이어서 PROVENANCE 없음 1건 실패(48/49), 기록 추가 후49/49.
+- 기존 전체 재실행: foundation-contract **51/51**, foundation-edge **16/16**, room-traversal **4/4**, mobile-layout **20/20**, mobile-fullscreen **6/6**, browser-playtest **20/20**, ABYSSFALL polish/audio/audio-wind **3종 통과**. audio404는 의도적인 실패 경로 로그. 기준 브랜치의 검사 파일 수정/약화/건너뛰기 없음.
+- 환경/캡처: Python3/Pillow12.3.0, Playwright/시스템 Chromium, 로컬 HTTP 127.0.0.1:8766/HK_URL 지정. HK_SHOT_DIR=/tmp로 `/tmp/hk-pixel-jump-standing.png`, `/tmp/hk-pixel-jump-running.png`, 모바일 `/tmp/hk-mobile-780x330.png` 등 저장/육안 확인. PC·모바일에서 native 픽셀 클러스터와 서로 다른 점프 실루엣, 타일 윗면을 확인. 거친 확대 블록이나 혼합 크기 픽셀은 관찰하지 못했지만 모바일 축소 경계에는 약한 브라우저 필터링이 있을 수 있음. 선명도는 해당 캡처의 육안 관찰이며 전체 실기기 보증이 아님.
+- 5개 관리 문서: WORK_LOG 누적·STATUS/CHANGELOG 갱신. AGENTS/CLAUDE는 역할/절차 변경이 없어 해당 항목 변경 없음. README에 자산 구조/프레임/원래 크기 재작성/검사·대체 표시·한계 추가. 과거 이력 보존.
+- 한계/판단 대기: 외형이 닮았는지·보기 좋은지·동작이 자연스러운지는 자동 검사로 확인 불가, **사용자 판단 대기**. 실기기·실제 회전·타 브라우저·장시간 플레이 미확인. 타깃/레이블/디버그는 기존 벡터·시스템 글꼴 유지(이번 범위 밖). 적·보스·음향·추가 방·Noah 콤보는 범위 밖.
+- 제출/인계: [PR #8](https://github.com/kirakein-gif/PLAYVAULT/pull/8), 구현 커밋은 PR head 참조. 완료 후 Ready로 전환하여 Claude Code의 독립 자산/렌더·기반 전체 검사와 외형/픽셀 선명도 검토 요청. PR #7 미병합이므로 main diff에 규격·원본 검사도 포함됨. 병합·수동 배포 명령 없음.
+
+
+### 2026-10-31 (Asia/Seoul) · 픽셀아트 HD 원격 제출 기록
+
+- 담당 Codex / 검토 담당 Claude Code / 검토 대기. 구현 커밋 `d6052ba`를 `codex/hollow-keep-pixel-art`에 푸시 완료, PR #8. 마지막 정리는 PROVENANCE 끝의 빈 줄 제거와 이 제출 기록뿐이며 코드/PNG/검사 결과는 동일함.
+- 자산 49/49, 렌더 5/5와 위 기반 전체 검사 통과. 범위/원본 보존 및 전체 PR diff 검사를 최종 확인 후 Ready로 전환. 병합·수동 배포 없음. 사용자 외형·동작 판단 대기.
+
 ### 2026-10-31 (Asia/Seoul) · PR #8 검토(픽셀아트 HD 주인공·타일·렌더러)와 팔레트 결정
 
 - 담당 AI: Claude Code(검토). 구현 담당: Codex. 검토 담당은 구현 브랜치를 수정하지 않음.
@@ -738,6 +762,24 @@
 - 다음: Codex가 `CODEX_TASK_03.md`로 시험본 제작 → Claude Code 검토 → 사용자 밀도 선택 → 전체 재제작.
 - 종료 상태: 시험 준비 완료.
 
+
+### 2026-10-31 (Asia/Seoul) · CODEX_TASK_03 목표 외형 시험본 x1/x2
+
+- 담당 Codex / **검토 담당 Claude Code / 검토 대기**. 사용자 재요청 횟수 1회(이전 외형 차이 피드백 후 시험본 우선 지시), 이번 검토 발견 문제 수 미확정. 밀도는 사용자가 선택하며 우열 판정하지 않음.
+- 기준: 같은 PR #8 `codex/hollow-keep-pixel-art`의 `e82b5f2`. 원격 fetch/열린 PR #7/#8, “순서 변경: 목표 외형 시험본 먼저” 댓글, CODEX_TASK_03/ART_DIRECTION/목표 참고 README·JPEG/원본 PNG 확인. `3350dfb`, `0224e70`, `89453ef`를 순서대로 cherry-pick(`0e1b23d`, `5525153`, `b99a679`). WORK_LOG 충돌은 기존 구현/제출 항목 전체 뒤에 검토 항목을 붙여 양측 원문을 시간순으로 보존. 착수 STATUS `5791d6c` 공유 후 구현.
+- 범위/버전: `next/assets/pixel-trial/` x1/x2(각 Ethan idle4/run6, Noah idle4), 비교 캡처, 경로 A 소스 PNG/빌더, scale 렌더/로더, 추가 런타임 검사, README·관리 문서. sim.js/CONFIG·기존 게임·기본 pixel 자산·입력/지형·공용 자산·런처·다른 게임·기타 검사 원본 보존. pixel-render의 실패 주입 경로만 한 줄 보완, 판정 조건은 보존. 게임/캐시 버전 변경 없음. 전체 스프라이트/베기 재제작은 밀도 선택 후로 보류.
+- 제작: 목표 보드 JPEG 대신 이전 image_gen 원본 PNG를 사용하고 같은 인물의 여섯 달리기 위상을 새로 생성. 특정 게임/작가 이름 모방 지시 없음. 원본 두 PNG를 `next/tools/art-source/`에 보존, 두 시험 폴더 PROVENANCE에 전체 지시문/경로 A/손질/소스 출처 기록. 첫 running 프레임은 목표 보드의 해당 자세를 유지하고 나머지 위상은 새 원본에서 제작.
+- 밀도/손질: 같은 소스를 각각 독립 면적 샘플링(x2는 x1 확대 아님), 두 시안 합동에서 공통64색 팔레트 도출. alpha0/255·투명RGB정리·떨어진 단일픽셀/흐린조각 제거·1px 선택 윤곽, 내부 얼굴 눈/눈썹/하이라이트 재찍기(튀어나온 코 도형 없음), 손/옷 고립1px 구멍 정리. 같은 게임공간의 호흡/자락 위상, 머리/몸 정렬과 접지 고정. x1 frame128×96/pivot64,95; x2 frame256×192/pivot128,190; body는 게임42×68/39×64 유지. tileSize30/60 메타데이터, 새 타일/배경은 시험 범위 밖.
+- 렌더: 선택 query에서 x1/x2 manifest/그림 로드, artStatus.scale 반환. 실제 해상도=(960×scale)×k, setTransform(k×scale), PNG는 frame/scale 게임 크기로 출력하며 그림픽셀 좌표로 반올림. 빠진 run/jump/attack/land와 효과는 도형 대체. 없는 공격/착지의 표시 기간도 기존20/8틱을 유지해 idle 그림으로 잘못 대체하지 않게 함. 기본 mode는 scale1·기존 자산 그대로.
+- 시험 자산: 지정 HK_ART_REQUIRE=`ethan:idle,run;noah:idle`, HK_ART_DIR x1/x2, CHROMIUM_PATH=/usr/bin/chromium의 원본 pixel-assets는 **각각18/18 통과**. 기록 작성 전 17/18(PROVENANCE 없음), 기록 작성 후18/18.
+- 원래 pixel-render 그대로는 두 trial HK_URL에서 **각각4/5**. 정상 로드/세 뷰포트 backing/resize 통과. 실패 주입 정규식이 `/assets/pixel/ethan-idle.png`로 고정되어 시험 PNG를 막지 못한 것이 원인. 검사 강도를 유지하고 시험 폴더도 404로 차단하도록 정규식을 `/assets/(?:pixel|pixel-trial/x[12])/ethan-idle.png/`로 한 줄 확장(`4917569`), failed/이동/오류 판정은 바꾸지 않음. 보완 후 **두 시험본 및 기본 각각5/5 통과**. 처음에는 원본 보존/별도 검사로 구분하려 했으나, 이 오류는 판정 약화 없이 실제 선택 경로를 검사하게 고칠 수 있어 수정하고 별도 커밋으로 검토 대상으로 명시. 원본 작성자의 한 줄 변경 검토 필요.
+- 추가 검사 `density-trial.cjs`: **10/10 통과**. 실제 시험 PNG 경로의404/failed기록/대체 후 이동, 두 scale/backing·같은 게임크기·native정렬·run/좌우반전·누락점프 대체·PC/모바일(780×330) 캡처 확인. 원래 시험의 경로 문제와 한 줄 보완을 숨기지 않고 추가 결과와 구분.
+- 기본 자산 재실행: 최신 원본 pixel-assets **50/51**, 유일 실패 `noah/fx-slash.loop=true`. 알려진 전체/베기 재제작 보류 지시 때문에 기본 자산은 그대로 둠. 기본 pixel-render **5/5**, foundation-contract **51/51**, foundation-edge **16/16**, room-traversal **4/4**, mobile-layout **20/20**, mobile-fullscreen **6/6**, browser-playtest **20/20**, ABYSSFALL polish/audio/audio-wind **3종 통과**. audio404는 의도적인 실패 경로. pixel-render 주입 경로 외 원본 검사 변경/건너뛰기 없음.
+- 비교/첨부: `next/assets/pixel-trial/comparison/`에 Ethan idle/run·Noah idle의 목표|x1|x2 같은 표시 높이 이미지3장 및 두 모드의 PC1280×900·모바일780×330/DPR2 Ethan/Noah 게임 캡처8장, 설명 README. 원본/candidate를 같은 물리 표시 높이로 비교. 게임 캡처는 실제 재생 중 idle 위상이 조금 다를 수 있음. PR #8에 이미지/비교 모음 링크를 첨부.
+- 환경: Python3/Pillow/numpy/scipy, Playwright/Chromium, HTTP127.0.0.1:8766, HK_URL query trial-x1/x2 및 기본. 실제 휴대전화·화면 회전·장시간 동작은 미확인. 자동 검사는 외형/자연스러움/우열 판단을 하지 않음.
+- 5개 관리 문서 검토: WORK_LOG 누적·STATUS/CHANGELOG 갱신, AGENTS/CLAUDE는 절차 변경이 없어 해당 항목 변경 없음. README에 시험 주소/밀도/원본과 추가 검사 결과/보류 사항 추가. 과거·검토 기록 보존.
+- 제출/인계: 같은 PR #8에 푸시, 구현 커밋은 PR head 참조. **사용자 밀도 선택 / Claude Code 검토 대기**. pixel-render 주입 경로 한 줄 확장을 검토 담당에게 별도 검토 요청하고, 선택 후 전체 동작/베기 재제작을 진행. 병합·수동 배포 없음.
+
 ### 2026-10-31 (Asia/Seoul) · PR #8 검토(목표 외형 밀도 시험본 x1/x2)
 
 - 담당 AI: Claude Code(검토). 구현 담당: Codex. 검토 담당은 구현 브랜치를 수정하지 않음.
@@ -768,6 +810,20 @@
 - 다음: Codex가 `CODEX_TASK_04.md`로 scale 2 전체 제작 → Claude Code 검토 → 사용자 외형 판단.
 - 종료 상태: 기준 제출.
 
+### 2026-11-01 (Asia/Seoul) · CODEX_TASK_04 선택 x2 전체 동작 구현 제출
+
+- 담당 Codex / 재검토 Claude Code(대기) / 브랜치 `codex/hollow-keep-pixel-art`, 같은 PR #8. 기준 b36f092, 시작 전 최신 원격/PR/댓글 확인. 규격 최신2a8ecc6와 앞선a89db8c를 c95a5f8/59b4dca로 반영하고 착수e06d682를 원격 공유. WORK_LOG 충돌은 양측 기존 기록을 보존해 해결했다.
+- 범위: `next/assets/pixel/`, renderer/loader, 생성 원본·재현 도구, `pixel-review/`, README·관리 문서. 게임 버전 전후: foundation 시험 방(버전 번호 없음) 유지. x2 확정으로 기본136/128px 밀도 적용, 게임 속 몸 크기와 판정 동일.
+- 경로 A: 새 Ethan/Noah 동작 원본 생성 → 각 자세 높이별 축소 → 공유64색·알파·1px 윤곽·떠 있는 점·손/옷 구멍·머리/발 정렬 정리. 선택 trial x2 idle/run 출발점 보존, Noah run 신규. Ethan 생성 보드의 제자리 점프가2개여서 목표 원본 중간 자세로 보완해3개 구성. 생성 지시문 전문·도구 정보는 기본 PROVENANCE. 각 주인공 idle4/run6/jump-standing3/jump-running3/land2/attack4.
+- 공격 준비 모두2틱; 판정/룬탄은 종전 즉시. attack 이벤트 방향을 고정하고 손 위치 metadata로 Noah 베기를 앞쪽에 배치, 준비에는 숨김, 공격 나이 기준3프레임 단발. 얇은 곡선·밝은 칼날·가늘어지는 꼬리/분산점으로 재제작. Rune2프레임 반복,60px 타일(ledge32행만 불투명),1920×1080 배경. 기본 로드 실패 시에도 scale2 backing hint.
+- 검증(이번 실행, Chromium / 로컬 HTTP8766): pixel-assets **51/51**, pixel-render **7/7**(좌/우 베기 포함), foundation-contract **51/51**, foundation-edge **16/16**, room-traversal **4/4**, mobile-layout **20/20**, mobile-fullscreen **6/6**, browser-playtest **20/20**, density-trial **10/10**. ABYSSFALL polish/audio/audio-wind **3종 통과**(audio404 경고는 의도한 실패 복구 검사). 로그 `/tmp/hk04-*.log`. 이전 기본50/51 slash.loop 실패는 이번 loopfalse로 해결.
+- 재현: 저장소 루트 HTTP 서버, `HK_URL=http://127.0.0.1:8766/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/<name>.cjs`; 자산 검사는 HTTP 불필요. 기존 회귀는 `node tests/{polish-regression,audio-regression,audio-wind-regression}.cjs` 각각 실행.
+- 검사 보존: 이번 작업은 tests 파일을 수정하지 않았다. 이전4917569의 시험 경로404 정규식 보완은 Claude Code가 이미 검토한 상태로 유지. density-trial 원본은 시험본 디렉터리에 캡처를 덮어쓰기 때문에 **내용이 동일한 사본**을 `/tmp/hk-density-check/tests/`에서 실행하고 출력도 임시 sibling assets로 격리(HK_URL 위 주소, 전역 Playwright NODE_PATH 설정). 원본 판정/경로 코드 변경·건너뛰기 없음. 이 출력 경로 제약은 검사 담당에게 인계.
+- 보존 확인: task04 착수e06d682 대비 sim.js·모든 검사·pixel-trial 전체 diff없음; trial은 b36f092 대비도 diff없음. 다른 게임·공용 자산·루트 런처 변경 없음. 원본 PNG16개 재빌드 SHA256 동일. 로컬 자산 검사에서 ledge 아래 잔점1개를 발견해 빌더 y경계 수정 후51/51 통과. 비교용 생성 도구의 참조 crop 오류/네임스페이스 오류는 정리 후 재실행.
+- 제출 캡처: `next/assets/pixel-review/README.md`, 목표6자세 동일 표시 높이 비교(각 주인공), 실제 공격 연속(실제 관찰 tick 표기, 느린 프레임 누락 가능), PC1280×900·모바일780×330/DPR2. 기술 검사 통과는 외형 유사성·움직임 품질의 증거가 아님. 사용자 판단 대기, 실제 기기 회전 확인 필요.
+- 5개 관리 문서 검토: STATUS·WORK_LOG·CHANGELOG 갱신, AGENTS·CLAUDE 규칙/흐름 변경 없음. 루트 README 관련 변경 불필요, next README 현재/과거 구분 및 재현 절차 갱신.
+- 검토 담당 / 발견 문제 수: Claude Code / 이번 구현 재검토 전으로 미확인(직전 규격 타이밍 결정 반영). 사용자 재요청 횟수: task04 구현 착수 후0회. 다음: 같은 PR #8에 푸시 → Claude Code 재검토 → 사용자 외형 판단. 병합·배포하지 않음.
+
 ### 2026-11-01 (Asia/Seoul) · PR #8 검토(x2 전체 동작·베기 효과·타일·배경)와 검사 수정
 
 - 담당 AI: Claude Code(검토). 구현 담당: Codex. 검토 담당은 구현 브랜치를 수정하지 않음.
@@ -794,6 +850,19 @@
 - 다음: Codex가 `fx-slash`를 한 획(칼날 선에 붙은 가늘어지는 꼬리)으로 수정 → Claude Code 재검토.
 - 종료 상태: 수정 대기(Codex).
 
+### 2026-11-01 (Asia/Seoul) · PR #8 Noah 베기 두 줄 수정 제출
+
+- 담당 Codex / 검토 담당 Claude Code(재검토 대기). 사용자 요청 및 PR #8 "Noah 베기 효과가 두 줄로 보임" 댓글 확인. 기준 head71b7fe7, 같은 `codex/hollow-keep-pixel-art`. 시작 전 원격 fetch·main af58238·PR #7/#8·실제 코드/관리 문서 확인, 착수 cb78e82 원격 공유. 게임 버전 전후: foundation 시험 방(번호 없음) 유지.
+- 규격 반영: 앞선559c722(활성 자산 기준 렌더 검사·직전 검토 기록)→7aa2def, 요청db1679b(한 획 규칙·연결 덩어리 검사)→ef92a4a. WORK_LOG 충돌은 HEAD의 task04 제출 기록과 규격 브랜치의 새 검토 기록을 모두 보존해 해결. pixel-assets/pixel-render 원본은 db1679b와 바이트 동일, 이후 변경하지 않았다. 기타 검사도 변경 없음.
+- 원인 재현: 새 pixel-assets를 기존 효과에 실행하면50/51, 0번 프레임의6px 이상 덩어리2개로 실패. 단일 그리기 호출 문제가 아니라 밝은 호와 떨어진 어두운 평행선의 그림 문제.
+- 수정: image_gen으로 기존 투명3프레임을 한 획으로 편집한 밑그림 생성(`tools/art-source/noah-slash-single-stroke-source.png`). 재현 빌더에서 연결된3개 호를 분리하고 종전 네이티브 위치/크기에 맞춰 축소·기존64색·알파0/255로 정리, 떨어진 축소 잔점 제거. 밝은 칼날 바로 안쪽에 붙은 어두운 꼬리, 끝은 가늘게. 떨어진 평행선을 만들던 별도 inner arc 코드는 제거. 효과 frame112×144/pivot(0,72)/각2틱/loopfalse 유지, 렌더러·게임 수치 변경 없음. PROVENANCE 전문 지시문/정리 절차 갱신.
+- 이번 실행: pixel-assets **51/51**, pixel-render **7/7**, foundation-contract **51/51**, foundation-edge **16/16**, room-traversal **4/4**, mobile-layout **20/20**, mobile-fullscreen **6/6**, browser-playtest **20/20**, density-trial **10/10**, ABYSSFALL polish/audio/audio-wind **3종 통과**. 추가 시험 자산 x1/x2 각각18/18, 각 시험 렌더7/7. audio404 경고는 기존 실패 복구 검사에서 예상됨. 로그 `/tmp/hk-slash-*.log`(before의50/51은 수정 전 재현).
+- 재현: 저장소 루트 HTTP8766, `HK_URL=http://127.0.0.1:8766/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/<name>.cjs`; trial 렌더는URL에?art=trial-x1|x2. density-trial 원본을 내용 동일 사본으로 `/tmp/hk-slash-density/tests/`에서 실행해 sibling assets 임시 출력으로 격리(시험본 비교 파일 보존), cmp 동일 확인. 원본 판정·검사 코드는 변경하지 않음. 기존 회귀는 `node tests/<name>.cjs`.
+- PNG 검증: 효과3프레임의8방향 연결 덩어리는 각각1개(302/581/288px), 기존 색상4개 사용. 다른 런타임 PNG15개는71b7fe7 기준 SHA256 동일. 전체 PNG16개 재생성 해시 동일. manifest·palette·sim.js·render.js·pixel-trial·기존 게임·공용 자산·런처 변경 없음.
+- 캡처: 새 `capture-noah-single-stroke.cjs`에서 Playwright 브라우저 시계를 제어하고 실제 키보드 입력/기존 루프를 사용, pose/world 주입 없음. 좌우 실제 공격 나이0~11 모든 틱을 확인 후 연속 캡처 저장. `pixel-review/noah-single-stroke/README.md` 및 개별 PNG/연속 strip. 준비0~1 효과없음,2~7 단발3프레임,8이후 효과없음. 이전 task04 캡처는 이력으로 보존하고 새 수정 링크를 우선 안내.
+- 5개 관리 문서 검토: STATUS·WORK_LOG·CHANGELOG 갱신, AGENTS·CLAUDE 흐름 변경 없음. 루트 README 변경 필요 없음, next README/PROVENANCE/캡처 README 갱신.
+- 검토 담당 / 발견 문제 수: Claude Code / 사용자 발견1건(직전 검토 누락 기록은 기준 커밋에서 보존), 이번 수정 재검토 전. 사용자 재요청 횟수: task04 제출 후1회(이번 두 줄 수정). 종료 상태: 같은 PR #8 푸시·재검토 대기. 외형/동작 사용자 판단 대기, 실기기 회전 확인 필요. 병합·배포하지 않음.
+
 ### 2026-11-01 (Asia/Seoul) · PR #8 재검토(Noah 베기 효과 한 획)
 
 - 담당 AI: Claude Code(검토). 구현 담당: Codex. 검토 담당은 구현 브랜치를 수정하지 않음.
@@ -806,3 +875,17 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: 사용자 화면 확인 → 승인 시 PR #7 → PR #8 병합, 시험본·검토 캡처 폴더 정리 여부 결정.
 - 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-01 (Asia/Seoul) · PR #7·#8 병합과 밀도 시험본 삭제
+
+- 담당 AI: Claude Code. 사용자 지시: "좋아요. 병합하고 시험본 폴더는 지워 주세요".
+- 병합: PR #7 → main(`d62b7d5`). PR #8 → 통합 브랜치 `claude/merge-pr8-pixel-art`에서 병합(`897bb67`). 충돌은 `docs/WORK_LOG.md` 한 곳(양쪽 추가) — 앞 세 곳은 Codex 항목만, 마지막은 Codex 수정 제출 → Claude Code 재검토 순으로 정리, 양쪽 제목 41개 보존 확인.
+- 삭제: `next/assets/pixel-trial/`(x1 전체, x2 팔레트, 비교 캡처), `next/tests/density-trial.cjs`, `next/tools/build-density-trial.py`, `pixel-art.js`의 `?art=trial-*` 전환, `pixel-render.cjs`의 시험본 분기.
+- 보존: `build-full-x2.py`가 출발점으로 읽는 x2 재료(manifest, Ethan idle·run, Noah idle, PROVENANCE)를 `next/tools/art-source/density-trial-x2/`로 옮기고 스크립트 경로 2곳·`assets/pixel/PROVENANCE.md` 참조 1곳 수정. 저장소 밖 사본에서 `build-full-x2.py` 실행(이 환경에 scipy 설치 필요) → 생성 결과가 커밋된 자산과 바이트 단위로 동일. 검토 캡처 `assets/pixel-review/`는 사용자 지시 범위 밖이라 유지.
+- **작업 중 실수(Claude Code):** 시험본 전환을 지우면서 `pixel-art.js` `status()`에 남은 `choice` 참조를 놓쳐 페이지 오류 발생 → 화면 검사가 0/7·전체 화면 2/6으로 실패해 커밋 전에 발견, `manifest?.scale || 2`로 수정(기존 기본값과 동일).
+- 테스트(수정 후, 커밋 전): pixel-assets 51/51, pixel-render 7/7, 인수 51/51, 경계 16/16, 구덩이 4/4, 모바일 배치 20/20, 전체 화면 6/6, 브라우저 20/20, ABYSSFALL 회귀 3종 통과, 페이지 오류 0, `artStatus()` = `{loaded:true, failed:[], scale:2}`, 시험본 주소 404.
+- STATUS·CHANGELOG 갱신.
+- 검토 담당 / 발견 문제 수: 해당 없음(병합·정리 작업). 자체 실수 1건(커밋 전 수정).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 결정 — 2단계 탐험 구조 또는 Noah 3단 콤보.
+- 종료 상태: 병합 PR 제출 후 병합.
