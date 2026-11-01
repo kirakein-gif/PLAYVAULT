@@ -2,6 +2,10 @@
 
 확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #11 검토, 2단계 보완 규격 제출).
 
+## 진행 중 · CODEX_TASK_06 출입문·봉쇄물·방 밀도 보완
+
+Codex / `codex/hollow-keep-exploration-refine` / 기준 main `1588a46` / 2026-11-01. 사용자 지시로 기준 브랜치를 main으로 확정하고 작업 지시서에 정정 한 줄 추가. 범위: next/ 출입문 규칙·봉쇄물 렌더/그림·8방 밀도/완주 기록·기존 자체 검사/캡처 갱신, README·STATUS·WORK_LOG·CHANGELOG. 인수 검사 원본·1단계 수치/캐릭터 크기·기존 게임/공용 자산/런처 보존. 다음 Claude Code 검토, 사용자 재미/난이도 판단. 병합·배포 없음.
+
 ## 제출 · THE HOLLOW KEEP 2단계 보완 규격(출입문·봉쇄물·방 밀도) / 사용자 확인 → Codex 구현 대기
 
 Claude Code / `claude/hollow-keep-exploration-refine` / 기준: PR #11 `fc7befd` + PR #10 브랜치 병합(`1670f40`) / 2026-11-01. 사용자 결정: "문"을 출입문(들어가면 다른 곳)과 봉쇄물(잠기면 못 지나감)로 구분, 조사 버튼 유지, 방 밀도 추가, 막히지 않은 길도 둠. 범위: `EXPLORATION_REFINE_SPEC.md`, `CODEX_TASK_06.md`, `tests/entrance-contract.cjs`(새 9개), `area-data.cjs`(출입문 배치·봉쇄물 모양·D1~D6·완주 출입문 조건), `pixel-assets.cjs`(물건 그림 이름 변경), DESIGN_DIRECTION·EXPLORATION_SPEC 안내. 게임 코드·그림 변경 없음.
