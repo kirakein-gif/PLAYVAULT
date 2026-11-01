@@ -965,3 +965,17 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex `CODEX_TASK_06.md`(기준 main) → Claude Code 검토.
 - 종료 상태: 병합 완료.
+
+### 2026-11-01 (Asia/Seoul) · CODEX_TASK_06 출입문·봉쇄물·밀도 보완 제출
+
+- 담당 Codex / 검토 Claude Code(대기). 사용자 추가 지시: 기준은main. 원격 fetch/prune·열린 PR 없음·main1588a46 및 병합 이력을 확인하고 같은 main에서 `codex/hollow-keep-exploration-refine`를 만들었습니다. STATUS와 지시서 정정 첫 커밋8b3654c를 원격 공유한 뒤 Draft PR #14 개설. 구현/검증 SHA **e8e041e**. 버전 전후: 번호 없는2단계 시범 구역 유지.
+- 출입문: 기본2×3칸, 발/중심/지상 조건, ↑·조사 누른 순간 진입, 짝 중앙/발 정렬·속도0·공격 정리, enter/room/unlock/denied, entered/unlocked 기록. 인장 열쇠로 잠금 한 번 해제 후 양방향 유지. 봉쇄물은 통로에 맞는 세로/가로 반복 격자와 실제 조건의 열쇠/레버/빛/표적 기호로 바꿨습니다. 기존 문짝 자산은 보존하되 봉쇄물에는 그리지 않음을 실제 drawImage 기록으로 확인했습니다.
+- 구역:8방 모두 세 층, 3~4칸 통로·세로 사다리·높은 공간을 혼합. 빈칸 비율 평균0.571, 방별0.543~0.585. 출입문2쌍 모두 먼 방 연결, 하나는 인장 열쇠 잠금. 보관실의 밀폐된 아래 칸에 청동/인장 열쇠를 두어 벽 파괴가 필요하며, 출입문과 위층에는 막히지 않은 경로를 둡니다. Noah 레버의 가까운 발판/사다리와 Ethan의 높이 우회를 제외했습니다. 완주 입력은3671틱=61.2초·61구간·교대2회, 모든 방/물건/출입문 쌍·잠금 해제 후 시작 방 복귀. 사람의 플레이 시간/재미 판정이 아닙니다.
+- 그림: image_gen의 새 원본을 경로A로 분리/축소·기존64색·알파0/255에 정리. 60px 격자와 방법 기호,120×180 아치/잠긴 아치를 refine-objects.png에 추가. 새 격자는 반복 경계가 이어집니다. 숨은 벽은 기존 벽돌과 같고14개 네이티브 픽셀만 미세한 금으로 다릅니다(팔레트 축소로 금이 사라진 것을 육안/픽셀 비교로 발견해 원본 금을1px로 정리). 지시문 전문·빌더·원본은PROVENANCE와tools에 보존. 영웅/효과/배경·기존 타일·팔레트와CONFIG 값은main과 동일합니다.
+- 이번 검사: entrance-contract **9/9**, area-data **17/17**(D1~D6/모양/짝/완주 포함), pixel-assets **55/55**, exploration-contract **14/14**, foundation-contract **51/51**, foundation-edge **16/16**, room-traversal **4/4**, exploration-edge **11/11**, exploration-browser **5/5**, pixel-render **7/7**, mobile-layout **20/20**, mobile-fullscreen **6/6**, browser-playtest(?room=test) **20/20**, ABYSSFALL polish/audio/audio-wind **3종 통과**. audio404 경고는 기존 실패 복구 검사입니다. 로그/tmp/hk06-*.log.
+- 검사 보존: main1588a46 대비 요청된 인수 검사 원본은 바이트 동일합니다. 허용된 자체 탐험 검사2개만 새 좌표/조건에 맞췄습니다. 옛 종탑 발판 점프 검사는 새 아래 통로에서 봉쇄물을 넘지 못하는 것으로 갱신하고, 위층 우회로는 봉쇄물이 닫힌 상태에서도 실제로 통과하는 별도 검사를 추가했습니다. 보호된 표적의 출발 좌표도 새 봉쇄물 앞쪽으로 옮겨 같은 차단 조건을 유지했습니다. 숨은 열쇠 밀폐/벽 파괴와 사다리 경계 회귀도 추가. 브라우저는 기존4항목과 모든 물건 확인을 유지하고 출입문 사용/잠금, 실제 기호/출입문 그림 확인을 더해5항목입니다.
+- 자체 발견/수정: 무작위 입력에서 사다리 꼭대기의 한쪽 발판과 단단한 바닥에 동시에 걸친 채↓+점프하면 기존0.01px 내림이 벽 겹침을 만들었습니다(seed3/tick2890). 단단한 바닥이 받치면 내려가기 예외를 적용하지 않도록 수정하고 경계 회귀 검사를 추가했습니다. 수정 후12시드×5000틱=60000틱에서 벽/봉쇄물 겹침 없음(LCG1664525/1013904223,17틱마다 입력 갱신, 일반키확률.36/교대.12). 이는 모든 끼임/재미를 보증하지 않습니다.
+- 재현: 저장소 루트 HTTP8766, `HK_URL=http://127.0.0.1:8766/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/<name>.cjs`. 기존browser-playtest는URL에?room=test. 순수Node/자산 검사는HTTP 불필요. build-area1→record-area1, 그림은build-full-x2.py→build-exploration-art.py. 구역/완주/그림/manifest 재생성 해시 일치.
+- 캡처: 실제 브라우저 완주에서8방·봉쇄물5개 닫힘/열림·출입문2쌍 진입 전후·지도·모바일780×330·숨은 물건 등28장 선택. pack-refine-review.py로 무손실WebP 총779912바이트, 원본PNG와 디코딩RGBA 바이트 동일 검사. 이전 캡처는 보존. 재현/링크는next/assets/exploration-refine-review/README.md. 브라우저 시계만 제어하며world/pose/좌표 주입 없음.
+- 5개 관리 문서 검토: STATUS/WORK_LOG/CHANGELOG 갱신, AGENTS/CLAUDE 규칙 변경 없음. 루트README 변경 필요 없음, nextREADME·PROVENANCE 갱신. 기존 게임·공용 자산·런처·다른 게임·area2·1단계 시험 방은 변경하지 않았습니다.
+- 검토 담당/발견 문제 수: Claude Code / 이번 구현 검토 전 미확인. 자체 규칙 문제1건(경계 내림)과 그림 정리1건(미세 금 소실)을 위에 기록. 사용자 재요청: task06 착수 후0회. 다음: PR #14 Draft→Ready → Claude Code 전체 재실행/실제 경로 검토 → 사용자 재미·난이도·외형 판단. 실기기 회전 확인 필요. 병합·배포하지 않음.
