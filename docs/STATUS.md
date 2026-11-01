@@ -1,6 +1,13 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Codex**(탐험 구조 구현 제출).
+확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #11 검토, 2단계 보완 규격 제출).
+
+## 제출 · THE HOLLOW KEEP 2단계 보완 규격(출입문·봉쇄물·방 밀도) / 사용자 확인 → Codex 구현 대기
+
+Claude Code / `claude/hollow-keep-exploration-refine` / 기준: PR #11 `fc7befd` + PR #10 브랜치 병합(`1670f40`) / 2026-11-01. 사용자 결정: "문"을 출입문(들어가면 다른 곳)과 봉쇄물(잠기면 못 지나감)로 구분, 조사 버튼 유지, 방 밀도 추가, 막히지 않은 길도 둠. 범위: `EXPLORATION_REFINE_SPEC.md`, `CODEX_TASK_06.md`, `tests/entrance-contract.cjs`(새 9개), `area-data.cjs`(출입문 배치·봉쇄물 모양·D1~D6·완주 출입문 조건), `pixel-assets.cjs`(물건 그림 이름 변경), DESIGN_DIRECTION·EXPLORATION_SPEC 안내. 게임 코드·그림 변경 없음.
+- 현재 PR #11 구현 기준 예상 실패: entrance-contract 0/9, area-data 10/17(밀도·봉쇄물 모양·출입문·숨은 곳·Noah 레버 높이), pixel-assets 53/54(새 그림 이름). Codex가 `CODEX_TASK_06.md`로 구현하면 통과해야 한다.
+- 병합 순서 제안: PR #10 → PR #11 → 이 보완 규격 PR → Codex 보완 구현 PR. 사용자 승인 전 병합 없음.
+- PR #11 검토: 막는 문제 0건, 사소한 지적 2건(browser-playtest 기본 주소, 검토 캡처 용량). 미리보기 `https://78040d2c.kirakein-playvault.pages.dev/games/the-hollow-keep/next/`.
 
 ## 구현 제출 · CODEX_TASK_05 탐험 시범 구역 / Claude Code 검토 대기
 
