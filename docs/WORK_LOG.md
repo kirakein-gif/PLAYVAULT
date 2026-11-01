@@ -908,3 +908,18 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: 사용자 PR 확인 → Codex가 `CODEX_TASK_05.md`로 구현 → Claude Code 검토.
 - 종료 상태: 규격 제출.
+
+### 2026-11-01 (Asia/Seoul) · Codex 2단계 구현(PR #11) 검토
+
+- 담당 AI: Claude Code(검토). 구현: Codex `codex/hollow-keep-exploration` `fc7befd`.
+- 범위 확인: 검사·규격 원본이 PR #10(`f6b8be1`)과 바이트 동일. main 대비 기존 게임·공용 자산·런처 변경 없음.
+- 테스트(저장소 밖 `git archive` 사본, 로컬 HTTP 서버): exploration-contract 14/14, area-data 8/8(완주 재생 3602틱·교대 2회), exploration-edge 8/8, exploration-browser 4/4, pixel-assets 53/53, pixel-render 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, foundation-contract 51/51, foundation-edge 16/16, room-traversal 4/4, browser-playtest `?room=test` 20/20, ABYSSFALL 회귀 3종 통과.
+- 독립 검사: 시작 위치 104곳(문 안 8곳 제외) × 무작위 입력 총 416,000틱 → 벽·닫힌 문 겹침, 화면 밖 갇힘 0건(임시 스크립트, 커밋 안 함).
+- 화면 확인: 성문 방, 완주 후 지도(8방), 모바일 780×330.
+- 지적(차단 아님): browser-playtest 기본 `HK_URL`이 구역 화면을 가리켜 인자 없이 실행 시 4개 후 TypeError. 검토 캡처 폴더 용량.
+- 설계 관찰(사용자 판단): 방이 넓고 비어 촘촘함이 약함, 부서지는 벽이 숨은 곳보다 필수 통로로 쓰임.
+- Git/PR: [PR #11 검토](https://github.com/kirakein-gif/PLAYVAULT/pull/11) (COMMENT). 미리보기 `https://78040d2c.kirakein-playvault.pages.dev/games/the-hollow-keep/next/`.
+- 검토 담당 / 발견 문제 수: Claude Code / 사소 2건(차단 0).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 미리보기 확인 → 승인 시 PR #10 → PR #11 병합.
+- 종료 상태: 검토 완료, 사용자 판단 대기.
