@@ -10,6 +10,7 @@ PLAYVAULT — THE HOLLOW KEEP 2단계 보완: 출입문(entrance)·봉쇄물 구
 
 저장소: kirakein-gif/PLAYVAULT
 기준 브랜치: claude/hollow-keep-exploration-refine (PR #10·#11이 main에 병합되었다면 main 위의 같은 브랜치)
+추가 지시: 이제 기준 브랜치는 main이다. 위의 기준 브랜치 문구보다 이 지시를 우선한다.
 작업 브랜치: codex/hollow-keep-exploration-refine
 
 [작업 시작 전]

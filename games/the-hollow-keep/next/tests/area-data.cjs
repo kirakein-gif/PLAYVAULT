@@ -3,6 +3,7 @@
  * THE HOLLOW KEEP · 시범 구역 데이터·완주 인수 테스트
  * 규격: games/the-hollow-keep/docs/EXPLORATION_SPEC.md §2, §4, §6, §7
  *       games/the-hollow-keep/docs/EXPLORATION_REFINE_SPEC.md §3~§6 (출입문, 봉쇄물 모양, 방 밀도 D1~D6)
+ *       games/the-hollow-keep/docs/TILE_MOSAIC_SPEC.md §4~§5 (back 격자, 다양성 V1~V4)
  * 실행: node games/the-hollow-keep/next/tests/area-data.cjs
  * 환경 변수: HK_AREA(구역 파일, 기본 next/areas/area1.json), HK_WALK(완주 기록, 기본 area1.walkthrough.json), HK_SIM
  *   HK_AREA_REQ=off  — 검사기 자체 검증용. §7 필수 요소·보완 §5 밀도·§6 출입문 개수 검사를 끈다(형식·연결·배치·모양·완주 검사는 그대로).
@@ -281,6 +282,62 @@ if (REQ) {
       assert.ok(spots.some((s) => Math.abs(s.c - l.x) <= 1 && reach(s, N.height + N.jumpHeight - 4)), `${l.id}: Noah가 닿는 설 곳(가로 1칸 이내)이 없음`);
       for (let c = l.x - 1; c <= l.x + 1; c++) for (let r = 0; r <= Math.min(ROWS - 1, l.y + 3); r++) assert.notEqual(g[r] && g[r][c], 'H', `${l.id}: ${r}행 ${c}열 사다리가 너무 가까움`);
     }
+  });
+}
+
+// ── TILE_MOSAIC_SPEC §4 back 격자 ──
+const DECO = ['w', 'p', 'b', 'c'];
+check('back 격자(모자이크 §4): 18줄×32글자, 문자 . w p b c, 벽 칸엔 장식 없음, w·p·b는 세로 2칸 이상', () => {
+  for (const [id, r] of rooms) {
+    if (r.back === undefined) { assert.ok(!REQ, `${id}.back 없음`); continue; }
+    assert.ok(Array.isArray(r.back) && r.back.length === ROWS, `${id}.back은 ${ROWS}줄`);
+    r.back.forEach((row, i) => { assert.equal(row.length, COLS, `${id}.back[${i}] 길이`); assert.match(row, /^[.wpbc]+$/, `${id}.back[${i}]에 허용되지 않은 문자`); });
+    for (let rr = 0; rr < ROWS; rr++) for (let c = 0; c < COLS; c++) {
+      const ch = r.back[rr][c]; if (ch === '.') continue;
+      assert.notEqual(r.grid[rr][c], '#', `${id}: ${rr}행 ${c}열 벽 칸에 장식 ${ch}`);
+      if ('wpb'.includes(ch)) {
+        const up = rr > 0 && r.back[rr - 1][c] === ch, down = rr < ROWS - 1 && r.back[rr + 1][c] === ch;
+        assert.ok(up || down, `${id}: ${rr}행 ${c}열 ${ch}가 한 칸뿐(세로 2칸 이상 필요)`);
+      }
+    }
+  }
+});
+
+if (REQ) {
+  const decoStat = rooms.map(([id, r]) => {
+    const kinds = new Set(), open = r.grid.join('').split('').filter((ch) => ch !== '#').length;
+    let n = 0; for (const row of r.back || []) for (const ch of row) if (ch !== '.') { n++; kinds.add(ch); }
+    return { id, kinds, ratio: open ? n / open : 0 };
+  });
+  check('모자이크 §5 V1 장식 종류: 방마다 2종 이상, 구역 전체로 w·p·b·c 모두', () => {
+    const few = decoStat.filter((d) => d.kinds.size < 2).map((d) => `${d.id}:${[...d.kinds].join('') || '없음'}`);
+    assert.deepEqual(few, [], `장식이 2종 미만인 방: ${few.join(', ')}`);
+    const all = new Set(decoStat.flatMap((d) => [...d.kinds]));
+    const miss = DECO.filter((k) => !all.has(k));
+    assert.deepEqual(miss, [], `구역에서 쓰지 않은 장식: ${miss.join(', ')}`);
+  });
+  check('모자이크 §5 V2 장식 양: 방마다 벽 아닌 칸의 3%~25%', () => {
+    const bad = decoStat.filter((d) => d.ratio < 0.03 || d.ratio > 0.25).map((d) => `${d.id} ${(d.ratio * 100).toFixed(1)}%`);
+    assert.deepEqual(bad, [], bad.join(', '));
+  });
+  check('모자이크 §5 V3 방 모양 차이: 어떤 두 방도 # 위치가 58칸 이상 다름', () => {
+    const bad = [];
+    for (let i = 0; i < rooms.length; i++) for (let j = i + 1; j < rooms.length; j++) {
+      const a = rooms[i][1].grid.join(''), b = rooms[j][1].grid.join('');
+      let d = 0; for (let k = 0; k < a.length; k++) if ((a[k] === '#') !== (b[k] === '#')) d++;
+      if (d < 58) bad.push(`${rooms[i][0]}–${rooms[j][0]} ${d}칸`);
+    }
+    assert.deepEqual(bad, [], `너무 비슷한 방: ${bad.join(', ')}`);
+  });
+  check('모자이크 §5 V4 사다리 배치: 사다리 열 집합이 같은 방이 3개 이하', () => {
+    const sets = new Map();
+    for (const [id, r] of rooms) {
+      const cols = [...new Set(r.grid.flatMap((row) => [...row].map((ch, c) => (ch === 'H' ? c : -1)).filter((c) => c >= 0)))].sort((a, b) => a - b);
+      if (!cols.length) continue;
+      const k = cols.join(','); sets.set(k, [...(sets.get(k) || []), id]);
+    }
+    const bad = [...sets.entries()].filter(([, ids]) => ids.length > 3).map(([k, ids]) => `열 ${k}: ${ids.join(', ')}`);
+    assert.deepEqual(bad, [], bad.join(' / '));
   });
 }
 

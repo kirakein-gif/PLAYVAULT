@@ -70,11 +70,11 @@
         ladders.push({x:x*tile,y:y*tile,w:tile,h:(end-y)*tile,openTop});
         if(y>0&&!openTop)platforms.push({x:x*tile,y:y*tile,w:tile,h:1,oneway:true});
       }
-      const objects=(r.objects||[]).map(o=>({...o,cellX:o.x,cellY:o.y,x:o.x*tile,y:o.y*tile,w:(o.w||1)*tile,h:(o.h||(o.type==='target'?2:1))*tile}));
+      const objects=(r.objects||[]).map(o=>({...o,cellX:o.x,cellY:o.y,x:o.x*tile,y:o.y*tile,w:(o.w||(o.type==='entrance'?2:1))*tile,h:(o.h||(o.type==='target'?2:o.type==='entrance'?3:1))*tile}));
       rooms[id]={width:area.cols*tile,height:area.rows*tile,name:r.name,grid:r.grid,pos:r.pos,objects,walls,solids:walls.slice(),platforms,ladders,dummies:objects.filter(o=>o.type==='target')};
     }
     const start=area.start,w=createWorld({room:rooms[start.room],spawn:start,hero});
-    Object.assign(w,{area,areaRooms:rooms,roomId:start.room,visited:{[start.room]:true},flags:{switches:{},doors:{},broken:{},keys:{},picked:{},cleared:{}}});
+    Object.assign(w,{area,areaRooms:rooms,roomId:start.room,visited:{[start.room]:true},flags:{switches:{},doors:{},broken:{},keys:{},picked:{},cleared:{},entered:{},unlocked:{}}});
     w.room=rooms[w.roomId];w.dummies=w.room.dummies;refreshArea(w);w.player.onGround=supported(w.player,[...w.room.solids,...w.room.platforms]);return w;
   }
   function refreshArea(w, ev=[]) {
@@ -104,6 +104,23 @@
       }
     }
   }
+  function enter(w,edge,ev) {
+    const p=w.player,f=w.flags;
+    if(!p.onGround||p.climbing||!(edge('up')||edge('interact')))return;
+    const source=w.room.objects.find(o=>o.type==='entrance'&&p.x+p.w/2>=o.x&&p.x+p.w/2<o.x+o.w&&Math.abs(p.y+p.h-o.y-o.h)<=2);
+    if(!source)return;
+    const pair=Object.entries(w.areaRooms).flatMap(([room,r])=>r.objects.map(o=>({room,o}))).find(({o})=>o.id===source.to&&o.type==='entrance'&&o.to===source.id);
+    if(!pair)return;
+    const lock=source.lock||pair.o.lock;
+    if(lock&&!f.unlocked[source.id]&&!f.unlocked[pair.o.id]){
+      if(!(f.keys[lock.key]>0)){ev.push({type:'denied',id:source.id});return;}
+      f.keys[lock.key]--;f.unlocked[source.id]=true;f.unlocked[pair.o.id]=true;ev.push({type:'unlock',id:source.id});
+    }
+    const from=w.roomId;w.roomId=pair.room;w.room=w.areaRooms[pair.room];w.dummies=w.room.dummies;w.visited[pair.room]=true;w.attacks=[];
+    Object.assign(p,{x:pair.o.x+(pair.o.w-p.w)/2,y:pair.o.y+pair.o.h-p.h,vx:0,vy:0,onGround:true,climbing:false,jumpKind:null,takeoffVx:0,jumpBuffer:0,coyote:0});
+    f.entered[source.id]=true;ev.push({type:'enter',id:source.id,to:pair.o.id,room:pair.room});
+    if(from!==pair.room)ev.push({type:'room',from,to:pair.room,dir:'entrance'});
+  }
   function climb(w,held,edge,ev,c) {
     const p=w.player,center=p.x+p.w/2,feet=p.y+p.h;
     const ladder=w.room.ladders.find(l=>center>=l.x&&center<l.x+l.w&&p.y<l.y+l.h&&feet>=l.y-.01);
@@ -122,14 +139,37 @@
   }
   function transition(w,ev) {
     const p=w.player,r=w.room,cx=p.x+p.w/2,cy=p.y+p.h/2;
-    const dir=cx<0?'left':cx>r.width?'right':cy<0?'up':cy>r.height?'down':null;
+    const crossed=cx<0?'left':cx>r.width?'right':cy<0?'up':cy>r.height?'down':null;
+    const dir=crossed||(p.x<0?'left':p.x+p.w>r.width?'right':p.y<0?'up':p.y+p.h>r.height?'down':null);
     if(!dir)return;
     const delta={left:[-1,0],right:[1,0],up:[0,-1],down:[0,1]}[dir];
     const pos=w.area.rooms[w.roomId].pos;
     const entry=Object.entries(w.area.rooms).find(([,next])=>next.pos[0]===pos[0]+delta[0]&&next.pos[1]===pos[1]+delta[1]);
     if(!entry)return;
-    const from=w.roomId;w.roomId=entry[0];p.x-=delta[0]*r.width;p.y-=delta[1]*r.height;
-    w.room=w.areaRooms[w.roomId];w.dummies=w.room.dummies;w.visited[w.roomId]=true;w.attacks=[];
+    const destination=w.areaRooms[entry[0]],candidate={...p,x:p.x-delta[0]*r.width,y:p.y-delta[1]*r.height};
+    // Probe the center-crossing pose as the leading edge reaches the boundary.
+    // Closed exits then hold steadily, rather than repeatedly moving out and snapping back.
+    const probe={...candidate};
+    if(!crossed){
+      if(delta[0])probe.x=delta[0]>0?-p.w/2+1e-6:r.width-p.w/2-1e-6;
+      else probe.y=delta[1]>0?-p.h/2+1e-6:r.height-p.h/2-1e-6;
+    }
+    const center=probe.x+probe.w/2;
+    const blocked=destination.solids.some(s=>{
+      // Attached shoulders may cross boundary masonry beside a one-cell ladder.
+      // Mechanisms and masonry across the center lane always block entry.
+      if(p.climbing&&delta[1]&&!s.type&&(center<=s.x||center>=s.x+s.w))return false;
+      return overlap(probe,s);
+    });
+    if(blocked){
+      ev.push({type:'roomBlocked',from:w.roomId,to:entry[0],dir});
+      if(delta[0]){p.x=delta[0]>0?r.width-p.w:0;p.vx=0;}
+      else {p.y=delta[1]>0?r.height-p.h:0;p.vy=0;if(delta[1]>0&&!p.climbing)p.onGround=true;}
+      return;
+    }
+    if(!crossed)return;
+    const from=w.roomId;w.roomId=entry[0];p.x=candidate.x;p.y=candidate.y;
+    w.room=destination;w.dummies=w.room.dummies;w.visited[w.roomId]=true;w.attacks=[];
     ev.push({type:'room',from,to:w.roomId,dir});
   }
   function move(p, solids, platforms = []) {
@@ -184,7 +224,7 @@
     const c = CONFIG.heroes[w.active];
     let climbing = false;
     if (w.area) climbing = climb(w, held, edge, ev, c);
-    const dropping = w.area && edge('jump') && held.down && p.onGround && supported(p, w.room.platforms);
+    const dropping = w.area && edge('jump') && held.down && p.onGround && supported(p, w.room.platforms) && !supported(p, w.room.solids);
     if (dropping) { p.dropTicks = 14; p.onGround = false; p.coyote = 0; p.jumpBuffer = 0; p.y += .01; }
     const wasGround = p.onGround;
     if (!climbing) {
@@ -228,7 +268,7 @@
       if (p.jumpBuffer > 0) jump();
     }
     }
-    if (w.area) { transition(w, ev); interact(w, held, edge, ev); refreshArea(w, ev); }
+    if (w.area) { transition(w, ev); interact(w, held, edge, ev); enter(w, edge, ev); refreshArea(w, ev); }
     w.attacks = w.attacks.filter(a => a.life > 0);
     if (edge('attack') && !w.attackCooldowns[w.active]) {
       const wp = c.weapon;
@@ -288,7 +328,7 @@
   }
   return { TICK, CONFIG, createWorld, step, getPlayer: w => w.player,
     getMap: w => ({current:w.roomId,rooms:w.area?Object.entries(w.area.rooms).map(([id,r])=>({id,pos:copy(r.pos),visited:!!w.visited[id]})):[]}),
-    getFlags: w => copy(w.flags||{switches:{},doors:{},broken:{},keys:{},picked:{},cleared:{}}),
+    getFlags: w => copy(w.flags||{switches:{},doors:{},broken:{},keys:{},picked:{},cleared:{},entered:{},unlocked:{}}),
     getHitboxes: w => w.attacks.filter(a => a.life > 0).map(a => ({ x: a.x, y: a.y, w: a.w, h: a.h })),
     snapshot: w => copy(w) };
 });

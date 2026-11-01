@@ -45,16 +45,30 @@
     }
     function areaObjects(world) {
       const flags=HKSim.getFlags(world),objects=HKPixel.manifest()?.objects||{};
+      function prop(name,x,y,w,h){const art=objects[name],image=art&&HKPixel.image(art.file);if(!image)return false;ctx.drawImage(image,art.x,art.y,art.w,art.h,x,y,w,h);return true;}
       for(const o of world.room.objects){
         if(o.type==='target'||o.type==='key'&&flags.picked[o.id]||o.type==='breakable'&&flags.broken[o.id])continue;
-        const key=o.type==='switch'?(o.kind==='light'?'light':'lever')+'-'+(flags.switches[o.id]?'on':'off'):o.type==='door'?(flags.doors[o.id]?'door-open':o.open.key?'locked-door':'door-closed'):o.type;
-        const art=objects[key],image=art&&HKPixel.image(art.file);
-        if(o.type==='breakable'&&image){
-          for(let y=0;y<o.h;y+=30)for(let x=0;x<o.w;x+=30)ctx.drawImage(image,art.x,art.y,art.w,art.h,o.x+x,o.y+y,30,30);
-        }else if(image){
-          const h=o.type==='door'?o.h:45,w=o.type==='door'?o.w:30;
-          ctx.drawImage(image,art.x,art.y,art.w,art.h,o.x,o.y+o.h-h,w,h);
-        }else{ctx.fillStyle=o.type==='key'?'#e9c779':'#68798c';ctx.fillRect(o.x,o.y,o.w,o.h);}
+        if(o.type==='door'){
+          if(flags.doors[o.id])continue;
+          const g=world.room.grid,c=o.cellX,r=o.cellY,cols=o.w/30;
+          const vertical=Array.from({length:cols},(_,i)=>i+c).every(x=>g[r-1]?.[x]==='#'&&(r+o.h/30>=18||g[r+o.h/30]?.[x]==='#'));
+          const kind=vertical?'barrier-v':'barrier-h';
+          for(let y=0;y<o.h;y+=30)for(let x=0;x<o.w;x+=30)if(!prop(kind,o.x+x,o.y+y,30,30)){ctx.fillStyle='#566579';ctx.fillRect(o.x+x,o.y+y,30,30);}
+          const source=o.open.switch&&Object.values(world.areaRooms).flatMap(room=>room.objects).find(s=>s.id===o.open.switch);
+          const mark=o.open.key?'mark-key':o.open.cleared?'mark-target':source?.kind==='light'?'mark-light':'mark-lever';
+          prop(mark,o.x+o.w/2-15,o.y+o.h/2-15,30,30);continue;
+        }
+        if(o.type==='breakable'){
+          for(let y=0;y<o.h;y+=30)for(let x=0;x<o.w;x+=30)prop('breakable',o.x+x,o.y+y,30,30);
+          continue;
+        }
+        if(o.type==='entrance'){
+          const pair=Object.values(world.areaRooms).flatMap(room=>room.objects).find(other=>other.id===o.to);
+          const locked=(o.lock||pair?.lock)&&!flags.unlocked[o.id];
+          prop(locked?'entrance-locked':'entrance',o.x,o.y,o.w,o.h);text('↑ / E',o.x+8,o.y-6,'#c2c0cf',10);continue;
+        }
+        const name=o.type==='switch'?(o.kind==='light'?'light':'lever')+'-'+(flags.switches[o.id]?'on':'off'):o.type;
+        if(!prop(name,o.x,o.y+o.h-45,30,45)){ctx.fillStyle='#68798c';ctx.fillRect(o.x,o.y,o.w,o.h);}
         if(o.type==='switch')text(o.hero?o.hero.toUpperCase()+' · E':'E',o.x-12,o.y-16,'#e4d5af',10);
       }
     }
@@ -67,19 +81,34 @@
       const p = HKSim.getPlayer(world), room = world.room;
       ctx.clearRect(0, 0, 960, 540); ctx.fillStyle = '#101320'; ctx.fillRect(0, 0, 960, 540);
       const background=HKPixel.manifest()?.background,pixelBackground=background&&HKPixel.image(background);
-      if(pixelBackground)ctx.drawImage(pixelBackground,0,0,960,540);
-      else if (backdrop.complete && backdrop.naturalWidth) {
+      if(!room.grid&&pixelBackground)ctx.drawImage(pixelBackground,0,0,960,540);
+      else if (!room.grid&&backdrop.complete && backdrop.naturalWidth) {
         ctx.globalAlpha = .18; ctx.drawImage(backdrop, 0, 0, 960, 540); ctx.globalAlpha = 1;
       }
-      if(!pixelBackground)for (let x = 28; x < 960; x += 154) {
+      if(!room.grid&&!pixelBackground)for (let x = 28; x < 960; x += 154) {
         ctx.strokeStyle = '#31313e'; ctx.lineWidth = 5;
         ctx.beginPath(); ctx.moveTo(x, 480); ctx.lineTo(x, 170); ctx.quadraticCurveTo(x, 105, x + 59, 76);
         ctx.quadraticCurveTo(x + 118, 105, x + 118, 170); ctx.lineTo(x + 118, 480); ctx.stroke();
         ctx.strokeStyle = '#4b4250'; ctx.lineWidth = 1; ctx.stroke();
       }
       if(room.grid){
+        const salt=[...world.roomId].reduce((sum,ch)=>sum+ch.charCodeAt(0),0),hash=(x,y)=>x*7+y*13+salt;
+        const wall=(y,x)=>y<0||y>=18||x<0||x>=32||room.grid[y][x]==='#';
+        // Mosaic layers: dark masonry, authored ornaments, then collision surfaces.
+        room.grid.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='#')areaCell('back-'+(hash(x,y)%3+1),x*30,y*30);}));
+        const back=room.back||world.area.rooms[world.roomId].back;
+        if(back)back.forEach((row,y)=>[...row].forEach((ch,x)=>{
+          if(ch==='.'||wall(y,x))return;
+          if(ch==='c'){areaCell('candle',x*30,y*30);return;}
+          const family={w:'window',p:'pillar',b:'banner'}[ch];if(!family)return;
+          const part=back[y-1]?.[x]!==ch?'top':back[y+1]?.[x]!==ch?(ch==='p'?'base':'bottom'):'mid';
+          areaCell(family+'-'+part,x*30,y*30);
+        }));
         room.grid.forEach((row,y)=>[...row].forEach((ch,x)=>{
-          if(ch==='#')areaCell(y>0&&room.grid[y-1][x]!=='#'?'floor-top':'wall-fill',x*30,y*30);
+          if(ch==='#'){
+            const tile=!wall(y-1,x)?'floor-top':!wall(y+1,x)?'wall-bottom':!wall(y,x-1)?'wall-left':!wall(y,x+1)?'wall-right':hash(x,y)%2?'wall-fill':'wall-fill-2';
+            areaCell(tile,x*30,y*30);
+          }
           if(ch==='-')areaCell('ledge',x*30,y*30,16);
           if(ch==='H')areaCell('ladder',x*30,y*30);
         }));
