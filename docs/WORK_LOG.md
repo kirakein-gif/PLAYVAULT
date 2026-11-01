@@ -1020,3 +1020,16 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex `CODEX_TASK_07.md`에 포함.
 - 종료 상태: 규격 보강.
+
+### 2026-11-01 (Asia/Seoul) · Codex 모자이크·봉인 수정·사다리(PR #14 `6fdcc52`) 재검토
+
+- 담당 AI: Claude Code(검토). 구현: Codex `f40d0f1`(+기록 `6fdcc52`), PR #15 규격 `0bc593d` 병합 포함.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): exploration-contract 16/16, entrance 9/9, foundation-contract 51/51, area-data 22/22(완주 4159틱·교대 2회), pixel-assets 57/57, tile-mosaic-render 7/7, pixel-render 구역·시험 방 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest(`?room=test`) 20/20, foundation-edge 16/16, room-traversal 4/4, exploration-edge 13/13, ABYSSFALL 회귀 3종 통과. 검사 원본 변경 없음.
+- 무작위 입력(시작 314곳, 47.1만 틱): 겹침 0건(이전 1건 해결).
+- 화면: 사다리 가로대 식별 가능(Codex 측정 가로대 3개·대비 8.11:1). 벽 가장자리·장식 조각·방마다 다른 모양 확인.
+- 관찰(차단 아님): 종탑 한쪽 발판이 어두운 틈처럼 보이고 장식이 발판 뒤로 이어짐(가독성 확인 필요). 장식 배치가 두 종 나란히 붙은 같은 패턴. 캡처 1.6MB·원본 그림 1.8MB 추가.
+- Git/PR: [PR #14 재검토](https://github.com/kirakein-gif/PLAYVAULT/pull/14) (COMMENT). 미리보기 `https://463bfd68.kirakein-playvault.pages.dev/games/the-hollow-keep/next/`.
+- 검토 담당 / 발견 문제 수: Claude Code / 0건(관찰 3건).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 미리보기 확인 → 승인 시 PR #15 → PR #14 병합.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
