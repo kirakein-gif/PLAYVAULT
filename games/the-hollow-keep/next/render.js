@@ -38,6 +38,26 @@
       return true;
     }
     const backdrop = new Image(); backdrop.src = '../assets/title-keep-v1.webp';
+    function areaCell(name,x,y,h=30) {
+      const tiles=HKPixel.manifest()?.tiles,cell=tiles?.cells[name],image=tiles&&HKPixel.image(tiles.file),scale=HKPixel.status().scale;
+      if(image&&cell)ctx.drawImage(image,cell[0]*60,cell[1]*60,60,h*scale,x,y,30,h);
+      else {ctx.fillStyle=name==='ladder'?'#726349':'#2b374b';ctx.fillRect(x,y,30,h);}
+    }
+    function areaObjects(world) {
+      const flags=HKSim.getFlags(world),objects=HKPixel.manifest()?.objects||{};
+      for(const o of world.room.objects){
+        if(o.type==='target'||o.type==='key'&&flags.picked[o.id]||o.type==='breakable'&&flags.broken[o.id])continue;
+        const key=o.type==='switch'?(o.kind==='light'?'light':'lever')+'-'+(flags.switches[o.id]?'on':'off'):o.type==='door'?(flags.doors[o.id]?'door-open':o.open.key?'locked-door':'door-closed'):o.type;
+        const art=objects[key],image=art&&HKPixel.image(art.file);
+        if(o.type==='breakable'&&image){
+          for(let y=0;y<o.h;y+=30)for(let x=0;x<o.w;x+=30)ctx.drawImage(image,art.x,art.y,art.w,art.h,o.x+x,o.y+y,30,30);
+        }else if(image){
+          const h=o.type==='door'?o.h:45,w=o.type==='door'?o.w:30;
+          ctx.drawImage(image,art.x,art.y,art.w,art.h,o.x,o.y+o.h-h,w,h);
+        }else{ctx.fillStyle=o.type==='key'?'#e9c779':'#68798c';ctx.fillRect(o.x,o.y,o.w,o.h);}
+        if(o.type==='switch')text(o.hero?o.hero.toUpperCase()+' · E':'E',o.x-12,o.y-16,'#e4d5af',10);
+      }
+    }
     function text(label, x, y, color = '#b8b2bf', size = 12) {
       ctx.fillStyle = color; ctx.font = `${size}px system-ui`; ctx.fillText(label, x, y);
     }
@@ -57,7 +77,15 @@
         ctx.quadraticCurveTo(x + 118, 105, x + 118, 170); ctx.lineTo(x + 118, 480); ctx.stroke();
         ctx.strokeStyle = '#4b4250'; ctx.lineWidth = 1; ctx.stroke();
       }
-      for (const s of room.solids) {
+      if(room.grid){
+        room.grid.forEach((row,y)=>[...row].forEach((ch,x)=>{
+          if(ch==='#')areaCell(y>0&&room.grid[y-1][x]!=='#'?'floor-top':'wall-fill',x*30,y*30);
+          if(ch==='-')areaCell('ledge',x*30,y*30,16);
+          if(ch==='H')areaCell('ladder',x*30,y*30);
+        }));
+        areaObjects(world);text(room.name,42,53,'#e0c78f',16);
+      }
+      for (const s of room.grid?[]:room.solids) {
         if(tileBlock(s))continue;
         ctx.fillStyle = '#292d3a'; ctx.fillRect(s.x, s.y, s.w, s.h);
         ctx.fillStyle = '#716675'; ctx.fillRect(s.x, s.y, s.w, 3);
@@ -72,7 +100,7 @@
         text(`${d.hp} HP`, d.x - 10, d.y - 10, '#d9b787', 10);
       }
       const light = world.active === 'ethan';
-      let action = p.onGround ? Math.abs(p.vx)>.1?'run':'idle' : p.jumpKind==='running'?'jump-running':'jump-standing';
+      let action = p.climbing ? 'idle' : p.onGround ? Math.abs(p.vx)>.1?'run':'idle' : p.jumpKind==='running'?'jump-running':'jump-standing';
       const state=visual[world.active]||{},anims=HKPixel.manifest()?.heroes[world.active]?.animations;
       const duration=name=>anims?.[name]?.ticks?.reduce((a,b)=>a+b,0)||({attack:20,land:8}[name]||0);
       if(state.attack!==undefined&&world.tick-state.attack<duration('attack'))action='attack';
@@ -126,6 +154,7 @@
     draw.event=(event,world)=>{
       if(previousWorld!==world){visual={};previousWorld=world;}
       const state = visual[world.active] ||= {};
+      if(event.type==='room')visual={};
       if(event.type==='attack'){state.attack=world.tick;state.attackFace=world.player.face;}
       if(event.type==='land')state.land=world.tick;
     };

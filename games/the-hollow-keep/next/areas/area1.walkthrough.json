@@ -1,0 +1,181 @@
+{
+  "hero": "ethan",
+  "inputs": [
+    {
+      "keys": "",
+      "ticks": 5
+    },
+    {
+      "keys": "right",
+      "ticks": 232
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "down",
+      "ticks": 204
+    },
+    {
+      "keys": "right",
+      "ticks": 97
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "attack",
+      "ticks": 1
+    },
+    {
+      "keys": "",
+      "ticks": 36
+    },
+    {
+      "keys": "right",
+      "ticks": 149
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "left",
+      "ticks": 245
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "up",
+      "ticks": 330
+    },
+    {
+      "keys": "right",
+      "ticks": 445
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "attack",
+      "ticks": 1
+    },
+    {
+      "keys": "",
+      "ticks": 66
+    },
+    {
+      "keys": "attack",
+      "ticks": 1
+    },
+    {
+      "keys": "",
+      "ticks": 66
+    },
+    {
+      "keys": "right",
+      "ticks": 199
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "up",
+      "ticks": 345
+    },
+    {
+      "keys": "left",
+      "ticks": 102
+    },
+    {
+      "keys": "",
+      "ticks": 13
+    },
+    {
+      "keys": "swap",
+      "ticks": 1
+    },
+    {
+      "keys": "",
+      "ticks": 16
+    },
+    {
+      "keys": "jump",
+      "ticks": 13
+    },
+    {
+      "keys": "jump,interact",
+      "ticks": 1
+    },
+    {
+      "keys": "jump",
+      "ticks": 35
+    },
+    {
+      "keys": "",
+      "ticks": 1
+    },
+    {
+      "keys": "left",
+      "ticks": 273
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "swap",
+      "ticks": 1
+    },
+    {
+      "keys": "",
+      "ticks": 16
+    },
+    {
+      "keys": "interact",
+      "ticks": 1
+    },
+    {
+      "keys": "",
+      "ticks": 1
+    },
+    {
+      "keys": "left",
+      "ticks": 286
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "interact",
+      "ticks": 1
+    },
+    {
+      "keys": "",
+      "ticks": 1
+    },
+    {
+      "keys": "left",
+      "ticks": 103
+    },
+    {
+      "keys": "",
+      "ticks": 12
+    },
+    {
+      "keys": "down",
+      "ticks": 197
+    },
+    {
+      "keys": "",
+      "ticks": 10
+    }
+  ]
+}

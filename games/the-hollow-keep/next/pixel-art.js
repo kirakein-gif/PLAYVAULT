@@ -19,6 +19,7 @@
       manifest = await response.json();
       const files = new Set([...(manifest.tiles ? [manifest.tiles.file] : []), ...(manifest.background ? [manifest.background] : [])]);
       for (const hero of Object.values(manifest.heroes)) for (const anim of Object.values(hero.animations)) files.add(anim.file);
+      for (const object of Object.values(manifest.objects || {})) files.add(object.file);
       await Promise.all([...files].map(load));
     } catch { fail('manifest.json'); }
     settled = true;
