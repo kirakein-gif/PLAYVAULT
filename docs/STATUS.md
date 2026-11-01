@@ -9,6 +9,10 @@
 사용자 결정(2026-10-31): 다음 단계는 **아트 기준부터**. 콘셉트는 **픽셀아트 HD**(게임 좌표 1단위 = 그림 1픽셀, 그림 해상도 960×540), 고딕 방향 유지. 아트 기준·검사는 Claude Code, 그림 제작·적용은 Codex(역할 분담).
 
 
+### 진행 중 · PR #8 Noah 베기 한 획 수정
+
+Codex / `codex/hollow-keep-pixel-art` / 기준 `71b7fe7` / 2026-11-01. 사용자 요청과 PR 댓글 확인, 규격 `db1679b` 반영 예정. 범위: 기본 noah-fx-slash.png·재생성 도구·공격 비교 캡처·PROVENANCE/README·관리 문서. 검사 원본은 기준 커밋 반영 후 그대로 유지, sim.js·trial·기존 게임 보존. 다음 Claude Code 재검토 / 병합·배포 금지.
+
 ### 구현 제출 · CODEX_TASK_04 x2 전체 제작 / Claude Code 재검토·사용자 외형 판단 대기
 
 Codex / 같은 `codex/hollow-keep-pixel-art`, PR #8 / 기준 `b36f092`. 사용자 x2 확정, 규격 `2a8ecc6` 적용(`c95a5f8`, `59b4dca`). 기본 pixel 자산을 x2 전체 동작/Noah run/베기·룬탄·60px타일·1920×1080배경으로 교체하고 준비≤2틱/손기준 베기 재생을 구현. 시험본 pixel-trial·게임 규칙·이번 검사 원본은 보존. 착수 공유 `e06d682`, 최종 구현은 이 항목을 갱신한 PR #8 커밋 참조. 목표6자세 비교·실제 공격 연속·PC/780×330 캡처는 `next/assets/pixel-review/README.md`.
