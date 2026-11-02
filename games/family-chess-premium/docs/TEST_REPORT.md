@@ -57,11 +57,26 @@
 | debug APK 빌드 (`./gradlew assembleDebug`) | **통과(GitHub Actions)** — 이 세션은 `dl.google.com` 차단으로 Android SDK를 받을 수 없어 로컬 빌드 불가 |
 | APK 설치·versionName 1.0.0·INTERNET 권한 없음 | 통과(에뮬레이터 `dumpsys package`) |
 | 비행기 모드·INTERNET 권한 없이 앱 실행 → 메인 화면 표시 | 통과(에뮬레이터, 8.6초) |
-| 에뮬레이터에서 5단계 Stockfish 응수·아카데미 화면 | 아래 "에뮬레이터 결과" 참조 |
+| 에뮬레이터에서 5단계 Stockfish 응수·무르기·아카데미·재시작 | **통과** (아래) |
 
 ### 에뮬레이터 결과
 
-EMULATOR_RESULT_PLACEHOLDER
+GitHub Actions 실행 [#6](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41448790849) (커밋 `c71a2ac`), Android 14 x86_64 에뮬레이터, 1280×800 가로, 160dpi, `tests/android/smoke.cjs` → **ANDROID SMOKE: PASS**
+
+| 단계 | 결과 |
+| --- | --- |
+| Wi-Fi·모바일 데이터 끄기 + 비행기 모드 | `Active default network: none` 확인 |
+| 앱 실행 → 메인 메뉴 | 8.7초 |
+| 컴퓨터 대국 1~5단계, 1.e4 후 응수 | 2.5 / 2.5 / 2.0 / 1.9 / 2.0초 (e5, c5, e5, e5, e6) |
+| 각 단계 무르기 | 남은 수 0 (정상 복구) |
+| 아카데미 → 전술 → 첫 문제 | 정상 표시 |
+| 강제 종료 후 재실행 | 메인 메뉴 정상 |
+| WebView 요청 중 로컬(https://localhost) 외 요청 | 0건 |
+| 페이지 오류 | 0건 |
+
+참고(관찰 사실): 같은 테스트를 에뮬레이터 GPU 모드 `swiftshader_indirect`로 돌린 실행 #4·#5에서는 설정 창을 연 직후 **에뮬레이터 프로세스가 종료**되었고, `swangle_indirect`로 바꾼 #6에서는 통과했습니다. 에뮬레이터 소프트웨어 GPU 문제로 보이지만 원인을 로그로 확정하지는 못했으므로, 실제 태블릿에서 첫 실행 시 설정 창·대국 화면이 정상인지 확인이 필요합니다.
+
+APK: 같은 실행의 아티팩트 `FamilyChessPremium-v1.0.0-debug-apk` (13.7MB zip, 만료 2027-01-31).
 
 ## 5. 미확인 (실제로 확인하지 못함)
 

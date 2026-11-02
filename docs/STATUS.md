@@ -6,7 +6,7 @@
 
 Claude Code / 브랜치 `ccr-6aa2a39e-1vn67a`(세션 지정) / 기준 main **4ec1cfa** / 2026-11-02. 사용자 개별 지시("코드에서도 충분히 가능하죠? 만들어주세요")로 역할 분담표의 "신규 기능 1차 구현 = Codex"보다 우선해 Claude Code가 구현. 범위: 새 폴더 `games/family-chess-premium/`와 새 CI `.github/workflows/family-chess-android.yml`(이 경로만 트리거). 다른 게임·공용 자산·루트 런처(`index.html`)·배포 설정 변경 없음.
 - 구현: Vite+React+TS+Capacitor 8, chess.js 규칙, Stockfish 19 Lite 단일 스레드 WASM(Web Worker, APK 내장), 자체 SVG 입체 기물·원목 텍스처·아이콘, 합성 효과음, 2인/컴퓨터 5단계/복기, 아카데미(검증 문제 121개·강의 17개·별 기록·오늘의 훈련), 한·영, 프로필 2개, JSON 백업. INTERNET 권한 없음.
-- 검증(이번 세션): 단위 190/190, 오프라인 브라우저 E2E 22/22(외부 요청 0), 문제 121개 깊이 20 재검증 121/121, 강의 과제 엔진 점검, 난이도 강도 측정(단계마다 강해짐). GitHub Actions에서 debug APK 빌드 성공, 에뮬레이터 비행기 모드 실행 확인. 상세: `games/family-chess-premium/docs/TEST_REPORT.md`.
+- 검증(이번 세션): 단위 190/190, 오프라인 브라우저 E2E 22/22(외부 요청 0), 문제 121개 깊이 20 재검증 121/121, 강의 과제 엔진 점검, 난이도 강도 측정(단계마다 강해짐). GitHub Actions 실행 #6(`c71a2ac`): debug APK 빌드 성공, Android 14 에뮬레이터 네트워크 차단 상태에서 설치·실행·Stockfish 5단계 응수·무르기·아카데미·재실행 통과(외부 요청 0). 상세: `games/family-chess-premium/docs/TEST_REPORT.md`.
 - 환경 제약: 이 세션은 `dl.google.com`(Android SDK)·`database.lichess.org` 접속 차단 → APK는 CI에서 빌드, 문제는 Lichess 대신 자체 생성·엔진 검증(`docs/PUZZLES.md`).
 - 미확인: 실제 태블릿 설치·조작감·청감·진동·백업 파일 저장 위치·뒤로가기. 릴리스 서명 없음(debug APK).
 - 다음: 사용자 실기기 설치·사용 피드백 → PR 제출 여부·main 병합 결정(사용자 승인 필요). PR 미제출, 병합·배포 없음.
