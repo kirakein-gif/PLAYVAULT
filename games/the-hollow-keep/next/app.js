@@ -55,8 +55,11 @@
     const container=document.getElementById('config-fields');container.replaceChildren();
     const groups = [['공통', S.CONFIG, ['swapCooldownTicks']], ...Object.entries(S.CONFIG.heroes).map(([hero,c]) => [hero.toUpperCase(),c,
       ['climbSpeed','runSpeed','airControlSpeed','stopTicks','jumpHeight','minJumpHeight','variableJump','gravity','maxFall','coyoteTicks','jumpBufferTicks','accelerationGround','accelerationAir','friction']]),
-      ...Object.entries(S.CONFIG.heroes).map(([hero,c])=>[hero.toUpperCase()+' 무기',c.weapon,['damage','range','cooldownTicks','activeTicks',...(c.weapon.kind==='projectile'?['speed']:[])]])];
-    const labels={climbSpeed:'사다리 속도',swapCooldownTicks:'교대 대기(틱)',runSpeed:'최고 속도',airControlSpeed:'공중 조작 속도',stopTicks:'정지 상한(틱)',jumpHeight:'점프 높이',minJumpHeight:'짧은 점프 높이',variableJump:'짧은 점프 사용',gravity:'중력',maxFall:'최대 낙하',coyoteTicks:'코요테(틱)',jumpBufferTicks:'버퍼(틱)',accelerationGround:'지상 가속 비율',accelerationAir:'공중 가속 비율',friction:'마찰 배율',damage:'피해',range:'사거리',cooldownTicks:'공격 간격(틱)',activeTicks:'판정 수명(틱)',speed:'탄속'};
+      ...Object.entries(S.CONFIG.heroes).map(([hero,c])=>[hero.toUpperCase()+' 무기',c.weapon,['damage','range','cooldownTicks','activeTicks',...(c.weapon.kind==='projectile'?['speed']:['comboWindowTicks'])]]),
+      ...S.CONFIG.heroes.noah.weapon.combo.map((stage,i)=>['NOAH 콤보 '+(i+1)+'단',stage,['damage','range','recoveryTicks']]),
+      ['ETHAN 충전',S.CONFIG.heroes.ethan.weapon.charge,['stage2Ticks','stage3Ticks']],
+      ...S.CONFIG.heroes.ethan.weapon.charge.shots.map((shot,i)=>['ETHAN 충전탄 '+(i+2)+'단',shot,['damage']])];
+    const labels={comboWindowTicks:'콤보 연결 창(틱)',recoveryTicks:'다음 공격 대기(틱)',stage2Ticks:'2단 충전(틱)',stage3Ticks:'3단 충전(틱)',climbSpeed:'사다리 속도',swapCooldownTicks:'교대 대기(틱)',runSpeed:'최고 속도',airControlSpeed:'공중 조작 속도',stopTicks:'정지 상한(틱)',jumpHeight:'점프 높이',minJumpHeight:'짧은 점프 높이',variableJump:'짧은 점프 사용',gravity:'중력',maxFall:'최대 낙하',coyoteTicks:'코요테(틱)',jumpBufferTicks:'버퍼(틱)',accelerationGround:'지상 가속 비율',accelerationAir:'공중 가속 비율',friction:'마찰 배율',damage:'피해',range:'사거리',cooldownTicks:'공격 간격(틱)',activeTicks:'판정 수명(틱)',speed:'탄속'};
     for(const [title,obj,keys] of groups){
       const group=document.createElement('fieldset'),legend=document.createElement('legend');legend.textContent=title;group.append(legend);
       for(const key of keys){
@@ -72,12 +75,24 @@
         control.addEventListener('change',()=>{
           if(!boolean && (!control.checkValidity() || !Number.isFinite(control.valueAsNumber))){control.value=obj[key];return;}
           obj[key]=boolean?control.checked:control.valueAsNumber;
+          // The first combo stage and the legacy first-attack controls are one value.
+          const weapon=S.CONFIG.heroes.noah.weapon,first=weapon.combo[0];
+          const pair={damage:'damage',range:'range',height:'height',activeTicks:'activeTicks',cooldownTicks:'recoveryTicks'};
+          if(obj===weapon&&pair[key])first[pair[key]]=obj[key];
+          if(obj===first){const base=Object.keys(pair).find(k=>pair[k]===key);if(base)weapon[base]=obj[key];}
+          const charge=S.CONFIG.heroes.ethan.weapon.charge;
+          if(obj===charge&&charge.stage2Ticks>=charge.stage3Ticks){
+            if(key==='stage2Ticks')charge.stage3Ticks=charge.stage2Ticks+1;
+            else charge.stage2Ticks=Math.max(1,charge.stage3Ticks-1);
+            charge.stage3Ticks=Math.max(2,charge.stage3Ticks);fields();
+          }
           const hero=Object.values(S.CONFIG.heroes).find(c=>c===obj);
           if(hero){
             if(hero.minJumpHeight>hero.jumpHeight)hero.minJumpHeight=hero.jumpHeight;
             if(hero.airControlSpeed>=hero.runSpeed)hero.airControlSpeed=Math.max(.01,Number((hero.runSpeed*.45).toFixed(2)));
             fields();
           }
+          if(obj===weapon||obj===first)fields();
           reset();document.getElementById('config-message').textContent='수치를 적용하고 방을 초기화했습니다.';
         });
         label.append(control);group.append(label);

@@ -1,0 +1,21 @@
+PASS debug hidden and fullscreen never entered automatically
+PASS D key moves the actual player
+PASS space jumps, release lands, hold does not repeat
+PASS standing and running jumps expose takeoff state and render distinct poses
+PASS X shot stops at the near target and leaves the far target untouched
+PASS Q swaps hero and updates visible HUD
+PASS Noah melee hits nearby target once
+PASS F2 panel applies CONFIG and exports JSON
+PASS editing controls does not move the player
+PASS blur clears held movement
+PASS mobile landscape fits stage and controls
+PASS starting hero is visible with no controls covering the play area
+PASS real multitouch right + jump moves and jumps
+PASS joystick steers left and releases on touch cancellation
+PASS touch attack and swap buttons trigger gameplay
+PASS portrait pauses and landscape resumes without stuck input
+PASS fullscreen reflows after resizing and keeps joystick input
+PASS held joystick survives fullscreen entry and resize until touch release
+PASS denied fullscreen request reports guidance and keeps controls usable
+PASS no page errors or missing resources
+20/20 browser checks passed; screenshots: /tmp/hollow-keep-{desktop,mobile,mobile-start,mobile-fullscreen}.png
