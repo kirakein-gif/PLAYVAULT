@@ -2,6 +2,10 @@
 
 확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #15·#14 병합, 사다리 작업 새 브랜치 지시).
 
+## 진행 · CODEX_TASK_08 사다리 행동·오르기 동작
+
+2026-11-02 (Asia/Seoul) / 담당 Codex / 브랜치 `codex/hollow-keep-ladder-actions` / 기준 `origin/main` **1dea1e2**. fetch/prune 및 전체 PR 확인: 열린 PR·동일 원격 브랜치 없음, #14·#15·#16 병합 확인. 사용자 인계에 따라 착수. 범위: next/sim.js·render.js, 두 주인공 climb 자산·제작 도구·제작 기록·검토 캡처, next/README 및 STATUS/WORK_LOG/CHANGELOG. 기존 검사 원본·조작 수치·기존 게임·공용 자산 보존. 계획: L1~L3 구현 → 경로 A climb 4프레임 제작·거리 기반 렌더 → TASK_08 전체 검사·캡처 → Claude Code 검토용 Ready PR. 병합·수동 배포 없음.
+
 ## 병합 완료 · PR #15 → PR #14 (2026-11-01) / 다음: Codex 사다리 작업(새 브랜치)
 
 사용자 승인("지금 병합하고 새 브랜치로 진행해 주세요"). PR #14를 main에 병합(`27f6110`, PR #15 규격 `0bc593d`까지 포함). PR #15는 그 head가 PR #14에 먼저 병합되어 이미 닫혀 있었으므로, 이후 커밋(사다리 행동 규격·검사, 재검토 기록)은 `claude/hollow-keep-tile-mosaic` 새 PR로 main에 병합. 사다리 행동·climb 동작은 새 브랜치 `codex/hollow-keep-ladder-actions`(기준 main)에서 `CODEX_TASK_08.md`로 진행.
