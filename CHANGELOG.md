@@ -245,3 +245,24 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 ## THE HOLLOW KEEP · 사다리 위 행동·오르기 동작 규격 (2026-11-01, Asia/Seoul)
 
 - 규격·검사만. 점프 후 재매달림 금지, 옆 바닥으로 내리기, 매달린 채 공격 방향, climb 동작. `LADDER_ACTIONS_SPEC.md`, `CODEX_TASK_08.md`, `ladder-actions.cjs`(8), `ladder-render.cjs`(7). Codex 구현 대기.
+
+
+## THE HOLLOW KEEP · 사다리 행동·climb (2026-11-02, Asia/Seoul)
+
+- PR #17 / 기준1dea1e2·착수741c28e. 점프 후16틱 사다리 재매달림 제한, 좌우 방향·인접 바닥/한쪽 발판으로 내림(발±8·몸 공간), 매달린 공격 유지. ↓+점프는 사다리 점프 우선.
+- 두 주인공 경로A4프레임climb, 거리8단위마다 진행·정지 시 정지·공격은attack. scale2/64색/0·255알파, 기존 조작 수치·몸 크기·게임 버전 번호 유지.
+- 원본 인수 검사 보존, 요구 검사 전부 통과·추가경계4/4. 실제 입력13장·전체 결과/로그: next/assets/ladder-actions-review. 재빌드 해시 동일. 미술상 후면 반전 한계·실기기 미확인·Claude Code 검토 대기. 병합·수동 배포 없음. 상세 WORK_LOG 참조.
+
+## THE HOLLOW KEEP · 사다리 대각선 정정·PC 키보드 검사 (2026-11-02, Asia/Seoul)
+
+- 규격·검사만. 옆으로 내리기는 ←/→만 누를 때(대각선은 오르기). `ladder-actions.cjs` 10개, `keyboard-ime.cjs` 7개(한글 입력 상태). PR #17 수정 대기.
+
+## THE HOLLOW KEEP · TASK_08 추가 지시 1·2 (2026-11-02)
+
+- PR #17 / dc5e336 후속, 정정규격origin/claude/hollow-keep-ladder-diagonal을69e8497로 병합(양측 기록 보존). 대각선은 오르내림·방향전환 유지, 위/아래를 놓고 좌우만 누를 때 옆바닥으로 내림.
+- 가로대6px·20/20/20px간격(이음새포함), 새 네후면자세로 몸통·손중앙정렬·하향외투·아래쪽무릎교대. 전체 의상반전 제거. 다른타일·기존동작·팔레트·조작수치·몸크기·버전번호보존.
+- 최신검사·실제입력14장/로그는 next/assets/ladder-actions-review/followup. 원본검사보존, 재생성4파일해시동일. Claude Code 재검토 및 사용자 외형/손맛판단대기, 병합·수동배포없음.
+
+## THE HOLLOW KEEP · 사다리 행동·오르기 동작 병합 (2026-11-02, Asia/Seoul)
+
+- PR #18(규격·검사) → PR #17(Codex 구현 `3d254ae`) main 병합. 사다리 점프 후 재매달림 제한, 옆 바닥 내리기(←/→만), 대각선 오르기, 매달린 채 공격 방향, climb 4프레임(거리 기반·가운데 정렬), 가로대 20px 간격, 한글 입력 상태 키보드 검사. 게임 버전 번호 변경 없음.

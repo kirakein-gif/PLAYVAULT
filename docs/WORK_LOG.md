@@ -1077,3 +1077,77 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex `CODEX_TASK_08.md`(새 브랜치) → Claude Code 검토.
 - 종료 상태: 병합 진행.
+
+### 2026-11-02 (Asia/Seoul) · CODEX_TASK_08 사다리 행동·오르기 동작 제출
+
+- 담당 Codex / 재검토 Claude Code(대기). 사용자 지정대로 최신origin/main **1dea1e2d22b2ef68588193c63e6d5423ed9a32e5**에서 새 `codex/hollow-keep-ladder-actions` 생성. fetch/prune·전체PR 확인: #14·#15·#16 병합, 열린PR·동일 원격브랜치 없음. 로컬work는 변경 없음·main과 동일. 착수 **741c28e** STATUS 담당선언을 먼저 푸시하고 [Draft PR #17](https://github.com/kirakein-gif/PLAYVAULT/pull/17) 개설. 이전과제 변경 재적용/이전브랜치 사용 없음.
+- TASK_08 전문/전달블록, AGENTS/STATUS/WORK_LOG최근/CHANGELOG/README/CLAUDE, LADDER_ACTIONS_SPEC·ART_DIRECTION·EXPLORATION_SPEC·DESIGN_DIRECTION과 실제sim/render/자산제작·검사를 확인. 범위: next/sim·render, 새climb그림/도구/제작기록/캡처·README, 관리3문서. 버전 전후: 번호 없는2단계 시범구역 유지. 기존 게임/공용 자산·CONFIG·캐릭터 크기·방/완주 데이터·기존 런타임PNG는 변경하지 않음.
+- L1: 사다리 점프 후16틱은↑/↓에도 재부착 금지(점프틱에17로 설정, 다음틱부터감소). 제한 종료 후 정상 재부착. ↓+점프는 사다리 점프가 한쪽 발판내림보다 우선하도록 함. L2: 좌우방향 유지, 발높이±8의 인접면(한칸틈까지)과 목적지 몸 공간 검사 후 내려섬. 면이 없거나 몸이 막히면 매달림 유지. L3: 기존공격 판정 유지+마지막좌우방향. 기존 사다리 꼭대기·위방·1칸통로·봉인 겹침차단·교대 회귀 통과.
+- 그림: image_gen + 기존외형참고 → 경로A새원본climb-source.png → build-climb.py로136/128px네이티브·기존64색·0/255알파·192px프레임·발pivot(96,191)의4프레임시트. 원본이 같은쪽손을 반복해 첫2후면자세+반대후면실루엣반전으로 손발교대를 구성. **의상 비대칭도 반전되는 미술상 한계**를 PROVENANCE/PR/검토기록에 명시. 모델/seed미공개, 전문지시문·표본/알파/팔레트/글러브·부츠윤곽/핀홀정리·재현 기록. 다른PNG·팔레트 보존.
+- 렌더: 실제사다리이동의절대거리누적으로8단위마다climb프레임. 멈추면정지, 교대에도거리유지, 공격중기존attack우선. 실제키보드입력·시계스케줄링으로 두주인공 각각climb전4프레임/매달린왼쪽공격/성문중간층내림 +780×330 **13장** 캡처. 월드/좌표주입없음. PNG원본과RGBA동일무손실WebP **3414518바이트**. `next/assets/ladder-actions-review/README.md`·TEST_RESULTS.md·logs 참조.
+- 실제검사: ladder-actions **8/8**, 추가ladder-edge **4/4**, pixel-assets **63/63**, ladder-render **7/7**, exploration-contract **16/16**, entrance **9/9**, foundation-contract **51/51**, area-data **22/22**, tile-mosaic-render **7/7**, pixel-render 구역/시험방각 **7/7**, mobile-layout **20/20**, mobile-fullscreen **6/6**, exploration-browser **6/6**, browser-playtest(?room=test) **20/20**, foundation-edge **16/16**, room-traversal **4/4**, exploration-edge **13/13**, ABYSSFALL polish/audio/audio-wind **3종통과**. 기존완주4159틱·교대2회 유지, 재기록불필요. 원본인수검사 수정없음. 추가경계는↓점프+발판지지/옆바닥몸공간막힘/높이허용밖/정지·교대거리유지 확인.
+- 실행문제/보완: 처음exploration-browser는 기본8766과서버8765불일치로연결실패 → HK_URL=8765지정후6/6. 추가경계fixture는처음벽이사다리어깨와겹쳐준비실패 → 한칸틈fixture로정정후4/4(원본검사변경없음). 네트워크/소켓은기본샌드박스차단으로승인된확장실행사용. audio404는기존실패복구검사의예상경고.
+- 재현: 루트 `python3 -m http.server 8765 --bind 127.0.0.1`, `HK_URL=http://127.0.0.1:8765/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/<name>.cjs`. 시험방pixel-render/browser-playtest는?room=test. 캡처tools/capture-ladder-actions.cjs, 제작tools/build-climb.py. 재생성PNG2개/manifest SHA256동일. git diff --check 통과, 기존검사·이전PNG변경없음 확인.
+- 5개관리문서검토: STATUS/WORK_LOG/CHANGELOG갱신, AGENTS/CLAUDE규칙변경없음. 루트README변경필요없음, nextREADME·PROVENANCE갱신. 구현커밋은이항목과함께제출한PR #17커밋참조. Draft→Ready로제출하며 main병합·수동배포/게시없음.
+- 다음: **Claude Code** PR #17기준SHA를확인후원본검사/실제입력재실행·L1~L3·거리기반climb/정지·반전의상/그림검토. 미술/손맛은사용자판단대기, 실기기회전·터치·성능미확인. 검토담당/발견문제수: Claude Code / 재검토전미확인. 자체발견↓점프우선순위1건수정·원본그림교대부족1건후면반전보완(한계명시). 사용자재요청: 이번착수후0회. 병합·배포여부는사용자별도승인사항.
+
+### 2026-11-02 (Asia/Seoul) · Codex 사다리 행동(PR #17 `dc5e336`) 검토, 대각선 정정, PC 키보드 검사
+
+- 담당 AI: Claude Code(검토·규격). 구현: Codex `codex/hollow-keep-ladder-actions`.
+- 범위: 검사 원본 변경 없음(Codex 자체 `ladder-edge.cjs` 추가). 기존 게임·공용 자산 변경 없음.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): ladder-actions 8/8, ladder-edge 4/4, exploration-contract 16/16, entrance 9/9, foundation-contract 51/51, area-data 22/22, exploration-edge 13/13, foundation-edge 16/16, pixel-assets 63/63, ladder-render 7/7, tile-mosaic-render 7/7, pixel-render 구역·시험 방 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest(`?room=test`) 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종(polish-regression은 동시 실행 중 시간 초과, 단독 재실행 통과). 무작위 입력(314곳, 47.1만 틱) 겹침 0건.
+- 화면: climb 4프레임 두 주인공(등을 보이며 팔다리 교대), 옆 바닥 내리기·사다리 공격 캡처 확인.
+- **발견 1건(규격 측 원인, Claude Code):** L2 "대각선으로 오르다 옆 바닥 높이면 내림" 때문에 사다리 아래 끝(옆이 바닥)에서 ↑+←/→를 누르면 잡자마자 내려 오르지 못함. 구역 사다리 아래 끝 12곳 모두 해당. 모바일 조이스틱은 데드존 0.25라 위로 약 15°만 기울어도 좌우가 들어와 휴대전화에서 자주 발생. 키보드 W+A도 같음.
+- 정정(`claude/hollow-keep-ladder-diagonal`): 옆으로 내리기는 ↑/↓ 없이 ←/→만 누를 때. `ladder-actions.cjs` 대각선 내리기 검사 삭제, 대각선 오르기 2개·↑ 놓고 내리기 1개 추가(8 → 10). PR #17 구현은 7/10, 정정 참조 구현(PR #17 `sim.js`에 조건 한 줄)은 10/10, 다른 검사 영향 없음.
+- 사용자 요청(작업 중): "평일 낮에는 회사 컴퓨터에서 할 거라서 키보드 인식도 되게 해 줘". 확인: 키는 `KeyboardEvent.code`(물리 키)로 읽어 한글 입력 상태에서도 동작(한글 key 값·keyCode 229 이벤트로 이동·교대·지도 확인). `keyboard-ime.cjs`(7) 추가 — PR #17은 6/7(사다리 아래 W+A 대각선만 실패), 정정 참조 7/7. LADDER_ACTIONS_SPEC §5, CODEX_TASK_08 추가 지시.
+- 검토 담당 / 발견 문제 수: Claude Code / 1건(대각선, 규격 결함).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #17에서 추가 지시 처리 → Claude Code 재검토 → 승인 시 정정 PR → PR #17 병합.
+- 종료 상태: 검토 완료, 수정 대기.
+
+### 2026-11-02 (Asia/Seoul) · 회사 PC 미리보기, 사다리 간격·오르기 자세 기준
+
+- 담당 AI: Claude Code.
+- 사용자: PC에서 Cloudflare 미리보기(`*.pages.dev`)가 열리지 않음. 휴대전화에서는 열렸으므로 회사 네트워크 차단으로 추정(이 환경에서도 접속 불가라 원인 미확인). 대안: PR #17 `dc5e336`의 `next/` 실행 파일(js·css·areas·assets/pixel, 32개, 1.2MB)을 claude.ai 비공개 Artifact로 게시(`https://claude.ai/artifact/L8uL1fgH7wNmwVJh9Hmbm1`). 저장소 변경 없음. 미리보기용 사본에서 `?room=test` 링크만 뺌.
+- 사용자 확인: 사다리 점프로 옆으로 넘어가기 동작은 좋음. 문제 2건: ① 사다리 가로대 간격이 일정하지 않음 ② 오르기 교차 동작은 좋지만 측면으로 쏠려 부자연스러움.
+- 측정: ① ladder 칸 가로대 9·27·45px → 칸 안 18px, 이음새 24px ② 올린 손이 사다리 중심에서 Ethan ±16~17.5단위, Noah ±12.7~16단위(가로대 끝 ±10), Ethan 무게중심 +2.5/−3.5단위.
+- 변경(`claude/hollow-keep-ladder-diagonal`, PR #18): TILE_MOSAIC_SPEC §7(가로대 간격 이음새까지 같게), LADDER_ACTIONS_SPEC §3-1(무게중심 ±2단위, 올린 손 ±12단위), `pixel-assets.cjs` 검사 2개(analyze에 프레임별 무게중심·맨 위 6줄 중심 추가), CODEX_TASK_08 추가 지시 2.
+- 검증: PR #17 자산 62/65(두 항목 3건 실패), 보정한 합성 자산(가로대 20px 간격, 좌우 대칭 오르기 프레임) 65/65. 옆모습 idle을 그대로 쓰면 무게중심 −4단위로 검출됨.
+- 검토 담당 / 발견 문제 수: 사용자 발견 2건(규격에 간격·자세 기준이 없던 것은 Claude Code 누락).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #17에서 추가 지시 1·2 처리 → 재검토 → 미리보기 Artifact 갱신.
+- 종료 상태: 규격 보강.
+
+### 2026-11-02 (Asia/Seoul) · PR #17 추가 지시 1·2: 대각선·가로대·중앙 자세
+
+- 담당 Codex / 재검토 Claude Code(대기). 사용자 인계로 같은PR #17/codex/hollow-keep-ladder-actions에서 수정. 최신fetch·열린PR17/18·PR17리뷰확인: 구현dc5e336, 정정규격 `origin/claude/hollow-keep-ladder-diagonal` **817fd637fa90314550ab65866e270577b883d516**. TASK_08전문/추가지시두개·AGENTS·최신STATUS/WORK_LOG·정정LADDER_ACTIONS_SPEC/TILE_MOSAIC_SPEC·실제빌더/검사확인. 사용자가지정한규격브랜치를 **69e8497**로병합(STATUS/WORK_LOG/CHANGELOG충돌은양측이력보존), 착수담당/범위공유푸시·PR17Draft전환. main병합아님, PR18원격작업덮어쓰기없음.
+- L2정정: 좌우는항상방향전환, ↑/↓가함께들어오면옆내림후보를만들지않아대각선오르내림유지. 위/아래를놓고좌우만누를때면높이±8/몸공간을검사해내림. 입력기코드는이미물리키code를써수정불필요, 새keyboard-ime원본검사로확인. CONFIG/캐릭터크기/기존사다리규칙/공용자산/기존게임/구역·완주기록/버전번호변경없음.
+- 가로대: 기존경로A원본의따뜻한재질/레일을유지하고3가로대밴드를각6네이티브행으로정리해시작7/27/47px에배치. 이음새포함간격20/20/20px. tiles.png에서ladder60px칸외모든픽셀RGBA동일확인. build-tile-mosaic.py재현갱신.
+- 자세: image_gen으로climb-source.png참고한새중앙후면자세원본climb-centered-source.png제작. 몸통수직·외투아래·무릎몸아래교대, 올린손좁게. build-climb.py가4원본자세를각각사용, 이전전체의상반전제거. 기존136/128px·192프레임·pivot96/191·64색/0·255알파유지. 샘플링후네이티브윤곽/핀홀정리및프레임전체무게중심이동(몸/손개별왜곡없음). 무게중심오차최대0.247단위/올린손최대6.591단위(요구±2/±12). PROVENANCE전문지시문/도구/과정/이전한계해소기록. 이전원본·캡처보존.
+- 실제입력capture-ladder-actions를정정규칙에맞춰↑+←로오른뒤↑를놓고옆으로내리는입력으로갱신. 좌표/월드/그림주입없음. 두주인공climb전4프레임·매달린공격·옆내림·PC연속사다리·780×330 **14장**, 원본PNG와RGBA동일무손실WebP **3665878바이트**. `next/assets/ladder-actions-review/followup/README.md`·TEST_RESULTS.md·logs참조. 기존캡처이력보존.
+- 이번실행: ladder-actions10/10·자체ladder-edge4/4·keyboard-ime7/7·pixel-assets65/65·ladder-render7/7·exploration-contract16/16·entrance9/9·foundation51/51·area-data22/22·tile-mosaic-render7/7·pixel-render구역/시험방각7/7·mobile-layout20/20·mobile-fullscreen6/6·foundation-edge16/16·room-traversal4/4·exploration-edge13/13·ABYSSFALL3종통과. exploration-browser6/6·browser-playtest(?room=test)20/20, 전체최종결과는followup/TEST_RESULTS.md와동봉로그참조. 기존4159틱·교대2회완주유지, 재기록불필요. 정정검사원본3개및다른인수원본수정없음. tiles/두climbPNG/manifest재생성4개SHA256동일.
+- 실행중문제: 이전턴HTTP서버종료로최초브라우저연결실패→HTTP8765재시작후재실행(판정/검사변경없음). audio404는기존실패복구예상경고. 새그림/규칙의원본검사실패없음. 추가손맛/실기기성능평가를자동검사로주장하지않음.
+- 재현: 루트HTTP8765, HK_URL=http://127.0.0.1:8765/games/the-hollow-keep/next/·CHROMIUM_PATH=/usr/bin/chromium로next/tests실행. 시험방browser-playtest/pixel-render는?room=test. 빌드mosaic→climb, 캡처HK_SHOT_DIR=/tmp/hk08b-review. 5관리문서검토: STATUS/WORK_LOG/CHANGELOG갱신, AGENTS/CLAUDE규칙변경없음. nextREADME/PROVENANCE갱신, 루트README변경필요없음.
+- 다음: 같은PR17 Ready로갱신→Claude Code원본검사/대각선/한글키보드/연속가로대/몸·손중심/전4자세재검토→사용자외형/손맛판단. 검토담당/발견문제수: Claude Code직전1건(대각선규격결함), 사용자2건(간격/자세); 이번재검토전미확인. 사용자재요청: 최초제출후1회(이번추가지시1·2묶음). 실기기회전/터치/성능미확인. 병합·수동배포/게시없음.
+
+### 2026-11-02 (Asia/Seoul) · Codex 사다리 추가 수정(PR #17 `3d254ae`) 재검토
+
+- 담당 AI: Claude Code(검토). 구현: Codex(추가 지시 1·2).
+- 범위: PR #18 규격 `817fd63` 병합 포함, 검사 원본 동일(Codex 자체 ladder-edge만 추가).
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): ladder-actions 10/10, ladder-edge 4/4, keyboard-ime 7/7, pixel-assets 65/65, ladder-render 7/7, tile-mosaic-render 7/7, exploration-contract 16/16, entrance 9/9, foundation-contract 51/51, area-data 22/22, exploration-edge 13/13, foundation-edge 16/16, pixel-render 구역·시험 방 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest(`?room=test`) 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱) 겹침 0건. 사다리 아래에서 ↑, ↑+←, ↑+→ 모두 잡고 오름.
+- 화면: 사다리 4칸 이어도 가로대 간격 같음. 오르기 4프레임 두 주인공 모두 몸 곧게 가운데, 손은 사다리 위. 관찰: Noah 등의 검이 교차 프레임에서 좌우 반전(Codex가 PR에 명시한 한계).
+- 회사 PC 미리보기 Artifact를 `3d254ae` 빌드로 갱신(같은 주소, 버전 2).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건(관찰 1건).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 미리보기 확인 → 승인 시 PR #18 → PR #17 병합.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-02 (Asia/Seoul) · PR #18·#17 병합
+
+- 담당 AI: Claude Code. 사용자: "병합해 주세요. 잘 되네요. 사다리 올라갈 때 크게 위화감은 없습니다."
+- 사용자 결정: Noah 검 위치가 오르기 교차 프레임에서 좌우로 바뀌는 것은 그대로 둔다("좌우 프레임을 따로 두려면 처음부터 이동할 때도 따로 그렸겠죠.. 괜찮습니다"). 좌우 반전 그림을 쓰는 현재 방식 유지.
+- 순서: PR #18 브랜치에 PR #17 head `3d254ae`를 병합(WORK_LOG 양쪽 추가 충돌, Codex 제출 → Claude Code 재검토 순으로 정리) → PR #18을 main에 병합 → PR #17은 head가 main에 포함되어 병합 처리됨을 확인.
+- 검토 담당 / 발견 문제 수: 해당 없음(병합 작업).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 결정 대기(다음 단계 후보: 3단계 전투 확장, 한쪽 발판 가독성, Noah 3단 콤보).
+- 종료 상태: 병합.
