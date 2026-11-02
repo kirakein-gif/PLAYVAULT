@@ -18,10 +18,10 @@ export interface LevelConfig {
 }
 
 export const LEVELS: LevelConfig[] = [
-  { level: 1, key: 'easy', skill: 0, depth: 2, movetimeMs: 300, minThinkMs: 650, fallbackElo: 1320 },
-  { level: 2, key: 'normal', skill: 4, depth: 5, movetimeMs: 500, minThinkMs: 650, fallbackElo: 1500 },
-  { level: 3, key: 'challenging', skill: 9, depth: 8, movetimeMs: 800, minThinkMs: 650, fallbackElo: 1800 },
-  { level: 4, key: 'hard', skill: 15, depth: 12, movetimeMs: 1300, minThinkMs: 600, fallbackElo: 2200 },
+  { level: 1, key: 'easy', skill: 0, depth: 1, movetimeMs: 250, minThinkMs: 700, fallbackElo: 1320 },
+  { level: 2, key: 'normal', skill: 3, depth: 4, movetimeMs: 450, minThinkMs: 650, fallbackElo: 1500 },
+  { level: 3, key: 'challenging', skill: 7, depth: 7, movetimeMs: 700, minThinkMs: 650, fallbackElo: 1800 },
+  { level: 4, key: 'hard', skill: 13, depth: 12, movetimeMs: 1300, minThinkMs: 600, fallbackElo: 2200 },
   { level: 5, key: 'master', skill: 20, depth: 22, movetimeMs: 2200, minThinkMs: 500, fallbackElo: 3190 },
 ];
 

@@ -172,7 +172,11 @@ export function ChessBoard(p: BoardProps) {
       if (!wasSelected) select(sq);
       downInfo.current = { x, y, sq, wasSelected };
       setDrag({ id: piece.id, from: sq, x, y, active: false });
-      (e.target as Element).setPointerCapture?.(e.pointerId);
+      try {
+        (e.target as Element).setPointerCapture?.(e.pointerId);
+      } catch {
+        /* synthetic or already-released pointer */
+      }
       return;
     }
     if (selected && sq !== selected) {

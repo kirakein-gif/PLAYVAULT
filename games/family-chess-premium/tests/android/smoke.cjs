@@ -22,6 +22,10 @@ const log = (s, extra = {}) => { console.log(s, JSON.stringify(extra)); result.s
   // landscape tablet orientation
   await device.shell('settings put system accelerometer_rotation 0');
   await device.shell('settings put system user_rotation 1');
+  await device.shell('cmd window user-rotation lock 1').catch(() => undefined);
+  await new Promise((r) => setTimeout(r, 3000));
+  const net2 = (await device.shell('dumpsys connectivity | grep -m1 "Active default network"').catch(() => Buffer.from('?'))).toString().trim();
+  log('network re-check', { net2 });
   await device.shell(`am force-stop ${PKG}`);
   await device.shell('logcat -c');
   const t0 = Date.now();
@@ -36,11 +40,22 @@ const log = (s, extra = {}) => { console.log(s, JSON.stringify(extra)); result.s
   // A headless emulator WebView may not run requestAnimationFrame, so every wait
   // uses interval polling and every tap goes to coordinates (no rAF "stable" checks).
   const waitSel = (sel, timeout = 60000) => page.waitForFunction((q) => !!document.querySelector(q), sel, { polling: 300, timeout });
+  // buttons: DOM click (React onClick); board squares: real PointerEvents at the square centre
   const click = async (sel) => {
     await waitSel(sel, 30000);
-    const b = await page.evaluate((q) => { const r = document.querySelector(q).getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; }, sel);
-    await page.mouse.click(b.x, b.y);
-    await page.waitForTimeout(350);
+    await page.evaluate((q) => document.querySelector(q).click(), sel);
+    await page.waitForTimeout(400);
+  };
+  const tapSq = async (sq) => {
+    await waitSel(`[data-square=${sq}]`, 30000);
+    await page.evaluate((s) => {
+      const r = document.querySelector(`[data-square=${s}]`).getBoundingClientRect();
+      const board = document.querySelector('[data-testid=board]');
+      const o = { bubbles: true, cancelable: true, clientX: r.x + r.width / 2, clientY: r.y + r.height / 2, pointerId: 1, pointerType: 'touch', isPrimary: true };
+      board.dispatchEvent(new PointerEvent('pointerdown', o));
+      board.dispatchEvent(new PointerEvent('pointerup', o));
+    }, sq);
+    await page.waitForTimeout(400);
   };
   const exists = (sel) => page.evaluate((q) => !!document.querySelector(q), sel);
   await waitSel('[data-testid=menu-ai]');
@@ -48,7 +63,6 @@ const log = (s, extra = {}) => { console.log(s, JSON.stringify(extra)); result.s
   await page.waitForTimeout(800);
   await device.screenshot({ path: path.join(out, '01-home.png') });
 
-  const tapSq = (sq) => click(`[data-square=${sq}]`);
   const replies = {};
   for (const level of [1, 2, 3, 4, 5]) {
     await click('[data-testid=menu-ai]');

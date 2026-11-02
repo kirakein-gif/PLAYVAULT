@@ -34,6 +34,13 @@ const LINES = [
     c.undo(); fens.push(c.fen());
   }
   const positions = fens.slice(0, nPos);
+  // tactical positions: the start of shipped puzzles (one clearly best move)
+  const PZ = JSON.parse(fs.readFileSync(path.join(__dirname, '../../src/academy/puzzles/puzzles.json'), 'utf8'));
+  const tactical = PZ.filter((_, i) => i % 3 === 0).map((p) => {
+    const c = new Chess(p.fen);
+    c.move({ from: p.moves[0].slice(0, 2), to: p.moves[0].slice(2, 4), promotion: p.moves[0][4] });
+    return { fen: c.fen(), answer: p.moves[1], alts: p.moves.length === 2 ? p.alternatives : [], mate: !!p.mateIn };
+  });
   const judge = new Engine('single');
   await judge.init({ Hash: 64 });
   const player = new Engine('lite-single');
@@ -66,13 +73,26 @@ const LINES = [
         if (d <= 0.03) best++;
       }
     }
-    const row = { level: L.level, key: L.key, skill: L.skill, depth: L.depth, avgWinChanceLoss: +(loss / n).toFixed(3), blunderRate: +(blunders / n).toFixed(3), nearBestRate: +(best / n).toFixed(3), avgMsPerMove: Math.round((Date.now() - tStart) / n) };
+    let solved = 0, tn = 0;
+    for (let s = 0; s < samples; s++) {
+      for (const t of tactical) {
+        player.send('ucinewgame');
+        player.setOption('Skill Level', L.skill);
+        const r = await player.go(t.fen, `go depth ${L.depth} movetime ${L.movetime}`, 1);
+        const c = new Chess(t.fen);
+        let mated = false;
+        try { c.move({ from: r.bestmove.slice(0, 2), to: r.bestmove.slice(2, 4), promotion: r.bestmove[4] }); mated = c.isCheckmate(); } catch {}
+        if (r.bestmove === t.answer || t.alts.includes(r.bestmove) || (t.mate && mated)) solved++;
+        tn++;
+      }
+    }
+    const row = { level: L.level, key: L.key, skill: L.skill, depth: L.depth, avgWinChanceLoss: +(loss / n).toFixed(3), blunderRate: +(blunders / n).toFixed(3), nearBestRate: +(best / n).toFixed(3), tacticFoundRate: +(solved / tn).toFixed(3), tacticPositions: tactical.length, avgMsPerMove: Math.round((Date.now() - tStart) / (n + tn)) };
     report.levels.push(row);
     console.log(JSON.stringify(row));
   }
-  const losses = report.levels.map((l) => l.avgWinChanceLoss);
-  report.monotonic = losses.every((v, i) => i === 0 || v <= losses[i - 1] + 0.005);
-  console.log(report.monotonic ? 'STRENGTH: levels get stronger 1 -> 5' : 'STRENGTH: NOT monotonic', losses.join(' > '));
+  const found = report.levels.map((l) => l.tacticFoundRate);
+  report.monotonic = found.every((v, i) => i === 0 || v > found[i - 1]);
+  console.log(report.monotonic ? 'STRENGTH: tactic-finding rate rises with every level' : 'STRENGTH: NOT strictly increasing', found.join(' < '));
   const out = path.join(__dirname, '../../docs/engine-strength.json');
   fs.writeFileSync(out, JSON.stringify(report, null, 2));
   judge.quit(); player.quit();
