@@ -203,6 +203,13 @@ async function analyze(page, file, opts) {
           assert.ok(Array.isArray(a.ticks) && a.ticks.length === a.frames && a.ticks.every(isInt), `${name} ticks는 프레임 수만큼의 양의 정수`);
         }
         if (name === 'idle' || name === 'run' || name === 'climb' || name === 'charge') assert.equal(a.loop, true, `${name}.loop는 true`);
+        if (hero === 'noah' && /^attack(-[23])?$/.test(name) && SIM.CONFIG.heroes.noah.weapon.combo) {
+          // COMBAT_SPEC §2-1: 다음 공격 직전까지 동작이 이어지고, 핵심 자세가 4틱 이상 보임
+          const k = name === 'attack' ? 0 : Number(name.slice(-1)) - 1, rec = SIM.CONFIG.heroes.noah.weapon.combo[k].recoveryTicks;
+          const total = a.ticks.reduce((x, y) => x + y, 0);
+          assert.ok(total >= rec - 2, `${name} 동작 길이 ${total}틱 < ${rec - 2}틱(${k + 1}단 회복 ${rec} - 2) — 너무 빨라 몸 동작이 안 보임`);
+          assert.ok(Math.max(...a.ticks) >= 4, `${name} 가장 오래 보이는 자세 ${Math.max(...a.ticks)}틱 < 4틱`);
+        }
         if (name.startsWith('attack')) assert.ok(a.ticks[0] <= 2, `attack 첫(준비) 프레임 ${a.ticks[0]}틱 > 2틱 — 판정은 누르는 즉시 생기므로 휘두르기 전에 피해가 먼저 보임`);
         assert.ok(/\.png$/i.test(a.file || ''), `${name} 파일은 .png`);
       }
