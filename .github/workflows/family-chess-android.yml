@@ -1,0 +1,112 @@
+# Builds the FAMILY CHESS PREMIUM debug APK and runs it on an Android emulator
+# with networking switched off. Scoped to games/family-chess-premium only.
+name: family-chess-android
+
+on:
+  push:
+    paths:
+      - 'games/family-chess-premium/**'
+      - '.github/workflows/family-chess-android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: games/family-chess-premium
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: games/family-chess-premium/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit -p tsconfig.json
+      - run: npx vitest run
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: games/family-chess-premium/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: android-actions/setup-android@v3
+      - name: Android SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+      - run: npm ci
+      - name: Web build
+        run: npm run build
+      - name: Capacitor sync
+        run: npx cap sync android
+      - name: Assemble debug APK
+        working-directory: games/family-chess-premium/android
+        run: ./gradlew assembleDebug --no-daemon
+      - name: Name the APK
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk out/FamilyChessPremium-v1.0.0-debug.apk
+          ls -l out
+          unzip -l out/FamilyChessPremium-v1.0.0-debug.apk | grep -E "engine/stockfish|puzzles|pieces/wK" || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FamilyChessPremium-v1.0.0-debug-apk
+          path: games/family-chess-premium/out/FamilyChessPremium-v1.0.0-debug.apk
+          if-no-files-found: error
+
+  emulator-offline-test:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: FamilyChessPremium-v1.0.0-debug-apk
+          path: games/family-chess-premium/out
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Enable KVM
+        working-directory: .
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Playwright (Android driver only, no browsers)
+        run: npm install --no-save --no-package-lock playwright@1.63.0
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+      - name: Install and run on a tablet emulator (network off)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_tablet
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          working-directory: games/family-chess-premium
+          script: |
+            adb install -r out/FamilyChessPremium-v1.0.0-debug.apk
+            adb shell dumpsys package com.playvault.familychess | grep -E "versionName|android.permission" || true
+            node tests/android/smoke.cjs android-smoke
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-smoke-results
+          path: games/family-chess-premium/android-smoke

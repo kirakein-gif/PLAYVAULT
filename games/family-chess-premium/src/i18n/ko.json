@@ -1,0 +1,139 @@
+{
+  "app": { "name": "우리집 체스", "premium": "PREMIUM", "full": "우리집 체스 PREMIUM", "tagline": "함께 두고, 함께 강해지는 체스" },
+  "common": {
+    "back": "뒤로", "home": "홈", "close": "닫기", "cancel": "취소", "confirm": "확인", "ok": "확인", "yes": "예", "no": "아니요",
+    "next": "다음", "prev": "이전", "retry": "다시 시도", "start": "시작", "continue": "이어서 하기", "save": "저장", "delete": "삭제",
+    "loading": "불러오는 중…", "on": "켜기", "off": "끄기", "white": "백", "black": "흑", "random": "무작위",
+    "computer": "컴퓨터", "settings": "설정", "more": "더보기", "detail": "자세히 보기", "hideDetail": "간단히",
+    "langShort": "한국어", "otherLang": "EN", "player": "플레이어"
+  },
+  "pieces": { "k": "킹", "q": "퀸", "r": "룩", "b": "비숍", "n": "나이트", "p": "폰" },
+  "home": {
+    "twoPlayers": "둘이서 대국", "twoPlayersSub": "Two Players",
+    "vsComputer": "컴퓨터와 대국", "vsComputerSub": "Play vs Computer",
+    "academy": "체스 아카데미", "academySub": "Chess Academy",
+    "resumeTitle": "진행 중인 대국이 있습니다", "resumeBody": "{mode} · {moves}수 진행됨. 이어서 두시겠습니까?",
+    "resume": "이어서 두기", "discard": "새로 시작", "profile": "프로필", "exitTitle": "앱을 종료할까요?", "exit": "종료"
+  },
+  "setup": {
+    "title": "컴퓨터와 대국", "level": "난이도", "color": "내 기물 색", "start": "대국 시작",
+    "levels": {
+      "easy": "쉬움", "normal": "보통", "challenging": "도전", "hard": "어려움", "master": "마스터",
+      "easyDesc": "가볍게 두는 연습 상대", "normalDesc": "실수도 하는 편한 상대", "challengingDesc": "전술을 노리는 상대",
+      "hardDesc": "실수를 거의 놓치지 않음", "masterDesc": "엔진 최대 강도"
+    }
+  },
+  "game": {
+    "twoTitle": "둘이서 대국", "aiTitle": "컴퓨터와 대국", "turnW": "백 차례", "turnB": "흑 차례", "yourTurn": "내 차례입니다",
+    "aiThinking": "컴퓨터가 생각하는 중…", "check": "체크!", "undo": "무르기", "newGame": "새 게임", "flip": "판 뒤집기",
+    "resign": "기권", "offerDraw": "무승부 합의", "claimDraw": "무승부 주장", "claimThreefold": "같은 포지션이 세 번 나왔습니다. 무승부를 주장할 수 있습니다.",
+    "claimFifty": "50수 동안 잡기와 폰 이동이 없었습니다. 무승부를 주장할 수 있습니다.", "savePgn": "기보(PGN) 저장", "loadPgn": "기보 불러오기",
+    "autoRotate": "매 턴 판 자동 회전", "engineLoading": "체스 엔진 준비 중…", "engineError": "체스 엔진이 응답하지 않습니다.",
+    "engineRetry": "엔진 다시 시작", "illegal": "그 칸으로는 갈 수 없습니다", "mustEscape": "먼저 체크를 피해야 합니다",
+    "pinned": "이 기물이 움직이면 킹이 공격당합니다", "notYourPiece": "지금은 {color} 차례입니다", "promotion": "승격할 기물을 고르세요",
+    "confirmNew": "지금 대국을 끝내고 새 게임을 시작할까요?", "confirmResign": "정말 기권할까요?", "confirmDraw": "두 사람 모두 무승부에 동의합니까?",
+    "moves": "기보", "you": "나", "level": "{level}단계 · {name}", "saved": "기보를 저장했습니다", "pgnInvalid": "기보 파일을 읽을 수 없습니다",
+    "loaded": "기보를 불러왔습니다", "noUndo": "되돌릴 수가 없습니다",
+    "result": {
+      "whiteWins": "백 승리", "blackWins": "흑 승리", "draw": "무승부", "youWin": "승리했습니다!", "youLose": "컴퓨터 승리",
+      "checkmate": "체크메이트", "stalemate": "스테일메이트 (둘 곳이 없음)", "insufficient": "메이트할 기물이 부족함",
+      "fivefold": "같은 포지션 5회 반복", "seventyFive": "75수 규칙", "threefoldClaim": "3회 반복 무승부 주장", "fiftyClaim": "50수 규칙 무승부 주장",
+      "resign": "기권", "agreement": "합의 무승부"
+    },
+    "review": "복기하기", "again": "한 판 더", "savedGames": "저장된 대국"
+  },
+  "review": {
+    "title": "대국 복기", "analyzing": "Stockfish 분석 중… {done}/{total}", "analyzed": "분석 완료 · 깊이 {depth}", "start": "처음", "end": "끝",
+    "best": "최선의 수", "good": "좋은 수", "ok": "무난한 수", "inaccuracy": "부정확한 수", "mistake": "실수", "blunder": "큰 실수",
+    "uncertainNote": "분석 깊이가 부족해 단정하기 어렵습니다",
+    "reason": {
+      "bestMove": "엔진이 추천한 수와 같습니다.", "goodMove": "엔진 추천과 거의 같은 가치의 수입니다.", "fine": "큰 차이가 없는 수입니다.",
+      "missedMate": "{best}로 {n}수 만에 메이트할 수 있었습니다.", "allowsMate": "이 수 뒤에 상대가 {n}수 만에 메이트할 수 있습니다.",
+      "losesPiece": "이 수 뒤에 상대가 {square}의 {piece}을(를) 잡을 수 있습니다. 추천 수: {best}",
+      "evalDrop": "평가가 떨어진 수입니다. 추천 수: {best}", "stillWinning": "여전히 유리하지만 더 좋은 수가 있었습니다: {best}"
+    },
+    "recommend": "추천 수", "showBest": "추천 수 보기", "playLine": "추천 수순 재생", "stopLine": "재생 멈춤", "retryHere": "이 장면에서 다시 두기",
+    "summary": "{color}: 부정확 {i} · 실수 {m} · 큰 실수 {b}", "noGames": "아직 저장된 대국이 없습니다.", "pickGame": "복기할 대국을 고르세요",
+    "eval": "평가", "mine": "내 수만 보기", "moveN": "{n}수", "uncertain": "(확실하지 않음)"
+  },
+  "academy": {
+    "title": "체스 아카데미", "daily": "오늘의 10분 훈련", "dailyDesc": "전술 3 · 체크메이트 1 · 엔드게임 1", "dailyDone": "오늘의 훈련 완료!",
+    "dailyCelebrate": "멋져요! 오늘 훈련을 모두 마쳤습니다.", "records": "나의 기록", "glossary": "용어 사전", "solvedOf": "{solved}/{total} 해결",
+    "lessonsDone": "{done}/{total} 강의 완료", "rules": "기물 이동 도움말",
+    "course": {
+      "tactics": "전술 훈련", "tacticsDesc": "포크·핀·스큐어·발견 공격·수비",
+      "checkmate": "체크메이트 훈련", "checkmateDesc": "1수·2수·3수 메이트",
+      "strategy": "전략 훈련", "strategyDesc": "중앙·전개·왕의 안전·활동성",
+      "openings": "오프닝", "openingsDesc": "원리와 대표 오프닝의 이유",
+      "endgames": "엔드게임", "endgamesDesc": "폰 엔드게임과 기본 메이트",
+      "review": "실전 복기", "reviewDesc": "방금 둔 대국에서 배우기"
+    }
+  },
+  "puzzles": {
+    "title": "문제 목록", "filter": {
+      "all": "전체", "untried": "미도전", "unsolved": "미해결", "solved": "해결 완료", "below3": "별 3개 미만", "favorites": "즐겨찾기"
+    },
+    "allThemes": "모든 유형", "allLevels": "모든 난이도", "difficulty": { "easy": "쉬움", "medium": "보통", "hard": "어려움" },
+    "status": { "untried": "미도전", "unsolved": "미해결", "solved": "해결" }, "number": "문제 {n}", "empty": "조건에 맞는 문제가 없습니다.",
+    "cat": {
+      "mate": "체크메이트", "fork": "포크·이중 공격", "pin": "핀", "skewerDiscovered": "스큐어·발견 공격", "defense": "수비·기물 보호", "endgame": "엔드게임"
+    },
+    "theme": {
+      "mate": "메이트", "fork": "포크", "pin": "핀", "skewer": "스큐어", "discoveredAttack": "발견 공격", "doubleAttack": "이중 공격",
+      "defense": "수비", "endgame": "엔드게임", "hangingPiece": "무방비 기물", "sacrifice": "희생", "promotion": "승격", "backRankMate": "백랭크 메이트"
+    },
+    "favAdd": "즐겨찾기 추가", "favRemove": "즐겨찾기 해제", "attempts": "도전 {n}회"
+  },
+  "solve": {
+    "toMove": "{color} 차례", "opponentMoving": "상대가 수를 둡니다…",
+    "prompt": {
+      "mate1": "한 수 만에 체크메이트하세요.", "mate2": "2수 만에 체크메이트하세요.", "mate3": "3수 만에 체크메이트하세요.",
+      "fork": "한 기물로 두 기물을 동시에 공격하는 수를 찾아보세요.", "pin": "핀을 이용해 이득을 보는 수를 찾아보세요.",
+      "skewer": "앞의 큰 기물을 공격해 뒤의 기물을 얻는 수를 찾아보세요.", "discoveredAttack": "한 기물을 비켜서 숨은 공격을 여는 수를 찾아보세요.",
+      "doubleAttack": "두 곳을 동시에 위협하는 수를 찾아보세요.", "defense": "상대의 위협을 막고 기물을 지키는 수를 찾아보세요.",
+      "endgame": "엔드게임에서 이기는 정확한 수를 찾아보세요.", "tactic": "기물 이득을 얻는 가장 좋은 수를 찾아보세요."
+    },
+    "hint": "힌트", "hintN": "힌트 {n}", "restart": "다시 시작", "next": "다음 문제", "showSolution": "정답 보기",
+    "correct": "좋습니다! 계속하세요.", "wrong": "좋은 시도예요. 다시 생각해 보세요.", "solved": "정답입니다!", "revealed": "정답 수순을 보여드렸습니다. 다시 풀어 보세요.",
+    "stars3": "첫 시도에 힌트 없이 해결!", "stars2": "스스로 정답을 찾았습니다", "stars1": "힌트를 사용해 해결했습니다",
+    "best": "최고 기록", "last": "최근", "explain": "해설", "hint1": {
+      "mate": "상대 킹이 피할 칸이 거의 없습니다.", "fork": "상대 기물 두 개가 한 기물의 공격 범위에 들어올 수 있습니다.",
+      "pin": "상대 기물 하나가 뒤에 있는 더 중요한 기물 때문에 움직이기 어렵습니다.", "skewer": "큰 기물과 그 뒤의 기물이 한 줄에 서 있습니다.",
+      "discoveredAttack": "내 기물 하나가 다른 기물의 공격 길을 막고 있습니다.", "doubleAttack": "한 수로 두 가지 위협을 만들 수 있습니다.",
+      "defense": "상대가 무엇을 노리는지 먼저 확인하세요.", "endgame": "기물이 적을수록 킹과 폰의 한 걸음이 중요합니다.",
+      "tactic": "상대 기물 중 지켜지지 않거나 약한 곳을 찾아보세요.",
+      "check": "첫 수는 체크입니다.", "capture": "첫 수는 상대 기물을 잡는 수입니다.", "quiet": "첫 수는 체크도 잡기도 아닌 조용한 수입니다."
+    },
+    "hint2": "{square}의 {piece}에 주목하세요.", "hint2targets": "노릴 곳: {targets}", "hint3": "추천 이동: {from} → {to}",
+    "explainT": {
+      "mate": "{line} 으로 체크메이트입니다.", "fork": "{move}: {square}의 {piece} 하나로 {targets}을(를) 동시에 공격하는 포크입니다.",
+      "pin": "{move}: 핀 때문에 {pinned}이(가) 자유롭게 움직이지 못하는 점을 이용합니다.",
+      "skewer": "{move}: {front}을(를) 공격해 비키게 한 뒤 그 뒤의 {back}을(를) 얻는 스큐어입니다.",
+      "discoveredAttack": "{move}: 기물이 비켜서며 뒤에 있던 {attacker}의 공격 길이 열리는 발견 공격입니다.",
+      "doubleAttack": "{move}: 한 수로 {targets}을(를) 동시에 위협합니다.",
+      "defense": "{move}: 상대의 위협을 막아 기물을 지킵니다. 다른 수는 대부분 기물을 잃습니다.",
+      "endgame": "{line}: 이 엔드게임에서 이기는(또는 지키는) 유일한 길입니다.", "tactic": "{line}: 기물 이득을 얻는 수순입니다."
+    }
+  },
+  "lesson": {
+    "step": "{n} / {total}", "yourTurn": "직접 두어 보세요", "tryAgain": "다시 한 번 생각해 보세요", "wellDone": "잘했습니다!", "complete": "강의 완료",
+    "completed": "완료", "replay": "다시 보기", "showMove": "수 보여주기", "lessons": "강의 목록", "practice": "컴퓨터와 연습"
+  },
+  "records": {
+    "title": "나의 기록", "total": "전체 {total}문제", "solved": "해결 {n}", "stars": "별 {n}개", "untried": "미도전 {n}", "unsolved": "미해결 {n}",
+    "games": "대국 {n}판", "aiRecord": "컴퓨터 상대 {w}승 {l}패 {d}무", "lessons": "강의 완료 {n}"
+  },
+  "glossary": { "title": "체스 용어 사전 · Glossary" },
+  "settings": {
+    "title": "설정", "sound": "효과음", "volume": "음량", "haptics": "진동 피드백", "lowPower": "절전 모드",
+    "lowPowerDesc": "애니메이션을 줄이고 엔진 계산을 가볍게 합니다", "coords": "체스판 좌표 표시", "autoRotate": "둘이서 대국: 매 턴 판 회전",
+    "otherLang": "아카데미에서 영어 문장 함께 보기", "language": "언어", "profiles": "프로필", "current": "사용 중", "rename": "이름 변경",
+    "use": "이 프로필 사용", "namePrompt": "새 이름", "data": "데이터 백업", "export": "기록 내보내기 (JSON)", "import": "기록 불러오기",
+    "exportOk": "저장했습니다: {path}", "exportShare": "다른 곳에 보내기", "exportFail": "내보내기에 실패했습니다",
+    "importConfirm": "{date}에 만든 백업({profiles})으로 지금의 모든 기록을 덮어씁니다. 계속할까요?", "importOk": "기록을 복원했습니다",
+    "importFail": "복원할 수 없는 파일입니다 ({reason})", "uninstallWarn": "앱을 삭제하면 기기 안의 기록도 지워집니다. 가끔 백업을 내보내 두세요.",
+    "about": "앱 정보", "licenses": "오픈소스 라이선스", "version": "버전 {v}", "offline": "인터넷 없이 모든 기능이 동작합니다. 기록은 이 기기에만 저장됩니다.",
+    "engine": "체스 엔진: {name}", "errors": { "notJson": "JSON 형식 아님", "wrongApp": "이 앱의 백업이 아님", "newerSchema": "더 새로운 버전의 백업", "noSchema": "버전 정보 없음", "noProfiles": "프로필 없음", "badProfile": "프로필 손상", "notObject": "형식 오류" }
+  },
+  "licenses": { "title": "오픈소스 라이선스와 출처" }
+}

@@ -1,0 +1,44 @@
+import { useEffect, useState } from 'react';
+import { useApp } from '../state';
+import { TopBar } from '../components/ui';
+
+const ITEMS = [
+  { name: 'Stockfish 19', license: 'GPL-3.0', note: 'The Stockfish developers (see AUTHORS). https://github.com/official-stockfish/Stockfish' },
+  { name: 'Stockfish.js 19.0.1 (stockfish-19-lite-single)', license: 'GPL-3.0', note: 'Nathan Rugg / Chess.com — WASM build of Stockfish. NNUE net nn-61e7af4bb97d by Chris Bao. https://github.com/nmrugg/stockfish.js' },
+  { name: 'chess.js 1.4.0', license: 'BSD-2-Clause', note: 'Jeff Hlywa. https://github.com/jhlywa/chess.js' },
+  { name: 'React 19', license: 'MIT', note: 'Meta Platforms, Inc.' },
+  { name: 'Capacitor 8 (+ App, Preferences, Filesystem, Share, Haptics)', license: 'MIT', note: 'Ionic. https://capacitorjs.com' },
+  { name: 'Noto Serif KR', license: 'SIL OFL 1.1', note: 'Google / Adobe — via @fontsource/noto-serif-kr' },
+  { name: 'Cinzel', license: 'SIL OFL 1.1', note: 'Natanael Gama — via @fontsource/cinzel' },
+  { name: 'Pieces, board textures, icons, sounds', license: 'Original', note: 'Made for this app (procedural SVG, generated wood, synthesised audio).' },
+  { name: 'Puzzles', license: 'Original', note: 'Generated from engine self-play and verified with Stockfish 19 for this app.' },
+];
+
+export function LicensesScreen() {
+  const { t } = useApp();
+  const [gpl, setGpl] = useState('');
+  useEffect(() => {
+    fetch('licenses/STOCKFISH-GPL-3.0.txt')
+      .then((r) => r.text())
+      .then(setGpl)
+      .catch(() => setGpl(''));
+  }, []);
+  return (
+    <div className="screen licenses">
+      <TopBar title={t('licenses.title')} />
+      <div className="licenseBody">
+        {ITEMS.map((i) => (
+          <div key={i.name} className="licItem">
+            <b>{i.name}</b> <span className="tag">{i.license}</span>
+            <div className="licNote">{i.note}</div>
+          </div>
+        ))}
+        <p className="licNote">
+          This app bundles the Stockfish engine under the GNU General Public License v3. The corresponding source code is available at the repositories above
+          (Stockfish.js tag v19.0.1). See LICENSES/ in the project source.
+        </p>
+        {gpl && <pre className="gpl">{gpl}</pre>}
+      </div>
+    </div>
+  );
+}
