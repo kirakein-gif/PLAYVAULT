@@ -47,6 +47,14 @@ test('CONFIG: noah.weapon.combo 3단·comboWindowTicks, 1단 = 기존 weapon 값
   assert.deepEqual(P(world('ethan')).charge, { ticks: 0, level: 0 }, 'getPlayer().charge 초기값');
 });
 
+test('Noah 콤보 창(COMBAT_SPEC §2-2): comboWindowTicks 20', () => {
+  assert.equal(cfg('noah').weapon.comboWindowTicks, 20);
+});
+test('Noah 리듬(COMBAT_SPEC §2-1): 1단 회복 18 그대로, 2단 22·3단 34틱', () => {
+  const c = cfg('noah').weapon.combo;
+  assert.deepEqual(c.map((x) => x.recoveryTicks), [18, 22, 34], `recoveryTicks ${c.map((x) => x.recoveryTicks).join(',')}`);
+});
+
 // ── Noah ──
 const N = () => cfg('noah').weapon;
 test('Noah: 리듬에 맞춰 세 번 누르면 1·2·3단, 피해 22·22·44 (3단 뒤엔 다시 1단)', () => {

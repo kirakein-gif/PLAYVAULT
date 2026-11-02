@@ -1165,3 +1165,54 @@
 - 다음: 규격 PR 병합 승인 → Codex `CODEX_TASK_09.md` → Claude Code 검토 → 사용자 손맛 확인 → 2차(체력·피격·적 3종) 규격.
 - 병합: 사용자 승인("병합하고 코덱스에 넘길게요")으로 PR #19를 main에 병합. 병합 후 weapons-contract·pixel-assets 새 항목은 Codex 구현 전 예상 실패.
 - 종료 상태: 규격 병합, Codex 구현 대기.
+
+### 2026-11-02 (Asia/Seoul) · Codex 전투 1차(PR #20 `bf87c75`) 검토
+
+- 담당 AI: Claude Code(검토). 구현: Codex `codex/hollow-keep-combat-weapons`.
+- 범위: 검사 원본·규격 main과 동일(Codex 자체 weapons-edge만 추가). 기존 게임·공용 자산 변경 없음.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 15/15(제 사본 HK_SIM으로도 15/15), weapons-edge 6/6, pixel-assets 92/92, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest(`?room=test`) 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱, 공격 포함) 겹침 0건.
+- 그림: Noah 1·2·3단 동작·베기 궤적이 서로 다르고 한 획. Ethan 충전 빛 9프레임 성장, 2·3단 탄이 1단보다 큼, 빛 터짐 3프레임 고리.
+- 관찰(차단 아님): 시험 방 피해 숫자가 같은 자리에 쌓여 표적 HP 글자를 가림 → 2차에서 피해 표시 정리 제안.
+- 회사 PC 미리보기 Artifact를 `bf87c75` 빌드로 갱신(버전 3). 미리보기 사본에서만 `#test`로 무기 시험 방을 열 수 있게 app.js 한 줄·링크 추가(claude.ai는 주소의 `?room=test`를 넘기지 않음). 저장소 코드는 변경 없음.
+- Git/PR: [PR #20 검토](https://github.com/kirakein-gif/PLAYVAULT/pull/20) (COMMENT).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건(관찰 1건).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛·외형 확인 → 승인 시 PR #20 병합(이 기록 브랜치 함께) → 2차(체력·피격·적 3종, 둘 다 쓰러졌을 때 처리 제안) 규격.
+- 종료 상태: 검토 완료, 사용자 판단 대기.
+
+### 2026-11-02 (Asia/Seoul) · Noah 3단 베기 손맛 보완 규격
+
+- 담당 AI: Claude Code. 사용자 의견(미리보기 확인): "에단의 충전 공격은 괜찮다. 노아의 3단 베기는 너무 빨라서 움직임이 잘 안 보인다, 궤적만 여기저기 다른 느낌", 선택 "자세 멈춤 + 리듬 조금 느리게", 작업 중 추가 "촥~ 촥~ 촥 하는 느낌, 격투 게임의 3단 콤보처럼".
+- 측정(PR #20 `bf87c75`): 베기 동작 1·2단 9틱, 3단 12틱, 가장 긴 자세 3~4틱. 동작 뒤 다음 공격까지 9~18틱은 서 있는 자세.
+- 판단: 맞을 때 멈춤(히트스톱)을 게임 시간에 넣으면 콤보 타이밍 검사·완주 기록 재생이 모두 어긋나므로 그림 표시 효과(자세 붙잡기·표적 밝힘·밀림·3단 화면 흔들림)로 정함. 효과음이 "촥" 느낌에 가장 크지만 4단계 범위라 사용자 결정 대기.
+- 변경(`claude/hollow-keep-combat-review`): COMBAT_SPEC §2-1(2·3단 회복 22·34틱, 동작 길이 ≥ 회복-2, 핵심 자세 ≥4틱, 타격 연출), CODEX_TASK_09 추가 지시, `weapons-contract.cjs` 리듬 검사 1개(15 → 16), `pixel-assets.cjs` 동작 길이·자세 멈춤 검사.
+- 검증: PR #20 그대로면 weapons-contract 15/16, pixel-assets 91/92(동작 9틱 < 16틱). 회복 값과 ticks만 바꾼 사본은 weapons-contract 16/16, pixel-assets 92/92, foundation-contract 51/51, foundation-edge 16/16, area-data 22/22. Codex 자체 weapons-edge는 옛 타이밍 가정으로 실패 → Codex가 갱신하도록 지시.
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건(베기 동작이 안 보임 — 1차 규격에 동작 길이 기준이 없던 것은 Claude Code 누락).
+- 사용자 재요청 횟수: 0회.
+- 사용자 결정(후속): 효과음은 넣지 않음 — "소리가 안 나도 느낌으로 소리가 나는 것처럼 충분히 가능합니다". COMBAT_SPEC §2-1·CODEX_TASK_09 추가 지시의 금지 항목에 반영.
+- 다음: Codex가 PR #20에서 추가 지시 처리 → 재검토 → 미리보기 갱신.
+- 종료 상태: 규격 보강.
+
+### 2026-11-02 (Asia/Seoul) · Codex Noah 베기 보완(PR #20 `091e41b`) 재검토
+
+- 담당 AI: Claude Code(검토).
+- 범위: PR #21 규격 `097119f` 병합 포함, 검사 원본 동일. 콤보 회복 18·22·34, 시뮬레이션 시간 정지 없음, 효과음 없음.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 16/16, weapons-edge 6/6, pixel-assets 92/92, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱) 겹침 0건.
+- 그림: 베기 동작 16·20·32틱, 핵심 자세 9·12·22틱. 캡처에서 명중 밝힘, 세 단 자세 구분, 피해 숫자 위아래 분리 확인.
+- 회사 PC 미리보기 Artifact를 `091e41b` 빌드로 갱신(버전 4, 미리보기 사본만 `#test` 링크 유지).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛 확인 → 승인 시 PR #21 → PR #20 병합 → 2차(체력·피격·적 3종) 규격.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-02 (Asia/Seoul) · Noah 콤보 연결 규격(끊김 원인 측정)
+
+- 담당 AI: Claude Code. 사용자 의견(미리보기 `091e41b`): "3단 콤보 연출이 좀 어렵네요. 촥 하는 느낌은 있는데 세 모션의 연결이 좀 부자연스럽다. 끊기기도 하고."
+- 측정: ① 동작 16·20틱 < 회복 18·22틱 → 맞히지 않으면 단 사이 2틱 idle/run(실제 화면 3~4프레임, 새 combo-render로 확인). §2-1의 "회복-2" 기준이 허용한 틈 — Claude Code 규격 결함. ② 기준점 맞춤 실루엣 겹침: 1단 끝→2단 시작 0.49, 2단 끝→3단 시작 0.48(한 동작 안 이웃 프레임도 0.46~0.69, 각 4프레임). ③ 창 14틱(0.23초).
+- 변경(`claude/hollow-keep-combat-review`, PR #21): COMBAT_SPEC §2-2(틈 없음: 동작 ≥ 회복 + 창 동안 마지막 프레임 유지, 연결 자세 겹침 0.7 이상, 각 단 6프레임 이상, 창 20틱), CODEX_TASK_09 추가 지시 2, `weapons-contract.cjs`(창 20, 16 → 17), `pixel-assets.cjs`(6프레임·동작 ≥ 회복·연결 자세, analyze가 첫·마지막 프레임 마스크 반환, 세 단 '서로 다른 그림' 검사는 가운데 프레임만 비교하도록 조정 — 연결 프레임은 같아도 됨), 새 `combo-render.cjs`(5).
+- 검증: `091e41b`는 pixel-assets 91/93(동작 16틱·연결 0.49/0.48), weapons-contract 16/17, combo-render 4/5(콤보 중 다른 자세 3~4프레임, 2회 반복 같은 결과). 참조 사본(창 20, 각 단 6프레임·연결 프레임 공유, 렌더러가 창 동안 마지막 프레임 유지)은 pixel-assets 93/93, weapons-contract 17/17, combo-render 5/5(2회), pixel-render 7/7, ladder-render 7/7, weapons-edge 6/6, foundation 51/51, area-data 22/22.
+- 작성 중 바로잡은 검사 결함(Claude Code): combo-render의 키 간격이 짧아 3번째 입력이 2단 미리 입력과 겹쳐 사라짐 → 각 입력이 앞 단 회복 중에 들어가게 간격 조정. (참조 사본 pixel-render 5/7은 참조 그림 파일 이름을 바꿔서 생긴 것으로, 이름을 되돌리자 7/7.)
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건(연결 끊김), 원인 4가지 측정.
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #20에서 추가 지시 2 처리 → 재검토 → 미리보기 갱신.
+- 종료 상태: 규격 보강.
