@@ -41,12 +41,19 @@ test('CONFIG: noah.weapon.combo 3단·comboWindowTicks, 1단 = 기존 weapon 값
   for (const k of ['damage', 'range', 'height', 'activeTicks', 'recoveryTicks']) n.combo.forEach((s, i) => assert.equal(typeof s[k], 'number', `combo[${i}].${k}`));
   assert.equal(n.combo[0].damage, n.damage); assert.equal(n.combo[0].range, n.range); assert.equal(n.combo[0].recoveryTicks, n.cooldownTicks);
   assert.ok(Number.isInteger(n.comboWindowTicks) && n.comboWindowTicks > 0, 'comboWindowTicks');
-  assert.ok(n.combo[2].damage > n.combo[0].damage && n.combo[2].range > n.combo[1].range && n.combo[1].range > n.combo[0].range, '단계가 올라갈수록 길고 3단이 가장 강함');
+  assert.ok(n.combo[2].damage > n.combo[0].damage && n.combo[2].range > Math.max(n.combo[0].range, n.combo[1].range), '3단이 가장 강하고 가장 김');
   assert.ok(e.charge && e.charge.stage3Ticks > e.charge.stage2Ticks && e.charge.stage2Ticks > 0, 'ethan.weapon.charge 단계 틱');
   assert.ok(Array.isArray(e.charge.shots) && e.charge.shots.length === 2 && e.charge.shots[1].burstRadius > 0 && e.charge.shots[1].burstDamage > 0, 'charge.shots[2단, 3단], 3단 burst');
   assert.deepEqual(P(world('ethan')).charge, { ticks: 0, level: 0 }, 'getPlayer().charge 초기값');
 });
 
+test('Noah 동선(COMBAT_SPEC §2-3): 2단 파고들기(lunge ≥ 10)·위로 넓은 판정, 3단 디딤 없음·가장 긴 사거리', () => {
+  const c = cfg('noah').weapon.combo;
+  assert.ok((c[1].lunge || 0) >= 10, `2단 lunge ${c[1].lunge}`);
+  assert.ok(c[1].height >= 76, `2단 판정 높이 ${c[1].height} (올려 베기는 위로 넓게)`);
+  assert.ok(!c[2].lunge, `3단 lunge ${c[2].lunge} (크게 내려치기는 발을 버팀)`);
+  assert.ok(c[2].range >= 88, `3단 사거리 ${c[2].range}`);
+});
 test('Noah 콤보 창(COMBAT_SPEC §2-2): comboWindowTicks 20', () => {
   assert.equal(cfg('noah').weapon.comboWindowTicks, 20);
 });
@@ -92,10 +99,13 @@ test('Noah: 창 마지막 틱에 누르면 이어짐', () => {
   assert.deepEqual(steps, [1, 2], `단계 ${steps.join(',')}`);
 });
 
-test('Noah: 3단만 닿는 거리(1·2단 사거리 밖)의 표적은 3단에만 맞음', () => {
-  const c = N().combo, gap = Math.round((c[1].range + c[2].range) / 2); // 72와 84 사이
+test('Noah: 3단만 닿는 거리(1·2단이 디딤을 포함해도 닿지 않는 곳)의 표적은 3단에만 맞음', () => {
+  const c = N().combo, L = (k) => c[k].lunge || 0;
+  const reach12 = Math.max(c[0].range + L(0), L(0) + c[1].range + L(1)); // 1·2단이 닿는 가장 먼 곳
+  const reach3 = L(0) + L(1) + c[2].range + L(2);                          // 3단(앞 단 디딤만큼 앞에서)
+  assert.ok(reach3 > reach12 + 4, `3단 도달 ${reach3}이 1·2단 ${reach12}보다 충분히 길지 않음`);
+  const gap = Math.round((reach12 + reach3) / 2);
   const w = world('noah', [dummy('far', PX + cfg('noah').width + gap)]);
-  const lunge = c[2].lunge || 0;
   const hits = [];
   for (let k = 0; k < 3; k++) {
     const before = hp(w, 'far');
@@ -104,22 +114,23 @@ test('Noah: 3단만 닿는 거리(1·2단 사거리 밖)의 표적은 3단에만
     hits.push(before - hp(w, 'far'));
   }
   assert.equal(hits[0] + hits[1], 0, `1·2단에 맞음(${hits.join(',')}) — 표적 간격 ${gap}`);
-  assert.equal(hits[2], c[2].damage, `3단 피해 ${hits[2]} (디딤 ${lunge} 포함)`);
+  assert.equal(hits[2], c[2].damage, `3단 피해 ${hits[2]} (간격 ${gap})`);
 });
 
-test('Noah: 3단 디딤은 앞으로 이동하고 벽은 뚫지 않음', () => {
+test('Noah: 디딤(lunge)이 있는 단은 그만큼 앞으로 이동하고 벽은 뚫지 않음, 없는 단은 제자리', () => {
   const c = N().combo;
-  const go = (wallGap) => {
-    const extra = wallGap === null ? [] : [{ x: PX + cfg('noah').width + wallGap, y: 0, w: 40, h: FLOOR_Y }];
-    const w = world('noah', [], extra);
-    for (let k = 0; k < 2; k++) { HK.step(w, I({ attack: true })); run(w, c[k].recoveryTicks - 1); }
-    const x0 = P(w).x; HK.step(w, I({ attack: true })); run(w, c[2].activeTicks + 2);
-    return { w, dx: P(w).x - x0 };
-  };
-  const free = go(null);
-  assert.ok(free.dx >= (c[2].lunge || 0) * 0.8 && free.dx <= (c[2].lunge || 0) + 0.5, `디딤 ${free.dx.toFixed(1)} (lunge ${c[2].lunge})`);
-  const walled = go(2);
-  assert.ok(front(walled.w) <= PX + cfg('noah').width + 2 + 0.01, '벽을 뚫고 디딤');
+  for (let k = 0; k < 3; k++) {
+    const go = (wallGap) => {
+      const extra = wallGap === null ? [] : [{ x: PX + cfg('noah').width + wallGap, y: 0, w: 40, h: FLOOR_Y }];
+      const w = world('noah', [], extra);
+      for (let j = 0; j < k; j++) { HK.step(w, I({ attack: true })); run(w, c[j].recoveryTicks - 1); }
+      const x0 = P(w).x; HK.step(w, I({ attack: true })); run(w, c[k].activeTicks + 2);
+      return { w, dx: P(w).x - x0, x0 };
+    };
+    const want = c[k].lunge || 0, free = go(null);
+    assert.ok(Math.abs(free.dx - want) <= Math.max(0.5, want * 0.2), `${k + 1}단 이동 ${free.dx.toFixed(1)} (lunge ${want})`);
+    if (want) { const walled = go(2); assert.ok(front(walled.w) <= PX + cfg('noah').width + 2 + 0.01, `${k + 1}단 디딤이 벽을 뚫음`); }
+  }
 });
 
 test('Noah: 교대하면 콤보가 사라져 돌아와서 1단', () => {

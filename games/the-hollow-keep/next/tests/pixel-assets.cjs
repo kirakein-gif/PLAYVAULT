@@ -110,13 +110,13 @@ async function analyze(page, file, opts) {
     const frameStats = [];
     if (opts.frameW) {
       for (let f = 0; f < Math.floor(W / opts.frameW); f++) {
-        let sx = 0, n = 0, top = -1;
+        let sx = 0, sy = 0, n = 0, top = -1;
         for (let y = 0; y < Math.min(H, opts.frameH); y++) for (let x = 0; x < opts.frameW; x++) {
-          if (d[(y * W + f * opts.frameW + x) * 4 + 3]) { sx += x; n++; if (top < 0) top = y; }
+          if (d[(y * W + f * opts.frameW + x) * 4 + 3]) { sx += x; sy += y; n++; if (top < 0) top = y; }
         }
         let tx = 0, tn = 0;
         if (top >= 0) for (let y = top; y < Math.min(top + 6, H); y++) for (let x = 0; x < opts.frameW; x++) if (d[(y * W + f * opts.frameW + x) * 4 + 3]) { tx += x; tn++; }
-        frameStats.push({ massX: n ? sx / n : null, topX: tn ? tx / tn : null });
+        frameStats.push({ massX: n ? sx / n : null, massY: n ? sy / n : null, topX: tn ? tx / tn : null });
       }
     }
     // 첫·마지막 프레임 불투명 마스크(기준점 기준 좌표 문자열) — 콤보 연결 자세 비교용(COMBAT_SPEC §2-2)
@@ -321,6 +321,17 @@ async function analyze(page, file, opts) {
         assert.ok(a.W !== b.W || a.H !== b.H || a.hash !== b.hash, '두 점프 시트가 픽셀까지 같음');
       });
     }
+    if (!TRIAL && heroes.noah) check('noah: 베기 궤적(COMBAT_SPEC §2-3) — 1단 수평 우세, 2단 아래→위 20단위 이상, 3단 위→아래 30단위 이상·2단보다 큼', () => {
+      const path = (n) => { const r2 = results2[`noah/${n}`]; assert.ok(r2, `${n} 시트 없음`); const f = r2.frameStats; return { dx: f[f.length - 1].massX - f[0].massX, dy: f[f.length - 1].massY - f[0].massY, ys: f.map((x) => x.massY) }; };
+      const p1 = path('fx-slash'), p2 = path('fx-slash-2'), p3 = path('fx-slash-3'), bad = [];
+      if (Math.abs(p1.dx) < Math.abs(p1.dy)) bad.push(`1단 세로 이동 ${p1.dy.toFixed(0)}px > 가로 ${p1.dx.toFixed(0)}px(치기는 수평 우세)`);
+      if (p2.dy > -20 * SCALE) bad.push(`2단 위로 ${(-p2.dy).toFixed(0)}px < ${20 * SCALE}px(올려 베기)`);
+      if (p2.ys.some((y, i) => i && y > p2.ys[i - 1] + 2 * SCALE)) bad.push(`2단 궤적이 중간에 내려감(${p2.ys.map((y) => y.toFixed(0)).join('→')})`);
+      if (p3.dy < 30 * SCALE) bad.push(`3단 아래로 ${p3.dy.toFixed(0)}px < ${30 * SCALE}px(내려치기)`);
+      if (p3.ys.some((y, i) => i && y < p3.ys[i - 1] - 2 * SCALE)) bad.push(`3단 궤적이 중간에 올라감(${p3.ys.map((y) => y.toFixed(0)).join('→')})`);
+      if (Math.abs(p3.dy) <= Math.abs(p2.dy)) bad.push(`3단 세로 이동 ${p3.dy.toFixed(0)}px가 2단 ${p2.dy.toFixed(0)}px보다 크지 않음(가장 큰 궤적)`);
+      assert.deepEqual(bad, [], bad.join(' / '));
+    });
     if (!TRIAL && heroes.noah) check('noah: 콤보 연결 자세 — 1단 끝↔2단 시작, 2단 끝↔3단 시작 실루엣 겹침 0.7 이상(COMBAT_SPEC §2-2)', () => {
       const iou = (A, B) => { const a2 = new Set(A); let inter = 0; for (const p of B) if (a2.has(p)) inter++; return inter / (a2.size + B.length - inter); };
       const bad = [];

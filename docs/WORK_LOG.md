@@ -1228,3 +1228,14 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: 사용자 손맛 확인 → 승인 시 PR #21 → PR #20 병합, 또는 그림 기준(자세 기준 그림) 추가 결정.
 - 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-02 (Asia/Seoul) · Noah 콤보 동선 다시 짜기 규격(치기 → 파고들어 올려 베기 → 크게 내려치기)
+
+- 담당 AI: Claude Code. 사용자 의견(미리보기 `00479e7`): "2타째 올려치는 느낌이 잘 안 난다. 1타를 치고, 2타 때는 좀 파고들어서 아래에서 위로 휘둘러 올리고, 3타째는 크게 휘둘러서 내려치는 느낌이 나야 하지 않을까?"
+- 측정: 베기 효과 프레임별 무게중심 이동 — 1단 아래로 82px(내려 베기), 2단 위로 5~10px, 3단 수평. 디딤이 3단. 원인은 1차 규격 §2의 동선 문구("2단 올려 베기, 3단 가로 베기 + 디딤") 자체 — Claude Code 규격 결함.
+- 변경(`claude/hollow-keep-combat-review`, PR #21): COMBAT_SPEC §2-3(동선 표, combo[1] range 64·height 80·lunge 12, combo[2] range 90·height 64·디딤 없음, 인물 크기 일정 검토 항목), 기준 그림 `docs/reference/noah-combo-keyposes.png`(막대 그림, 방향·박자만) + reference README, CODEX_TASK_09 추가 지시 3, `weapons-contract.cjs`(동선 검사 추가, '3단만 닿는 거리'를 디딤 포함 도달 거리로 다시 계산, 디딤 검사를 단별로 일반화 → 18개), `pixel-assets.cjs`(베기 궤적 방향 검사, analyze에 massY 추가).
+- 검증: `00479e7`은 weapons-contract 17/18, pixel-assets 93/94(1단 세로 82 > 가로 2, 2단 위로 5, 3단 아래로 4). 참조 사본(수치 변경, 궤적 시트를 바꿔 끼운 합성)은 weapons-contract 18/18, pixel-assets 94/94, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16.
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건(동선 반대).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #20에서 추가 지시 3 처리 → 재검토 → 미리보기 갱신.
+- 종료 상태: 규격 보강.
