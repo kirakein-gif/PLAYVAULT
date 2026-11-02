@@ -28,8 +28,20 @@ for i,(name,(_,_,im))in enumerate(zip(names,parts)):
     for x in range(60):
      if a[y,x,3]:
       value=float(np.mean(a[y,x,:3]));a[y,x,:3]=nearest((151,129,109)if value<70 else(215,166,114)if value<110 else(233,205,169)if value<155 else a[y,x,:3])
-  # Rails repeat with no end cap; first/last rows share the source rail footprint.
-  a[-1]=a[0];tile=Image.fromarray(a);cell=3
+  # Preserve source rail/wood material, but normalize all three rung bands
+  # to six native rows at starts7/27/47: every cyclic gap is exactly20px.
+  rows=np.count_nonzero(a[:,:,3],axis=1);active=rows>=.8*rows.max()
+  groups=[]
+  for y,on in enumerate(active):
+   if on:
+    if y==0 or not active[y-1]:groups.append([])
+    groups[-1].append(y)
+  assert len(groups)==3,groups
+  uniform=np.repeat(a[0:1],60,axis=0)
+  for start,group in zip((7,27,47),groups):
+   band=Image.fromarray(a[group[0]:group[-1]+1]).resize((60,6),Image.Resampling.NEAREST)
+   uniform[start:start+6]=np.array(band)
+  a=uniform;a[-1]=a[0];tile=Image.fromarray(a);cell=3
  else:
   im=im.resize((60,60),Image.Resampling.BOX);base=Image.new('RGBA',(60,60),(16,20,32,255));base.alpha_composite(im);a=np.array(base).astype(float)
   if name.startswith('back-'):a[:,:,:3]*=.58

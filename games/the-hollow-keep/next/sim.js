@@ -124,15 +124,33 @@
   function climb(w,held,edge,ev,c) {
     const p=w.player,center=p.x+p.w/2,feet=p.y+p.h;
     const ladder=w.room.ladders.find(l=>center>=l.x&&center<l.x+l.w&&p.y<l.y+l.h&&feet>=l.y-.01);
-    if(p.climbing&&edge('jump')){p.climbing=false;p.onGround=true;return false;}
-    if(!p.climbing&&ladder&&!edge('jump')&&(held.down||(held.up&&feet>ladder.y+.01)))p.climbing=true;
+    if(p.climbing&&edge('jump')){p.climbing=false;p.ladderLock=17;p.onGround=true;return false;}
+    if(!p.climbing&&!p.ladderLock&&ladder&&!edge('jump')&&(held.down||(held.up&&feet>ladder.y+.01)))p.climbing=true;
     if(!p.climbing)return false;
     if(!ladder){p.climbing=false;return false;}
+    const dir=Number(!!held.right)-Number(!!held.left);
+    if(dir) {
+      p.face=dir;
+      // Reach only the adjacent surface, never a distant shelf or occupied body.
+      const surfaces=(held.up||held.down?[]:[...w.room.solids,...w.room.platforms]).filter(s=>Math.abs(s.y-feet)<=8)
+        .sort((a,b)=>Math.abs(a.y-feet)-Math.abs(b.y-feet));
+      for(const s of surfaces) {
+        const x=dir<0?s.x+s.w-p.w:s.x;
+        const gap=dir<0?ladder.x-(s.x+s.w):s.x-(ladder.x+ladder.w);
+        if(gap<0||gap>w.area.tile)continue;
+        const body={x,y:s.y-p.h,w:p.w,h:p.h};
+        if(w.room.solids.some(solid=>overlap(body,solid)))continue;
+        Object.assign(p,body,{climbing:false,onGround:true,vx:0,vy:0,jumpKind:null,takeoffVx:0});
+        return true;
+      }
+    }
+    const oldY=p.y;
     p.x=ladder.x+(ladder.w-p.w)/2;p.vx=0;p.vy=(Number(!!held.down)-Number(!!held.up))*c.climbSpeed;
     // A one-cell ladder portal is narrower than the hero's shoulder width.
     // Use its center lane through boundary masonry while attached.
     const solids=w.room.solids.filter(s=>!!s.type||!((ladder.openTop&&s.y===0)||(ladder.y+ladder.h>=w.room.height&&s.y===w.room.height-w.area.tile)));
     move(p,solids);
+    p.climbDistance=(p.climbDistance||0)+Math.abs(p.y-oldY);
     if(held.up&&!ladder.openTop&&ladder.y>0&&p.y+p.h<=ladder.y){p.y=ladder.y-p.h;p.vy=0;p.climbing=false;p.onGround=true;}
     if(p.onGround&&held.down)p.climbing=false;
     return true;
@@ -194,6 +212,7 @@
     const edge = key => !!held[key] && !w.previous[key];
     w.tick++;
     if (w.area) refreshArea(w);
+    p.ladderLock = Math.max(0, (p.ladderLock || 0) - 1);
     p.dropTicks = Math.max(0, p.dropTicks - 1);
     w.swapCooldown = Math.max(0, w.swapCooldown - 1);
     for (const key of Object.keys(w.attackCooldowns)) w.attackCooldowns[key] = Math.max(0, w.attackCooldowns[key] - 1);
@@ -222,9 +241,10 @@
       } else ev.push({ type: 'swapBlocked' });
     }
     const c = CONFIG.heroes[w.active];
+    const ladderJump = p.climbing && edge('jump');
     let climbing = false;
     if (w.area) climbing = climb(w, held, edge, ev, c);
-    const dropping = w.area && edge('jump') && held.down && p.onGround && supported(p, w.room.platforms) && !supported(p, w.room.solids);
+    const dropping = w.area && !ladderJump && edge('jump') && held.down && p.onGround && supported(p, w.room.platforms) && !supported(p, w.room.solids);
     if (dropping) { p.dropTicks = 14; p.onGround = false; p.coyote = 0; p.jumpBuffer = 0; p.y += .01; }
     const wasGround = p.onGround;
     if (!climbing) {
