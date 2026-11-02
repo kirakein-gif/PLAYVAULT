@@ -2,6 +2,10 @@
 
 확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Codex**(PR #17 추가 지시 1·2 수정, Claude Code 재검토 대기).
 
+
+## 제출 · THE HOLLOW KEEP 3단계 전투 1차 규격(Noah 3단 콤보·Ethan 3단계 충전) / 사용자 확인 → Codex 구현 대기
+
+Claude Code / `claude/hollow-keep-combat-spec` / 2026-11-02. `COMBAT_SPEC.md`, `CODEX_TASK_09.md`, `weapons-contract.cjs`(15), `pixel-assets.cjs`(새 동작·효과). 게임 코드·그림 변경 없음. main 병합 시 weapons-contract 1/15, pixel-assets 63/68은 Codex 구현 전 예상 실패. 체력 주인공별·쓰러지면 자동 교대 + 짧은 무적은 2차.
 ## 수정 제출 · TASK_08 추가 지시 1·2 / PR #17 재검토 대기
 
 2026-11-02 / Codex / PR #17, `codex/hollow-keep-ladder-actions` / 기준dc5e336 + 정정규격병합69e8497. 사용자인계에따라 대각선은오르내림·방향전환유지, 위/아래없이좌우만누르면옆으로내림. 사다리가로대6px·20/20/20px간격(이음새포함). 새4후면자세로몸통·손중앙정렬, 전체의상반전제거. 중심오차최대0.247단위/올린손최대6.591단위, 기존크기/수치유지.
