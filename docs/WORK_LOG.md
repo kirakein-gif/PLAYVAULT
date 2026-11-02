@@ -1216,3 +1216,15 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex가 PR #20에서 추가 지시 2 처리 → 재검토 → 미리보기 갱신.
 - 종료 상태: 규격 보강.
+
+### 2026-11-02 (Asia/Seoul) · Codex Noah 콤보 연결(PR #20 `00479e7`) 재검토
+
+- 담당 AI: Claude Code(검토).
+- 범위: PR #21 규격 `c77525a` 병합 포함, 검사 원본 동일.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 17/17, weapons-edge 6/6, pixel-assets 93/93, combo-render 5/5(3회), foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱) 겹침 0건.
+- 그림: 각 단 6프레임, 동작 18·22·34틱, 연결 프레임 공유(겹침 1.0). 관찰: 단 안 이웃 프레임 겹침 0.43~0.73. 1단·3단 일부 프레임이 idle·2단 초반보다 커 보임(눈대중 약 1.2배, 시트마다 색·자세가 달라 자동 측정 실패 — 측정 시도: 몸 면적, 후드 색 영역 모두 신뢰 불가).
+- 회사 PC 미리보기 Artifact `00479e7` 빌드로 갱신(버전 5).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건(관찰 2건).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛 확인 → 승인 시 PR #21 → PR #20 병합, 또는 그림 기준(자세 기준 그림) 추가 결정.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
