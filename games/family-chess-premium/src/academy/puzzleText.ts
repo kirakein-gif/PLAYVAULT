@@ -7,6 +7,7 @@ export function promptKey(p: Puzzle): string {
   if (p.category === 'mate') return `mate${Math.min(3, p.mateIn ?? 1)}`;
   if (p.category === 'fork') return p.themes.includes('fork') ? 'fork' : 'doubleAttack';
   if (p.category === 'skewerDiscovered') return p.themes.includes('skewer') ? 'skewer' : 'discoveredAttack';
+  if (p.category === 'other') return 'tactic';
   return p.category; // pin, defense, endgame
 }
 

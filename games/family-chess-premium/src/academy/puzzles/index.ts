@@ -7,9 +7,9 @@ export const puzzleNumber = (id: string) => PUZZLES.findIndex((p) => p.id === id
 
 export type Course = 'tactics' | 'checkmate' | 'endgames' | 'all';
 export const COURSE_CATEGORIES: Record<Course, PuzzleCategory[]> = {
-  tactics: ['fork', 'pin', 'skewerDiscovered', 'defense'],
+  tactics: ['fork', 'pin', 'skewerDiscovered', 'defense', 'other'],
   checkmate: ['mate'],
   endgames: ['endgame'],
-  all: ['mate', 'fork', 'pin', 'skewerDiscovered', 'defense', 'endgame'],
+  all: ['mate', 'fork', 'pin', 'skewerDiscovered', 'defense', 'endgame', 'other'],
 };
 export const puzzlesOfCourse = (c: Course) => PUZZLES.filter((p) => COURSE_CATEGORIES[c].includes(p.category));

@@ -6,7 +6,7 @@ import { statusOf } from '../academy/progressManager';
 import { LESSONS } from '../academy/lessons';
 import type { PuzzleCategory } from '../academy/types';
 
-const CATS: PuzzleCategory[] = ['mate', 'fork', 'pin', 'skewerDiscovered', 'defense', 'endgame'];
+const CATS: PuzzleCategory[] = ['mate', 'fork', 'pin', 'skewerDiscovered', 'defense', 'endgame', 'other'];
 
 export function RecordsScreen() {
   const { t, profile, go, click } = useApp();

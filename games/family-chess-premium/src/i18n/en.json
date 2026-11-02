@@ -76,7 +76,7 @@
     "allThemes": "All themes", "allLevels": "All levels", "difficulty": { "easy": "Easy", "medium": "Medium", "hard": "Hard" },
     "status": { "untried": "Not tried", "unsolved": "Unsolved", "solved": "Solved" }, "number": "Puzzle {n}", "empty": "No puzzles match.",
     "cat": {
-      "mate": "Checkmate", "fork": "Fork · Double attack", "pin": "Pin", "skewerDiscovered": "Skewer · Discovered attack", "defense": "Defence", "endgame": "Endgame"
+      "mate": "Checkmate", "fork": "Fork · Double attack", "pin": "Pin", "skewerDiscovered": "Skewer · Discovered attack", "defense": "Defence", "endgame": "Endgame", "other": "Other tactics"
     },
     "theme": {
       "mate": "Mate", "fork": "Fork", "pin": "Pin", "skewer": "Skewer", "discoveredAttack": "Discovered attack", "doubleAttack": "Double attack",

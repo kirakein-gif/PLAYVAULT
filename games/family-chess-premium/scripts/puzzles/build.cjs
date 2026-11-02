@@ -25,7 +25,27 @@ for (const r of raw) {
   else if (t.tags.includes('skewer') || t.tags.includes('discoveredAttack')) category = 'skewerDiscovered';
   else if (t.tags.includes('pin')) category = 'pin';
   else if (t.tags.includes('fork') || t.tags.includes('doubleAttack')) category = 'fork';
+  else if (r.kind === 'tactic' && !r.mateIn) category = 'other'; // hanging piece, sacrifice, in-between move ...
   if (!category) continue;
+  if (category === 'defense') {
+    // a real "protect your piece / parry the threat" position: enough choices,
+    // something of ours is actually under attack, and not just a king step out of check
+    const st = new Chess(t.startFen);
+    const opp = t.solver === 'w' ? 'b' : 'w';
+    if (st.moves().length < 5) continue;
+    const mover = st.get(r.solution[0].slice(0, 2));
+    if (st.inCheck() && mover.type === 'k') continue;
+    const VAL = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+    let threatened = st.inCheck();
+    for (const row of st.board()) for (const p of row) {
+      if (!p || p.color !== t.solver || p.type === 'k' || p.type === 'p') continue;
+      const att = st.attackers(p.square, opp);
+      if (!att.length) continue;
+      const cheapest = Math.min(...att.map((a) => VAL[st.get(a).type]));
+      if (!st.attackers(p.square, t.solver).length || cheapest < VAL[p.type]) threatened = true;
+    }
+    if (!threatened) continue;
+  }
   // endgame puzzles must be decisive technique, not trivial captures
   if (category === 'endgame' && t.tags.includes('hangingPiece') && solverMoves === 1) continue;
   const score = r.foundDepth + 3 * (solverMoves - 1) + (r.mateIn === 3 ? 3 : 0);
@@ -39,7 +59,7 @@ const counts = {};
 for (const c of cands) { const k = `${c.category}/${c.difficulty}${c.r.mateIn ? '/m' + c.r.mateIn : ''}`; counts[k] = (counts[k] || 0) + 1; }
 console.error('candidates', cands.length, counts);
 
-const TARGET = { mate: 30, fork: 18, pin: 15, skewerDiscovered: 16, defense: 16, endgame: 12 };
+const TARGET = { mate: 30, fork: 18, pin: 16, skewerDiscovered: 16, defense: 16, endgame: 14, other: 12 };
 const MATE_SPLIT = { 1: 10, 2: 12, 3: 8 };
 const MIX = { easy: 0.35, medium: 0.4, hard: 0.25 };
 
@@ -67,7 +87,7 @@ function san(fen, moves) {
   return moves.map((u) => c.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] }).san);
 }
 
-const ORDER = ['mate', 'fork', 'pin', 'skewerDiscovered', 'defense', 'endgame'];
+const ORDER = ['mate', 'fork', 'pin', 'skewerDiscovered', 'defense', 'endgame', 'other'];
 const DORD = { easy: 0, medium: 1, hard: 2 };
 selected.sort((a, b) => ORDER.indexOf(a.category) - ORDER.indexOf(b.category) || (a.r.mateIn || 0) - (b.r.mateIn || 0) || DORD[a.difficulty] - DORD[b.difficulty]);
 

@@ -33,51 +33,54 @@ const log = (s, extra = {}) => { console.log(s, JSON.stringify(extra)); result.s
     if (!/^(https?:\/\/localhost|data:|blob:|about:)/.test(r.url())) result.external.push(r.url());
   });
   page.on('pageerror', (e) => result.errors.push(String(e)));
-  await page.waitForSelector('[data-testid=menu-ai]', { timeout: 60000 });
+  // A headless emulator WebView may not run requestAnimationFrame, so every wait
+  // uses interval polling and every tap goes to coordinates (no rAF "stable" checks).
+  const waitSel = (sel, timeout = 60000) => page.waitForFunction((q) => !!document.querySelector(q), sel, { polling: 300, timeout });
+  const click = async (sel) => {
+    await waitSel(sel, 30000);
+    const b = await page.evaluate((q) => { const r = document.querySelector(q).getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; }, sel);
+    await page.mouse.click(b.x, b.y);
+    await page.waitForTimeout(350);
+  };
+  const exists = (sel) => page.evaluate((q) => !!document.querySelector(q), sel);
+  await waitSel('[data-testid=menu-ai]');
   log('home visible', { ms: Date.now() - t0, viewport: await page.evaluate(() => [innerWidth, innerHeight, devicePixelRatio]) });
   await page.waitForTimeout(800);
   await device.screenshot({ path: path.join(out, '01-home.png') });
 
-  const tapSq = async (sq) => {
-    await page.click(`[data-square=${sq}]`, { force: true });
-    await page.waitForTimeout(250);
-  };
+  const tapSq = (sq) => click(`[data-square=${sq}]`);
   const replies = {};
   for (const level of [1, 2, 3, 4, 5]) {
-    await page.click('[data-testid=menu-ai]');
-    if (await page.locator('[data-testid=confirm-no]').count()) await page.click('[data-testid=confirm-no]');
-    await page.click(`[data-testid=level-${level}]`);
-    await page.click('[data-testid=color-w]');
-    await page.click('[data-testid=setup-start]');
-    await page.waitForSelector('[data-square=e2]');
+    await click('[data-testid=menu-ai]');
+    if (await exists('[data-testid=confirm-no]')) await click('[data-testid=confirm-no]');
+    await click(`[data-testid=level-${level}]`);
+    await click('[data-testid=color-w]');
+    await click('[data-testid=setup-start]');
+    await waitSel('[data-square=e2]');
     await tapSq('e2');
     await tapSq('e4');
     const s = Date.now();
     await page.waitForFunction(() => {
       const m = [...document.querySelectorAll('.moveSan')].map((x) => x.textContent).filter(Boolean);
       return m.length >= 2;
-    }, null, { timeout: 90000 });
-    const moves = await page.locator('.moveList').innerText();
+    }, null, { timeout: 90000, polling: 300 });
+    const moves = await page.evaluate(() => document.querySelector('.moveList').innerText);
     replies[level] = { ms: Date.now() - s, moves: moves.replace(/\s+/g, ' ').trim() };
     log(`level ${level} replied`, replies[level]);
     if (level === 3) await device.screenshot({ path: path.join(out, '02-game-ai.png') });
     // undo while idle must restore the start position for the player
-    await page.click('[data-testid=undo]');
-    await page.waitForTimeout(400);
-    const after = await page.locator('.moveSan').allInnerTexts();
-    log(`level ${level} undo`, { remaining: after.filter(Boolean).length });
-    await page.click('[data-testid=game-home]');
-    await page.waitForTimeout(400);
+    await click('[data-testid=undo]');
+    const after = await page.evaluate(() => [...document.querySelectorAll('.moveSan')].map((x) => x.textContent).filter(Boolean));
+    log(`level ${level} undo`, { remaining: after.length });
+    await click('[data-testid=game-home]');
   }
   result.replies = replies;
 
   // academy + first puzzle
-  await page.click('[data-testid=menu-academy]');
-  await page.waitForTimeout(500);
+  await click('[data-testid=menu-academy]');
   await device.screenshot({ path: path.join(out, '03-academy.png') });
-  await page.click('[data-testid=course-tactics]');
-  await page.waitForTimeout(500);
-  await page.locator('.stage').first().click();
+  await click('[data-testid=course-tactics]');
+  await click('.stage');
   await page.waitForTimeout(1500);
   await device.screenshot({ path: path.join(out, '04-puzzle.png') });
   log('academy ok');
@@ -88,7 +91,7 @@ const log = (s, extra = {}) => { console.log(s, JSON.stringify(extra)); result.s
   await device.shell(`am start -n ${PKG}/.MainActivity`);
   const wv2 = await device.webView({ pkg: PKG }, { timeout: 60000 });
   const p2 = await wv2.page();
-  await p2.waitForSelector('[data-testid=menu-ai]', { timeout: 60000 });
+  await p2.waitForFunction(() => !!document.querySelector('[data-testid=menu-ai]'), null, { polling: 300, timeout: 60000 });
   log('restart ok');
 
   const logcat = (await device.shell('logcat -d -s Capacitor:* Capacitor/Console:* chromium:*')).toString();

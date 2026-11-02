@@ -386,7 +386,7 @@ export function GameScreen(props: GameScreenProps) {
         </div>
         {playerCard(bottom)}
         <div className="controls">
-          <Btn icon={Icon.undo} onClick={undo} testId="undo" disabled={!history.length || !!result}>
+          <Btn icon={Icon.undo} onClick={undo} testId="undo" disabled={!history.length}>
             {t('game.undo')}
           </Btn>
           <Btn icon={Icon.plus} onClick={() => (history.length && !result ? setModal('new') : newGame())} testId="new-game">

@@ -13,7 +13,7 @@ export type PuzzleTheme =
   | 'backRankMate';
 
 /** Course bucket used for menus and counting (one per puzzle). */
-export type PuzzleCategory = 'mate' | 'fork' | 'pin' | 'skewerDiscovered' | 'defense' | 'endgame';
+export type PuzzleCategory = 'mate' | 'fork' | 'pin' | 'skewerDiscovered' | 'defense' | 'endgame' | 'other';
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
 export interface PuzzleHint {

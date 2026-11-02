@@ -47,7 +47,7 @@ export function pickDaily(puzzles: Puzzle[], records: Record<string, PuzzleRecor
     return out;
   };
   const chosen = new Set<string>();
-  const tactics = puzzles.filter((p) => ['fork', 'pin', 'skewerDiscovered', 'defense'].includes(p.category) && p.difficulty !== 'hard');
+  const tactics = puzzles.filter((p) => ['fork', 'pin', 'skewerDiscovered', 'defense', 'other'].includes(p.category) && p.difficulty !== 'hard');
   const mates = puzzles.filter((p) => p.category === 'mate');
   const endgames = puzzles.filter((p) => p.category === 'endgame');
   return [...take(tactics, 3, chosen), ...take(mates, 1, chosen), ...take(endgames, 1, chosen)];

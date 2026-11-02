@@ -76,7 +76,7 @@
     "allThemes": "모든 유형", "allLevels": "모든 난이도", "difficulty": { "easy": "쉬움", "medium": "보통", "hard": "어려움" },
     "status": { "untried": "미도전", "unsolved": "미해결", "solved": "해결" }, "number": "문제 {n}", "empty": "조건에 맞는 문제가 없습니다.",
     "cat": {
-      "mate": "체크메이트", "fork": "포크·이중 공격", "pin": "핀", "skewerDiscovered": "스큐어·발견 공격", "defense": "수비·기물 보호", "endgame": "엔드게임"
+      "mate": "체크메이트", "fork": "포크·이중 공격", "pin": "핀", "skewerDiscovered": "스큐어·발견 공격", "defense": "수비·기물 보호", "endgame": "엔드게임", "other": "기타 전술"
     },
     "theme": {
       "mate": "메이트", "fork": "포크", "pin": "핀", "skewer": "스큐어", "discoveredAttack": "발견 공격", "doubleAttack": "이중 공격",

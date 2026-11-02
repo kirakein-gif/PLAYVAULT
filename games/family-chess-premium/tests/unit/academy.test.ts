@@ -129,7 +129,7 @@ describe('achievement records', () => {
     expect(a).toHaveLength(5);
     expect(new Set(a).size).toBe(5);
     const cat = (id: string) => PUZZLES.find((p) => p.id === id)!.category;
-    expect(a.slice(0, 3).every((id) => ['fork', 'pin', 'skewerDiscovered', 'defense'].includes(cat(id)))).toBe(true);
+    expect(a.slice(0, 3).every((id) => ['fork', 'pin', 'skewerDiscovered', 'defense', 'other'].includes(cat(id)))).toBe(true);
     expect(cat(a[3])).toBe('mate');
     expect(cat(a[4])).toBe('endgame');
     expect(a.slice(0, 3)).toContain(Object.keys(recs)[0]); // review puzzle included
