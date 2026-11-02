@@ -26,8 +26,8 @@
           height: 46, activeTicks: 9, comboWindowTicks:20,
           combo:[
             {damage:22,range:66,height:46,activeTicks:9,recoveryTicks:18},
-            {damage:22,range:72,height:46,activeTicks:9,recoveryTicks:22},
-            {damage:44,range:84,height:60,activeTicks:12,recoveryTicks:34,lunge:10}
+            {damage:22,range:64,height:80,activeTicks:9,recoveryTicks:22,lunge:12},
+            {damage:44,range:90,height:64,activeTicks:12,recoveryTicks:34}
           ] } }
     }
   };

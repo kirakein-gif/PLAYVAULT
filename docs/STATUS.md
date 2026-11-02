@@ -1,11 +1,15 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Codex**(PR #20 Noah 콤보 연결 보완, Claude Code 재검토 대기).
+확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Codex**(PR #20 Noah 콤보 동선 보완, Claude Code 재검토 대기).
 
 
-## 수정 진행 · TASK_09 추가 지시3 / Noah 콤보 동선
+## 수정 제출 · TASK_09 추가 지시3 / Noah 콤보 동선
 
-2026-11-02(Asia/Seoul) / Codex / PR #20, `codex/hollow-keep-combat-weapons` / 기준00479e7 + 규격abbcd8f. 사용자 지시로 §2-3·기준 그림·검사를 병합하고 구현합니다. 범위: Noah 1타가로·2타파고들기12/올려베기·3타머리위내려치기, idle과 같은 인물 크기, 제작/검증/캡처와 관리 문서. 1단/이동 수치·Ethan·창20·타격 연출 유지. 원본 검사 약화·시간정지·효과음·main 병합·배포 없음. 완료 후 Claude Code 재검토 인계.
+2026-11-02(Asia/Seoul) / Codex / `codex/hollow-keep-combat-weapons` / 기준00479e7 + 규격abbcd8f(병합ffe7736) / [PR #20](https://github.com/kirakein-gif/PLAYVAULT/pull/20). 제자리 가로치기 → 12단위 파고들며 낮게→높게 올려 베기 → 발을 버티고 머리 위에서 크게 내려치기로 보강했습니다. 2단range64/height80/lunge12,3단range90/height64/디딤없음. 1단·이동·피해/회복/창20·Ethan·기존 타격 연출은 유지했습니다.15자세를 동일0.46비율로 새로 처리해 인물 크기를 맞췄고, 각6프레임·18/22/34틱·끝/다음첫 RGBA공유(IoU1.0)를 유지했습니다.
+
+이번 무기18/18·자산94/94·combo-render5/5·자체경계6/6, 실제전투6/6·명중/동선좌우2/2·연결해제2/2 및 전체 회귀 통과. 실제 효과는1단가로37.3/세로2.6,2단위41.9,3단아래60.7단위이며 단조로운 궤적입니다. 최초 pixel-render5/7은 투명여백을 잘라 픽셀 위치를 유지한 채 양쪽7/7로 수정했고 원본 로그를 보존했습니다. 검사는 약화하지 않았습니다.
+
+좌우82틱/1367ms영상·각핵심자세/방향기준·idle대비모든자세·연결비교·관측과로그: `next/assets/combat-review/choreography/`. Claude Code 재검토와 사용자 자연스러움 판단 대기입니다. 회사 PC 미리보기 갱신은 사용자 측 후속 작업, 실기기 미확인, 버전 번호 변경·main 병합·수동 배포 없음. 아래는 이전 제출 당시 기록입니다.
 
 ## 수정 제출 · TASK_09 추가 지시2 / Noah 콤보 연결
 

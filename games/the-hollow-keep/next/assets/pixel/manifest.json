@@ -359,7 +359,7 @@
         "attack": {
           "file": "noah-attack.png",
           "frameW": 352,
-          "frameH": 224,
+          "frameH": 256,
           "frames": 6,
           "pivot": {
             "x": 160,
@@ -376,46 +376,47 @@
           "loop": false,
           "hands": [
             {
-              "x": 148,
-              "y": 73
+              "x": 160,
+              "y": 144
             },
             {
-              "x": 220,
-              "y": 115
+              "x": 191,
+              "y": 130
             },
             {
-              "x": 192,
-              "y": 155
+              "x": 201,
+              "y": 133
             },
             {
-              "x": 182,
-              "y": 166
-            },
-            {
-              "x": 194,
-              "y": 166
+              "x": 171,
+              "y": 179
             },
             {
               "x": 182,
-              "y": 163
+              "y": 187
+            },
+            {
+              "x": 179,
+              "y": 191
             }
           ]
         },
         "fx-slash": {
           "file": "noah-fx-slash.png",
-          "frameW": 112,
-          "frameH": 144,
+          "frameW": 192,
+          "frameH": 256,
           "frames": 3,
           "pivot": {
             "x": 0,
-            "y": 72
+            "y": 215
           },
           "ticks": [
             2,
             2,
-            2
+            3
           ],
-          "loop": false
+          "loop": false,
+          "anchor": "feet"
         },
         "climb": {
           "file": "noah-climb.png",
@@ -437,7 +438,7 @@
         "attack-2": {
           "file": "noah-attack-2.png",
           "frameW": 352,
-          "frameH": 224,
+          "frameH": 256,
           "frames": 6,
           "pivot": {
             "x": 160,
@@ -454,35 +455,35 @@
           "loop": false,
           "hands": [
             {
-              "x": 182,
-              "y": 163
+              "x": 179,
+              "y": 191
             },
             {
-              "x": 191,
-              "y": 110
+              "x": 181,
+              "y": 126
             },
             {
-              "x": 157,
-              "y": 52
+              "x": 152,
+              "y": 93
             },
             {
-              "x": 144,
-              "y": 73
+              "x": 146,
+              "y": 92
             },
             {
-              "x": 138,
-              "y": 88
+              "x": 147,
+              "y": 90
             },
             {
-              "x": 150,
-              "y": 80
+              "x": 148,
+              "y": 101
             }
           ]
         },
         "attack-3": {
           "file": "noah-attack-3.png",
           "frameW": 352,
-          "frameH": 224,
+          "frameH": 256,
           "frames": 6,
           "pivot": {
             "x": 160,
@@ -499,62 +500,64 @@
           "loop": false,
           "hands": [
             {
-              "x": 150,
-              "y": 80
+              "x": 148,
+              "y": 101
             },
             {
-              "x": 206,
-              "y": 133
+              "x": 191,
+              "y": 166
             },
             {
-              "x": 203,
-              "y": 140
-            },
-            {
-              "x": 206,
-              "y": 131
+              "x": 173,
+              "y": 180
             },
             {
               "x": 172,
-              "y": 119
+              "y": 176
             },
             {
-              "x": 148,
-              "y": 73
+              "x": 156,
+              "y": 143
+            },
+            {
+              "x": 160,
+              "y": 144
             }
           ]
         },
         "fx-slash-2": {
           "file": "noah-fx-slash-2.png",
-          "frameW": 160,
-          "frameH": 160,
+          "frameW": 192,
+          "frameH": 256,
           "frames": 3,
           "pivot": {
-            "x": 6,
-            "y": 120
+            "x": 0,
+            "y": 215
           },
           "ticks": [
             2,
             2,
             3
           ],
-          "loop": false
+          "loop": false,
+          "anchor": "feet"
         },
         "fx-slash-3": {
           "file": "noah-fx-slash-3.png",
           "frameW": 192,
-          "frameH": 96,
+          "frameH": 256,
           "frames": 3,
           "pivot": {
-            "x": 6,
-            "y": 48
+            "x": 0,
+            "y": 215
           },
           "ticks": [
             3,
             3,
             3
           ],
-          "loop": false
+          "loop": false,
+          "anchor": "feet"
         }
       }
     }

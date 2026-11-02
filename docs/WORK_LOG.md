@@ -1285,3 +1285,17 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex가 PR #20에서 추가 지시 3 처리 → 재검토 → 미리보기 갱신.
 - 종료 상태: 규격 보강.
+
+
+## 2026-11-02 · Codex · TASK_09 추가 수정 지시3 / PR #20 콤보 동선
+
+- 요청/담당: 사용자 최신 추가수정3을 같은 PR #20에서 구현. 원격 확인: main4ec1cfa, 구현00479e7, 규격abbcd8f, PR20/21 OPEN. 규격 §2-3·방향기준·검사를 ffe7736으로 병합(양쪽 WORK_LOG 보존), STATUS 작업권/범위를 원격 공유하고 PR20을 draft로 전환한 뒤 코드 수정. Codex 구현, Claude Code는 재검토 담당. 이전 과제 재적용 없음.
+- 버전 전후: 기존 게임 번호 동일(새 번호 없음). 대상 next/Noah 전투6PNG·manifest/sim/render·제작/실제캡처도구·자체weapons-edge·관리문서. 다른 게임·공용 자산·배포 설정 변경 없음.
+- 규칙:1타/이동/피해/회복/창20/Ethan 수치 유지,2타range64/height80/lunge12,3타range90/height64/디딤없음. 자체weapons-edge의 벽/좌향/공중/사다리/방경계6항목은 유지하며 파고들기 위치/거리만 새 규격에 맞추고3타제자리 추가 확인. 원본weapons-contract·pixel-assets·combo-render 등은abbcd8f와 동일(약화 없음).
+- 경로A image_gen: 실제idle·목표외형·방향막대그림을 참고해15자세 새 생성. 같은0.46배로 원래 픽셀에 한 번 샘플링, 칼 높이와 무관하게 발기준 정렬. 64색·알파0/255·몸frame352x256/pivot160,215. 각6프레임·18/22/34틱, 끝=다음첫 RGBA공유로1→2·2→3·3→1 IoU1.0. 실제 prompt/소스/정리를 PROVENANCE에 기록. Ethan manifest·전투6장 이외모든PNG00479e7와 동일, 재빌드 전체PNG/JSON해시 동일.
+- 표시:1타가로치기,2타낮게숙인준비→일어서며올려베기→높은준비,3타머리위→큰내려치기→거두기. 기존명중3/3/5틱·밝힘·그림밀림·3타흔들림·피해숫자분리/시간지속 유지. 효과를 발기준에 붙여 손 높이 변화가 궤적을 흐리지 않게 했습니다. 정적효과dy+5.17/-83.79/+123.41px, 실제좌우1타가로37.29/세로2.59단위·2타위41.90·3타아래60.71(흔들림포함),2/3타단조로운방향·2타정확히12파고들기/3타제자리 확인.
+- 이번 검사 통과: weapons18/18·pixel-assets94/94·combo-render5/5·weapons-edge6/6; foundation51/51·edge16/16·exploration16/16·entrance9/9·ladder10/10·area22/22(4159틱69.3초교대2회)·exploration-edge13/13·ladder-edge4/4·traversal4/4. pixel-render구역/시험실각7/7·ladder/tile/IME각7/7·mobilelayout20/20·fullscreen6/6·explorationbrowser6/6·browserplaytest20/20. ECLIPSE polish/audio/audio-wind 모두PASS(다른 게임 회귀로 구분).
+- 실제입력capture-combat6/6, 명중/동선좌우2/2(기존 확인 항목+세계좌표 효과 중심/12파고들기/제자리), 창/이동해제2/2. 좌우82틱1367ms영상 디코딩RGBA/시간동일,44장→10보드, 핵심자세를 방향기준과 나란히·idle과모든자세크기비교·단사이비교. 자료/원본로그: `next/assets/combat-review/choreography/`, 과거 자료 보존.
+- 실패/정정: 최초pixel-render구역/시험실각5/7. 효과 이미지의 투명왼쪽여백이 몸뒤까지그리는영역을차지했습니다. 원본검사는 유지하고 앞쪽192px로 자르고pivot0,215로 바꿔 실제픽셀/위치는 유지한 채각7/7로 재통과. 94/94/실제조작검사도 재통과. 좌우82틱+idle166장 수정전후RGBA동일 검증, 실패로그도before-trim에 보존했습니다. 효과그림의3단계중심검증도 실제그리기에서 시행했습니다.
+- 5개 관리 문서 검토: WORK_LOG/STATUS/CHANGELOG 갱신, AGENTS/CLAUDE 절차 변경 없음. next README/PROVENANCE 갱신. 이 항목 포함 `fix(hollow-keep): stage rising cut before overhead smash` 커밋을 일반 push, 같은 PR20 검토 가능으로 갱신합니다. main 병합·수동 배포·게임시간정지·효과음 없음.
+- 검토 담당/발견 문제 수: Claude Code 이번 수정 재검토 대기(미확인). 사용자 재요청 누적3회(박자/명중,연결,동선). 자동검사는통과했지만 자세 자연스러움·실기기 회전/터치/성능은 사용자 판단 필요. 다음은 PR20최신head의choreography/TEST_RESULTS 재현절차로 Claude Code 재검토, 회사 PC미리보기갱신은 사용자측 후속작업.

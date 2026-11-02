@@ -288,3 +288,7 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 ## THE HOLLOW KEEP · TASK_09 콤보 연결 보완 (2026-11-02)
 
 PR #20, 기준091e41b + 정정 규격c77525a(병합3e85135). Noah 각6프레임·18/22/34틱으로 거두기/준비를 보강하고, 앞 단 끝=다음 단 시작을 같은 그림으로 연결했습니다. 창20틱 동안 마지막 자세 유지, 이동/창 만료 시 해제합니다. 기존 세 핵심 베기·효과·명중3/3/5틱·1단/이동 수치·Ethan 유지. 무기17/17·자산93/93·콤보화면5/5 및 전체 회귀 통과. [좌우 영상·단 사이 캡처](games/the-hollow-keep/next/assets/combat-review/linked/README.md). 게임 버전 번호 변경·main 병합·수동 배포 없음. 자세한 이번 실행·한계는 WORK_LOG 최신 항목 참조.
+
+## THE HOLLOW KEEP · TASK_09 콤보 동선 보완 (2026-11-02)
+
+PR #20, 기준00479e7 + 정정 규격abbcd8f(병합ffe7736). Noah 제자리 가로치기 → 2타12단위 파고들며 올려 베기 → 3타머리 위에서 크게 내려치기. 2타range64/height80,3타range90/height64·디딤없음. 인물15자세 동일 축척, 각6프레임/18·22·34틱과 공유 연결 자세 유지. 실제 궤적은2타위로41.9·3타아래60.7단위, 1타·이동·피해/회복·창20·Ethan·기존 명중연출 유지. 무기18/18·자산94/94·콤보화면5/5와 전체 회귀 통과. [좌우 영상·기준/idle비교·검증](games/the-hollow-keep/next/assets/combat-review/choreography/README.md). 게임 버전 번호 변경·main 병합·수동 배포 없음. 자세한 이력은 WORK_LOG 최신 항목 참조.

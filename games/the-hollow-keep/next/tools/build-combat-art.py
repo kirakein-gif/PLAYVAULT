@@ -67,10 +67,6 @@ def poses(hero,name,parts,heights,headXs,handPoints,ticks):
  sheet(hero,name,frames,(fw,fh),(px,py),ticks,name=='charge',hands)
 
 parts=objects('combat-poses-source.png',10000)
-upper=sorted([p for p in parts if p[0][1]<200],key=lambda p:p[0][0]);assert len(upper)==4
-poses('noah','attack-2',upper,[110,154,178,160],[270,575,925,1270],[(180,300),(642,143),(911,46),(1260,85)],[2,2,12,4])
-fin=objects('combat-finisher-source.png',10000);fin.sort(key=lambda p:(p[0][1]>500,p[0][0]));assert len(fin)==4
-poses('noah','attack-3',fin,[144,128,112,132],[465,1165,550,1215],[(380,64),(1290,237),(675,730),(1295,745)],[2,2,22,6])
 eth=sorted([p for p in parts if p[0][1]>750],key=lambda p:p[0][0]);assert len(eth)==4
 poses('ethan','charge',eth,[136]*4,[208,548,919,1294],[(302,834),(646,845),(1009,845),(1369,839)],[8]*4)
 
@@ -89,8 +85,6 @@ def fx(hero,name,row,dimensions,size,pivot,positions=None,once=False,one=False):
   frame=Image.new('RGBA',size);x,y=positions[i] if positions else((size[0]-width)//2,(size[1]-height)//2)
   frame.paste(im,(x,y));frames.append(frame)
  sheet(hero,name,frames,size,pivot,[2,2,3] if name=='fx-slash-2' else[3]*len(frames),not once)
-fx('noah','fx-slash-2',0,[(50,66),(86,104),(110,100)],(160,160),(6,120),[(6,54),(6,16),(6,20)],True,True)
-fx('noah','fx-slash-3',1,[(112,34),(156,48),(184,46)],(192,96),(6,48),[(6,31),(6,24),(6,25)],True,True)
 # Nine native frames: three level banks with three gathering pulses each.
 frames=[]
 for level in range(3):
@@ -102,39 +96,40 @@ sheet('ethan','fx-charge',frames,(96,96),(48,48),[6]*9,True)
 fx('ethan','fx-rune-2',3,[(52,30),(55,32),(53,31)],(64,48),(32,24))
 fx('ethan','fx-rune-3',4,[(72,44),(77,46),(74,45)],(96,64),(48,32))
 fx('ethan','fx-burst',5,[(40,40),(112,112),(176,176)],(192,192),(96,96),once=True)
-# Linked recoveries: original cut/core poses plus new authored recovery source.
-# A recovery endpoint is literally the next attack's preparation, including the
-# third-to-first loop. All stages share a native foot pivot; no pose cross-fade.
-links=objects('combo-recovery-source.png',10000)
-links.sort(key=lambda p:(0 if p[0][1]<350 else 1 if p[0][1]<690 else 2,p[0][0]));assert len(links)==9,len(links)
-heights=[112,118,124,148,132,144,112,136,150]
-heads=[330,805,1303,312,815,1305,330,804,1298]
-handpoints=[(368,228),(867,228),(1340,225),(268,365),(761,407),(1277,408),(414,829),(821,804),(1266,707)]
-facepoints=[(340,144),(820,133),(1320,137),(326,449),(831,452),(1325,456),(343,823),(819,786),(1314,790)]
-bridges=[];bridgeHands=[]
-for (box,im),height,head,hand,face in zip(links,heights,heads,handpoints,facepoints):
- scale=height/im.height;im=clean(im.resize((round(im.width*scale),height),Image.Resampling.BOX))
- dx=160-round((head-box[0])*scale-4);dy=215-height+1
- frame=Image.new('RGBA',(352,224));frame.paste(im,(dx,dy))
- for (x,y),hexcolor in [(face,'#251f29'),((face[0]+2/scale,face[1]+1/scale),'#d6ae92'),(hand,'#8d96a4')]:
-  x=round(dx+(x-box[0])*scale);y=round(dy+(y-box[1])*scale)
-  rgb=tuple(bytes.fromhex(hexcolor[1:]));color=min([tuple(bytes.fromhex(c[1:]))for c in colors],key=lambda c:sum((c[i]-rgb[i])**2 for i in range(3)))+(255,)
-  if 0<=x<352 and 0<=y<224 and frame.getpixel((x,y))[3]:frame.putpixel((x,y),color)
- bridges.append(frame);bridgeHands.append({'x':round(dx+(hand[0]-box[0])*scale),'y':round(dy+(hand[1]-box[1])*scale)})
-
-def originalFrames(name):
- anim=json.loads((SRC/'combo-base/manifest.json').read_text())if name=='attack'else manifest['heroes']['noah']['animations'][name]
- image=Image.open(SRC/'combo-base/noah-attack.png'if name=='attack'else OUT/anim['file']).convert('RGBA');frames=[];hands=[]
- for i in range(4):
-  frame=Image.new('RGBA',(352,224));dx=160-anim['pivot']['x'];dy=215-anim['pivot']['y']
-  frame.paste(image.crop((i*anim['frameW'],0,(i+1)*anim['frameW'],anim['frameH'])),(dx,dy));frames.append(frame)
-  h=anim['hands'][i];hands.append({'x':h['x']+dx,'y':h['y']+dy})
- return frames,hands
-base1,h1=originalFrames('attack');base2,h2=originalFrames('attack-2');base3,h3=originalFrames('attack-3')
-sequences=[('attack',[bridges[8],base1[1],base1[2],*bridges[0:3]],[bridgeHands[8],h1[1],h1[2],*bridgeHands[0:3]],[2,2,9,2,1,2]),
- ('attack-2',[bridges[2],base2[1],base2[2],*bridges[3:6]],[bridgeHands[2],h2[1],h2[2],*bridgeHands[3:6]],[2,2,12,2,2,2]),
- ('attack-3',[bridges[5],base3[1],base3[2],*bridges[6:9]],[bridgeHands[5],h3[1],h3[2],*bridgeHands[6:9]],[2,2,22,3,3,2])]
-for name,frames,hands,ticks in sequences:sheet('noah',name,frames,(352,224),(160,215),ticks,False,hands)
+# Choreography source: constant0.46 sampling factor for all fifteen bodies.
+# Feet, rather than sword bounds, determine root; crouching never enlarges a body.
+parts=objects('combo-choreography-source.png',10000)
+parts.sort(key=lambda p:(0 if p[0][1]<320 else 1 if p[0][1]<660 else 2,p[0][0]));assert len(parts)==15,len(parts)
+feet=[(173,318),(490,318),(837,318),(1153,318),(1437,317),
+      (163,650),(480,652),(808,652),(1154,652),(1479,651),
+      (183,947),(482,947),(818,946),(1154,945),(1458,948)]
+handpoints=[(173,163),(557,133),(925,141),(1177,238),(1485,257),
+            (205,599),(526,459),(790,387),(1123,385),(1450,379),
+            (156,699),(551,841),(846,871),(1181,860),(1448,790)]
+frames=[];hands=[]
+for (box,im),foot,hand in zip(parts,feet,handpoints):
+ scale=.46;sample=clean(im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.BOX))
+ dx=160-round((foot[0]-box[0])*scale);dy=215-round((foot[1]-box[1])*scale)
+ frame=Image.new('RGBA',(352,256));frame.paste(sample,(dx,dy));frames.append(frame)
+ hands.append({'x':round(dx+(hand[0]-box[0])*scale),'y':round(dy+(hand[1]-box[1])*scale)})
+for name,indices,ticks in [('attack',[0,1,2,3,4,5],[2,2,9,2,1,2]),
+ ('attack-2',[5,6,7,8,9,10],[2,2,12,2,2,2]),
+ ('attack-3',[10,11,12,13,14,0],[2,2,22,3,3,2])]:
+ sheet('noah',name,[frames[i]for i in indices],(352,256),(160,215),ticks,False,[hands[i]for i in indices])
+# Single generated ribbon per phase, rooted at feet so its path does not jump
+# when the hands rise/fall. The existing effect source supplies shape/material.
+paths=[('fx-slash',1,[(72,18),(108,26),(128,30)],[(175,123),(198,121),(216,119)],False,[2,2,3]),
+       ('fx-slash-2',0,[(60,76),(76,92),(90,100)],[(192,133),(208,81),(196,27)],False,[2,2,3]),
+       ('fx-slash-3',0,[(95,92),(130,110),(145,120)],[(183,3),(203,63),(180,125)],True,[3,3,3])]
+for name,row,dimensions,positions,flip,ticks in paths:
+ frames=[]
+ for i,((width,height),(x,y))in enumerate(zip(dimensions,positions)):
+  ribbon=effect(row,i)
+  if flip:ribbon=ribbon.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+  ribbon=clean(ribbon.resize((width,height),Image.Resampling.BOX),True)
+  frame=Image.new('RGBA',(192,256));frame.paste(ribbon,(x-160,y));frames.append(frame)
+ sheet('noah',name,frames,(192,256),(0,215),ticks,False)
+ manifest['heroes']['noah']['animations'][name]['anchor']='feet'
 
 (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
-print('Built linked6-frame Noah combos and Ethan combat effects; existing64-color palette preserved.')
+print('Built strike / step-in rising cut / overhead smash and Ethan effects; existing64-color palette preserved.')

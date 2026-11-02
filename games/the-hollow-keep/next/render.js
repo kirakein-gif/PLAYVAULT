@@ -199,7 +199,7 @@
             const scale=HKPixel.status().scale;
             const handX=p.x+p.w/2+(hand.x-animation.pivot.x)/scale*displayFace;
             const handY=p.y+p.h+(hand.y-animation.pivot.y)/scale;
-            sprite(a.hero,fx,anim=>timed(anim,fxAge),handX,handY,displayFace);
+            sprite(a.hero,fx,anim=>timed(anim,fxAge),arc.anchor==='feet'?p.x+p.w/2:handX,arc.anchor==='feet'?p.y+p.h:handY,displayFace);
             continue;
           }
         }else if(sprite(a.hero,fx,anim=>timed(anim,world.tick),a.x+a.w/2,a.y+a.h/2,a.face))continue;

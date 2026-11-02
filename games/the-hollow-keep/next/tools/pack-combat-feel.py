@@ -28,7 +28,21 @@ for direction in ['right','left']:
   assert frame.tobytes()==frames[index].tobytes(),(direction,i,index)
   elapsed+=decoded.info['duration']
  assert elapsed==sum(durations),(elapsed,sum(durations))
- observation={'events':data['events'],'frames':[{'i':t['i'],'tick':t['tick'],'pose':t['paint']['sprites'],'target':t['paint']['targets'],'physicalTarget':{'x':t['target']['x'],'y':t['target']['y'],'hp':t['target']['hp']},'text':t['paint']['text']}for t in trace]}
+ # Actual game pixels beside idle and the direction-only reference diagram.
+ idle=Image.open(source/f'noah-{direction}-idle.png').convert('RGBA')
+ sizes=Image.new('RGBA',(5040,1380),(16,19,32,255));sizeLabels=ImageDraw.Draw(sizes)
+ reference=Image.open(ROOT.parent/'docs/reference/noah-combo-keyposes.png').convert('RGBA')
+ comparison=Image.new('RGBA',(2160,940),(16,19,32,255));comparisonLabels=ImageDraw.Draw(comparison)
+ for stage in range(1,4):
+  file='noah-attack'+('-'+str(stage)if stage>1 else'')+'.png';y=(stage-1)*460
+  sizeLabels.text((8,y+10),f'{direction} IDLE - same game scale',fill='#f1e6c9');sizes.paste(idle,(0,y+40))
+  for phase in range(6):
+   idx=next(i for i,t in enumerate(trace)if any(e['file']==file and e['frame']==phase for e in t['paint']['sprites']));im=frames[idx];x=(phase+1)*720
+   sizeLabels.text((x+8,y+10),f'{direction} stage{stage} pose{phase} - same game scale',fill='#f1e6c9');sizes.paste(im,(x,y+40));assert sizes.crop((x,y+40,x+720,y+460)).tobytes()==im.tobytes()
+  core=next(i for i,t in enumerate(trace)if any(e['file']==file and e['frame']==2 for e in t['paint']['sprites']));x=(stage-1)*720
+  comparison.paste(reference.crop(((stage-1)*400,0,stage*400,440)),(x+160,0));comparisonLabels.text((x+8,460),f'{direction} stage{stage}: actual core / reference direction above',fill='#f1e6c9');comparison.paste(frames[core],(x,500))
+ sizes.save(out/f'noah-{direction}-idle-size.webp',lossless=True,method=6);comparison.save(out/f'noah-{direction}-keyposes-reference.webp',lossless=True,method=6)
+ observation={'events':data['events'],'frames':[{'i':t['i'],'tick':t['tick'],'pose':t['paint']['sprites'],'effects':t['paint'].get('effects',[]),'target':t['paint']['targets'],'physicalTarget':{'x':t['target']['x'],'y':t['target']['y'],'hp':t['target']['hp']},'text':t['paint']['text']}for t in trace]}
  (out/f'noah-{direction}-observations.json').write_text(json.dumps(observation,separators=(',',':'))+'\n')
  print(direction,len(frames),'actual tick frames /',elapsed,'ms; decodedRGBA/time equality verified')
 print('followup images:',sum(p.stat().st_size for p in out.glob('*.webp')),'bytes')

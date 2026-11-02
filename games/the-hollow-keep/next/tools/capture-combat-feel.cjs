@@ -8,14 +8,18 @@ try{for(const direction of ['right','left']){
  const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(String(e)));
  await page.clock.install({time:new Date('2026-11-02T04:00:00Z')});await page.clock.pauseAt(new Date('2026-11-02T04:00:01Z'));
  await page.addInitScript(()=>{
-  window.__events=[];window.__paint={sprites:[],targets:[],text:[]};
+  window.__events=[];window.__paint={sprites:[],effects:[],targets:[],text:[]};
   Object.defineProperty(window,'HKSim',{configurable:true,set(sim){const step=sim.step;sim.step=function(w,input){const ev=step(w,input);for(const e of ev)window.__events.push({...e,tick:w.tick});return ev;};Object.defineProperty(window,'HKSim',{value:sim,writable:true,configurable:true});}});
   const draw=CanvasRenderingContext2D.prototype.drawImage,rect=CanvasRenderingContext2D.prototype.fillRect,txt=CanvasRenderingContext2D.prototype.fillText;
   const matrix=ctx=>{const m=ctx.getTransform();return {a:m.a,e:m.e,f:m.f};};
-  CanvasRenderingContext2D.prototype.drawImage=function(img,...a){if(a.length===8&&/noah-attack/.test(img.src||''))window.__paint.sprites.push({file:img.src.split('/').pop(),frame:a[0]/a[2],matrix:matrix(this)});return draw.call(this,img,...a);};
+  CanvasRenderingContext2D.prototype.drawImage=function(img,...a){if(a.length===8&&/noah-attack/.test(img.src||''))window.__paint.sprites.push({file:img.src.split('/').pop(),frame:a[0]/a[2],matrix:matrix(this)});if(a.length===8&&/noah-fx-slash/.test(img.src||'')){
+   const frame=a[0]/a[2],key=img.src+':'+frame;window.__fxCenters=window.__fxCenters||{};
+   if(!window.__fxCenters[key]){const c=document.createElement('canvas');c.width=a[2];c.height=a[3];draw.call(c.getContext('2d'),img,a[0],a[1],a[2],a[3],0,0,c.width,c.height);const data=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let x=0,y=0,n=0;for(let i=0;i<data.length;i+=4)if(data[i+3]){x+=(i/4)%c.width;y+=Math.floor(i/4/c.width);n++;}window.__fxCenters[key]={x:x/n,y:y/n};}
+   const center=window.__fxCenters[key],m=this.getTransform(),x=a[4]+center.x*a[6]/a[2],y=a[5]+center.y*a[7]/a[3];window.__paint.effects.push({file:img.src.split('/').pop(),frame,x:m.a*x+m.c*y+m.e,y:m.b*x+m.d*y+m.f});
+  }return draw.call(this,img,...a);};
   CanvasRenderingContext2D.prototype.fillRect=function(x,y,w,h){if(y===430&&w===12&&h===60)window.__paint.targets.push({x,y,w,h,color:this.fillStyle,matrix:matrix(this)});return rect.call(this,x,y,w,h);};
   CanvasRenderingContext2D.prototype.fillText=function(text,x,y,...args){if(String(text).startsWith('−')||String(text).endsWith(' HP')){const width=this.measureText(text).width,size=parseFloat(this.font),left=this.textAlign==='center'?x-width/2:x;window.__paint.text.push({text,x:left,y:y-size,w:width,h:size,matrix:matrix(this)});}return txt.call(this,text,x,y,...args);};
-  const raf=requestAnimationFrame;window.requestAnimationFrame=cb=>raf.call(window,t=>{window.__paint={sprites:[],targets:[],text:[]};cb(t);});
+  const raf=requestAnimationFrame;window.requestAnimationFrame=cb=>raf.call(window,t=>{window.__paint={sprites:[],effects:[],targets:[],text:[]};cb(t);});
  });
  await page.goto(url);await page.evaluate(()=>HKPixel.ready);await page.locator('canvas').focus();await page.clock.runFor(100);
  const state=()=>page.evaluate(()=>HKPlaytest.snapshot());async function ticks(n){const target=(await state()).tick+n;while((await state()).tick<target)await page.clock.runFor(16);}
@@ -23,6 +27,7 @@ try{for(const direction of ['right','left']){
  const targetX=direction==='right'?100:179;await page.keyboard.down('ArrowRight');while((await state()).player.x<targetX)await ticks(1);await page.keyboard.up('ArrowRight');await ticks(10);
  if(direction==='left'){await page.keyboard.down('ArrowLeft');await ticks(1);await page.keyboard.up('ArrowLeft');await ticks(8);}
  const s0=await state(),x=Math.max(0,Math.min(600,s0.player.x+s0.player.w/2-150)),y=310,trace=[];
+ const idle=await page.evaluate(({x,y})=>{const canvas=document.querySelector('canvas'),unit=canvas.width/960,crop=document.createElement('canvas');crop.width=720;crop.height=420;crop.getContext('2d').drawImage(canvas,x*unit,y*unit,360*unit,210*unit,0,0,720,420);return crop.toDataURL();},{x,y});fs.writeFileSync(path.join(out,`noah-${direction}-idle.png`),Buffer.from(idle.split(',')[1],'base64'));
  await page.evaluate(()=>window.__events=[]);
  const rhythm=await page.evaluate(()=>HKSim.CONFIG.heroes.noah.weapon.combo.map(s=>s.recoveryTicks));
  const length=rhythm[0]+rhythm[1]+rhythm[2]+8;
@@ -46,6 +51,17 @@ try{for(const direction of ['right','left']){
   const overlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
   for(let i=0;i<labels.length;i++){assert.ok(hpLabels.every(h=>!overlap(labels[i],h)),'damage does not cover HP');assert.ok(labels.slice(i+1).every(b=>!overlap(labels[i],b)),'damage labels do not overlap');}
  }
+ const paths=[];
+ for(let step=1;step<=3;step++){
+  const file='noah-fx-slash'+(step>1?'-'+step:'')+'.png',samples=[];
+  for(let phase=0;phase<3;phase++){const t=trace.find(t=>t.paint.effects.some(e=>e.file===file&&e.frame===phase));assert.ok(t,'all slash phases painted');const e=t.paint.effects.find(e=>e.file===file&&e.frame===phase);samples.push({x:e.x/t.unit,y:e.y/t.unit});}
+  paths.push({dx:samples[2].x-samples[0].x,dy:samples[2].y-samples[0].y,ys:samples.map(s=>s.y)});
+ }
+ assert.ok(Math.abs(paths[0].dx)>Math.abs(paths[0].dy),'actual strike predominantly horizontal');assert.ok(paths[1].dy<=-20,'actual rising slash moves up at least20 units');assert.ok(paths[2].dy>=30&&paths[2].dy>-paths[1].dy,'actual overhead travels farther down than rising slash moves up');
+ assert.ok(paths[1].ys.every((v,i,a)=>!i||v<=a[i-1]),'actual rising path monotonic');assert.ok(paths[2].ys.every((v,i,a)=>!i||v>=a[i-1]),'actual overhead path monotonic');
+ const at=tick=>trace.find(t=>t.tick===tick).player.x;
+ assert.ok(Math.abs(at(attacks[2].tick-1)-at(attacks[1].tick-1)-12*(direction==='right'?1:-1))<1e-6,'rising cut lunges exactly12 units');assert.equal(trace.at(-1).player.x,at(attacks[2].tick-1),'overhead finisher planted');
+ console.log('PATH '+direction+': '+JSON.stringify(paths));
  assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,`noah-${direction}-trace.json`),JSON.stringify({events,trace},null,2));
  console.log(`PASS ${direction}:18/22 rhythm;3/3/5 visual hold;2tick flash;3px recoil without physics movement;6tick finisher shake;separate floating labels;world ticks uninterrupted`);checks++;await context.close();
 }}finally{await browser.close();}
