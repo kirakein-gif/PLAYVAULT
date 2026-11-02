@@ -1189,5 +1189,6 @@
 - 검증: PR #20 그대로면 weapons-contract 15/16, pixel-assets 91/92(동작 9틱 < 16틱). 회복 값과 ticks만 바꾼 사본은 weapons-contract 16/16, pixel-assets 92/92, foundation-contract 51/51, foundation-edge 16/16, area-data 22/22. Codex 자체 weapons-edge는 옛 타이밍 가정으로 실패 → Codex가 갱신하도록 지시.
 - 검토 담당 / 발견 문제 수: 사용자 발견 1건(베기 동작이 안 보임 — 1차 규격에 동작 길이 기준이 없던 것은 Claude Code 누락).
 - 사용자 재요청 횟수: 0회.
+- 사용자 결정(후속): 효과음은 넣지 않음 — "소리가 안 나도 느낌으로 소리가 나는 것처럼 충분히 가능합니다". COMBAT_SPEC §2-1·CODEX_TASK_09 추가 지시의 금지 항목에 반영.
 - 다음: Codex가 PR #20에서 추가 지시 처리 → 재검토 → 미리보기 갱신.
 - 종료 상태: 규격 보강.
