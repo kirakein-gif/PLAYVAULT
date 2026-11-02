@@ -3,6 +3,10 @@
 확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Codex**(PR #20 Noah 박자·명중 연출 보완, Claude Code 재검토 대기).
 
 
+## 수정 진행 · TASK_09 추가 지시2 / Noah 콤보 연결
+
+2026-11-02 / Codex / PR #20, codex/hollow-keep-combat-weapons / 기준091e41b + origin/claude/hollow-keep-combat-review(c77525a). 사용자 지시로 규격§2-2·검사를 병합합니다. 범위: 연결 창20, 창 동안 마지막 자세 유지·이동/창 만료 시 해제, Noah 각6프레임과 공유 연결 자세·제작도구·검증/캡처/기록. 기존 세 핵심 베기·효과·리듬18/22/34·명중 연출·Ethan은 유지합니다. 원본 검사 약화·게임 시간 정지·효과음·main 병합·수동 배포 없음. Claude Code 재검토용 같은 PR 갱신.
+
 ## 수정 제출 · PR #20 Noah 베기 박자·명중 연출 / Claude Code 재검토 대기
 
 2026-11-02 / Codex / `codex/hollow-keep-combat-weapons` / 기준 bf87c75 + 정정 규격097119f(병합e1a4409) / [PR #20](https://github.com/kirakein-gif/PLAYVAULT/pull/20). Noah 2·3단 회복을22·34틱으로, 몸 동작을16·20·32틱으로 늘렸습니다. 준비2틱 뒤 베기·긴 핵심 자세·거두기, 명중 시 추가3·3·5틱 표시 유지, 표적2틱 밝힘·3픽셀 그림 밀림, 3단만6틱 감쇠 흔들림과 더 굵고 긴 효과를 적용했습니다. 피해 숫자는 HP와 서로를 피하며 떠오릅니다.
