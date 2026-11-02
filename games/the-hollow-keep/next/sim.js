@@ -132,7 +132,7 @@
     if(dir) {
       p.face=dir;
       // Reach only the adjacent surface, never a distant shelf or occupied body.
-      const surfaces=[...w.room.solids,...w.room.platforms].filter(s=>Math.abs(s.y-feet)<=8)
+      const surfaces=(held.up||held.down?[]:[...w.room.solids,...w.room.platforms]).filter(s=>Math.abs(s.y-feet)<=8)
         .sort((a,b)=>Math.abs(a.y-feet)-Math.abs(b.y-feet));
       for(const s of surfaces) {
         const x=dir<0?s.x+s.w-p.w:s.x;

@@ -1,10 +1,12 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #15·#14 병합, 사다리 작업 새 브랜치 지시).
+확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Codex**(PR #17 추가 지시 1·2 수정, Claude Code 재검토 대기).
 
-## 수정 진행 · TASK_08 추가 지시 1·2
+## 수정 제출 · TASK_08 추가 지시 1·2 / PR #17 재검토 대기
 
-2026-11-02 / Codex / PR #17, codex/hollow-keep-ladder-actions / 기준dc5e336 + origin/claude/hollow-keep-ladder-diagonal. 사용자 인계에 따라 대각선 입력·사다리 가로대 이음새 간격·climb 중심 자세를 함께 보완합니다. 규격/검사 브랜치 병합, 문서 충돌은 양측 이력 보존. 범위 sim.js·climb/ladder 제작 도구·게임 전용 자산·캡처·기록. 전체 회귀와 keyboard-ime 후 Claude Code 재검토, main병합·수동배포 없음.
+2026-11-02 / Codex / PR #17, `codex/hollow-keep-ladder-actions` / 기준dc5e336 + 정정규격병합69e8497. 사용자인계에따라 대각선은오르내림·방향전환유지, 위/아래없이좌우만누르면옆으로내림. 사다리가로대6px·20/20/20px간격(이음새포함). 새4후면자세로몸통·손중앙정렬, 전체의상반전제거. 중심오차최대0.247단위/올린손최대6.591단위, 기존크기/수치유지.
+
+최신원본검사 ladder-actions10/10·keyboard-ime7/7·자산65/65·ladder-render7/7 및 전체회귀 결과·14장실제입력캡처: `next/assets/ladder-actions-review/followup/`. 재빌드4파일해시동일, ladder외다른타일RGBA동일. 다음 Claude Code 재검토→사용자외형/손맛판단. 실기기회전·터치·성능미확인. 게임버전번호변경없음, main병합·수동배포없음. 아래는최초제출·이전검토이력입니다.
 
 ## 검토 제출 · CODEX_TASK_08 사다리 행동·오르기 동작
 

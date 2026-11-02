@@ -1117,3 +1117,15 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex가 PR #17에서 추가 지시 1·2 처리 → 재검토 → 미리보기 Artifact 갱신.
 - 종료 상태: 규격 보강.
+
+### 2026-11-02 (Asia/Seoul) · PR #17 추가 지시 1·2: 대각선·가로대·중앙 자세
+
+- 담당 Codex / 재검토 Claude Code(대기). 사용자 인계로 같은PR #17/codex/hollow-keep-ladder-actions에서 수정. 최신fetch·열린PR17/18·PR17리뷰확인: 구현dc5e336, 정정규격 `origin/claude/hollow-keep-ladder-diagonal` **817fd637fa90314550ab65866e270577b883d516**. TASK_08전문/추가지시두개·AGENTS·최신STATUS/WORK_LOG·정정LADDER_ACTIONS_SPEC/TILE_MOSAIC_SPEC·실제빌더/검사확인. 사용자가지정한규격브랜치를 **69e8497**로병합(STATUS/WORK_LOG/CHANGELOG충돌은양측이력보존), 착수담당/범위공유푸시·PR17Draft전환. main병합아님, PR18원격작업덮어쓰기없음.
+- L2정정: 좌우는항상방향전환, ↑/↓가함께들어오면옆내림후보를만들지않아대각선오르내림유지. 위/아래를놓고좌우만누를때면높이±8/몸공간을검사해내림. 입력기코드는이미물리키code를써수정불필요, 새keyboard-ime원본검사로확인. CONFIG/캐릭터크기/기존사다리규칙/공용자산/기존게임/구역·완주기록/버전번호변경없음.
+- 가로대: 기존경로A원본의따뜻한재질/레일을유지하고3가로대밴드를각6네이티브행으로정리해시작7/27/47px에배치. 이음새포함간격20/20/20px. tiles.png에서ladder60px칸외모든픽셀RGBA동일확인. build-tile-mosaic.py재현갱신.
+- 자세: image_gen으로climb-source.png참고한새중앙후면자세원본climb-centered-source.png제작. 몸통수직·외투아래·무릎몸아래교대, 올린손좁게. build-climb.py가4원본자세를각각사용, 이전전체의상반전제거. 기존136/128px·192프레임·pivot96/191·64색/0·255알파유지. 샘플링후네이티브윤곽/핀홀정리및프레임전체무게중심이동(몸/손개별왜곡없음). 무게중심오차최대0.247단위/올린손최대6.591단위(요구±2/±12). PROVENANCE전문지시문/도구/과정/이전한계해소기록. 이전원본·캡처보존.
+- 실제입력capture-ladder-actions를정정규칙에맞춰↑+←로오른뒤↑를놓고옆으로내리는입력으로갱신. 좌표/월드/그림주입없음. 두주인공climb전4프레임·매달린공격·옆내림·PC연속사다리·780×330 **14장**, 원본PNG와RGBA동일무손실WebP **3665878바이트**. `next/assets/ladder-actions-review/followup/README.md`·TEST_RESULTS.md·logs참조. 기존캡처이력보존.
+- 이번실행: ladder-actions10/10·자체ladder-edge4/4·keyboard-ime7/7·pixel-assets65/65·ladder-render7/7·exploration-contract16/16·entrance9/9·foundation51/51·area-data22/22·tile-mosaic-render7/7·pixel-render구역/시험방각7/7·mobile-layout20/20·mobile-fullscreen6/6·foundation-edge16/16·room-traversal4/4·exploration-edge13/13·ABYSSFALL3종통과. exploration-browser6/6·browser-playtest(?room=test)20/20, 전체최종결과는followup/TEST_RESULTS.md와동봉로그참조. 기존4159틱·교대2회완주유지, 재기록불필요. 정정검사원본3개및다른인수원본수정없음. tiles/두climbPNG/manifest재생성4개SHA256동일.
+- 실행중문제: 이전턴HTTP서버종료로최초브라우저연결실패→HTTP8765재시작후재실행(판정/검사변경없음). audio404는기존실패복구예상경고. 새그림/규칙의원본검사실패없음. 추가손맛/실기기성능평가를자동검사로주장하지않음.
+- 재현: 루트HTTP8765, HK_URL=http://127.0.0.1:8765/games/the-hollow-keep/next/·CHROMIUM_PATH=/usr/bin/chromium로next/tests실행. 시험방browser-playtest/pixel-render는?room=test. 빌드mosaic→climb, 캡처HK_SHOT_DIR=/tmp/hk08b-review. 5관리문서검토: STATUS/WORK_LOG/CHANGELOG갱신, AGENTS/CLAUDE규칙변경없음. nextREADME/PROVENANCE갱신, 루트README변경필요없음.
+- 다음: 같은PR17 Ready로갱신→Claude Code원본검사/대각선/한글키보드/연속가로대/몸·손중심/전4자세재검토→사용자외형/손맛판단. 검토담당/발견문제수: Claude Code직전1건(대각선규격결함), 사용자2건(간격/자세); 이번재검토전미확인. 사용자재요청: 최초제출후1회(이번추가지시1·2묶음). 실기기회전/터치/성능미확인. 병합·수동배포/게시없음.

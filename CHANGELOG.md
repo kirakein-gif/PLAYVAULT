@@ -256,3 +256,9 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 ## THE HOLLOW KEEP · 사다리 대각선 정정·PC 키보드 검사 (2026-11-02, Asia/Seoul)
 
 - 규격·검사만. 옆으로 내리기는 ←/→만 누를 때(대각선은 오르기). `ladder-actions.cjs` 10개, `keyboard-ime.cjs` 7개(한글 입력 상태). PR #17 수정 대기.
+
+## THE HOLLOW KEEP · TASK_08 추가 지시 1·2 (2026-11-02)
+
+- PR #17 / dc5e336 후속, 정정규격origin/claude/hollow-keep-ladder-diagonal을69e8497로 병합(양측 기록 보존). 대각선은 오르내림·방향전환 유지, 위/아래를 놓고 좌우만 누를 때 옆바닥으로 내림.
+- 가로대6px·20/20/20px간격(이음새포함), 새 네후면자세로 몸통·손중앙정렬·하향외투·아래쪽무릎교대. 전체 의상반전 제거. 다른타일·기존동작·팔레트·조작수치·몸크기·버전번호보존.
+- 최신검사·실제입력14장/로그는 next/assets/ladder-actions-review/followup. 원본검사보존, 재생성4파일해시동일. Claude Code 재검토 및 사용자 외형/손맛판단대기, 병합·수동배포없음.
