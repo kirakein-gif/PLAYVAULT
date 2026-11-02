@@ -1165,3 +1165,17 @@
 - 다음: 규격 PR 병합 승인 → Codex `CODEX_TASK_09.md` → Claude Code 검토 → 사용자 손맛 확인 → 2차(체력·피격·적 3종) 규격.
 - 병합: 사용자 승인("병합하고 코덱스에 넘길게요")으로 PR #19를 main에 병합. 병합 후 weapons-contract·pixel-assets 새 항목은 Codex 구현 전 예상 실패.
 - 종료 상태: 규격 병합, Codex 구현 대기.
+
+### 2026-11-02 (Asia/Seoul) · Codex 전투 1차(PR #20 `bf87c75`) 검토
+
+- 담당 AI: Claude Code(검토). 구현: Codex `codex/hollow-keep-combat-weapons`.
+- 범위: 검사 원본·규격 main과 동일(Codex 자체 weapons-edge만 추가). 기존 게임·공용 자산 변경 없음.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 15/15(제 사본 HK_SIM으로도 15/15), weapons-edge 6/6, pixel-assets 92/92, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest(`?room=test`) 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱, 공격 포함) 겹침 0건.
+- 그림: Noah 1·2·3단 동작·베기 궤적이 서로 다르고 한 획. Ethan 충전 빛 9프레임 성장, 2·3단 탄이 1단보다 큼, 빛 터짐 3프레임 고리.
+- 관찰(차단 아님): 시험 방 피해 숫자가 같은 자리에 쌓여 표적 HP 글자를 가림 → 2차에서 피해 표시 정리 제안.
+- 회사 PC 미리보기 Artifact를 `bf87c75` 빌드로 갱신(버전 3). 미리보기 사본에서만 `#test`로 무기 시험 방을 열 수 있게 app.js 한 줄·링크 추가(claude.ai는 주소의 `?room=test`를 넘기지 않음). 저장소 코드는 변경 없음.
+- Git/PR: [PR #20 검토](https://github.com/kirakein-gif/PLAYVAULT/pull/20) (COMMENT).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건(관찰 1건).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛·외형 확인 → 승인 시 PR #20 병합(이 기록 브랜치 함께) → 2차(체력·피격·적 3종, 둘 다 쓰러졌을 때 처리 제안) 규격.
+- 종료 상태: 검토 완료, 사용자 판단 대기.
