@@ -13,13 +13,22 @@
         gravity: .70, jumpHeight: 80, variableJump: true, minJumpHeight: 34,
         maxFall: 13.5, coyoteTicks: 6, jumpBufferTicks: 7,
         weapon: { kind: 'projectile', damage: 22, range: 1017.6, cooldownTicks: 29,
-          speed: 10.6, width: 18, height: 12, activeTicks: 96 } },
+          speed: 10.6, width: 18, height: 12, activeTicks: 96,
+          charge: { stage2Ticks:40, stage3Ticks:80, shots:[
+            {damage:44,width:26,height:18,speed:11.5},
+            {damage:66,width:34,height:24,speed:12.5,burstRadius:45,burstDamage:33}
+          ] } } },
       noah: { width: 39, height: 64, runSpeed: 3.85, airControlSpeed: 1.73, climbSpeed: 2.4, stopTicks: 5,
         accelerationGround: .68, accelerationAir: .40, friction: .60,
         gravity: .57, jumpHeight: 145, variableJump: true, minJumpHeight: 56,
         maxFall: 13.8, coyoteTicks: 8, jumpBufferTicks: 8,
         weapon: { kind: 'melee', damage: 22, range: 66, cooldownTicks: 18,
-          height: 46, activeTicks: 9 } }
+          height: 46, activeTicks: 9, comboWindowTicks:14,
+          combo:[
+            {damage:22,range:66,height:46,activeTicks:9,recoveryTicks:18},
+            {damage:22,range:72,height:46,activeTicks:9,recoveryTicks:22},
+            {damage:44,range:84,height:60,activeTicks:12,recoveryTicks:34,lunge:10}
+          ] } }
     }
   };
   const copy = value => JSON.parse(JSON.stringify(value));
@@ -48,7 +57,7 @@
     r.solids = r.solids || []; r.dummies = r.dummies || [];
     const player = { x: spawn.x, y: spawn.y, w: c.width, h: c.height,
       vx: 0, vy: 0, face: 1, onGround: false, coyote: 0, jumpBuffer: 0,
-      jumpStartFeet: null, jumpCut: false, takeoffVx: 0, jumpKind: null, climbing: false, dropTicks: 0 };
+      jumpStartFeet: null, jumpCut: false, takeoffVx: 0, jumpKind: null, climbing: false, dropTicks: 0, charge:{ticks:0,level:0}, combo:{step:0,started:0,buffered:false} };
     player.onGround = supported(player, r.solids);
     return { tick: 0, active: hero, room: r, player, dummies: r.dummies,
       previous: {}, swapCooldown: 0, attackCooldowns: { ethan: 0, noah: 0 }, attacks: [], nextAttackId: 1 };
@@ -145,7 +154,10 @@
       }
     }
     const oldY=p.y;
-    p.x=ladder.x+(ladder.w-p.w)/2;p.vx=0;p.vy=(Number(!!held.down)-Number(!!held.up))*c.climbSpeed;
+    // Keep the short finisher step while its hitbox is active; the ten-unit
+    // step stays within the attached ladder lane. Recenter after the swing.
+    if(!w.attacks.some(a=>a.hero===w.active&&a.kind==='melee'&&a.lunge&&a.life>0))p.x=ladder.x+(ladder.w-p.w)/2;
+    p.vx=0;p.vy=(Number(!!held.down)-Number(!!held.up))*c.climbSpeed;
     // A one-cell ladder portal is narrower than the hero's shoulder width.
     // Use its center lane through boundary masonry while attached.
     const solids=w.room.solids.filter(s=>!!s.type||!((ladder.openTop&&s.y===0)||(ladder.y+ladder.h>=w.room.height&&s.y===w.room.height-w.area.tile)));
@@ -236,6 +248,7 @@
       if (!blocked(candidate)) {
         Object.assign(p, candidate); p.vx *= CONFIG.swapVelocityScale; p.vy *= CONFIG.swapVelocityScale;
         w.active = to; w.swapCooldown = CONFIG.swapCooldownTicks;
+        p.charge={ticks:0,level:0};p.combo={step:0,started:0,buffered:false};
         w.attacks = w.attacks.filter(a => a.kind === 'projectile');
         ev.push({ type: 'swap', from, to });
       } else ev.push({ type: 'swapBlocked' });
@@ -290,19 +303,54 @@
     }
     if (w.area) { transition(w, ev); interact(w, held, edge, ev); enter(w, edge, ev); refreshArea(w, ev); }
     w.attacks = w.attacks.filter(a => a.life > 0);
-    if (edge('attack') && !w.attackCooldowns[w.active]) {
-      const wp = c.weapon;
-      w.attackCooldowns[w.active] = wp.cooldownTicks;
-      w.attacks.push({ id: w.nextAttackId++, hero: w.active, kind: wp.kind,
-        x: p.face > 0 ? p.x + p.w : p.x - (wp.kind === 'melee' ? wp.range : wp.width),
-        y: p.y + (p.h - wp.height) / 2, w: wp.kind === 'melee' ? wp.range : wp.width,
-        h: wp.height, face: p.face, damage: wp.damage, speed: wp.speed || 0,
-        range: wp.range, traveled: 0, life: wp.activeTicks, hit: [] });
-      ev.push({ type: 'attack', hero: w.active });
+    const wp=c.weapon;
+    const fire=(level=1,step=1)=>{
+      const shot=wp.kind==='melee'?wp.combo[step-1]:level>1?wp.charge.shots[level-2]:wp;
+      const spec={...wp,...shot};
+      w.attackCooldowns[w.active]=wp.kind==='melee'?spec.recoveryTicks:wp.cooldownTicks;
+      const attack={id:w.nextAttackId++,hero:w.active,kind:wp.kind,level,step,
+        x:p.face>0?p.x+p.w:p.x-(wp.kind==='melee'?spec.range:spec.width),
+        y:p.y+(p.h-spec.height)/2,w:wp.kind==='melee'?spec.range:spec.width,h:spec.height,
+        face:p.face,damage:spec.damage,speed:spec.speed||0,range:spec.range,
+        traveled:0,life:spec.activeTicks,hit:[],lunge:spec.lunge||0,duration:spec.activeTicks,
+        burstRadius:level===3?spec.burstRadius||0:0,burstDamage:spec.burstDamage||0};
+      w.attacks.push(attack);
+      ev.push({type:'attack',hero:w.active,...(wp.kind==='melee'?{step}:{level})});
+    };
+    if(w.active==='noah'){
+      const combo=p.combo;
+      if(combo.step&&w.tick-combo.started>=wp.combo[combo.step-1].recoveryTicks+wp.comboWindowTicks){
+        combo.step=0;combo.buffered=false;
+      }
+      if(edge('attack'))combo.buffered=true;
+      if(combo.buffered&&!w.attackCooldowns.noah){
+        const step=combo.step%3+1;fire(1,step);
+        Object.assign(combo,{step,started:w.tick,buffered:false});
+      }
+    }else{
+      if(edge('attack')&&!w.attackCooldowns.ethan){fire();p.charge={ticks:0,level:1};}
+      else if(held.attack&&p.charge.level){
+        p.charge.ticks++;
+        const level=p.charge.ticks>=wp.charge.stage3Ticks?3:p.charge.ticks>=wp.charge.stage2Ticks?2:1;
+        if(level>p.charge.level){p.charge.level=level;ev.push({type:'charge',hero:'ethan',level});}
+      }
+      if(!held.attack&&p.charge.level){
+        if(p.charge.level>=2)fire(p.charge.level);
+        p.charge={ticks:0,level:0};
+      }
     }
     for (const a of w.attacks) {
       if (a.kind === 'melee') {
         // A swing stays attached to its owner; swapping cancels it.
+        if(a.lunge){
+          // Collision-checked horizontal step; do not change jump/gravity velocity.
+          const body={...p,vx:a.face*a.lunge/a.duration,vy:0};
+          move(body,w.room.solids);p.x=body.x;
+          if(w.area){
+            const from=w.roomId;transition(w,ev);
+            if(w.roomId!==from)break; // Room transitions cancel the old swing.
+          }
+        }
         a.x = a.face > 0 ? p.x + p.w : p.x - a.w; a.y = p.y + (p.h - a.h) / 2;
       } else {
         const distance = Math.min(a.speed, a.range - a.traveled);
@@ -325,7 +373,18 @@
           if (first.solid && first.box.breakable && w.area) { w.flags.broken[first.box.breakable] = true; ev.push({type:'break',id:first.box.breakable}); }
           if (!first.solid) {
             first.box.hp = Math.max(0, first.box.hp - a.damage);
-            ev.push({ type: 'hit', target: first.box.id, damage: a.damage });
+            ev.push({ type: 'hit', target: first.box.id, damage: a.damage,hero:a.hero,level:a.level,face:a.face });
+          }
+          if(a.burstRadius){
+            const x=a.face>0?first.box.x:first.box.x+first.box.w;
+            const y=(Math.max(a.y,first.box.y)+Math.min(a.y+a.h,first.box.y+first.box.h))/2;
+            ev.push({type:'burst',x,y,r:a.burstRadius});
+            for(const d of w.dummies)if(d.hp>0&&(first.solid||d.id!==first.box.id)){
+              const dx=x-Math.max(d.x,Math.min(x,d.x+d.w)),dy=y-Math.max(d.y,Math.min(y,d.y+d.h));
+              if(dx*dx+dy*dy<=a.burstRadius*a.burstRadius){
+                d.hp=Math.max(0,d.hp-a.burstDamage);ev.push({type:'hit',target:d.id,damage:a.burstDamage,hero:a.hero,level:a.level,face:a.face});
+              }
+            }
           }
           a.life = 0; delete a.sweep; continue;
         }
@@ -335,7 +394,7 @@
         }
         for (const d of targets) {
         a.hit.push(d.id); d.hp = Math.max(0, d.hp - a.damage);
-        ev.push({ type: 'hit', target: d.id, damage: a.damage });
+        ev.push({ type: 'hit', target: d.id, damage: a.damage,hero:a.hero,step:a.step,face:a.face });
       }
       }
       a.life--;

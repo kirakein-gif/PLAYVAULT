@@ -2,7 +2,7 @@
   'use strict';
   window.HKRender = function (canvas) {
     const ctx = canvas.getContext('2d');
-    let previousWorld = null, visual = {};
+    let previousWorld = null, visual = {}, bursts = [], impacts = {}, shake = null;
     function backing() {
       const box = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
       const scale = HKPixel.status().scale, unit = 960 * scale;
@@ -72,14 +72,20 @@
         if(o.type==='switch')text(o.hero?o.hero.toUpperCase()+' · E':'E',o.x-12,o.y-16,'#e4d5af',10);
       }
     }
-    function text(label, x, y, color = '#b8b2bf', size = 12) {
-      ctx.fillStyle = color; ctx.font = `${size}px system-ui`; ctx.fillText(label, x, y);
+    function text(label, x, y, color = '#b8b2bf', size = 12, align = 'left') {
+      ctx.fillStyle = color; ctx.font = `${size}px system-ui`; ctx.textAlign=align; ctx.fillText(label, x, y);
     }
     function draw(world, debug, effects) {
       backing();
-      if(previousWorld!==world){visual={};previousWorld=world;}
+      if(previousWorld!==world){visual={};bursts=[];impacts={};shake=null;previousWorld=world;}
       const p = HKSim.getPlayer(world), room = world.room;
       ctx.clearRect(0, 0, 960, 540); ctx.fillStyle = '#101320'; ctx.fillRect(0, 0, 960, 540);
+      ctx.save();
+      const shakeAge=shake?world.tick-shake.tick:-1;
+      if(shakeAge>=0&&shakeAge<6){
+        const offset=[[3,1],[-3,-1],[2,1],[-2,-1],[1,0],[-1,0]][shakeAge];
+        ctx.translate(offset[0],offset[1]);
+      }
       const background=HKPixel.manifest()?.background,pixelBackground=background&&HKPixel.image(background);
       if(!room.grid&&pixelBackground)ctx.drawImage(pixelBackground,0,0,960,540);
       else if (!room.grid&&backdrop.complete && backdrop.naturalWidth) {
@@ -123,21 +129,31 @@
       }
       for (const mark of room.labels || []) text(mark.text, mark.x, mark.y, '#a9a2b5', 11);
       for (const d of world.dummies) {
-        ctx.fillStyle = d.hp > 0 ? '#987667' : '#3a3540'; ctx.fillRect(d.x + 9, d.y, d.w - 18, d.h);
-        ctx.fillStyle = '#ccb58b'; ctx.fillRect(d.x, d.y + 13, d.w, 5);
-        ctx.strokeStyle = '#e1be83'; ctx.beginPath();ctx.arc(d.x+d.w/2,d.y+24,11,0,Math.PI*2);ctx.stroke();
+        const impact=impacts[d.id],age=impact?world.tick-impact.tick:-1;
+        const flash=age>=0&&age<2;
+        const push=age>=0&&age<3?impact.face*(3-age):0,x=d.x+push;
+        ctx.fillStyle = flash?'#ffffff':d.hp > 0 ? '#987667' : '#3a3540'; ctx.fillRect(x + 9, d.y, d.w - 18, d.h);
+        ctx.fillStyle = flash?'#ffffff':'#ccb58b'; ctx.fillRect(x, d.y + 13, d.w, 5);
+        ctx.strokeStyle = flash?'#ffffff':'#e1be83'; ctx.beginPath();ctx.arc(x+d.w/2,d.y+24,11,0,Math.PI*2);ctx.stroke();
         text(`${d.hp} HP`, d.x - 10, d.y - 10, '#d9b787', 10);
+        if(impact&&age>6)delete impacts[d.id];
       }
       const light = world.active === 'ethan';
       let action = p.climbing ? 'climb' : p.onGround ? Math.abs(p.vx)>.1?'run':'idle' : p.jumpKind==='running'?'jump-running':'jump-standing';
       const state=visual[world.active]||{},anims=HKPixel.manifest()?.heroes[world.active]?.animations;
       const duration=name=>anims?.[name]?.ticks?.reduce((a,b)=>a+b,0)||({attack:20,land:8}[name]||0);
-      if(state.attack!==undefined&&world.tick-state.attack<duration('attack'))action='attack';
+      const attackAction=world.active==='noah'&&state.attackStep>1?'attack-'+state.attackStep:'attack';
+      const rawAge=world.tick-state.attack;
+      const hold=state.hold?Math.max(0,Math.min(state.hold.ticks,world.tick-state.hold.tick)):0;
+      const attackAge=rawAge-hold;
+      const attacking=state.attack!==undefined&&attackAge<duration(attackAction);
+      if(attacking)action=attackAction;
+      else if(p.charge.level)action='charge';
       else if(p.onGround&&state.land!==undefined&&world.tick-state.land<duration('land'))action='land';
-      const age=action==='attack'?world.tick-state.attack:action==='land'?world.tick-state.land:world.tick;
+      const age=action.startsWith('attack')?attackAge:action==='land'?world.tick-state.land:world.tick;
       const frame=anim=>action==='climb'?Math.floor((p.climbDistance||0)/8)%anim.frames:action.startsWith('jump-')?(p.vy < -1?0:p.vy > 1?2:1):timed(anim,age);
-      const attackIndex=action==='attack'&&anims?.attack?timed(anims.attack,age):-1;
-      const displayFace=action==='attack'?(state.attackFace??p.face):p.face;
+      const attackIndex=attacking&&anims?.[attackAction]?timed(anims[attackAction],age):-1;
+      const displayFace=attacking?(state.attackFace??p.face):p.face;
       if(!sprite(world.active,action,frame,p.x+p.w/2,p.y+p.h,displayFace)){
         // Preserve geometric fallback when the current animation cannot be loaded.
         ctx.save();ctx.translate(p.x + p.w / 2, p.y + p.h);ctx.scale(p.face,1);
@@ -149,17 +165,26 @@
         ctx.fillStyle = light ? '#f4cf76' : '#89d7e7';ctx.fillRect(-p.w*.42,-p.h*.66,p.w*.74,5);ctx.fillRect(4,-p.h+7,12,3);
         ctx.restore();
       }
+      if(p.charge.level&&action==='charge'){
+        const pose=anims?.charge,scale=HKPixel.status().scale;
+        const hand=pose?.hands?.[timed(pose,world.tick)]||{x:144,y:90};
+        const x=p.x+p.w/2+(hand.x-(pose?.pivot.x||96))/scale*p.face;
+        const y=p.y+p.h+(hand.y-(pose?.pivot.y||191))/scale;
+        if(!sprite('ethan','fx-charge',()=>((p.charge.level-1)*3+Math.floor(world.tick/6)%3),x,y,p.face)){
+          ctx.strokeStyle='#9de9ed';ctx.strokeRect(x-3*p.charge.level,y-3*p.charge.level,6*p.charge.level,6*p.charge.level);
+        }
+      }
       for (const a of world.attacks.filter(a => a.life > 0)) {
-        const fx=a.kind==='projectile'?'fx-rune':'fx-slash';
+        const fx=a.kind==='projectile'?'fx-rune'+(a.level>1?'-'+a.level:''):'fx-slash'+(a.step>1?'-'+a.step:'');
         if(a.kind==='melee'){
           // One arc, only during the visible attack swing, rooted at its hand.
           // Trial sets without attack/fx keep their geometric fallback below.
-          const animation=anims?.attack,arc=anims?.['fx-slash'];
-          if(a.hero!==world.active||action!=='attack'||age<(animation?.ticks?.[0]??2))continue;
+          const animation=anims?.[attackAction],arc=anims?.[fx];
+          if(a.hero!==world.active||!attacking||age<(animation?.ticks?.[0]??2))continue;
           if(animation&&arc&&HKPixel.image(animation.file)&&HKPixel.image(arc.file)){
-            const start=animation.ticks[0],fxAge=age-start;
+            const start=animation.ticks[0],fxAge=rawAge-start;
             const life=arc.ticks.reduce((total,ticks)=>total+ticks,0);
-            if(a.hero!==world.active||action!=='attack'||attackIndex<1||fxAge<0||fxAge>=life)continue;
+            if(a.hero!==world.active||!attacking||attackIndex<1||fxAge<0||fxAge>=life)continue;
             const hand=animation.hands?.[attackIndex]||{x:animation.pivot.x+32,y:animation.pivot.y-70};
             const scale=HKPixel.status().scale;
             const handX=p.x+p.w/2+(hand.x-animation.pivot.x)/scale*displayFace;
@@ -172,19 +197,40 @@
         if (a.kind === 'projectile') {ctx.beginPath();ctx.ellipse(a.x+a.w/2,a.y+a.h/2,a.w/2,a.h/2,0,0,Math.PI*2);ctx.fill();}
         else {ctx.globalAlpha=.55;ctx.beginPath();ctx.ellipse(a.x+a.w/2,a.y+a.h/2,a.w/2,a.h/2,-a.face*.25,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
       }
-      for (const e of effects) text(`−${e.damage}`, e.x, e.y - (40 - e.life), '#fff0bd', 22);
+      const burstAnim=HKPixel.manifest()?.heroes.ethan.animations['fx-burst'];
+      const burstLife=burstAnim?.ticks.reduce((sum,n)=>sum+n,0)||12;
+      bursts=bursts.filter(b=>world.tick-b.tick<burstLife);
+      for(const b of bursts){
+        if(!sprite('ethan','fx-burst',anim=>timed(anim,world.tick-b.tick),b.x,b.y,1)){
+          ctx.strokeStyle='#b9ffff';ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.stroke();
+        }
+      }
+      for (const e of effects) text(`−${e.damage}`, e.x, e.y - (40 - e.life)*.55, '#fff0bd', 14, 'center');
       if (debug) {
         ctx.lineWidth=1;ctx.strokeStyle='#72e9ba';ctx.strokeRect(p.x,p.y,p.w,p.h);
         ctx.strokeStyle='#fa88b5';for(const b of HKSim.getHitboxes(world))ctx.strokeRect(b.x,b.y,b.w,b.h);
         text(`x ${p.x.toFixed(1)}  y ${p.y.toFixed(1)}  vx ${p.vx.toFixed(2)}  vy ${p.vy.toFixed(2)}`,20,72,'#9ee9dc');
         text(`ground ${p.onGround}  coyote ${p.coyote}  buffer ${p.jumpBuffer}  ${p.jumpKind || 'ground'} takeoff ${p.takeoffVx.toFixed(2)}  tick ${world.tick}`,20,90,'#9ee9dc');
       }
+      ctx.restore();
     }
     draw.event=(event,world)=>{
-      if(previousWorld!==world){visual={};previousWorld=world;}
+      if(previousWorld!==world){visual={};bursts=[];impacts={};shake=null;previousWorld=world;}
       const state = visual[world.active] ||= {};
-      if(event.type==='room')visual={};
-      if(event.type==='attack'){state.attack=world.tick;state.attackFace=world.player.face;}
+      if(event.type==='room'){visual={};bursts=[];impacts={};shake=null;}
+      if(event.type==='swap')visual={};
+      if(event.type==='burst')bursts.push({...event,tick:world.tick});
+      if(event.type==='attack'){state.attack=world.tick;state.attackFace=world.player.face;state.attackStep=event.step||1;state.hold=null;}
+      if(event.type==='hit'&&event.hero==='noah'){
+        // Keep the two-tick preparation visible, then align impact presentation
+        // with the first cut. Damage, cooldowns and the world clock keep running.
+        const action=event.step>1?'attack-'+event.step:'attack';
+        const prep=HKPixel.manifest()?.heroes.noah.animations[action]?.ticks[0]||2;
+        const tick=Math.max(world.tick,(state.attack??world.tick)+prep);
+        if(!state.hold)state.hold={tick,ticks:event.step===3?5:3};
+        impacts[event.target]={tick,face:event.face||1};
+        if(event.step===3)shake={tick};
+      }
       if(event.type==='land')state.land=world.tick;
     };
     return draw;

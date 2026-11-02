@@ -1,0 +1,7 @@
+PASS cooldown press does not start charging or fire on its later release
+PASS left-facing finisher moves exactly10 horizontally and respects a solid
+PASS charge3 burst on a target damages another through masonry without breaking it
+PASS third-level left shot stops at the target right face and excludes the direct target
+PASS airborne and attached attacks allow a three-step combo without detaching
+PASS a finisher crossing a room boundary is cancelled before damaging the new room
+6/6 supplemental weapon checks passed
