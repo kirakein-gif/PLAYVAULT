@@ -1091,3 +1091,16 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex가 PR #17에서 추가 지시 처리 → Claude Code 재검토 → 승인 시 정정 PR → PR #17 병합.
 - 종료 상태: 검토 완료, 수정 대기.
+
+### 2026-11-02 (Asia/Seoul) · 회사 PC 미리보기, 사다리 간격·오르기 자세 기준
+
+- 담당 AI: Claude Code.
+- 사용자: PC에서 Cloudflare 미리보기(`*.pages.dev`)가 열리지 않음. 휴대전화에서는 열렸으므로 회사 네트워크 차단으로 추정(이 환경에서도 접속 불가라 원인 미확인). 대안: PR #17 `dc5e336`의 `next/` 실행 파일(js·css·areas·assets/pixel, 32개, 1.2MB)을 claude.ai 비공개 Artifact로 게시(`https://claude.ai/artifact/L8uL1fgH7wNmwVJh9Hmbm1`). 저장소 변경 없음. 미리보기용 사본에서 `?room=test` 링크만 뺌.
+- 사용자 확인: 사다리 점프로 옆으로 넘어가기 동작은 좋음. 문제 2건: ① 사다리 가로대 간격이 일정하지 않음 ② 오르기 교차 동작은 좋지만 측면으로 쏠려 부자연스러움.
+- 측정: ① ladder 칸 가로대 9·27·45px → 칸 안 18px, 이음새 24px ② 올린 손이 사다리 중심에서 Ethan ±16~17.5단위, Noah ±12.7~16단위(가로대 끝 ±10), Ethan 무게중심 +2.5/−3.5단위.
+- 변경(`claude/hollow-keep-ladder-diagonal`, PR #18): TILE_MOSAIC_SPEC §7(가로대 간격 이음새까지 같게), LADDER_ACTIONS_SPEC §3-1(무게중심 ±2단위, 올린 손 ±12단위), `pixel-assets.cjs` 검사 2개(analyze에 프레임별 무게중심·맨 위 6줄 중심 추가), CODEX_TASK_08 추가 지시 2.
+- 검증: PR #17 자산 62/65(두 항목 3건 실패), 보정한 합성 자산(가로대 20px 간격, 좌우 대칭 오르기 프레임) 65/65. 옆모습 idle을 그대로 쓰면 무게중심 −4단위로 검출됨.
+- 검토 담당 / 발견 문제 수: 사용자 발견 2건(규격에 간격·자세 기준이 없던 것은 Claude Code 누락).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #17에서 추가 지시 1·2 처리 → 재검토 → 미리보기 Artifact 갱신.
+- 종료 상태: 규격 보강.

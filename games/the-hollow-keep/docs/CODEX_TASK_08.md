@@ -62,3 +62,27 @@ PLAYVAULT — THE HOLLOW KEEP: 사다리 대각선 입력 정정 + PC 키보드(
 [금지] 검사 원본 약화, 1단계 수치 변경, 병합·배포
 [완료] WORK_LOG·STATUS·CHANGELOG 갱신, Ready, 병합하지 않는다. 검토는 Claude Code.
 ```
+
+## 추가 수정 지시 2 (2026-11-02, 사용자 미리보기 확인 후)
+
+```text
+PLAYVAULT — THE HOLLOW KEEP: 사다리 가로대 간격 + 오르기 자세 가운데 정렬
+
+저장소: kirakein-gif/PLAYVAULT
+작업 브랜치: codex/hollow-keep-ladder-actions (PR #17, 위 "추가 수정 지시"와 함께 처리)
+먼저 할 일: origin/claude/hollow-keep-ladder-diagonal 을 다시 병합한다(검사 2개 추가).
+
+사용자 의견: "사다리 간격이 일정하지 않아 보인다(모자이크로 붙어서 그런 듯)", "양쪽으로 교차해서 올라가는 건 좋은데 너무 측면으로 쏠려 있어서 부자연스럽다".
+
+[그림 — TILE_MOSAIC_SPEC §7, LADDER_ACTIONS_SPEC §3-1, ART_DIRECTION 규칙(scale 2, 64색, 투명도 0/255, 경로 A)]
+- ladder 칸: 가로대 간격을 이음새까지 모두 같게(3개면 20px 간격). 지금은 9·27·45px → 이음새 24px.
+- ethan/noah climb: 교차 동작은 유지. 몸 무게중심 기준점 ±2단위, 올린 손(맨 위 6줄) 기준점 ±12단위.
+  지금은 올린 손이 ±12.7~17.5단위로 사다리 바깥을 잡고 몸이 한쪽으로 기움. 몸통 세로, 다리는 몸 아래에서 교대, 외투는 아래로.
+
+[검증]
+1. pixel-assets 전부 통과(사다리 간격·오르기 자세 검사 포함)
+2. ladder-render 7/7, 나머지 회귀 전체
+3. 캡처: 사다리 여러 칸 이어진 모습(PC), 오르기 4프레임을 사다리 위에서 한 장씩
+
+[금지] 검사 원본 약화, 1단계 수치·캐릭터 크기 변경, 병합·배포
+```
