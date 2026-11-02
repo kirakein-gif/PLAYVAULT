@@ -3,6 +3,10 @@
 확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Codex**(TASK_09 전투 무기 구현 제출, Claude Code 재검토 대기).
 
 
+## 수정 진행 · TASK_09 Noah 콤보 손맛 보완
+
+2026-11-02 / Codex / PR #20, `codex/hollow-keep-combat-weapons` / 기준 bf87c75 + origin/claude/hollow-keep-combat-review. 사용자 추가 지시로 검토 규격·검사를 병합합니다. 범위: 2·3단 회복22/34틱, Noah 동작 타이밍·핵심 자세 유지, 렌더 전용 명중 자세/표적 밝힘·밀림/3단 흔들림, 피해 숫자 겹침 정리, 3단 효과 크기·두께, 자체 검사/캡처·기록. Ethan 충전·1단/이동 수치는 유지합니다. 게임 시간 정지·소리·체력/적·main 병합·수동 배포 없음. 전체 검증 후 같은 PR을 Ready로 갱신, Claude Code 재검토 대기.
+
 ## 구현 제출 · TASK_09 전투 무기 1차 / Claude Code 재검토 대기
 
 2026-11-02 / Codex / `codex/hollow-keep-combat-weapons` / 기준 main **4ec1cfa**, 착수 **c4d07bf** / [PR #20](https://github.com/kirakein-gif/PLAYVAULT/pull/20). 최신 원격과 PR #17·#18·#19 병합, 중복 열린 작업·동일 원격 브랜치 없음을 확인하고 새 브랜치에서 시작했습니다. Noah 3단 콤보·미리 입력·연결 창·충돌을 지키는 3단 디딤, Ethan 40/80틱 충전·놓으면 발사·비관통·3단 빛 터짐, F2 조절 수치와 단계별 동작·효과를 구현했습니다. 교대하면 충전·콤보를 취소하며, 방 이동은 이전 공격을 취소합니다.

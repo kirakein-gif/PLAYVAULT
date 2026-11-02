@@ -1182,3 +1182,30 @@
 - 자체 검토 보완: 효과 마지막 프레임 시간, 방 이동 중 공격 취소, 사다리에서 디딤 누적 유지. 자체 경계 검사 초안의 구문 오류는 수정 후 검증했습니다. 원본 검사 실패/약화 없음. 보존 확인 중 Node 자식 프로세스 EPERM은 Git 원본을 임시 파일로 읽어 비교하는 방식으로 확인했습니다. audio404는 기존 실패 복구 검사의 예상 경고입니다.
 - 5개 관리 문서 검토: STATUS/WORK_LOG/CHANGELOG 갱신, AGENTS/CLAUDE 규칙 변경 없음. nextREADME·PROVENANCE 갱신, 루트README 변경 필요 없음. 구현 SHA는 이 항목과 함께 제출한 PR #20 커밋 참조. 브랜치 푸시·Draft→Ready 제출, main 병합·수동 배포/게시 없음.
 - 다음: **Claude Code**가 PR #20의 원본 규칙·실제 입력·단계별 렌더·충전 취소/주변 피해/퍼즐 보존·미리 입력 창·패널을 교차 검토합니다. 사용자 손맛·외형·동작 판단 대기, 실제 휴대전화 회전·터치감·성능 미확인. 2차 체력·피격·적3종은 별도 규격 후 진행. 검토 담당/발견 문제 수: Claude Code / 이번 구현 재검토 전 미확인. 사용자 재요청: TASK_09 착수 후0회.
+
+### 2026-11-02 (Asia/Seoul) · Codex 전투 1차(PR #20 `bf87c75`) 검토
+
+- 담당 AI: Claude Code(검토). 구현: Codex `codex/hollow-keep-combat-weapons`.
+- 범위: 검사 원본·규격 main과 동일(Codex 자체 weapons-edge만 추가). 기존 게임·공용 자산 변경 없음.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 15/15(제 사본 HK_SIM으로도 15/15), weapons-edge 6/6, pixel-assets 92/92, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest(`?room=test`) 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱, 공격 포함) 겹침 0건.
+- 그림: Noah 1·2·3단 동작·베기 궤적이 서로 다르고 한 획. Ethan 충전 빛 9프레임 성장, 2·3단 탄이 1단보다 큼, 빛 터짐 3프레임 고리.
+- 관찰(차단 아님): 시험 방 피해 숫자가 같은 자리에 쌓여 표적 HP 글자를 가림 → 2차에서 피해 표시 정리 제안.
+- 회사 PC 미리보기 Artifact를 `bf87c75` 빌드로 갱신(버전 3). 미리보기 사본에서만 `#test`로 무기 시험 방을 열 수 있게 app.js 한 줄·링크 추가(claude.ai는 주소의 `?room=test`를 넘기지 않음). 저장소 코드는 변경 없음.
+- Git/PR: [PR #20 검토](https://github.com/kirakein-gif/PLAYVAULT/pull/20) (COMMENT).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건(관찰 1건).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛·외형 확인 → 승인 시 PR #20 병합(이 기록 브랜치 함께) → 2차(체력·피격·적 3종, 둘 다 쓰러졌을 때 처리 제안) 규격.
+- 종료 상태: 검토 완료, 사용자 판단 대기.
+
+### 2026-11-02 (Asia/Seoul) · Noah 3단 베기 손맛 보완 규격
+
+- 담당 AI: Claude Code. 사용자 의견(미리보기 확인): "에단의 충전 공격은 괜찮다. 노아의 3단 베기는 너무 빨라서 움직임이 잘 안 보인다, 궤적만 여기저기 다른 느낌", 선택 "자세 멈춤 + 리듬 조금 느리게", 작업 중 추가 "촥~ 촥~ 촥 하는 느낌, 격투 게임의 3단 콤보처럼".
+- 측정(PR #20 `bf87c75`): 베기 동작 1·2단 9틱, 3단 12틱, 가장 긴 자세 3~4틱. 동작 뒤 다음 공격까지 9~18틱은 서 있는 자세.
+- 판단: 맞을 때 멈춤(히트스톱)을 게임 시간에 넣으면 콤보 타이밍 검사·완주 기록 재생이 모두 어긋나므로 그림 표시 효과(자세 붙잡기·표적 밝힘·밀림·3단 화면 흔들림)로 정함. 효과음이 "촥" 느낌에 가장 크지만 4단계 범위라 사용자 결정 대기.
+- 변경(`claude/hollow-keep-combat-review`): COMBAT_SPEC §2-1(2·3단 회복 22·34틱, 동작 길이 ≥ 회복-2, 핵심 자세 ≥4틱, 타격 연출), CODEX_TASK_09 추가 지시, `weapons-contract.cjs` 리듬 검사 1개(15 → 16), `pixel-assets.cjs` 동작 길이·자세 멈춤 검사.
+- 검증: PR #20 그대로면 weapons-contract 15/16, pixel-assets 91/92(동작 9틱 < 16틱). 회복 값과 ticks만 바꾼 사본은 weapons-contract 16/16, pixel-assets 92/92, foundation-contract 51/51, foundation-edge 16/16, area-data 22/22. Codex 자체 weapons-edge는 옛 타이밍 가정으로 실패 → Codex가 갱신하도록 지시.
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건(베기 동작이 안 보임 — 1차 규격에 동작 길이 기준이 없던 것은 Claude Code 누락).
+- 사용자 재요청 횟수: 0회.
+- 사용자 결정(후속): 효과음은 넣지 않음 — "소리가 안 나도 느낌으로 소리가 나는 것처럼 충분히 가능합니다". COMBAT_SPEC §2-1·CODEX_TASK_09 추가 지시의 금지 항목에 반영.
+- 다음: Codex가 PR #20에서 추가 지시 처리 → 재검토 → 미리보기 갱신.
+- 종료 상태: 규격 보강.
