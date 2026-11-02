@@ -40,6 +40,7 @@ const log = (s, extra = {}) => { console.log(s, JSON.stringify(extra)); result.s
   // buttons: DOM click (React onClick); board squares: real PointerEvents at the square centre
   const click = async (sel) => {
     await waitSel(sel, 30000);
+    console.log('click', sel);
     await page.evaluate((q) => document.querySelector(q).click(), sel);
     await page.waitForTimeout(400);
   };

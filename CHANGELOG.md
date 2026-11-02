@@ -76,6 +76,14 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 | 2026-10-19 | v0.12(문서/화면) | 3→2→1 예약 패와 다음 판 자동 진행, 미선택 대기·로딩 후 시작·미리보기 일시정지·에너지 0 종료 | [b5c3c5b](https://github.com/kirakein-gif/PLAYVAULT/commit/b5c3c5b8b8510b0d029b70b62482d480405f0804) |
 | 2026-10-19 | v0.13(문서/화면) | 수평 테이블과 타격 카메라 이동/축소 제거, 짧은 망치 머리·HUD 배치 조정. 정지 포즈 간 비례/앵커 정합은 남은 과제 | [e7b28cf](https://github.com/kirakein-gif/PLAYVAULT/commit/e7b28cfc1ce4e595cc7e8abfc6f55845543ca795) |
 
+## 우리집 체스 PREMIUM (FAMILY CHESS PREMIUM)
+
+경로: `games/family-chess-premium/`(독립 Vite·Capacitor 프로젝트), CI `.github/workflows/family-chess-android.yml`. 버전 표기는 개발 표식이며 배포를 뜻하지 않는다.
+
+| 날짜(KST) | 버전 | 주요 내용 | 관련 커밋 |
+| --- | --- | --- | --- |
+| 2026-11-02 | v1.0.0(신규) | 완전 오프라인 Android 태블릿 체스: 2인·컴퓨터 5단계(Stockfish 19 Lite WASM 내장)·복기, 아카데미(검증 문제 121·강의 17·별 기록·오늘의 훈련), 한·영, 프로필, JSON 백업, 자체 입체 기물·원목 보드·합성 효과음, debug APK CI 빌드. 상세 `games/family-chess-premium/README.md`, 테스트 `docs/TEST_REPORT.md` | 브랜치 `ccr-6aa2a39e-1vn67a`(435a935 … 이 항목을 포함한 커밋) |
+
 ## 플랫폼·공용 구조 및 병합
 
 | 날짜(KST) | 버전·근거 종류 | 주요 추가·구조 변경·수정 | 관련 커밋 |
