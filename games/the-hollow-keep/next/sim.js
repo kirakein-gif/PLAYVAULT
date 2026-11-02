@@ -23,7 +23,7 @@
         gravity: .57, jumpHeight: 145, variableJump: true, minJumpHeight: 56,
         maxFall: 13.8, coyoteTicks: 8, jumpBufferTicks: 8,
         weapon: { kind: 'melee', damage: 22, range: 66, cooldownTicks: 18,
-          height: 46, activeTicks: 9, comboWindowTicks:14,
+          height: 46, activeTicks: 9, comboWindowTicks:20,
           combo:[
             {damage:22,range:66,height:46,activeTicks:9,recoveryTicks:18},
             {damage:22,range:72,height:46,activeTicks:9,recoveryTicks:22},

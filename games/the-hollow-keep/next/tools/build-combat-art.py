@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """TASK_09 Route A: isolate generated source poses/effects, sample native pixels.
-Writes only new combat PNGs and manifest entries. Existing palette/assets preserved.
+Writes combat sheets and linked Noah attack frames/manifest; other assets preserved.
 """
 from pathlib import Path
 import json
@@ -102,6 +102,39 @@ sheet('ethan','fx-charge',frames,(96,96),(48,48),[6]*9,True)
 fx('ethan','fx-rune-2',3,[(52,30),(55,32),(53,31)],(64,48),(32,24))
 fx('ethan','fx-rune-3',4,[(72,44),(77,46),(74,45)],(96,64),(48,32))
 fx('ethan','fx-burst',5,[(40,40),(112,112),(176,176)],(192,192),(96,96),once=True)
-manifest['heroes']['noah']['animations']['attack']['ticks']=[2,2,9,3]
+# Linked recoveries: original cut/core poses plus new authored recovery source.
+# A recovery endpoint is literally the next attack's preparation, including the
+# third-to-first loop. All stages share a native foot pivot; no pose cross-fade.
+links=objects('combo-recovery-source.png',10000)
+links.sort(key=lambda p:(0 if p[0][1]<350 else 1 if p[0][1]<690 else 2,p[0][0]));assert len(links)==9,len(links)
+heights=[112,118,124,148,132,144,112,136,150]
+heads=[330,805,1303,312,815,1305,330,804,1298]
+handpoints=[(368,228),(867,228),(1340,225),(268,365),(761,407),(1277,408),(414,829),(821,804),(1266,707)]
+facepoints=[(340,144),(820,133),(1320,137),(326,449),(831,452),(1325,456),(343,823),(819,786),(1314,790)]
+bridges=[];bridgeHands=[]
+for (box,im),height,head,hand,face in zip(links,heights,heads,handpoints,facepoints):
+ scale=height/im.height;im=clean(im.resize((round(im.width*scale),height),Image.Resampling.BOX))
+ dx=160-round((head-box[0])*scale-4);dy=215-height+1
+ frame=Image.new('RGBA',(352,224));frame.paste(im,(dx,dy))
+ for (x,y),hexcolor in [(face,'#251f29'),((face[0]+2/scale,face[1]+1/scale),'#d6ae92'),(hand,'#8d96a4')]:
+  x=round(dx+(x-box[0])*scale);y=round(dy+(y-box[1])*scale)
+  rgb=tuple(bytes.fromhex(hexcolor[1:]));color=min([tuple(bytes.fromhex(c[1:]))for c in colors],key=lambda c:sum((c[i]-rgb[i])**2 for i in range(3)))+(255,)
+  if 0<=x<352 and 0<=y<224 and frame.getpixel((x,y))[3]:frame.putpixel((x,y),color)
+ bridges.append(frame);bridgeHands.append({'x':round(dx+(hand[0]-box[0])*scale),'y':round(dy+(hand[1]-box[1])*scale)})
+
+def originalFrames(name):
+ anim=json.loads((SRC/'combo-base/manifest.json').read_text())if name=='attack'else manifest['heroes']['noah']['animations'][name]
+ image=Image.open(SRC/'combo-base/noah-attack.png'if name=='attack'else OUT/anim['file']).convert('RGBA');frames=[];hands=[]
+ for i in range(4):
+  frame=Image.new('RGBA',(352,224));dx=160-anim['pivot']['x'];dy=215-anim['pivot']['y']
+  frame.paste(image.crop((i*anim['frameW'],0,(i+1)*anim['frameW'],anim['frameH'])),(dx,dy));frames.append(frame)
+  h=anim['hands'][i];hands.append({'x':h['x']+dx,'y':h['y']+dy})
+ return frames,hands
+base1,h1=originalFrames('attack');base2,h2=originalFrames('attack-2');base3,h3=originalFrames('attack-3')
+sequences=[('attack',[bridges[8],base1[1],base1[2],*bridges[0:3]],[bridgeHands[8],h1[1],h1[2],*bridgeHands[0:3]],[2,2,9,2,1,2]),
+ ('attack-2',[bridges[2],base2[1],base2[2],*bridges[3:6]],[bridgeHands[2],h2[1],h2[2],*bridgeHands[3:6]],[2,2,12,2,2,2]),
+ ('attack-3',[bridges[5],base3[1],base3[2],*bridges[6:9]],[bridgeHands[5],h3[1],h3[2],*bridgeHands[6:9]],[2,2,22,3,3,2])]
+for name,frames,hands,ticks in sequences:sheet('noah',name,frames,(352,224),(160,215),ticks,False,hands)
+
 (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
-print('Built9 combat sheets from3 generated sources; existing64-color palette preserved.')
+print('Built linked6-frame Noah combos and Ethan combat effects; existing64-color palette preserved.')

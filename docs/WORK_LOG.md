@@ -1249,3 +1249,16 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex가 PR #20에서 추가 지시 2 처리 → 재검토 → 미리보기 갱신.
 - 종료 상태: 규격 보강.
+
+
+## 2026-11-02 · Codex · TASK_09 추가 수정 지시2 / PR #20 콤보 연결
+
+- 요청/담당: 사용자 최신 지시의 추가 수정2를 같은 PR #20에서 Codex가 구현, Claude Code는 읽기 검토 담당. 시작 전 최신 GitHub/main4ec1cfa·PR20 OPEN·규격 브랜치c77525a를 확인. 시작 기준091e41b, 병합3e85135에서 작업권/범위를 STATUS와 draft PR에 공유했습니다. 기존 WORK_LOG 양쪽 내용을 보존해 규격 브랜치를 병합했습니다. 과거 TASK_08 재적용 없음.
+- 범위: next/sim.js(창14→20만), render.js(마지막 자세·이동 해제 latch·명중 core 시간 배분), Noah 공격3장/manifest·새 경로A source·재현 빌더·캡처 도구·관리 문서. main·다른 게임·공용 자산·배포 설정 변경 없음. 게임 버전 번호 전후 동일(추가 번호 없음).
+- 구현: 각6프레임,18/22/34틱. 새 거두기9자세, 앞 단 끝=다음 단 첫 실제 RGBA 공유(1→2·2→3·3→1 IoU1.0). 기존 cut/core 두 프레임은 원본과 pivot 정렬 후 픽셀 동일. 모든 다른 runtime PNG와 Ethan manifest는091e41b와 동일. Route A image_gen의 실제 prompt·정리/원본 보존 방법을 PROVENANCE에 기록했습니다. 두 번 빌드한 runtime PNG/JSON 동일.
+- 표시: 연결 가능 중 끝 자세 유지, 움직임/38·42·54틱 만료 시 평소 자세. 다음 단은 바로 첫 자세. 명중3/3/5틱 추가 유지는 긴 핵심 자세의 표시 시간에서 배분하여 모든 거두기가 다음 타 전에 보입니다(명중 core6/9/17틱). 게임 tick·표적 실제 좌표·1단 무기/이동 수치·Ethan 유지, 효과음 없음.
+- 이번 실행 통과: weapons17/17, pixel-assets93/93, combo-render5/5, weapons-edge6/6; foundation51/51·edge16/16, exploration16/16·entrance9/9·ladder10/10·area22/22·exploration-edge13/13·ladder-edge4/4·traversal4/4(4159틱); pixel-render 시험실/구역 각7/7, ladder-render7/7·tile7/7·IME7/7·mobile-layout20/20·fullscreen6/6·exploration-browser6/6·browser-playtest20/20. ECLIPSE polish/audio/audio-wind 모두 PASS(다른 게임 회귀로 구분).
+- 실제 조작/화면: capture-combat6/6(좌우18몸프레임·9효과프레임/방향·Ethan·모바일·F2), 명중좌우2/2, 창/이동해제2/2.44원본 캡처→10무손실보드, 좌우82틱/1367ms 클립 디코딩 RGBA/시간 일치, 연결 -2/-1/0/+1틱 비교2보드. `next/assets/combat-review/linked/`에 캡처·관측·검사 결과·원본로그 첨부, 이전 자료 보존.
+- 실패/정정: 구역용 검사를 처음 시험실 URL로 실행하여 area 미존재/타일2/7/준비 실패. 원본 로그를 보존하고 올바른 구역 주소에서 전부 통과했습니다. 자체 창 만료 검사는 처음 경계를1틱 일찍 기대했고 관측 tick-started37→38을 명시해 정정했습니다. 인수 테스트 원본 약화/삭제 없음. 요구 검사는 규격c77525a와 동일합니다.
+- 5개 관리 문서 검토: WORK_LOG·STATUS·CHANGELOG 갱신, AGENTS·CLAUDE 절차 변경 없음. next README·PROVENANCE 갱신. 커밋/PR: 이 항목을 포함한 `fix(hollow-keep): connect Noah combo recovery poses` 커밋을 같은 브랜치로 일반 push, PR #20 재검토 제출. main 병합·수동 배포 없음.
+- 검토 담당/발견 문제 수: Claude Code의 이번 수정 재검토 대기(미확인). 사용자 재요청 횟수2회(박자/명중 보완 후 연결 보완). 외형 자연스러움·실기기 터치감/성능은 사용자 확인 필요. 다음 담당은 Claude Code, PR20 최신 head와 linked/TEST_RESULTS의 실제 재현 절차 기준으로 재검토. 회사 PC 미리보기 갱신은 사용자 측 후속 작업입니다.

@@ -144,16 +144,26 @@
       const duration=name=>anims?.[name]?.ticks?.reduce((a,b)=>a+b,0)||({attack:20,land:8}[name]||0);
       const attackAction=world.active==='noah'&&state.attackStep>1?'attack-'+state.attackStep:'attack';
       const rawAge=world.tick-state.attack;
-      const hold=state.hold?Math.max(0,Math.min(state.hold.ticks,world.tick-state.hold.tick)):0;
+      const coreEnd=anims?.[attackAction]?.ticks.slice(0,3).reduce((a,b)=>a+b,0)||Infinity;
+      // Impact holds borrow time from the long core stance so recovery frames
+      // still arrive before the next buffered strike; the cut itself stays held.
+      const hold=state.hold&&rawAge<coreEnd?Math.max(0,Math.min(state.hold.ticks,world.tick-state.hold.tick)):0;
       const attackAge=rawAge-hold;
       const attacking=state.attack!==undefined&&attackAge<duration(attackAction);
-      if(attacking)action=attackAction;
+      const moving=Math.abs(p.vx)>.1||Math.abs(p.vy)>.1||['left','right','up','down','jump'].some(key=>world.previous[key]);
+      if(!attacking&&moving)state.releaseLinkPose=true;
+      const combo=HKSim.CONFIG.heroes.noah.weapon;
+      const linking=world.active==='noah'&&p.combo.step===state.attackStep&&p.combo.started===state.attack
+        &&rawAge<combo.combo[state.attackStep-1].recoveryTicks+combo.comboWindowTicks
+        &&(p.onGround||p.climbing)&&!state.releaseLinkPose;
+      const showingAttack=attacking||linking;
+      if(showingAttack)action=attackAction;
       else if(p.charge.level)action='charge';
       else if(p.onGround&&state.land!==undefined&&world.tick-state.land<duration('land'))action='land';
       const age=action.startsWith('attack')?attackAge:action==='land'?world.tick-state.land:world.tick;
       const frame=anim=>action==='climb'?Math.floor((p.climbDistance||0)/8)%anim.frames:action.startsWith('jump-')?(p.vy < -1?0:p.vy > 1?2:1):timed(anim,age);
-      const attackIndex=attacking&&anims?.[attackAction]?timed(anims[attackAction],age):-1;
-      const displayFace=attacking?(state.attackFace??p.face):p.face;
+      const attackIndex=showingAttack&&anims?.[attackAction]?timed(anims[attackAction],age):-1;
+      const displayFace=showingAttack?(state.attackFace??p.face):p.face;
       if(!sprite(world.active,action,frame,p.x+p.w/2,p.y+p.h,displayFace)){
         // Preserve geometric fallback when the current animation cannot be loaded.
         ctx.save();ctx.translate(p.x + p.w / 2, p.y + p.h);ctx.scale(p.face,1);
@@ -220,7 +230,7 @@
       if(event.type==='room'){visual={};bursts=[];impacts={};shake=null;}
       if(event.type==='swap')visual={};
       if(event.type==='burst')bursts.push({...event,tick:world.tick});
-      if(event.type==='attack'){state.attack=world.tick;state.attackFace=world.player.face;state.attackStep=event.step||1;state.hold=null;}
+      if(event.type==='attack'){state.attack=world.tick;state.attackFace=world.player.face;state.attackStep=event.step||1;state.hold=null;state.releaseLinkPose=false;}
       if(event.type==='hit'&&event.hero==='noah'){
         // Keep the two-tick preparation visible, then align impact presentation
         // with the first cut. Damage, cooldowns and the world clock keep running.

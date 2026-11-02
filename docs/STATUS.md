@@ -1,11 +1,15 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Codex**(PR #20 Noah 박자·명중 연출 보완, Claude Code 재검토 대기).
+확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Codex**(PR #20 Noah 콤보 연결 보완, Claude Code 재검토 대기).
 
 
-## 수정 진행 · TASK_09 추가 지시2 / Noah 콤보 연결
+## 수정 제출 · TASK_09 추가 지시2 / Noah 콤보 연결
 
-2026-11-02 / Codex / PR #20, codex/hollow-keep-combat-weapons / 기준091e41b + origin/claude/hollow-keep-combat-review(c77525a). 사용자 지시로 규격§2-2·검사를 병합합니다. 범위: 연결 창20, 창 동안 마지막 자세 유지·이동/창 만료 시 해제, Noah 각6프레임과 공유 연결 자세·제작도구·검증/캡처/기록. 기존 세 핵심 베기·효과·리듬18/22/34·명중 연출·Ethan은 유지합니다. 원본 검사 약화·게임 시간 정지·효과음·main 병합·수동 배포 없음. Claude Code 재검토용 같은 PR 갱신.
+2026-11-02 / Codex / `codex/hollow-keep-combat-weapons` / 기준091e41b + 규격c77525a(병합3e85135) / [PR #20](https://github.com/kirakein-gif/PLAYVAULT/pull/20). Noah 각6프레임·18/22/34틱, 새 거두기9자세·공유 끝/시작 그림(기준점 IoU1.0), 연결 창20틱과 마지막 자세 유지·이동/만료 시 해제를 반영했습니다. 세 핵심 베기/효과와1단·이동·Ethan은 보존했습니다. 명중3/3/5틱 추가 유지는 긴 핵심 자세 시간에서 배분해 다음 단 전에 모든 거두기를 표시합니다.
+
+무기17/17·자산93/93·combo-render5/5·자체경계6/6·실제입력6/6·명중좌우2/2·연결해제2/2 및 요구 전체 회귀 통과. 원본 검사 약화 없음. 구역용 검사 최초 URL 오설정 실패와 정정 재실행은 원본 로그에 기록했습니다. 캡처·좌우82틱/1367ms 영상·연결 비교·로그: `next/assets/combat-review/linked/`. 이전 제출 기록과 캡처는 보존합니다.
+
+다음은 Claude Code 재검토와 회사 PC 미리보기 갱신·사용자 자연스러움 판단입니다. 실기기 미확인, 버전 번호 변경·main 병합·수동 배포 없음. 아래는 이전 제출 당시 기록입니다.
 
 ## 수정 제출 · PR #20 Noah 베기 박자·명중 연출 / Claude Code 재검토 대기
 

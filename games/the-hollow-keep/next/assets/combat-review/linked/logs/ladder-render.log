@@ -1,0 +1,7 @@
+page.evaluate: TypeError: Cannot read properties of undefined (reading 'rooms')
+    at eval (eval at evaluate (:311:30), <anonymous>:6:27)
+    at UtilityScript.evaluate (<anonymous>:313:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+    at /workspace/PLAYVAULT/games/the-hollow-keep/next/tests/ladder-render.cjs:53:29 {
+  log: []
+}

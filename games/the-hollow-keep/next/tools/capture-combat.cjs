@@ -42,8 +42,8 @@ const out=process.env.HK_SHOT_DIR||'/tmp/hk09-review';fs.mkdirSync(out,{recursiv
     if(d){const step=d.file==='noah-attack.png'?1:Number(d.file.match(/-([23])\.png/)[1]),id=step+'-'+d.frame;
      if(!frames.has(id)){frames.add(id);await c.shot(`noah-${direction}-step-${step}-frame-${d.frame}`);}}
    }
-   assert.deepEqual((await c.state()).events.filter(e=>e.type==='attack').map(e=>e.step),[1,2,3]);assert.equal(frames.size,12,'four actual poses in each combo stage');assert.equal(fx.size,3,'three actual slash effect sheets');assert.equal(fxFrames.size,9,'all3 actual effect frames in each stage');assert.deepEqual(c.errors,[]);
-   console.log('PASS Noah '+direction+': actual1/2/3 events, all12 body frames and all9 slash effect frames');checks++;await c.context.close();
+   assert.deepEqual((await c.state()).events.filter(e=>e.type==='attack').map(e=>e.step),[1,2,3]);assert.equal(frames.size,18,'six actual poses in each combo stage');assert.equal(fx.size,3,'three actual slash effect sheets');assert.equal(fxFrames.size,9,'all3 actual effect frames in each stage');assert.deepEqual(c.errors,[]);
+   console.log('PASS Noah '+direction+': actual1/2/3 events, all18 body frames and all9 slash effect frames');checks++;await c.context.close();
   }
   for(const level of [2,3]){
    const c=await open();await c.page.keyboard.down('KeyJ');await c.ticks(level===2?42:82);
