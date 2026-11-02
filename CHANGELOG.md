@@ -266,3 +266,7 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 ## THE HOLLOW KEEP · 사다리 행동·오르기 동작 병합 (2026-11-02, Asia/Seoul)
 
 - PR #18(규격·검사) → PR #17(Codex 구현 `3d254ae`) main 병합. 사다리 점프 후 재매달림 제한, 옆 바닥 내리기(←/→만), 대각선 오르기, 매달린 채 공격 방향, climb 4프레임(거리 기반·가운데 정렬), 가로대 20px 간격, 한글 입력 상태 키보드 검사. 게임 버전 번호 변경 없음.
+
+## THE HOLLOW KEEP · 3단계 전투 1차 규격 (2026-11-02, Asia/Seoul)
+
+- 규격·검사만. Noah 3단 콤보(연타·미리 입력·3단 디딤), Ethan 3단계 충전 사격(누른 순간 1단, 40·80틱 충전, 놓으면 충전탄, 3단 빛 터짐, 비관통 유지). `COMBAT_SPEC.md`, `CODEX_TASK_09.md`, `weapons-contract.cjs`(15). Codex 구현 대기.

@@ -23,7 +23,11 @@ let SCALE = 1, TILE = BASE_TILE;
 const MAX_COLORS = 64;
 const FULL = { idle: 4, run: 6, 'jump-standing': 3, 'jump-running': 3, land: 2, attack: 4, climb: 4 }; // climb: LADDER_ACTIONS_SPEC §3
 const TRIAL = process.env.HK_ART_REQUIRE || '';
-const REQUIRE_BY_HERO = { ethan: FULL, noah: FULL };
+// COMBAT_SPEC §4: 주인공별 추가 동작(Noah 2·3단 베기, Ethan 충전 자세)
+const EXTRA = { ethan: { charge: 2 }, noah: { 'attack-2': 4, 'attack-3': 4 } };
+const REQUIRE_BY_HERO = { ethan: { ...FULL, ...EXTRA.ethan }, noah: { ...FULL, ...EXTRA.noah } };
+// COMBAT_SPEC §4: 주인공별 필수 효과(최소 프레임)
+const REQUIRED_FX = { ethan: { 'fx-rune': 2, 'fx-charge': 3, 'fx-rune-2': 2, 'fx-rune-3': 2, 'fx-burst': 3 }, noah: { 'fx-slash': 3, 'fx-slash-2': 3, 'fx-slash-3': 3 } };
 if (TRIAL) {
   for (const h of Object.keys(REQUIRE_BY_HERO)) REQUIRE_BY_HERO[h] = {};
   for (const part of TRIAL.split(';').filter(Boolean)) {
@@ -31,8 +35,9 @@ if (TRIAL) {
     REQUIRE_BY_HERO[h.trim()] = Object.fromEntries(list.split(',').map((n) => n.trim()).filter((n) => n in FULL).map((n) => [n, FULL[n]]));
   }
 }
-const REQUIRED = FULL; // 시트 분석 대상 이름 목록
-const OPTIONAL_FX = { 'fx-rune': 2, 'fx-slash': 3 };
+const REQUIRED = { ...FULL, ...EXTRA.ethan, ...EXTRA.noah }; // 시트 분석 대상 이름 목록
+const OPTIONAL_FX = { 'fx-rune': 2, 'fx-slash': 3, 'fx-slash-2': 3, 'fx-slash-3': 3, 'fx-charge': 3, 'fx-rune-2': 2, 'fx-rune-3': 2, 'fx-burst': 3 };
+const ONCE_FX = ['fx-slash', 'fx-slash-2', 'fx-slash-3', 'fx-burst'];
 const GROUNDED = ['idle', 'run', 'land'];
 const PNG_SIG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
@@ -197,13 +202,22 @@ async function analyze(page, file, opts) {
         if (!name.startsWith('jump-') || a.ticks !== undefined) {
           assert.ok(Array.isArray(a.ticks) && a.ticks.length === a.frames && a.ticks.every(isInt), `${name} ticks는 프레임 수만큼의 양의 정수`);
         }
-        if (name === 'idle' || name === 'run' || name === 'climb') assert.equal(a.loop, true, `${name}.loop는 true`);
-        if (name === 'attack') assert.ok(a.ticks[0] <= 2, `attack 첫(준비) 프레임 ${a.ticks[0]}틱 > 2틱 — 판정은 누르는 즉시 생기므로 휘두르기 전에 피해가 먼저 보임`);
+        if (name === 'idle' || name === 'run' || name === 'climb' || name === 'charge') assert.equal(a.loop, true, `${name}.loop는 true`);
+        if (name.startsWith('attack')) assert.ok(a.ticks[0] <= 2, `attack 첫(준비) 프레임 ${a.ticks[0]}틱 > 2틱 — 판정은 누르는 즉시 생기므로 휘두르기 전에 피해가 먼저 보임`);
         assert.ok(/\.png$/i.test(a.file || ''), `${name} 파일은 .png`);
       }
     });
   }
 
+  for (const hero of HEROES) {
+    if (TRIAL) break;
+    check(`${hero}: 필수 효과(COMBAT_SPEC §4) ${Object.keys(REQUIRED_FX[hero]).join(', ')}`, () => {
+      const anims = (heroes[hero] || {}).animations || {};
+      const missing = Object.keys(REQUIRED_FX[hero]).filter((n) => !anims[n]);
+      assert.deepEqual(missing, [], `빠진 효과: ${missing.join(', ')}`);
+      for (const n of Object.keys(REQUIRED_FX[hero])) if (ONCE_FX.includes(n)) assert.notEqual(anims[n].loop, true, `${n}.loop가 true(한 번만 재생해야 함)`);
+    });
+  }
   // ── 이미지 분석 ──
   const launch = process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {};
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'], ...launch });
@@ -227,7 +241,7 @@ async function analyze(page, file, opts) {
       });
       if (!fs.existsSync(file) || !fs.readFileSync(file).subarray(0, 8).equals(PNG_SIG)) continue;
       let r;
-      try { r = await analyze(page, file, { palette, frameW: s.a.frameW, frameH: s.a.frameH, minPart: s.name === 'fx-slash' ? 6 : 0 }); }
+      try { r = await analyze(page, file, { palette, frameW: s.a.frameW, frameH: s.a.frameH, minPart: s.name.startsWith('fx-slash') ? 6 : 0 }); }
       catch (e) { check(`${s.label}: 이미지 해석`, () => assert.fail(`해석 실패: ${e.message.split('\n')[0]}`)); continue; }
       results2[s.label] = r;
       check(`${s.label}: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음`, () => {
@@ -241,10 +255,11 @@ async function analyze(page, file, opts) {
         if (s.name in OPTIONAL_FX) assert.ok(s.a.frames >= OPTIONAL_FX[s.name], `${s.name} 프레임 ${s.a.frames} < ${OPTIONAL_FX[s.name]}`);
       });
       if (s.name in OPTIONAL_FX) {
-        const once = s.name === 'fx-slash'; // 베기는 한 번, 날아가는 룬탄은 반복 허용
-        check(`${s.label}: 이웃 프레임 그림이 다름${once ? '·한 번만 재생(loop가 true가 아님)·프레임마다 한 획' : ''}`, () => {
+        const once = ONCE_FX.includes(s.name); // 베기·빛 터짐은 한 번, 날아가는 룬탄·충전 빛은 반복 허용
+        const stroke = s.name.startsWith('fx-slash');
+        check(`${s.label}: 이웃 프레임 그림이 다름${once ? '·한 번만 재생(loop가 true가 아님)' : ''}${stroke ? '·프레임마다 한 획' : ''}`, () => {
           if (once) assert.notEqual(s.a.loop, true, `${s.name}.loop가 true(같은 효과가 반복 재생됨)`);
-          if (once) r.parts.forEach((n, i) => assert.equal(n, 1, `${i}번 프레임이 한 획이 아님: 6픽셀 이상 덩어리 ${n}개(떨어진 평행선·조각은 두 줄로 보임)`));
+          if (stroke) r.parts.forEach((n, i) => assert.equal(n, 1, `${i}번 프레임이 한 획이 아님: 6픽셀 이상 덩어리 ${n}개(떨어진 평행선·조각은 두 줄로 보임)`));
           r.frameHashes.forEach((hsh, i) => { if (i) assert.notEqual(hsh, r.frameHashes[i - 1], `${i - 1}·${i}번 프레임이 같은 그림`); });
         });
       }
@@ -288,6 +303,16 @@ async function analyze(page, file, opts) {
         assert.ok(a.W !== b.W || a.H !== b.H || a.hash !== b.hash, '두 점프 시트가 픽셀까지 같음');
       });
     }
+    if (!TRIAL && heroes.noah) check('noah: 1·2·3단 베기 효과(fx-slash, -2, -3)와 베기 동작(attack, -2, -3)이 서로 다른 그림(COMBAT_SPEC §4)', () => {
+      for (const group of [['fx-slash', 'fx-slash-2', 'fx-slash-3'], ['attack', 'attack-2', 'attack-3']]) {
+        const hs = group.map((n) => results2[`noah/${n}`]);
+        assert.ok(hs.every(Boolean), `${group.join('·')} 시트가 모두 있어야 함`);
+        for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) {
+          const shared = hs[i].frameHashes.filter((h) => hs[j].frameHashes.includes(h));
+          assert.equal(shared.length, 0, `${group[i]}와 ${group[j]}가 같은 프레임 ${shared.length}개를 씀(궤적이 달라야 함)`);
+        }
+      }
+    });
 
     // ── 타일셋 (시험본 모드에서는 생략) ──
     const t = TRIAL ? {} : (manifest.tiles || {});
