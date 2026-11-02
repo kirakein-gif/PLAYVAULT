@@ -38,3 +38,27 @@ PLAYVAULT — THE HOLLOW KEEP: 사다리 위 행동(점프로 떠나기·옆으�
 [금지] 검사 원본 약화(결함이 있으면 고치지 말고 PR에 이유를 적는다), 1단계 조작 수치·캐릭터 크기 변경, 기존 게임·공용 자산 수정, 적·체력, 병합·배포
 [완료] next/README.md 갱신, WORK_LOG·STATUS·CHANGELOG 갱신, Draft → Ready, 병합하지 않는다. 검토는 Claude Code.
 ```
+
+## 추가 수정 지시 (2026-11-02, PR #17 검토 후)
+
+```text
+PLAYVAULT — THE HOLLOW KEEP: 사다리 대각선 입력 정정 + PC 키보드(한글 입력 상태) 검사
+
+저장소: kirakein-gif/PLAYVAULT
+작업 브랜치: codex/hollow-keep-ladder-actions (PR #17을 이어서 수정한다)
+먼저 할 일: origin/claude/hollow-keep-ladder-diagonal 을 이 브랜치에 병합한다(정정된 규격·검사).
+
+[수정 — LADDER_ACTIONS_SPEC §2 L2 정정]
+- 옆으로 내리기는 ↑/↓ 없이 ←/→만 누를 때만. ↑/↓와 ←/→를 함께 누르면(대각선) 오르내리고 방향만 바뀐다.
+- 원인: 지금은 사다리 아래 끝(옆이 바닥)에서 ↑+←를 누르면 잡자마자 내려서 오를 수 없다.
+  모바일 조이스틱은 위로 약 15°만 기울어도 좌우가 함께 들어오고(데드존 0.25), 키보드 W+A도 같다. 구역 사다리 아래 끝 12곳 모두 해당.
+- 1단계 수치·다른 사다리 규칙은 그대로.
+
+[검증 — 결과를 그대로 보고]
+1. ladder-actions 10/10 (대각선 2개·↑ 놓고 내리기 1개 추가, 이전 대각선 내리기 검사는 삭제됨)
+2. 로컬 HTTP 서버 후 keyboard-ime 7/7(새 검사, 한글 입력 상태), ladder-render 7/7
+3. 나머지 전체 회귀(이전 지시와 같음)
+
+[금지] 검사 원본 약화, 1단계 수치 변경, 병합·배포
+[완료] WORK_LOG·STATUS·CHANGELOG 갱신, Ready, 병합하지 않는다. 검토는 Claude Code.
+```

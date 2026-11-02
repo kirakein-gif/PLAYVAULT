@@ -2,6 +2,10 @@
 
 확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #15·#14 병합, 사다리 작업 새 브랜치 지시).
 
+
+## 검토 · PR #17 사다리 행동 — 대각선 정정·PC 키보드 검사 추가 / Codex 수정 대기
+
+Claude Code / `claude/hollow-keep-ladder-diagonal` / 2026-11-02. PR #17(`dc5e336`) 전체 검사 통과, 단 사다리 아래 끝에서 대각선(↑+←/→, 모바일 조이스틱·키보드 W+A)으로 오르지 못하는 문제 1건(규격 L2 문구 원인). 정정 규격·`ladder-actions.cjs`(10), 새 `keyboard-ime.cjs`(7, 한글 입력 상태 키보드). CODEX_TASK_08 추가 지시로 PR #17에서 수정. 병합 없음.
 ## 병합 완료 · PR #15 → PR #14 (2026-11-01) / 다음: Codex 사다리 작업(새 브랜치)
 
 사용자 승인("지금 병합하고 새 브랜치로 진행해 주세요"). PR #14를 main에 병합(`27f6110`, PR #15 규격 `0bc593d`까지 포함). PR #15는 그 head가 PR #14에 먼저 병합되어 이미 닫혀 있었으므로, 이후 커밋(사다리 행동 규격·검사, 재검토 기록)은 `claude/hollow-keep-tile-mosaic` 새 PR로 main에 병합. 사다리 행동·climb 동작은 새 브랜치 `codex/hollow-keep-ladder-actions`(기준 main)에서 `CODEX_TASK_08.md`로 진행.

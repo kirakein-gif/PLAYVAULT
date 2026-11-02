@@ -1077,3 +1077,17 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex `CODEX_TASK_08.md`(새 브랜치) → Claude Code 검토.
 - 종료 상태: 병합 진행.
+
+### 2026-11-02 (Asia/Seoul) · Codex 사다리 행동(PR #17 `dc5e336`) 검토, 대각선 정정, PC 키보드 검사
+
+- 담당 AI: Claude Code(검토·규격). 구현: Codex `codex/hollow-keep-ladder-actions`.
+- 범위: 검사 원본 변경 없음(Codex 자체 `ladder-edge.cjs` 추가). 기존 게임·공용 자산 변경 없음.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): ladder-actions 8/8, ladder-edge 4/4, exploration-contract 16/16, entrance 9/9, foundation-contract 51/51, area-data 22/22, exploration-edge 13/13, foundation-edge 16/16, pixel-assets 63/63, ladder-render 7/7, tile-mosaic-render 7/7, pixel-render 구역·시험 방 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest(`?room=test`) 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종(polish-regression은 동시 실행 중 시간 초과, 단독 재실행 통과). 무작위 입력(314곳, 47.1만 틱) 겹침 0건.
+- 화면: climb 4프레임 두 주인공(등을 보이며 팔다리 교대), 옆 바닥 내리기·사다리 공격 캡처 확인.
+- **발견 1건(규격 측 원인, Claude Code):** L2 "대각선으로 오르다 옆 바닥 높이면 내림" 때문에 사다리 아래 끝(옆이 바닥)에서 ↑+←/→를 누르면 잡자마자 내려 오르지 못함. 구역 사다리 아래 끝 12곳 모두 해당. 모바일 조이스틱은 데드존 0.25라 위로 약 15°만 기울어도 좌우가 들어와 휴대전화에서 자주 발생. 키보드 W+A도 같음.
+- 정정(`claude/hollow-keep-ladder-diagonal`): 옆으로 내리기는 ↑/↓ 없이 ←/→만 누를 때. `ladder-actions.cjs` 대각선 내리기 검사 삭제, 대각선 오르기 2개·↑ 놓고 내리기 1개 추가(8 → 10). PR #17 구현은 7/10, 정정 참조 구현(PR #17 `sim.js`에 조건 한 줄)은 10/10, 다른 검사 영향 없음.
+- 사용자 요청(작업 중): "평일 낮에는 회사 컴퓨터에서 할 거라서 키보드 인식도 되게 해 줘". 확인: 키는 `KeyboardEvent.code`(물리 키)로 읽어 한글 입력 상태에서도 동작(한글 key 값·keyCode 229 이벤트로 이동·교대·지도 확인). `keyboard-ime.cjs`(7) 추가 — PR #17은 6/7(사다리 아래 W+A 대각선만 실패), 정정 참조 7/7. LADDER_ACTIONS_SPEC §5, CODEX_TASK_08 추가 지시.
+- 검토 담당 / 발견 문제 수: Claude Code / 1건(대각선, 규격 결함).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #17에서 추가 지시 처리 → Claude Code 재검토 → 승인 시 정정 PR → PR #17 병합.
+- 종료 상태: 검토 완료, 수정 대기.

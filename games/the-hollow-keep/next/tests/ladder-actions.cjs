@@ -86,9 +86,21 @@ test('L2 옆에 바닥이 없으면 ←·→는 바라보는 방향만 바꾸고
   assert.ok(P(w).climbing); assert.equal(P(w).face, 1, '→ 뒤 face');
 });
 
-test('L2 ↑+←로 오르다 바닥 높이에 오면 그 바닥으로 내림', () => {
-  const w = world(); climbTo(w, 420);
-  for (let i = 0; i < 200 && P(w).climbing; i++) HK.step(w, I({ up: true, left: true }));
+for (const [name, side] of [['←', 'left'], ['→', 'right']]) test(`L2 ↑+${name}(대각선)은 오르기: 사다리 아래에서 잡아 오르고, 옆 바닥 높이도 내리지 않고 지나감`, () => {
+  // 모바일 조이스틱은 위로 약 15°만 기울어도 좌우가 함께 들어온다(input.js 데드존 0.25). 대각선에서 내려 버리면 사다리를 잡을 수 없다.
+  const w = world(), y0 = P(w).y;
+  for (let i = 0; i < 40; i++) HK.step(w, I({ up: true, [side]: true }));
+  assert.ok(P(w).climbing && y0 - P(w).y >= 60, `사다리 아래에서 대각선으로 오르지 못함 (climbing ${P(w).climbing}, 상승 ${(y0 - P(w).y).toFixed(1)})`);
+  for (let i = 0; i < 120 && feet(P(w)) > SHELF - 40; i++) HK.step(w, I({ up: true, [side]: true }));
+  assert.ok(P(w).climbing && feet(P(w)) < SHELF - 30, `옆 바닥 높이(${SHELF})에서 내려 버림 (climbing ${P(w).climbing}, 발 ${feet(P(w)).toFixed(1)})`);
+  assert.equal(P(w).face, side === 'left' ? -1 : 1, '대각선의 좌우로 바라보는 방향은 바뀌어야 함');
+});
+
+test('L2 오르다 ↑를 놓고 ←만 누르면 그 높이의 바닥으로 내림', () => {
+  const w = world(); climbTo(w, SHELF + 2);
+  HK.step(w, I({ up: true, left: true }));
+  assert.ok(P(w).climbing, '↑와 함께 누를 때는 내리지 않아야 함');
+  for (let i = 0; i < 4; i++) HK.step(w, I({ left: true }));
   const p = P(w);
   assert.ok(!p.climbing && p.onGround && Math.abs(feet(p) - SHELF) <= 0.5, `climbing ${p.climbing}, 발 ${feet(p).toFixed(1)}`);
 });

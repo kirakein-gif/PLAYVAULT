@@ -245,3 +245,7 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 ## THE HOLLOW KEEP · 사다리 위 행동·오르기 동작 규격 (2026-11-01, Asia/Seoul)
 
 - 규격·검사만. 점프 후 재매달림 금지, 옆 바닥으로 내리기, 매달린 채 공격 방향, climb 동작. `LADDER_ACTIONS_SPEC.md`, `CODEX_TASK_08.md`, `ladder-actions.cjs`(8), `ladder-render.cjs`(7). Codex 구현 대기.
+
+## THE HOLLOW KEEP · 사다리 대각선 정정·PC 키보드 검사 (2026-11-02, Asia/Seoul)
+
+- 규격·검사만. 옆으로 내리기는 ←/→만 누를 때(대각선은 오르기). `ladder-actions.cjs` 10개, `keyboard-ime.cjs` 7개(한글 입력 상태). PR #17 수정 대기.
