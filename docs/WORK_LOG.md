@@ -1104,3 +1104,15 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex가 PR #17에서 추가 지시 1·2 처리 → 재검토 → 미리보기 Artifact 갱신.
 - 종료 상태: 규격 보강.
+
+### 2026-11-02 (Asia/Seoul) · Codex 사다리 추가 수정(PR #17 `3d254ae`) 재검토
+
+- 담당 AI: Claude Code(검토). 구현: Codex(추가 지시 1·2).
+- 범위: PR #18 규격 `817fd63` 병합 포함, 검사 원본 동일(Codex 자체 ladder-edge만 추가).
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): ladder-actions 10/10, ladder-edge 4/4, keyboard-ime 7/7, pixel-assets 65/65, ladder-render 7/7, tile-mosaic-render 7/7, exploration-contract 16/16, entrance 9/9, foundation-contract 51/51, area-data 22/22, exploration-edge 13/13, foundation-edge 16/16, pixel-render 구역·시험 방 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest(`?room=test`) 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱) 겹침 0건. 사다리 아래에서 ↑, ↑+←, ↑+→ 모두 잡고 오름.
+- 화면: 사다리 4칸 이어도 가로대 간격 같음. 오르기 4프레임 두 주인공 모두 몸 곧게 가운데, 손은 사다리 위. 관찰: Noah 등의 검이 교차 프레임에서 좌우 반전(Codex가 PR에 명시한 한계).
+- 회사 PC 미리보기 Artifact를 `3d254ae` 빌드로 갱신(같은 주소, 버전 2).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건(관찰 1건).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 미리보기 확인 → 승인 시 PR #18 → PR #17 병합.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
