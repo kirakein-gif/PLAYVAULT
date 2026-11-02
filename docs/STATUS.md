@@ -2,9 +2,13 @@
 
 확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #15·#14 병합, 사다리 작업 새 브랜치 지시).
 
-## 진행 · CODEX_TASK_08 사다리 행동·오르기 동작
+## 검토 제출 · CODEX_TASK_08 사다리 행동·오르기 동작
 
-2026-11-02 (Asia/Seoul) / 담당 Codex / 브랜치 `codex/hollow-keep-ladder-actions` / 기준 `origin/main` **1dea1e2**. fetch/prune 및 전체 PR 확인: 열린 PR·동일 원격 브랜치 없음, #14·#15·#16 병합 확인. 사용자 인계에 따라 착수. 범위: next/sim.js·render.js, 두 주인공 climb 자산·제작 도구·제작 기록·검토 캡처, next/README 및 STATUS/WORK_LOG/CHANGELOG. 기존 검사 원본·조작 수치·기존 게임·공용 자산 보존. 계획: L1~L3 구현 → 경로 A climb 4프레임 제작·거리 기반 렌더 → TASK_08 전체 검사·캡처 → Claude Code 검토용 Ready PR. 병합·수동 배포 없음.
+2026-11-02 (Asia/Seoul) / 담당 Codex / 재검토 Claude Code(대기) / 브랜치 `codex/hollow-keep-ladder-actions` / 기준 main **1dea1e2** / 착수741c28e / [PR #17](https://github.com/kirakein-gif/PLAYVAULT/pull/17). 최신fetch/prune·전체PR 확인: 열린 중복작업 없음, #14·#15·#16 병합 확인. 사다리 점프 후16틱 재매달림 제한, 옆 바닥±8단위로 내림·방향 전환, 매달린 공격, 두 주인공4프레임climb(이동거리8단위/프레임, 정지유지)을 구현했습니다. ↓+점프는 사다리에서 발판내림보다 점프를 우선합니다.
+
+검증: 사다리8/8·추가경계4/4·자산63/63·사다리렌더7/7·탐험16/16·출입문9/9·기반51/51·구역22/22·모자이크7/7·픽셀렌더구역/시험방각7/7·모바일20/20·전체화면6/6·탐험브라우저6/6·시험방브라우저20/20·기반경계16/16·통과4/4·탐험경계13/13·ABYSSFALL3종 통과. 원본 검사는 변경 없음, 기존4159틱 완주 유지. 캡처13장/로그/재현은 `next/assets/ladder-actions-review/`.
+
+다음: Claude Code가 PR #17 원본 인수·실제 입력·거리기반프레임·옆바닥내림을 재검토합니다. 외형·손맛은 사용자 판단, 실제기기 미확인. 후면 교대 자세 반전으로 의상 비대칭도 뒤집히는 미술상 한계(PROVENANCE)를 검토해 주세요. 버전 번호 변경 없음. 병합·수동 배포 없음. 아래는 이전 이력입니다.
 
 ## 병합 완료 · PR #15 → PR #14 (2026-11-01) / 다음: Codex 사다리 작업(새 브랜치)
 

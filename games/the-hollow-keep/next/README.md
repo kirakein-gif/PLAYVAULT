@@ -1,3 +1,9 @@
+## TASK_08 · 사다리 행동과 climb (2026-11-02)
+
+매달린 채 점프한 뒤16틱은 위/아래 입력에도 다시 잡지 않습니다. 좌우 입력은 방향을 바꾸며 발 높이±8단위의 인접 벽/한쪽 발판 위에 몸이 들어가면 내려섭니다. 서는 면이 없으면 계속 매달립니다. 매달린 공격과 교대는 유지합니다.
+
+두 주인공 climb은4프레임 반복, 실제 사다리 이동 거리8단위마다 다음 프레임이며 멈추면 그림도 멈춥니다. 공격 중에는 기존attack을 표시합니다. scale2·64색·0/255알파·조작 수치와 몸 크기는 그대로입니다. 제작: `python games/the-hollow-keep/next/tools/build-climb.py`. 실제 입력 캡처: `node games/the-hollow-keep/next/tools/capture-ladder-actions.cjs`(HTTP8765, CHROMIUM_PATH 지원). 검증·캡처는 [ladder-actions-review](assets/ladder-actions-review/README.md), 제작 한계는 [PROVENANCE](assets/pixel/PROVENANCE.md) 참조. 외형/손맛은 사용자 판단, 실기기 확인 필요. Claude Code 재검토 대기, 병합·수동 배포 없음.
+
 # THE HOLLOW KEEP · 타일 모자이크와 밝은 사다리
 
 CODEX_TASK_07을 같은 PR #14에서 이어서 적용했습니다. 규격 브랜치`0bc593d`를 병합한 뒤 봉인 이동 겹침·작은 조각의 화면·8방 모양·사다리를 함께 보완했습니다. 기존 시험 방은[?room=test](?room=test)로 보존합니다. 기존CONFIG 전체, 캐릭터/화면 크기와 영웅·효과 PNG는 그대로입니다.

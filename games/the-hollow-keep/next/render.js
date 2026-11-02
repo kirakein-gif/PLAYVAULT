@@ -129,13 +129,13 @@
         text(`${d.hp} HP`, d.x - 10, d.y - 10, '#d9b787', 10);
       }
       const light = world.active === 'ethan';
-      let action = p.climbing ? 'idle' : p.onGround ? Math.abs(p.vx)>.1?'run':'idle' : p.jumpKind==='running'?'jump-running':'jump-standing';
+      let action = p.climbing ? 'climb' : p.onGround ? Math.abs(p.vx)>.1?'run':'idle' : p.jumpKind==='running'?'jump-running':'jump-standing';
       const state=visual[world.active]||{},anims=HKPixel.manifest()?.heroes[world.active]?.animations;
       const duration=name=>anims?.[name]?.ticks?.reduce((a,b)=>a+b,0)||({attack:20,land:8}[name]||0);
       if(state.attack!==undefined&&world.tick-state.attack<duration('attack'))action='attack';
       else if(p.onGround&&state.land!==undefined&&world.tick-state.land<duration('land'))action='land';
       const age=action==='attack'?world.tick-state.attack:action==='land'?world.tick-state.land:world.tick;
-      const frame=anim=>action.startsWith('jump-')?(p.vy < -1?0:p.vy > 1?2:1):timed(anim,age);
+      const frame=anim=>action==='climb'?Math.floor((p.climbDistance||0)/8)%anim.frames:action.startsWith('jump-')?(p.vy < -1?0:p.vy > 1?2:1):timed(anim,age);
       const attackIndex=action==='attack'&&anims?.attack?timed(anims.attack,age):-1;
       const displayFace=action==='attack'?(state.attackFace??p.face):p.face;
       if(!sprite(world.active,action,frame,p.x+p.w/2,p.y+p.h,displayFace)){

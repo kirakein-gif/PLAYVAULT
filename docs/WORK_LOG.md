@@ -1077,3 +1077,16 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex `CODEX_TASK_08.md`(새 브랜치) → Claude Code 검토.
 - 종료 상태: 병합 진행.
+
+### 2026-11-02 (Asia/Seoul) · CODEX_TASK_08 사다리 행동·오르기 동작 제출
+
+- 담당 Codex / 재검토 Claude Code(대기). 사용자 지정대로 최신origin/main **1dea1e2d22b2ef68588193c63e6d5423ed9a32e5**에서 새 `codex/hollow-keep-ladder-actions` 생성. fetch/prune·전체PR 확인: #14·#15·#16 병합, 열린PR·동일 원격브랜치 없음. 로컬work는 변경 없음·main과 동일. 착수 **741c28e** STATUS 담당선언을 먼저 푸시하고 [Draft PR #17](https://github.com/kirakein-gif/PLAYVAULT/pull/17) 개설. 이전과제 변경 재적용/이전브랜치 사용 없음.
+- TASK_08 전문/전달블록, AGENTS/STATUS/WORK_LOG최근/CHANGELOG/README/CLAUDE, LADDER_ACTIONS_SPEC·ART_DIRECTION·EXPLORATION_SPEC·DESIGN_DIRECTION과 실제sim/render/자산제작·검사를 확인. 범위: next/sim·render, 새climb그림/도구/제작기록/캡처·README, 관리3문서. 버전 전후: 번호 없는2단계 시범구역 유지. 기존 게임/공용 자산·CONFIG·캐릭터 크기·방/완주 데이터·기존 런타임PNG는 변경하지 않음.
+- L1: 사다리 점프 후16틱은↑/↓에도 재부착 금지(점프틱에17로 설정, 다음틱부터감소). 제한 종료 후 정상 재부착. ↓+점프는 사다리 점프가 한쪽 발판내림보다 우선하도록 함. L2: 좌우방향 유지, 발높이±8의 인접면(한칸틈까지)과 목적지 몸 공간 검사 후 내려섬. 면이 없거나 몸이 막히면 매달림 유지. L3: 기존공격 판정 유지+마지막좌우방향. 기존 사다리 꼭대기·위방·1칸통로·봉인 겹침차단·교대 회귀 통과.
+- 그림: image_gen + 기존외형참고 → 경로A새원본climb-source.png → build-climb.py로136/128px네이티브·기존64색·0/255알파·192px프레임·발pivot(96,191)의4프레임시트. 원본이 같은쪽손을 반복해 첫2후면자세+반대후면실루엣반전으로 손발교대를 구성. **의상 비대칭도 반전되는 미술상 한계**를 PROVENANCE/PR/검토기록에 명시. 모델/seed미공개, 전문지시문·표본/알파/팔레트/글러브·부츠윤곽/핀홀정리·재현 기록. 다른PNG·팔레트 보존.
+- 렌더: 실제사다리이동의절대거리누적으로8단위마다climb프레임. 멈추면정지, 교대에도거리유지, 공격중기존attack우선. 실제키보드입력·시계스케줄링으로 두주인공 각각climb전4프레임/매달린왼쪽공격/성문중간층내림 +780×330 **13장** 캡처. 월드/좌표주입없음. PNG원본과RGBA동일무손실WebP **3414518바이트**. `next/assets/ladder-actions-review/README.md`·TEST_RESULTS.md·logs 참조.
+- 실제검사: ladder-actions **8/8**, 추가ladder-edge **4/4**, pixel-assets **63/63**, ladder-render **7/7**, exploration-contract **16/16**, entrance **9/9**, foundation-contract **51/51**, area-data **22/22**, tile-mosaic-render **7/7**, pixel-render 구역/시험방각 **7/7**, mobile-layout **20/20**, mobile-fullscreen **6/6**, exploration-browser **6/6**, browser-playtest(?room=test) **20/20**, foundation-edge **16/16**, room-traversal **4/4**, exploration-edge **13/13**, ABYSSFALL polish/audio/audio-wind **3종통과**. 기존완주4159틱·교대2회 유지, 재기록불필요. 원본인수검사 수정없음. 추가경계는↓점프+발판지지/옆바닥몸공간막힘/높이허용밖/정지·교대거리유지 확인.
+- 실행문제/보완: 처음exploration-browser는 기본8766과서버8765불일치로연결실패 → HK_URL=8765지정후6/6. 추가경계fixture는처음벽이사다리어깨와겹쳐준비실패 → 한칸틈fixture로정정후4/4(원본검사변경없음). 네트워크/소켓은기본샌드박스차단으로승인된확장실행사용. audio404는기존실패복구검사의예상경고.
+- 재현: 루트 `python3 -m http.server 8765 --bind 127.0.0.1`, `HK_URL=http://127.0.0.1:8765/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/<name>.cjs`. 시험방pixel-render/browser-playtest는?room=test. 캡처tools/capture-ladder-actions.cjs, 제작tools/build-climb.py. 재생성PNG2개/manifest SHA256동일. git diff --check 통과, 기존검사·이전PNG변경없음 확인.
+- 5개관리문서검토: STATUS/WORK_LOG/CHANGELOG갱신, AGENTS/CLAUDE규칙변경없음. 루트README변경필요없음, nextREADME·PROVENANCE갱신. 구현커밋은이항목과함께제출한PR #17커밋참조. Draft→Ready로제출하며 main병합·수동배포/게시없음.
+- 다음: **Claude Code** PR #17기준SHA를확인후원본검사/실제입력재실행·L1~L3·거리기반climb/정지·반전의상/그림검토. 미술/손맛은사용자판단대기, 실기기회전·터치·성능미확인. 검토담당/발견문제수: Claude Code / 재검토전미확인. 자체발견↓점프우선순위1건수정·원본그림교대부족1건후면반전보완(한계명시). 사용자재요청: 이번착수후0회. 병합·배포여부는사용자별도승인사항.
