@@ -93,8 +93,8 @@ export const STRATEGY: Lesson[] = [
         highlights: ['f2'],
         arrows: [['h4', 'f2'], ['g4', 'f2'], ['c5', 'f2']],
         task: {
-          accept: ['Re2', 'Rf1', 'Qf3', 'Qe2'],
-          success: { ko: '좋습니다. 기물이 몰려드는 지점을 먼저 지키거나 공격 기물을 없애야 합니다.', en: 'Good. Defend the target square or remove an attacker first.' },
+          accept: ['Re2', 'Rf1', 'Qf3', 'Qe2', 'd4'],
+          success: { ko: '좋습니다. 노리는 칸을 지키거나(Re2·Rf1·Qf3·Qe2), d4처럼 공격 기물을 쫓아내 위협을 없앱니다.', en: 'Good. Guard the target square (Re2, Rf1, Qf3, Qe2) or chase an attacker away like d4.' },
         },
       },
     ],
@@ -117,7 +117,7 @@ export const STRATEGY: Lesson[] = [
         task: {
           accept: ['Rd7'],
           success: { ko: 'Rd7! b7, f7 폰을 동시에 노립니다.', en: 'Rd7! It eyes the b7 and f7 pawns at once.' },
-          wrong: { 'Rd8+': { ko: '체크는 Kh7으로 쉽게 피합니다. 7랭크가 더 아픕니다.', en: 'The check is met by Kh7. The 7th rank hurts more.' } },
+          wrong: { 'Rd8+': { ko: 'Rd8+도 나쁜 수는 아니지만, 이번 과제는 7랭크를 차지하는 수입니다.', en: 'Rd8+ is not bad, but this task is about taking the 7th rank.' } },
         },
       },
       {
@@ -134,12 +134,12 @@ export const STRATEGY: Lesson[] = [
     summary: { ko: '고립 폰을 막고 공격하기', en: 'Blockade and attack an isolated pawn' },
     steps: [
       {
-        fen: '2r3k1/pp3ppp/8/3p4/8/4PN2/PP3PPP/2R3K1 w - - 0 1',
+        fen: '6k1/pp3ppp/8/3p4/8/4PN2/PP3PPP/6K1 w - - 0 1',
         text: { ko: 'd5의 흑 폰은 옆 파일(c·e)에 같은 편 폰이 없는 고립 폰(Isolated pawn)입니다. 폰으로는 지킬 수 없습니다.', en: 'Black’s d5 pawn has no friendly pawns on the c- or e-files: an isolated pawn. No pawn can defend it.' },
         highlights: ['d5'],
       },
       {
-        fen: '2r3k1/pp3ppp/8/3p4/8/4PN2/PP3PPP/2R3K1 w - - 0 1',
+        fen: '6k1/pp3ppp/8/3p4/8/4PN2/PP3PPP/6K1 w - - 0 1',
         text: { ko: '고립 폰 바로 앞 칸은 좋은 거점입니다. 나이트로 d4를 차지하세요.', en: 'The square in front of an isolated pawn is a great outpost. Put your knight on d4.' },
         task: { accept: ['Nd4'], success: { ko: 'd4의 나이트는 폰으로 쫓아낼 수 없고 폰의 전진도 막습니다(블록).', en: 'No pawn can chase a knight on d4, and it blocks the pawn.' } },
       },

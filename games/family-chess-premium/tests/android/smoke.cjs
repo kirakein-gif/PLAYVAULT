@@ -19,10 +19,7 @@ const log = (s, extra = {}) => { console.log(s, JSON.stringify(extra)); result.s
   for (const cmd of ['svc wifi disable', 'svc data disable', 'cmd connectivity airplane-mode enable']) await device.shell(cmd).catch(() => undefined);
   const net = (await device.shell('dumpsys connectivity | grep -m1 "Active default network"').catch(() => Buffer.from('?'))).toString().trim();
   log('network off', { net });
-  // landscape tablet orientation
-  await device.shell('settings put system accelerometer_rotation 0');
-  await device.shell('settings put system user_rotation 1');
-  await device.shell('cmd window user-rotation lock 1').catch(() => undefined);
+  // the emulator is started with a landscape 1280x800 skin (see workflow); no rotation commands
   await new Promise((r) => setTimeout(r, 3000));
   const net2 = (await device.shell('dumpsys connectivity | grep -m1 "Active default network"').catch(() => Buffer.from('?'))).toString().trim();
   log('network re-check', { net2 });

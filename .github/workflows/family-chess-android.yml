@@ -100,9 +100,9 @@ jobs:
           api-level: 34
           target: google_apis
           arch: x86_64
-          profile: pixel_tablet
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          # landscape tablet-sized screen (1280x800 at 160 dpi)
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -skin 1280x800 -prop qemu.sf.lcd_density=160
           working-directory: games/family-chess-premium
           script: |
             adb install -r out/FamilyChessPremium-v1.0.0-debug.apk

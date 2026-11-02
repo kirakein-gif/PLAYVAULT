@@ -43,7 +43,11 @@ export const ENDGAMES: Lesson[] = [
       {
         fen: '8/2P5/8/8/8/k7/8/2K5 w - - 0 1',
         text: { ko: '승격할 기물을 골라 보세요. (퀸을 추천합니다)', en: 'Promote the pawn. (The queen is recommended.)' },
-        task: { accept: ['c8=Q', 'c8=R'], success: { ko: '승격 완료! 이제 메이트를 향해 갑니다.', en: 'Promoted! Now head for mate.' } },
+        task: {
+          accept: ['c8=Q'],
+          success: { ko: '승격 완료! 이제 퀸으로 메이트를 향해 갑니다.', en: 'Promoted! Now head for mate with the queen.' },
+          wrong: { 'c8=R': { ko: '룩으로도 이길 수 있지만 퀸이 훨씬 빠릅니다. 퀸을 골라 보세요.', en: 'A rook also wins, but a queen is much faster. Choose the queen.' } },
+        },
       },
     ],
   },
