@@ -3,6 +3,10 @@
 확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Codex**(PR #20 Noah 콤보 연결 보완, Claude Code 재검토 대기).
 
 
+## 수정 진행 · TASK_09 추가 지시3 / Noah 콤보 동선
+
+2026-11-02(Asia/Seoul) / Codex / PR #20, `codex/hollow-keep-combat-weapons` / 기준00479e7 + 규격abbcd8f. 사용자 지시로 §2-3·기준 그림·검사를 병합하고 구현합니다. 범위: Noah 1타가로·2타파고들기12/올려베기·3타머리위내려치기, idle과 같은 인물 크기, 제작/검증/캡처와 관리 문서. 1단/이동 수치·Ethan·창20·타격 연출 유지. 원본 검사 약화·시간정지·효과음·main 병합·배포 없음. 완료 후 Claude Code 재검토 인계.
+
 ## 수정 제출 · TASK_09 추가 지시2 / Noah 콤보 연결
 
 2026-11-02 / Codex / `codex/hollow-keep-combat-weapons` / 기준091e41b + 규격c77525a(병합3e85135) / [PR #20](https://github.com/kirakein-gif/PLAYVAULT/pull/20). Noah 각6프레임·18/22/34틱, 새 거두기9자세·공유 끝/시작 그림(기준점 IoU1.0), 연결 창20틱과 마지막 자세 유지·이동/만료 시 해제를 반영했습니다. 세 핵심 베기/효과와1단·이동·Ethan은 보존했습니다. 명중3/3/5틱 추가 유지는 긴 핵심 자세 시간에서 배분해 다음 단 전에 모든 거두기를 표시합니다.

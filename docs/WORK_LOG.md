@@ -1262,3 +1262,26 @@
 - 실패/정정: 구역용 검사를 처음 시험실 URL로 실행하여 area 미존재/타일2/7/준비 실패. 원본 로그를 보존하고 올바른 구역 주소에서 전부 통과했습니다. 자체 창 만료 검사는 처음 경계를1틱 일찍 기대했고 관측 tick-started37→38을 명시해 정정했습니다. 인수 테스트 원본 약화/삭제 없음. 요구 검사는 규격c77525a와 동일합니다.
 - 5개 관리 문서 검토: WORK_LOG·STATUS·CHANGELOG 갱신, AGENTS·CLAUDE 절차 변경 없음. next README·PROVENANCE 갱신. 커밋/PR: 이 항목을 포함한 `fix(hollow-keep): connect Noah combo recovery poses` 커밋을 같은 브랜치로 일반 push, PR #20 재검토 제출. main 병합·수동 배포 없음.
 - 검토 담당/발견 문제 수: Claude Code의 이번 수정 재검토 대기(미확인). 사용자 재요청 횟수2회(박자/명중 보완 후 연결 보완). 외형 자연스러움·실기기 터치감/성능은 사용자 확인 필요. 다음 담당은 Claude Code, PR20 최신 head와 linked/TEST_RESULTS의 실제 재현 절차 기준으로 재검토. 회사 PC 미리보기 갱신은 사용자 측 후속 작업입니다.
+
+### 2026-11-02 (Asia/Seoul) · Codex Noah 콤보 연결(PR #20 `00479e7`) 재검토
+
+- 담당 AI: Claude Code(검토).
+- 범위: PR #21 규격 `c77525a` 병합 포함, 검사 원본 동일.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 17/17, weapons-edge 6/6, pixel-assets 93/93, combo-render 5/5(3회), foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱) 겹침 0건.
+- 그림: 각 단 6프레임, 동작 18·22·34틱, 연결 프레임 공유(겹침 1.0). 관찰: 단 안 이웃 프레임 겹침 0.43~0.73. 1단·3단 일부 프레임이 idle·2단 초반보다 커 보임(눈대중 약 1.2배, 시트마다 색·자세가 달라 자동 측정 실패 — 측정 시도: 몸 면적, 후드 색 영역 모두 신뢰 불가).
+- 회사 PC 미리보기 Artifact `00479e7` 빌드로 갱신(버전 5).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건(관찰 2건).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛 확인 → 승인 시 PR #21 → PR #20 병합, 또는 그림 기준(자세 기준 그림) 추가 결정.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-02 (Asia/Seoul) · Noah 콤보 동선 다시 짜기 규격(치기 → 파고들어 올려 베기 → 크게 내려치기)
+
+- 담당 AI: Claude Code. 사용자 의견(미리보기 `00479e7`): "2타째 올려치는 느낌이 잘 안 난다. 1타를 치고, 2타 때는 좀 파고들어서 아래에서 위로 휘둘러 올리고, 3타째는 크게 휘둘러서 내려치는 느낌이 나야 하지 않을까?"
+- 측정: 베기 효과 프레임별 무게중심 이동 — 1단 아래로 82px(내려 베기), 2단 위로 5~10px, 3단 수평. 디딤이 3단. 원인은 1차 규격 §2의 동선 문구("2단 올려 베기, 3단 가로 베기 + 디딤") 자체 — Claude Code 규격 결함.
+- 변경(`claude/hollow-keep-combat-review`, PR #21): COMBAT_SPEC §2-3(동선 표, combo[1] range 64·height 80·lunge 12, combo[2] range 90·height 64·디딤 없음, 인물 크기 일정 검토 항목), 기준 그림 `docs/reference/noah-combo-keyposes.png`(막대 그림, 방향·박자만) + reference README, CODEX_TASK_09 추가 지시 3, `weapons-contract.cjs`(동선 검사 추가, '3단만 닿는 거리'를 디딤 포함 도달 거리로 다시 계산, 디딤 검사를 단별로 일반화 → 18개), `pixel-assets.cjs`(베기 궤적 방향 검사, analyze에 massY 추가).
+- 검증: `00479e7`은 weapons-contract 17/18, pixel-assets 93/94(1단 세로 82 > 가로 2, 2단 위로 5, 3단 아래로 4). 참조 사본(수치 변경, 궤적 시트를 바꿔 끼운 합성)은 weapons-contract 18/18, pixel-assets 94/94, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16.
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건(동선 반대).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #20에서 추가 지시 3 처리 → 재검토 → 미리보기 갱신.
+- 종료 상태: 규격 보강.
