@@ -122,7 +122,14 @@
           draw.event(event,world);
           if(event.type==='swap'){name.textContent=world.active==='ethan'?'ETHAN · 빛 / 룬탄':'NOAH · 그림자 / 참격';notice.textContent='교대 · '+world.active.toUpperCase();}
           if(event.type==='swapBlocked')notice.textContent='공간이 좁아 교대할 수 없습니다.';
-          if(event.type==='hit'){const d=world.dummies.find(d=>d.id===event.target);if(d)effects.push({x:d.x,y:d.y,damage:event.damage,life:40});notice.textContent=area?`시험 표적 · 피해 ${event.damage}`:`${event.target==='near'?'가까운':'먼'} 표적 · 피해 ${event.damage}`;}
+          if(event.type==='hit'){const d=world.dummies.find(d=>d.id===event.target);if(d){
+            let x=d.x+d.w/2,y=d.y-28;
+            // Reserve a separate floating label lane, above the static HP caption.
+            while(effects.some(e=>Math.abs(e.x-x)<42&&Math.abs(e.y-(40-e.life)*.55-y)<18)){
+              y-=20;if(y<20){x+=44;y=d.y-28;}
+            }
+            effects.push({x,y,damage:event.damage,life:40});
+          }notice.textContent=area?`시험 표적 · 피해 ${event.damage}`:`${event.target==='near'?'가까운':'먼'} 표적 · 피해 ${event.damage}`;}
           if(event.type==='room'){effects=[];notice.textContent=area.rooms[world.roomId].hint;}
           if(event.type==='roomBlocked')notice.textContent='건너편 통로가 막혀 있습니다. 연결된 장치를 찾아보세요.';
           if(event.type==='switch')notice.textContent='장치가 켜졌습니다. 연결된 봉쇄물이 열립니다.';

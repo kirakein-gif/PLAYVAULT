@@ -1,0 +1,7 @@
+PASS default is area; map shows only visited room and pauses simulation
+PASS all recorded inputs complete the real browser area without state injection
+PASS map after circuit includes eight rooms, current room emphasized, mobile control labels present
+PASS barrier method glyphs match the actual room mechanisms; entrance art is separate
+PASS actual loft descent stays above the unopened seal, then passes after its lever
+PASS 780x330 mobile map button and two-axis joystick/interact buttons reach simulation
+6/6 exploration browser checks passed; captures: /tmp/hk-exploration-review

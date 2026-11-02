@@ -26,8 +26,8 @@
           height: 46, activeTicks: 9, comboWindowTicks:14,
           combo:[
             {damage:22,range:66,height:46,activeTicks:9,recoveryTicks:18},
-            {damage:22,range:72,height:46,activeTicks:9,recoveryTicks:18},
-            {damage:44,range:84,height:60,activeTicks:12,recoveryTicks:30,lunge:10}
+            {damage:22,range:72,height:46,activeTicks:9,recoveryTicks:22},
+            {damage:44,range:84,height:60,activeTicks:12,recoveryTicks:34,lunge:10}
           ] } }
     }
   };
@@ -373,7 +373,7 @@
           if (first.solid && first.box.breakable && w.area) { w.flags.broken[first.box.breakable] = true; ev.push({type:'break',id:first.box.breakable}); }
           if (!first.solid) {
             first.box.hp = Math.max(0, first.box.hp - a.damage);
-            ev.push({ type: 'hit', target: first.box.id, damage: a.damage });
+            ev.push({ type: 'hit', target: first.box.id, damage: a.damage,hero:a.hero,level:a.level,face:a.face });
           }
           if(a.burstRadius){
             const x=a.face>0?first.box.x:first.box.x+first.box.w;
@@ -382,7 +382,7 @@
             for(const d of w.dummies)if(d.hp>0&&(first.solid||d.id!==first.box.id)){
               const dx=x-Math.max(d.x,Math.min(x,d.x+d.w)),dy=y-Math.max(d.y,Math.min(y,d.y+d.h));
               if(dx*dx+dy*dy<=a.burstRadius*a.burstRadius){
-                d.hp=Math.max(0,d.hp-a.burstDamage);ev.push({type:'hit',target:d.id,damage:a.burstDamage});
+                d.hp=Math.max(0,d.hp-a.burstDamage);ev.push({type:'hit',target:d.id,damage:a.burstDamage,hero:a.hero,level:a.level,face:a.face});
               }
             }
           }
@@ -394,7 +394,7 @@
         }
         for (const d of targets) {
         a.hit.push(d.id); d.hp = Math.max(0, d.hp - a.damage);
-        ev.push({ type: 'hit', target: d.id, damage: a.damage });
+        ev.push({ type: 'hit', target: d.id, damage: a.damage,hero:a.hero,step:a.step,face:a.face });
       }
       }
       a.life--;

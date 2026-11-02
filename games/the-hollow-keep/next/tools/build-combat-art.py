@@ -68,9 +68,9 @@ def poses(hero,name,parts,heights,headXs,handPoints,ticks):
 
 parts=objects('combat-poses-source.png',10000)
 upper=sorted([p for p in parts if p[0][1]<200],key=lambda p:p[0][0]);assert len(upper)==4
-poses('noah','attack-2',upper,[110,154,178,160],[270,575,925,1270],[(180,300),(642,143),(911,46),(1260,85)],[2,2,2,3])
+poses('noah','attack-2',upper,[110,154,178,160],[270,575,925,1270],[(180,300),(642,143),(911,46),(1260,85)],[2,2,12,4])
 fin=objects('combat-finisher-source.png',10000);fin.sort(key=lambda p:(p[0][1]>500,p[0][0]));assert len(fin)==4
-poses('noah','attack-3',fin,[144,128,112,132],[465,1165,550,1215],[(380,64),(1290,237),(675,730),(1295,745)],[2,3,3,4])
+poses('noah','attack-3',fin,[144,128,112,132],[465,1165,550,1215],[(380,64),(1290,237),(675,730),(1295,745)],[2,2,22,6])
 eth=sorted([p for p in parts if p[0][1]>750],key=lambda p:p[0][0]);assert len(eth)==4
 poses('ethan','charge',eth,[136]*4,[208,548,919,1294],[(302,834),(646,845),(1009,845),(1369,839)],[8]*4)
 
@@ -90,7 +90,7 @@ def fx(hero,name,row,dimensions,size,pivot,positions=None,once=False,one=False):
   frame.paste(im,(x,y));frames.append(frame)
  sheet(hero,name,frames,size,pivot,[2,2,3] if name=='fx-slash-2' else[3]*len(frames),not once)
 fx('noah','fx-slash-2',0,[(50,66),(86,104),(110,100)],(160,160),(6,120),[(6,54),(6,16),(6,20)],True,True)
-fx('noah','fx-slash-3',1,[(96,24),(140,34),(172,32)],(192,96),(6,48),[(6,36),(6,31),(6,32)],True,True)
+fx('noah','fx-slash-3',1,[(112,34),(156,48),(184,46)],(192,96),(6,48),[(6,31),(6,24),(6,25)],True,True)
 # Nine native frames: three level banks with three gathering pulses each.
 frames=[]
 for level in range(3):
@@ -102,5 +102,6 @@ sheet('ethan','fx-charge',frames,(96,96),(48,48),[6]*9,True)
 fx('ethan','fx-rune-2',3,[(52,30),(55,32),(53,31)],(64,48),(32,24))
 fx('ethan','fx-rune-3',4,[(72,44),(77,46),(74,45)],(96,64),(48,32))
 fx('ethan','fx-burst',5,[(40,40),(112,112),(176,176)],(192,192),(96,96),once=True)
+manifest['heroes']['noah']['animations']['attack']['ticks']=[2,2,9,3]
 (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 print('Built9 combat sheets from3 generated sources; existing64-color palette preserved.')

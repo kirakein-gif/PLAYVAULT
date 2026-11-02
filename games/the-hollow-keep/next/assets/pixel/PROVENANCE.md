@@ -1,5 +1,12 @@
 # Full x2 production provenance
 
+## 2026-11-02 TASK_09 follow-up: Noah rhythm and impact presentation
+
+Route A retained; no new source generation was needed. Existing combat-effects-source.png is resampled by build-combat-art.py into a longer/thicker native third slash: phase sizes112x34,156x48,184x46 in the same192x96 grid (formerly96x24,140x34,172x32). Largest-component ribbon cleanup, fixed64-color palette and binary alpha remain. The new third stroke has opaque widths112/155/183px versus46/86/109 for slash2 and65/55/62 for slash1; it is a wider and thicker shallow connected crescent, not a filled disk. Original body/source PNGs and all Ethan PNG/manifest entries are unchanged.
+
+Noah timing is now attack2/2/9/3 (16ticks), attack-2 2/2/12/4 (20ticks), attack-3 2/2/22/6 (32ticks). The briefly drawn cut is followed by a longer held core stance and recovery. The builder writes these manifest timings including the original attack entry, preserving reproducibility after the other art builders. Initial preparation stays2ticks. Renderer-only impact holds add3/3/5ticks after preparation; the slash itself continues on real tick age so every effect frame remains visible. Target white flash2ticks, visual recoil3/2/1/0px and third-hit world shake6ticks do not change physical coordinates, damage timing or the simulation clock. No audio was added. New captures/observations and exact-time lossless clips are in ../combat-review/followup/.
+
+
 ## 2026-11-02 TASK_09: combo and charged-shot combat
 
 Route A, image_gen. Tool model/seed not exposed. Appearance reference: tools/art-source/target-pose-board.png. New generated sources: combat-poses-source.png (Noah rising attack and Ethan charging poses), combat-finisher-source.png (separate finisher source), combat-effects-source.png (six effect strips). Earlier/runtime PNGs and the existing64-color palette are unchanged. The first combined board merged two finisher silhouettes, so its second row was not used: a separate four-pose finisher source was generated instead. No whole-costume or action mirroring is used during production; runtime uses the existing left-facing mirror rule.

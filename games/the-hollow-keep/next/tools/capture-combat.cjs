@@ -34,8 +34,9 @@ const out=process.env.HK_SHOT_DIR||'/tmp/hk09-review';fs.mkdirSync(out,{recursiv
    await c.page.keyboard.down('ArrowRight');while((await c.state()).world.player.x+(await c.state()).world.player.w/2<168)await c.ticks(1);await c.page.keyboard.up('ArrowRight');await c.ticks(12);
    if(direction==='left'){await c.key('ArrowLeft',1);await c.ticks(8);}
    await c.page.evaluate(()=>window.__events=[]);const frames=new Set(),fx=new Set(),fxFrames=new Set();
-   for(let i=0;i<52;i++){
-    if([0,4,22].includes(i))await c.page.keyboard.down('KeyJ');else await c.page.keyboard.up('KeyJ');await c.ticks(1);
+   const rhythm=await c.page.evaluate(()=>({recover:HKSim.CONFIG.heroes.noah.weapon.combo.map(s=>s.recoveryTicks),finish:HKPixel.manifest().heroes.noah.animations['attack-3'].ticks.reduce((a,b)=>a+b,0)}));
+   for(let i=0;i<rhythm.recover[0]+rhythm.recover[1]+rhythm.finish+8;i++){
+    if([0,4,rhythm.recover[0]+4].includes(i))await c.page.keyboard.down('KeyJ');else await c.page.keyboard.up('KeyJ');await c.ticks(1);
     const s=await c.state(),d=s.draws.find(d=>/^noah-attack(?:-[23])?\.png$/.test(d.file));
     for(const draw of s.draws)if(draw.file.includes('fx-slash')){fx.add(draw.file);fxFrames.add(draw.file+':'+draw.frame);}
     if(d){const step=d.file==='noah-attack.png'?1:Number(d.file.match(/-([23])\.png/)[1]),id=step+'-'+d.frame;

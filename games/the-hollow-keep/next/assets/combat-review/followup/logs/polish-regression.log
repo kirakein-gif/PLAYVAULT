@@ -1,0 +1,45 @@
+PASS movement: grounded cadence, unchanged speed, stable facing, moving basic and special poses
+PASS rewards: 1/2/3 and numpad match displayed choices, no repeat/double apply or input-field hijack
+PASS integrated art: four actual crossings on desktop/mobile, all relic bounds, all zones and cached door states
+PASS hand launch: both facings, all target heights and directions, real player/priest firing, unchanged damage and collision
+PASS well and souls: exact fixed basin geometry, same XP gain, attraction, absorption and cleanup
+PASS doors: combat closure, clear opening, sealed boss remains locked
+PASS seal object: intact table before/after, final seal unlock, four boss door directions
+PASS desktop DPR 1: 24 floors, seals, boss defeat, stairs, clear, combat rendering, frame bounds
+PASS desktop DPR 2: 24 floors, seals, boss defeat, stairs, clear, combat rendering, frame bounds
+PASS desktop DPR 3: 24 floors, seals, boss defeat, stairs, clear, combat rendering, frame bounds
+PASS mobile DPR 1: 24 floors, seals, boss defeat, stairs, clear, combat rendering, frame bounds
+PASS mobile DPR 2: 24 floors, seals, boss defeat, stairs, clear, combat rendering, frame bounds
+PASS mobile DPR 3: 24 floors, seals, boss defeat, stairs, clear, combat rendering, frame bounds
+PASS ice: real inertia, counter-steering, whole-room/cleared ice and floor reset on desktop/touch layouts
+PASS fields: visible terrain contact, entry warning, damage ticks, cleared-room and passage safety for all new danger zones
+┌─────────┬───────┬─────┬────────┬───────┬──────────┬───────┬───────┐
+│ (index) │ floor │ hp  │ damage │ speed │ cooldown │ count │ bolts │
+├─────────┼───────┼─────┼────────┼───────┼──────────┼───────┼───────┤
+│ 0       │ 12    │ 241 │ 23.4   │ 0.88  │ 91.4     │ 6     │ 3     │
+│ 1       │ 15    │ 349 │ 30.9   │ 0.97  │ 82.7     │ 7     │ 3     │
+│ 2       │ 18    │ 482 │ 39.8   │ 1.06  │ 75.5     │ 8     │ 3     │
+│ 3       │ 21    │ 644 │ 50.2   │ 1.16  │ 69.5     │ 9     │ 5     │
+│ 4       │ 24    │ 988 │ 62.3   │ 1.25  │ 64.4     │ 10    │ 5     │
+└─────────┴───────┴─────┴────────┴───────┴──────────┴───────┴───────┘
+PASS depth: stronger, faster, more frequent and more numerous enemies; expanded spread; endless starts at 25
+PASS deep arrivals: full-size enemy groups remain outside entry safety distance on all four sides and both layouts
+PASS v40: reward/descent race, queued upgrades, local cheat guards, underground labels and persistent dense fog
+PASS v44: no floor-one prose; atmosphere only on floors 4, 7, 10, 13, 16, 19 and 22
+PASS v46: eight boss identities, increasing HP/armor, all phase attacks, rush finish and regional roster
+PASS v47: six distinct walking poses per region, distance cadence, unchanged speed, stopped feet and attack priority
+PASS v49: Ethan directional melee and one-hit knockback charge; Noah ranged fire and timed invulnerable roll on desktop/mobile
+PASS v51: consistent Ethan body scale, distinct relic cards and exclusive pools, melee/ranged crystal effects, one-use roll shot and Noah gear
+PASS v51 relic triggers: opposite grail curves, reflection versus avoidance, counterattack versus cooldown, and role-specific room recovery
+PASS v52: bounded shoulder knockback and idle stagger, boss immunity, consumed violet shot readiness, all layered FX stages on desktop/mobile
+PASS v52 growth: greater real melee reach, stacking HP/armor cap, and hit-confirmed blade recovery
+PASS v52 role growth: nine real attack upgrades produce Ethan 96 / Noah 50 at level 10
+PASS v52 haste growth: Ethan 2 / Noah 4 frames per selected upgrade
+PASS v54: delayed summon phases, safe emergence, activation, boss-death cancellation and timing-neutral walk transitions on desktop/mobile
+PASS v55: role-labelled normal/double growth, exact probability boundary, one-time choice application, honest cap handling, and rising enemy/elite/boss XP
+PASS v56: real reciprocal minimap corridors, combat/seal door states, hidden branches, and exact safe/hot/cooling lava boundaries on desktop/mobile
+PASS v57: sword and shoulder hits preserve enemy windups, projectiles and active charges
+PASS v60: depth-scaled rush distance, fixed attack duration/aim, swept contact and safe lateral dodge on desktop/mobile
+PASS v60 engagement: deep enemies initiate from range; unchanged windups and real high-dt rush collision
+PASS v53: all 210 actor frames isolated, cached and used by renderer; body and soft edges retained
+PASS v52 loading: pending images prevent entry; prepared assets unlock; failed combat image offers reload without starting old art
