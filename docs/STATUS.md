@@ -3,6 +3,10 @@
 확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Codex**(PR #17 추가 지시 1·2 수정, Claude Code 재검토 대기).
 
 
+## 진행 · TASK_09 전투 무기 1차
+
+2026-11-02 / 담당 Codex / 재검토 Claude Code / 브랜치 `codex/hollow-keep-combat-weapons` / 기준 `origin/main` **4ec1cfa**. 최신fetch·PR목록·동일원격브랜치없음확인, PR17/18/19병합확인. 범위 next/sim.js·render.js·app.js(필요시입력), 게임전용콤보/충전그림·제작도구·캡처·기록, nextREADME 및 STATUS/WORK_LOG/CHANGELOG. 계획: 무기상태/이벤트·패널구현→경로A새동작/효과·단계렌더→원본무기15개와전체회귀·실제입력캡처→Ready PR. 기존수치·게임/공용자산보존, 체력/적/보스·main병합·수동배포없음.
+
 ## 제출 · THE HOLLOW KEEP 3단계 전투 1차 규격(Noah 3단 콤보·Ethan 3단계 충전) / 사용자 확인 → Codex 구현 대기
 
 Claude Code / `claude/hollow-keep-combat-spec` / 2026-11-02. `COMBAT_SPEC.md`, `CODEX_TASK_09.md`, `weapons-contract.cjs`(15), `pixel-assets.cjs`(새 동작·효과). 게임 코드·그림 변경 없음. main 병합 시 weapons-contract 1/15, pixel-assets 63/68은 Codex 구현 전 예상 실패. 체력 주인공별·쓰러지면 자동 교대 + 짧은 무적은 2차.
