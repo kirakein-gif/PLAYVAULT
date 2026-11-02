@@ -34,7 +34,7 @@ const splashSvg = (w, h) => {
   <defs><radialGradient id="sb" cx="0.5" cy="0.42" r="0.75"><stop offset="0" stop-color="#1d2b36"/><stop offset="1" stop-color="#0b1218"/></radialGradient></defs>
   <rect width="${w}" height="${h}" fill="url(#sb)"/>
   <image href="${knightData}" x="${w / 2 - s * 0.17}" y="${h / 2 - s * 0.3}" width="${s * 0.34}" height="${s * 0.34}"/>
-  <text x="${w / 2}" y="${h / 2 + s * 0.17}" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="${s * 0.075}" fill="#e3c58f">FAMILY CHESS</text>
+  <text x="${w / 2}" y="${h / 2 + s * 0.17}" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="${s * 0.075}" fill="#e3c58f">CHESS MASTER</text>
   <text x="${w / 2}" y="${h / 2 + s * 0.25}" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="${s * 0.04}" letter-spacing="${s * 0.02}" fill="#c9a66b">PREMIUM</text>
 </svg>`;
 };

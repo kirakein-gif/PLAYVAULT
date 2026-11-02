@@ -2,7 +2,7 @@
   "name": "family-chess-premium",
   "private": true,
   "version": "1.0.0",
-  "description": "우리집 체스 PREMIUM / FAMILY CHESS PREMIUM — offline Android tablet chess",
+  "description": "CHESS MASTER PREMIUM (formerly 우리집 체스 PREMIUM) — offline Android tablet chess",
   "type": "module",
   "scripts": {
     "dev": "vite",

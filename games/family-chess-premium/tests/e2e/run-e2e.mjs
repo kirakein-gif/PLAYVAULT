@@ -79,7 +79,9 @@ await test('home shows exactly three main menus, title, language and settings', 
   assert((await p.locator('.menuCard').count()) === 3, 'three menu cards');
   assert(await p.locator('[data-testid=lang-toggle]').isVisible(), 'lang toggle');
   assert(await p.locator('[data-testid=settings-btn]').isVisible(), 'settings');
-  assert((await p.locator('.brandName').innerText()).includes('우리집 체스'), 'title');
+  assert((await p.locator('.brandName').innerText()) === 'CHESS MASTER', 'title is English');
+  await p.click('[data-testid=lang-toggle]');
+  assert((await p.locator('.brandName').innerText()) === 'CHESS MASTER', 'title stays English in EN mode');
   await p.context().close();
 });
 

@@ -189,7 +189,7 @@ export class GameController {
 
   pgn(headers: Record<string, string> = {}): string {
     const c = new Chess(this.startFen);
-    const h: Record<string, string> = { Event: 'Family Chess', Site: 'Offline', ...headers };
+    const h: Record<string, string> = { Event: 'Chess Master', Site: 'Offline', ...headers };
     if (this.startFen !== START_FEN) {
       h.SetUp = '1';
       h.FEN = this.startFen;

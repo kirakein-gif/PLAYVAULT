@@ -4,21 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#101820" />
-    <title>우리집 체스 PREMIUM</title>
+    <title>CHESS MASTER PREMIUM</title>
     <link rel="icon" href="icons/icon-192.png" />
     <style>
       html, body { margin: 0; height: 100%; background: #101820; }
       #splash { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vmin; background: radial-gradient(circle at 50% 40%, #1d2b36, #0b1218 70%); transition: opacity 420ms ease; }
       #splash.out { opacity: 0; pointer-events: none; }
       #splash img { width: 26vmin; height: 26vmin; filter: drop-shadow(0 2vmin 2.4vmin rgba(0,0,0,.6)); animation: rise 900ms cubic-bezier(.2,.8,.2,1) both; }
-      #splash .t { font: 700 max(30px, 5.4vmin)/1.1 Georgia, 'Noto Serif KR', serif; color: #e3c58f; letter-spacing: .04em; animation: fadeup 900ms 150ms ease both; }
+      #splash .t { font: 700 max(30px, 5.4vmin)/1.1 Georgia, 'Noto Serif KR', serif; color: #e3c58f; letter-spacing: .08em; animation: fadeup 900ms 150ms ease both; }
       #splash .p { font: 700 max(16px, 2.6vmin)/1 Georgia, serif; letter-spacing: .5em; color: #c9a66b; padding-left: .5em; animation: fadeup 900ms 300ms ease both; }
       @keyframes rise { from { opacity: 0; transform: translateY(4vmin) scale(.92); } }
       @keyframes fadeup { from { opacity: 0; transform: translateY(1.6vmin); } }
     </style>
   </head>
   <body>
-    <div id="splash"><img src="pieces/wN.svg" alt="" /><div class="t">우리집 체스</div><div class="p">PREMIUM</div></div>
+    <div id="splash"><img src="pieces/wN.svg" alt="" /><div class="t">CHESS MASTER</div><div class="p">PREMIUM</div></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

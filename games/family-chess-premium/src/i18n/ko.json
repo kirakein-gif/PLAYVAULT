@@ -1,5 +1,5 @@
 {
-  "app": { "name": "우리집 체스", "premium": "PREMIUM", "full": "우리집 체스 PREMIUM", "tagline": "함께 두고, 함께 강해지는 체스" },
+  "app": { "name": "CHESS MASTER", "premium": "PREMIUM", "full": "CHESS MASTER PREMIUM", "tagline": "함께 두고, 함께 강해지는 체스" },
   "common": {
     "back": "뒤로", "home": "홈", "close": "닫기", "cancel": "취소", "confirm": "확인", "ok": "확인", "yes": "예", "no": "아니요",
     "next": "다음", "prev": "이전", "retry": "다시 시도", "start": "시작", "continue": "이어서 하기", "save": "저장", "delete": "삭제",

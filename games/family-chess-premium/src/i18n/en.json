@@ -1,5 +1,5 @@
 {
-  "app": { "name": "Family Chess", "premium": "PREMIUM", "full": "FAMILY CHESS PREMIUM", "tagline": "Play together, grow stronger together" },
+  "app": { "name": "CHESS MASTER", "premium": "PREMIUM", "full": "CHESS MASTER PREMIUM", "tagline": "Play together, grow stronger together" },
   "common": {
     "back": "Back", "home": "Home", "close": "Close", "cancel": "Cancel", "confirm": "Confirm", "ok": "OK", "yes": "Yes", "no": "No",
     "next": "Next", "prev": "Previous", "retry": "Retry", "start": "Start", "continue": "Continue", "save": "Save", "delete": "Delete",

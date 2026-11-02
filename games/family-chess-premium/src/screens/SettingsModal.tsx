@@ -124,7 +124,7 @@ export function SettingsModal() {
           <h3>{t('settings.data')}</h3>
           <div className="rowBtns wrap">
             <Btn icon={Icon.save} onClick={doExport} testId="export">{t('settings.export')}</Btn>
-            {exported?.uri && isNative && <Btn onClick={() => void shareFile(exported.uri!, 'Family Chess backup')}>{t('settings.exportShare')}</Btn>}
+            {exported?.uri && isNative && <Btn onClick={() => void shareFile(exported.uri!, 'Chess Master backup')}>{t('settings.exportShare')}</Btn>}
             <Btn icon={Icon.folder} onClick={doImport} testId="import">{t('settings.import')}</Btn>
           </div>
           <p className="hintText">{t('settings.uninstallWarn')}</p>
