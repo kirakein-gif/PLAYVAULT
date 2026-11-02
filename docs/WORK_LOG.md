@@ -1090,3 +1090,30 @@
 - 재현: 루트 `python3 -m http.server 8765 --bind 127.0.0.1`, `HK_URL=http://127.0.0.1:8765/games/the-hollow-keep/next/ CHROMIUM_PATH=/usr/bin/chromium node games/the-hollow-keep/next/tests/<name>.cjs`. 시험방pixel-render/browser-playtest는?room=test. 캡처tools/capture-ladder-actions.cjs, 제작tools/build-climb.py. 재생성PNG2개/manifest SHA256동일. git diff --check 통과, 기존검사·이전PNG변경없음 확인.
 - 5개관리문서검토: STATUS/WORK_LOG/CHANGELOG갱신, AGENTS/CLAUDE규칙변경없음. 루트README변경필요없음, nextREADME·PROVENANCE갱신. 구현커밋은이항목과함께제출한PR #17커밋참조. Draft→Ready로제출하며 main병합·수동배포/게시없음.
 - 다음: **Claude Code** PR #17기준SHA를확인후원본검사/실제입력재실행·L1~L3·거리기반climb/정지·반전의상/그림검토. 미술/손맛은사용자판단대기, 실기기회전·터치·성능미확인. 검토담당/발견문제수: Claude Code / 재검토전미확인. 자체발견↓점프우선순위1건수정·원본그림교대부족1건후면반전보완(한계명시). 사용자재요청: 이번착수후0회. 병합·배포여부는사용자별도승인사항.
+
+### 2026-11-02 (Asia/Seoul) · Codex 사다리 행동(PR #17 `dc5e336`) 검토, 대각선 정정, PC 키보드 검사
+
+- 담당 AI: Claude Code(검토·규격). 구현: Codex `codex/hollow-keep-ladder-actions`.
+- 범위: 검사 원본 변경 없음(Codex 자체 `ladder-edge.cjs` 추가). 기존 게임·공용 자산 변경 없음.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): ladder-actions 8/8, ladder-edge 4/4, exploration-contract 16/16, entrance 9/9, foundation-contract 51/51, area-data 22/22, exploration-edge 13/13, foundation-edge 16/16, pixel-assets 63/63, ladder-render 7/7, tile-mosaic-render 7/7, pixel-render 구역·시험 방 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest(`?room=test`) 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종(polish-regression은 동시 실행 중 시간 초과, 단독 재실행 통과). 무작위 입력(314곳, 47.1만 틱) 겹침 0건.
+- 화면: climb 4프레임 두 주인공(등을 보이며 팔다리 교대), 옆 바닥 내리기·사다리 공격 캡처 확인.
+- **발견 1건(규격 측 원인, Claude Code):** L2 "대각선으로 오르다 옆 바닥 높이면 내림" 때문에 사다리 아래 끝(옆이 바닥)에서 ↑+←/→를 누르면 잡자마자 내려 오르지 못함. 구역 사다리 아래 끝 12곳 모두 해당. 모바일 조이스틱은 데드존 0.25라 위로 약 15°만 기울어도 좌우가 들어와 휴대전화에서 자주 발생. 키보드 W+A도 같음.
+- 정정(`claude/hollow-keep-ladder-diagonal`): 옆으로 내리기는 ↑/↓ 없이 ←/→만 누를 때. `ladder-actions.cjs` 대각선 내리기 검사 삭제, 대각선 오르기 2개·↑ 놓고 내리기 1개 추가(8 → 10). PR #17 구현은 7/10, 정정 참조 구현(PR #17 `sim.js`에 조건 한 줄)은 10/10, 다른 검사 영향 없음.
+- 사용자 요청(작업 중): "평일 낮에는 회사 컴퓨터에서 할 거라서 키보드 인식도 되게 해 줘". 확인: 키는 `KeyboardEvent.code`(물리 키)로 읽어 한글 입력 상태에서도 동작(한글 key 값·keyCode 229 이벤트로 이동·교대·지도 확인). `keyboard-ime.cjs`(7) 추가 — PR #17은 6/7(사다리 아래 W+A 대각선만 실패), 정정 참조 7/7. LADDER_ACTIONS_SPEC §5, CODEX_TASK_08 추가 지시.
+- 검토 담당 / 발견 문제 수: Claude Code / 1건(대각선, 규격 결함).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #17에서 추가 지시 처리 → Claude Code 재검토 → 승인 시 정정 PR → PR #17 병합.
+- 종료 상태: 검토 완료, 수정 대기.
+
+### 2026-11-02 (Asia/Seoul) · 회사 PC 미리보기, 사다리 간격·오르기 자세 기준
+
+- 담당 AI: Claude Code.
+- 사용자: PC에서 Cloudflare 미리보기(`*.pages.dev`)가 열리지 않음. 휴대전화에서는 열렸으므로 회사 네트워크 차단으로 추정(이 환경에서도 접속 불가라 원인 미확인). 대안: PR #17 `dc5e336`의 `next/` 실행 파일(js·css·areas·assets/pixel, 32개, 1.2MB)을 claude.ai 비공개 Artifact로 게시(`https://claude.ai/artifact/L8uL1fgH7wNmwVJh9Hmbm1`). 저장소 변경 없음. 미리보기용 사본에서 `?room=test` 링크만 뺌.
+- 사용자 확인: 사다리 점프로 옆으로 넘어가기 동작은 좋음. 문제 2건: ① 사다리 가로대 간격이 일정하지 않음 ② 오르기 교차 동작은 좋지만 측면으로 쏠려 부자연스러움.
+- 측정: ① ladder 칸 가로대 9·27·45px → 칸 안 18px, 이음새 24px ② 올린 손이 사다리 중심에서 Ethan ±16~17.5단위, Noah ±12.7~16단위(가로대 끝 ±10), Ethan 무게중심 +2.5/−3.5단위.
+- 변경(`claude/hollow-keep-ladder-diagonal`, PR #18): TILE_MOSAIC_SPEC §7(가로대 간격 이음새까지 같게), LADDER_ACTIONS_SPEC §3-1(무게중심 ±2단위, 올린 손 ±12단위), `pixel-assets.cjs` 검사 2개(analyze에 프레임별 무게중심·맨 위 6줄 중심 추가), CODEX_TASK_08 추가 지시 2.
+- 검증: PR #17 자산 62/65(두 항목 3건 실패), 보정한 합성 자산(가로대 20px 간격, 좌우 대칭 오르기 프레임) 65/65. 옆모습 idle을 그대로 쓰면 무게중심 −4단위로 검출됨.
+- 검토 담당 / 발견 문제 수: 사용자 발견 2건(규격에 간격·자세 기준이 없던 것은 Claude Code 누락).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #17에서 추가 지시 1·2 처리 → 재검토 → 미리보기 Artifact 갱신.
+- 종료 상태: 규격 보강.

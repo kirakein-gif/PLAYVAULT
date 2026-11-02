@@ -2,6 +2,10 @@
 
 확인일: **2026-11-01 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #15·#14 병합, 사다리 작업 새 브랜치 지시).
 
+## 수정 진행 · TASK_08 추가 지시 1·2
+
+2026-11-02 / Codex / PR #17, codex/hollow-keep-ladder-actions / 기준dc5e336 + origin/claude/hollow-keep-ladder-diagonal. 사용자 인계에 따라 대각선 입력·사다리 가로대 이음새 간격·climb 중심 자세를 함께 보완합니다. 규격/검사 브랜치 병합, 문서 충돌은 양측 이력 보존. 범위 sim.js·climb/ladder 제작 도구·게임 전용 자산·캡처·기록. 전체 회귀와 keyboard-ime 후 Claude Code 재검토, main병합·수동배포 없음.
+
 ## 검토 제출 · CODEX_TASK_08 사다리 행동·오르기 동작
 
 2026-11-02 (Asia/Seoul) / 담당 Codex / 재검토 Claude Code(대기) / 브랜치 `codex/hollow-keep-ladder-actions` / 기준 main **1dea1e2** / 착수741c28e / [PR #17](https://github.com/kirakein-gif/PLAYVAULT/pull/17). 최신fetch/prune·전체PR 확인: 열린 중복작업 없음, #14·#15·#16 병합 확인. 사다리 점프 후16틱 재매달림 제한, 옆 바닥±8단위로 내림·방향 전환, 매달린 공격, 두 주인공4프레임climb(이동거리8단위/프레임, 정지유지)을 구현했습니다. ↓+점프는 사다리에서 발판내림보다 점프를 우선합니다.
@@ -10,6 +14,11 @@
 
 다음: Claude Code가 PR #17 원본 인수·실제 입력·거리기반프레임·옆바닥내림을 재검토합니다. 외형·손맛은 사용자 판단, 실제기기 미확인. 후면 교대 자세 반전으로 의상 비대칭도 뒤집히는 미술상 한계(PROVENANCE)를 검토해 주세요. 버전 번호 변경 없음. 병합·수동 배포 없음. 아래는 이전 이력입니다.
 
+
+
+## 검토 · PR #17 사다리 행동 — 대각선 정정·PC 키보드 검사 추가 / Codex 수정 대기
+
+Claude Code / `claude/hollow-keep-ladder-diagonal` / 2026-11-02. PR #17(`dc5e336`) 전체 검사 통과, 단 사다리 아래 끝에서 대각선(↑+←/→, 모바일 조이스틱·키보드 W+A)으로 오르지 못하는 문제 1건(규격 L2 문구 원인). 정정 규격·`ladder-actions.cjs`(10), 새 `keyboard-ime.cjs`(7, 한글 입력 상태 키보드). CODEX_TASK_08 추가 지시로 PR #17에서 수정. 병합 없음.
 ## 병합 완료 · PR #15 → PR #14 (2026-11-01) / 다음: Codex 사다리 작업(새 브랜치)
 
 사용자 승인("지금 병합하고 새 브랜치로 진행해 주세요"). PR #14를 main에 병합(`27f6110`, PR #15 규격 `0bc593d`까지 포함). PR #15는 그 head가 PR #14에 먼저 병합되어 이미 닫혀 있었으므로, 이후 커밋(사다리 행동 규격·검사, 재검토 기록)은 `claude/hollow-keep-tile-mosaic` 새 PR로 main에 병합. 사다리 행동·climb 동작은 새 브랜치 `codex/hollow-keep-ladder-actions`(기준 main)에서 `CODEX_TASK_08.md`로 진행.

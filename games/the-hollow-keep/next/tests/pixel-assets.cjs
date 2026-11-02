@@ -101,6 +101,19 @@ async function analyze(page, file, opts) {
       }
       cells[name] = rowOpaque; cellLum[name] = { mean: n ? sum / n : null, rows: rowLum };
     }
+    // 프레임별 무게중심 x(불투명 픽셀 평균)와 맨 위 6줄의 x 중심(올린 손 위치) — 오르기 자세 검사용
+    const frameStats = [];
+    if (opts.frameW) {
+      for (let f = 0; f < Math.floor(W / opts.frameW); f++) {
+        let sx = 0, n = 0, top = -1;
+        for (let y = 0; y < Math.min(H, opts.frameH); y++) for (let x = 0; x < opts.frameW; x++) {
+          if (d[(y * W + f * opts.frameW + x) * 4 + 3]) { sx += x; n++; if (top < 0) top = y; }
+        }
+        let tx = 0, tn = 0;
+        if (top >= 0) for (let y = top; y < Math.min(top + 6, H); y++) for (let x = 0; x < opts.frameW; x++) if (d[(y * W + f * opts.frameW + x) * 4 + 3]) { tx += x; tn++; }
+        frameStats.push({ massX: n ? sx / n : null, topX: tn ? tx / tn : null });
+      }
+    }
     let h = 0; for (let i = 0; i < d.length; i++) h = (h * 31 + d[i]) >>> 0;
     const frameHashes = [];
     if (opts.frameW) {
@@ -136,7 +149,7 @@ async function analyze(page, file, opts) {
         parts.push(big);
       }
     }
-    return { W, H, alphaMid, off, offSample, upscaled, boxes, cells, cellLum, hash: h, frameHashes, parts };
+    return { W, H, alphaMid, off, offSample, upscaled, boxes, cells, cellLum, hash: h, frameHashes, parts, frameStats };
   }, { b64, opts });
 }
 
@@ -240,6 +253,15 @@ async function analyze(page, file, opts) {
           r.frameHashes.forEach((hsh, i) => { if (i) assert.notEqual(hsh, r.frameHashes[i - 1], `${i - 1}·${i}번 프레임이 같은 그림`); });
           assert.notEqual(r.frameHashes[0], r.frameHashes[r.frameHashes.length - 1], '첫·마지막 프레임이 같아 반복할 때 멈춰 보임');
         });
+        check(`${s.label}: 사다리 가운데에 매달린 자세(LADDER_ACTIONS_SPEC §3-1) — 무게중심 ±2단위, 올린 손이 사다리 폭 안`, () => {
+          const px = s.a.pivot.x, bad = [];
+          r.frameStats.forEach((f, i) => {
+            const dm = f.massX - px, dt = f.topX - px;
+            if (Math.abs(dm) > 2 * SCALE) bad.push(`${i}번 무게중심 ${dm >= 0 ? '+' : ''}${(dm / SCALE).toFixed(1)}단위`);
+            if (Math.abs(dt) > 12 * SCALE) bad.push(`${i}번 올린 손 ${dt >= 0 ? '+' : ''}${(dt / SCALE).toFixed(1)}단위(사다리 가로대 끝 ±10단위 + 여유 2)`);
+          });
+          assert.deepEqual(bad, [], `몸이 사다리 옆으로 쏠림: ${bad.join(', ')}`);
+        });
       }
       if (GROUNDED.includes(s.name)) {
         check(`${s.label}: 모든 프레임의 발이 기준선(pivot.y-2 ~ pivot.y)에 있음`, () => {
@@ -301,7 +323,7 @@ async function analyze(page, file, opts) {
         const dup = new Set(['back-1', 'back-2', 'back-3'].map((n) => String(t.cells[n])));
         assert.equal(dup.size, 3, 'back-1~3이 같은 칸을 가리킴(변형이 아님)');
       });
-      check('tiles: 사다리가 사다리로 읽힘(모자이크 §7) — 가로대 2~4개·두께 2단위 이상, 뒷벽 대비 3:1 이상', () => {
+      check('tiles: 사다리가 사다리로 읽힘(모자이크 §7) — 가로대 2~4개·두께 2단위 이상·이음새 포함 같은 간격, 뒷벽 대비 3:1 이상', () => {
         const rows = r.cells.ladder, lum = r.cellLum.ladder;
         assert.ok(rows && lum, 'ladder 칸 없음');
         const max = Math.max(...rows), rung = rows.map((c) => c > 0 && c >= 0.8 * max);
@@ -310,6 +332,9 @@ async function analyze(page, file, opts) {
         // 칸 위아래 끝에 걸친 가로대는 이어 붙이면 하나이므로 합친다
         if (groups.length > 1 && groups[0].y0 === 0 && rung[TILE - 1]) { const last = groups.pop(); groups[0].n += last.n; groups[0].lum += last.lum; }
         assert.ok(groups.length >= 2 && groups.length <= 4, `가로대 ${groups.length}개(2~4개 필요, 가는 줄이 촘촘하면 세로줄 두 개처럼 보임)`);
+        const starts = groups.map((g) => g.y0).sort((a2, b2) => a2 - b2);
+        const gaps = starts.map((y, i) => ((starts[(i + 1) % starts.length] - y) + TILE) % TILE || TILE);
+        assert.ok(Math.max(...gaps) - Math.min(...gaps) <= 1, `가로대 간격 ${gaps.join('·')}px — 칸을 이어 붙이면 이음새에서 간격이 달라 보임(모두 같아야 함)`);
         const thin = groups.filter((g) => g.n < 2 * SCALE).map((g) => g.n);
         assert.deepEqual(thin, [], `가로대 두께 ${thin.join(', ')}px (최소 ${2 * SCALE}px)`);
         const backs = ['back-1', 'back-2', 'back-3'].map((n) => r.cellLum[n] && r.cellLum[n].mean).filter((v) => v !== null && v !== undefined);
