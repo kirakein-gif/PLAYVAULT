@@ -1192,3 +1192,15 @@
 - 사용자 결정(후속): 효과음은 넣지 않음 — "소리가 안 나도 느낌으로 소리가 나는 것처럼 충분히 가능합니다". COMBAT_SPEC §2-1·CODEX_TASK_09 추가 지시의 금지 항목에 반영.
 - 다음: Codex가 PR #20에서 추가 지시 처리 → 재검토 → 미리보기 갱신.
 - 종료 상태: 규격 보강.
+
+### 2026-11-02 (Asia/Seoul) · Codex Noah 베기 보완(PR #20 `091e41b`) 재검토
+
+- 담당 AI: Claude Code(검토).
+- 범위: PR #21 규격 `097119f` 병합 포함, 검사 원본 동일. 콤보 회복 18·22·34, 시뮬레이션 시간 정지 없음, 효과음 없음.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 16/16, weapons-edge 6/6, pixel-assets 92/92, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱) 겹침 0건.
+- 그림: 베기 동작 16·20·32틱, 핵심 자세 9·12·22틱. 캡처에서 명중 밝힘, 세 단 자세 구분, 피해 숫자 위아래 분리 확인.
+- 회사 PC 미리보기 Artifact를 `091e41b` 빌드로 갱신(버전 4, 미리보기 사본만 `#test` 링크 유지).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛 확인 → 승인 시 PR #21 → PR #20 병합 → 2차(체력·피격·적 3종) 규격.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
