@@ -3,6 +3,13 @@
 실행 환경: Claude Code 클라우드 세션(Linux, Node 22, Chromium/Playwright 1.63) + GitHub Actions(ubuntu-latest, JDK 21, Android SDK 36, Android 14 x86_64 에뮬레이터).
 "통과"는 이번 세션에서 실제로 실행해 확인한 것만 적었습니다. 확인하지 못한 항목은 아래 **미확인**에 따로 적었습니다.
 
+## 추가 실행 (2026-11-03) — CHESS MASTER 제목·메뉴 수정·Lichess 문제 201개 추가
+
+- 단위 테스트 **391/391 통과**(문제 322개 전부 개별 검사 포함), 오프라인 E2E **22/22 통과**(제목이 한·영 모두 CHESS MASTER인지 추가 검사).
+- Lichess 문제 201개 Stockfish 19 깊이 20 재검증 **201/201 통과** (`docs/puzzle-recheck-lichess.json`).
+- 메인 메뉴 글자: 7개 해상도 × 한/영 14가지 모두 한 줄·카드 안. 실기 재확인 대기.
+- 아래 1~5절은 2026-11-02 첫 실행 기록입니다.
+
 ## 1. 단위 테스트 — Vitest 190/190 통과
 
 `npx vitest run` (로컬, CI `unit-tests` 작업 모두 통과)

@@ -16,7 +16,8 @@
 - 체스판 원목 텍스처: `scripts/build-textures.cjs`의 절차적 생성.
 - 앱 아이콘·스플래시: `scripts/build-icons.cjs`(자체 나이트 SVG 사용).
 - 효과음: `src/audio/sound.ts`에서 실행 시 합성(음원 파일 없음).
-- 전술 문제: 엔진 자체 대국에서 채굴 후 Stockfish 19로 검증(`scripts/puzzles/`). Lichess 데이터베이스는 이번 개발 환경에서 접속이 차단되어 사용하지 않았습니다.
+- 전술 문제 1–121: 엔진 자체 대국에서 채굴 후 Stockfish 19로 검증(`scripts/puzzles/`).
+- 전술 문제 122번 이후(ID `LI-…`): [Lichess 퍼즐 데이터베이스](https://database.lichess.org/)(CC0)에서 선별해 Stockfish 19로 재검증. 각 문제의 `source`에 원본 퍼즐 ID·레이팅·원본 대국 주소를 기록.
 
 ## GPLv3 고지
 

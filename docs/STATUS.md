@@ -4,6 +4,7 @@
 
 ## 개발 완료·검토 대기 · 우리집 체스 PREMIUM v1.0.0 → 제목 CHESS MASTER (새 게임, `games/family-chess-premium/`)
 
+- Lichess 문제 적용(2026-11-03): Lichess 퍼즐 DB(CC0)에서 201개 선별·깊이 20 재검증 201/201 → 문제 총 322개(기존 121개·ID·기록 유지, 122번부터 `LI-…`). 단위 391/391, E2E 22/22.
 - 필드테스트 1차 수정(2026-11-02): 제목을 한·영 모두 `CHESS MASTER`로, 메인 메뉴 글자 두 줄 넘침 수정(카드 폭 기준 글자·그림 크기, 단어 단위 줄바꿈, WebView 텍스트 배율 100%). 실기 재확인 대기. 앱 ID 유지.
 
 Claude Code / 브랜치 `ccr-6aa2a39e-1vn67a`(세션 지정) / 기준 main **4ec1cfa** / 2026-11-02. 사용자 개별 지시("코드에서도 충분히 가능하죠? 만들어주세요")로 역할 분담표의 "신규 기능 1차 구현 = Codex"보다 우선해 Claude Code가 구현. 범위: 새 폴더 `games/family-chess-premium/`와 새 CI `.github/workflows/family-chess-android.yml`(이 경로만 트리거). 다른 게임·공용 자산·루트 런처(`index.html`)·배포 설정 변경 없음.

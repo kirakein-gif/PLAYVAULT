@@ -11,7 +11,8 @@ const ITEMS = [
   { name: 'Noto Serif KR', license: 'SIL OFL 1.1', note: 'Google / Adobe — via @fontsource/noto-serif-kr' },
   { name: 'Cinzel', license: 'SIL OFL 1.1', note: 'Natanael Gama — via @fontsource/cinzel' },
   { name: 'Pieces, board textures, icons, sounds', license: 'Original', note: 'Made for this app (procedural SVG, generated wood, synthesised audio).' },
-  { name: 'Puzzles', license: 'Original', note: 'Generated from engine self-play and verified with Stockfish 19 for this app.' },
+  { name: 'Puzzles 1–121', license: 'Original', note: 'Generated from engine self-play and verified with Stockfish 19 for this app.' },
+  { name: 'Puzzles from 122 (LI-…)', license: 'CC0', note: 'Lichess puzzle database, https://database.lichess.org/ — thank you, Lichess. Re-verified with Stockfish 19.' },
 ];
 
 export function LicensesScreen() {

@@ -36,6 +36,8 @@ export interface Puzzle {
   themes: PuzzleTheme[];
   difficulty: Difficulty;
   mateIn: number | null;
+  /** Lichess puzzle rating (only for puzzles taken from the Lichess database) */
+  rating?: number;
   hint: PuzzleHint;
   /** structured explanation, rendered in either language */
   explain: { key: string; params: Record<string, string> };

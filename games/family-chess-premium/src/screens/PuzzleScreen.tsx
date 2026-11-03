@@ -254,6 +254,7 @@ export function PuzzleScreen({ id, list, daily }: { id: string; list: string[]; 
         <div className="pzMeta">
           <span className="tag">{t(`puzzles.cat.${puzzle.category}`)}</span>
           <span className={`tag d-${puzzle.difficulty}`}>{t(`puzzles.difficulty.${puzzle.difficulty}`)}</span>
+          {puzzle.rating && <span className="tag" title={puzzle.source}>Lichess {puzzle.rating}</span>}
           <span className="pzBest">
             {t('solve.best')} <Stars n={record?.best ?? 0} size="1.05em" />
           </span>

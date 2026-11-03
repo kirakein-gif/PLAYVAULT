@@ -8,7 +8,7 @@ const { Chess } = require('chess.js');
 const { Engine, winChance } = require('./engine.cjs');
 
 const [shard, shards, out] = [+process.argv[2], +process.argv[3], process.argv[4]];
-const P = JSON.parse(fs.readFileSync(path.join(__dirname, '../../src/academy/puzzles/puzzles.json'), 'utf8'));
+const P = JSON.parse(fs.readFileSync(process.env.PUZZLES || path.join(__dirname, '../../src/academy/puzzles/puzzles.json'), 'utf8'));
 (async () => {
   const e = new Engine('single');
   await e.init({ Hash: 64 });
