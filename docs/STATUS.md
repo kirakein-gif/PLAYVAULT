@@ -2,6 +2,10 @@
 
 확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Claude Code**(우리집 체스 PREMIUM v1.0.0 신규 개발). 아래 THE HOLLOW KEEP 항목은 Codex 기록 그대로입니다.
 
+## 진행 중 · CHESS MASTER Codex 비교용 스킨
+
+2026-11-03 / Codex / ccr-6aa2a39e-1vn67a / 기준 bfee4c9. 사용자 인계에 따라 Claude Code가 만든 family-chess-premium에 wizard-codex·gothic-codex 두 비교용 스킨(판/기물)을 추가합니다. Claude 기존 스킨·UI/게임 규칙 보존. 메뉴 상세 일러스트는 가족의 기물 선택 뒤 별도 진행. 대상 public/skins 새 자산·src/skins.ts 항목 추가·비교 캡처/제작 기록·관리 문서, 구현/검증 진행 중. 다음 Claude Code 교차 검토·가족 선택, 병합하지 않습니다.
+
 ## 개발 완료·검토 대기 · 우리집 체스 PREMIUM v1.0.0 → 제목 CHESS MASTER (새 게임, `games/family-chess-premium/`)
 
 - 스킨 선택(2026-11-03): 클래식 원목 / 마법사의 석실 / 고딕 성채, 프로필별 저장, '화려하지 않게' 기준. 메뉴 상세 일러스트는 Codex 대기(`games/family-chess-premium/docs/CODEX_TASK_SKINS.md`). 사용자 외형 판단 대기.
