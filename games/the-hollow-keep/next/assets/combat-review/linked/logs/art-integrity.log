@@ -1,0 +1,7 @@
+PASS attack: original cut/core pixels preserved after pivot translation; 6 frames, 18 ticks
+PASS attack-2: original cut/core pixels preserved after pivot translation; 6 frames, 22 ticks
+PASS attack-3: original cut/core pixels preserved after pivot translation; 6 frames, 34 ticks
+PASS attack -> attack-2: shared RGBA endpoint, aligned silhouette IoU1.0
+PASS attack-2 -> attack-3: shared RGBA endpoint, aligned silhouette IoU1.0
+PASS attack-3 -> attack: shared RGBA endpoint, aligned silhouette IoU1.0
+PASS builder reproducibility and all other runtime PNGs/Ethan manifest verified separately against091e41b

@@ -1,0 +1,8 @@
+PASS deterministic rebuild: all runtime PNG/JSON hashes identical
+PASS only six Noah runtime PNGs change; Ethan manifest and all other PNGs identical to00479e7
+PASS attack -> attack-2: endpoint RGBA identical, silhouette IoU1.0
+PASS attack-2 -> attack-3: endpoint RGBA identical, silhouette IoU1.0
+PASS attack-3 -> attack: endpoint RGBA identical, silhouette IoU1.0
+PASS final trimmed effect masks: dx/dy unchanged(+74.57,+5.17), (+17.35,-83.79), (+19.06,+123.41)px; origin translated160px to preserve all painted positions
+PASS final192x256 effect sheets: deterministic rebuild all runtime PNG/JSON identical
+PASS trim leaves every actual-input left/right82tick PNG and idle RGBA identical (166screenshots)

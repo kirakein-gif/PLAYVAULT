@@ -1,0 +1,15 @@
+clock.runFor: TypeError: w.room.objects is not iterable
+    at sim.step (<anonymous>:14:92)
+    at frame (http://127.0.0.1:8765/games/the-hollow-keep/next/app.js:121:30)
+    at <anonymous>:18:98
+    at ClockController._callFirstTimer (<anonymous>:285:20)
+    at ClockController._runTo (<anonymous>:120:33)
+    at <anonymous>:111:18
+    at ClockController._runWithDisabledRealTimeSync (<anonymous>:184:13)
+    at ClockController.runFor (<anonymous>:110:16)
+    at eval (eval at evaluate (:311:30), <anonymous>:1:33)
+    at eval (<anonymous>)
+    at ticks (/workspace/PLAYVAULT/games/the-hollow-keep/next/tests/exploration-browser.cjs:38:161)
+    at async /workspace/PLAYVAULT/games/the-hollow-keep/next/tests/exploration-browser.cjs:41:37 {
+  log: []
+}

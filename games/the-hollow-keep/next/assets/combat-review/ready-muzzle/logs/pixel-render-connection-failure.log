@@ -1,0 +1,25 @@
+FAIL PC 1280×900: 자산 로드, 캔버스 실제 해상도 = 960×k(가장 작은 충분한 정수), 보간 끔
+     page.goto: net::ERR_CONNECTION_TIMED_OUT at http://127.0.0.1:8765/games/the-hollow-keep/next/
+FAIL 모바일 780×330 DPR2: 자산 로드, 캔버스 실제 해상도 = 960×k(가장 작은 충분한 정수), 보간 끔
+     page.goto: net::ERR_CONNECTION_TIMED_OUT at http://127.0.0.1:8765/games/the-hollow-keep/next/
+FAIL 모바일 915×412 DPR2.625: 자산 로드, 캔버스 실제 해상도 = 960×k(가장 작은 충분한 정수), 보간 끔
+     page.goto: net::ERR_CONNECTION_TIMED_OUT at http://127.0.0.1:8765/games/the-hollow-keep/next/
+FAIL 화면 크기가 바뀌면 캔버스 실제 해상도를 다시 계산
+     page.goto: net::ERR_CONNECTION_TIMED_OUT at http://127.0.0.1:8765/games/the-hollow-keep/next/
+FAIL 그림 파일을 못 불러와도 도형으로 대신 그리고 게임은 계속 동작
+     page.goto: net::ERR_CONNECTION_TIMED_OUT at http://127.0.0.1:8765/games/the-hollow-keep/next/
+FAIL Noah 베기 효과(오른쪽): 휘두르는 프레임부터·공격 그림과 함께만·몸 앞쪽에만
+     page.goto: net::ERR_CONNECTION_TIMED_OUT at http://127.0.0.1:8765/games/the-hollow-keep/next/
+FAIL Noah 베기 효과(왼쪽): 휘두르는 프레임부터·공격 그림과 함께만·몸 앞쪽에만
+     page.goto: net::ERR_CONNECTION_TIMED_OUT at http://127.0.0.1:8765/games/the-hollow-keep/next/
+page.goto: net::ERR_CONNECTION_TIMED_OUT at http://127.0.0.1:8765/games/the-hollow-keep/next/
+Call log:
+  - navigating to "http://127.0.0.1:8765/games/the-hollow-keep/next/", waiting until "load"
+
+    at open (C:\Users\Administrator\Documents\Codex\2026-11-03\codex-games-the-hollow-keep-docs\work\PLAYVAULT\games\the-hollow-keep\next\tests\pixel-render.cjs:39:16)
+    at async C:\Users\Administrator\Documents\Codex\2026-11-03\codex-games-the-hollow-keep-docs\work\PLAYVAULT\games\the-hollow-keep\next\tests\pixel-render.cjs:152:29 {
+  log: [
+    '  - navigating to "http://127.0.0.1:8765/games/the-hollow-keep/next/", waiting until "load"'
+  ],
+  name: 'Error'
+}

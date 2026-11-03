@@ -1,0 +1,94 @@
+PASS manifest.json이 있고 형식이 맞음(version 1, scale 1|2, tileSize 30×scale)
+PASS palette.json: 1~64색, #rrggbb, 중복 없음
+PASS ethan: body가 sim.js CONFIG와 같음
+PASS ethan: 필수 동작과 최소 프레임 수, 기준점·시간 형식
+PASS noah: body가 sim.js CONFIG와 같음
+PASS noah: 필수 동작과 최소 프레임 수, 기준점·시간 형식
+PASS ethan: 필수 효과(COMBAT_SPEC §4) fx-rune, fx-charge, fx-rune-2, fx-rune-3, fx-burst
+PASS noah: 필수 효과(COMBAT_SPEC §4) fx-slash, fx-slash-2, fx-slash-3
+PASS ethan/idle: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/idle: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/idle: 모든 프레임의 발이 기준선(pivot.y-2 ~ pivot.y)에 있음
+PASS ethan/idle: 몸 크기가 판정 상자와 맞음(높이 ±15%, 가로 중심)
+PASS ethan/run: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/run: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/run: 모든 프레임의 발이 기준선(pivot.y-2 ~ pivot.y)에 있음
+PASS ethan/jump-standing: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/jump-standing: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/jump-running: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/jump-running: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/land: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/land: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/land: 모든 프레임의 발이 기준선(pivot.y-2 ~ pivot.y)에 있음
+PASS ethan/attack: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/attack: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/fx-rune: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/fx-rune: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/fx-rune: 이웃 프레임 그림이 다름
+PASS ethan/climb: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/climb: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/climb: 이웃 프레임 그림이 다름(손발이 번갈아 움직이는 오르기 동작)
+PASS ethan/climb: 사다리 가운데에 매달린 자세(LADDER_ACTIONS_SPEC §3-1) — 무게중심 ±2단위, 올린 손이 사다리 폭 안
+PASS ethan/charge: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/charge: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/fx-charge: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/fx-charge: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/fx-charge: 이웃 프레임 그림이 다름
+PASS ethan/fx-rune-2: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/fx-rune-2: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/fx-rune-2: 이웃 프레임 그림이 다름
+PASS ethan/fx-rune-3: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/fx-rune-3: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/fx-rune-3: 이웃 프레임 그림이 다름
+PASS ethan/fx-burst: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS ethan/fx-burst: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS ethan/fx-burst: 이웃 프레임 그림이 다름·한 번만 재생(loop가 true가 아님)
+PASS noah/idle: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS noah/idle: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS noah/idle: 모든 프레임의 발이 기준선(pivot.y-2 ~ pivot.y)에 있음
+PASS noah/idle: 몸 크기가 판정 상자와 맞음(높이 ±15%, 가로 중심)
+PASS noah/run: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS noah/run: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS noah/run: 모든 프레임의 발이 기준선(pivot.y-2 ~ pivot.y)에 있음
+PASS noah/jump-standing: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS noah/jump-standing: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS noah/jump-running: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS noah/jump-running: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS noah/land: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS noah/land: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS noah/land: 모든 프레임의 발이 기준선(pivot.y-2 ~ pivot.y)에 있음
+PASS noah/attack: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS noah/attack: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS noah/fx-slash: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS noah/fx-slash: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS noah/fx-slash: 이웃 프레임 그림이 다름·한 번만 재생(loop가 true가 아님)·프레임마다 한 획
+PASS noah/climb: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS noah/climb: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS noah/climb: 이웃 프레임 그림이 다름(손발이 번갈아 움직이는 오르기 동작)
+PASS noah/climb: 사다리 가운데에 매달린 자세(LADDER_ACTIONS_SPEC §3-1) — 무게중심 ±2단위, 올린 손이 사다리 폭 안
+PASS noah/attack-2: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS noah/attack-2: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS noah/attack-3: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS noah/attack-3: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS noah/fx-slash-2: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS noah/fx-slash-2: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS noah/fx-slash-2: 이웃 프레임 그림이 다름·한 번만 재생(loop가 true가 아님)·프레임마다 한 획
+PASS noah/fx-slash-3: PNG 파일·크기(frameW×프레임 수, frameH)
+PASS noah/fx-slash-3: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음
+PASS noah/fx-slash-3: 이웃 프레임 그림이 다름·한 번만 재생(loop가 true가 아님)·프레임마다 한 획
+PASS ethan: jump-running 그림이 jump-standing과 다름
+PASS noah: jump-running 그림이 jump-standing과 다름
+PASS noah: 1·2·3단 베기 효과(fx-slash, -2, -3)와 베기 동작(attack, -2, -3)이 서로 다른 그림(COMBAT_SPEC §4)
+PASS tiles: PNG 파일과 필수 칸(floor-top, wall-fill, ledge, ladder — EXPLORATION_SPEC §8)
+PASS tiles: 30의 배수 크기·투명도·팔레트·원래 해상도
+PASS tiles: 모자이크 조각 17종(TILE_MOSAIC_SPEC §3)이 있고 뒷벽·벽 조각은 꽉 참
+PASS tiles: 사다리가 사다리로 읽힘(모자이크 §7) — 가로대 2~4개·두께 2단위 이상·이음새 포함 같은 간격, 뒷벽 대비 3:1 이상
+PASS tiles: wall-fill은 꽉 참, floor-top은 아랫줄이 꽉 참, ledge는 위 16px만
+PASS bg-chapel.png: (960×540)×scale·투명도·팔레트·원래 해상도
+PASS objects: 필수 그림 14종이 manifest에 있음
+PASS objects: 봉쇄물 한 칸·출입문 2×3칸·기호 크기(보완 §4·§7)
+PASS objects refine-objects.png: 투명도 0/255·팔레트·원래 해상도·영역이 이미지 안
+PASS objects objects.png: 투명도 0/255·팔레트·원래 해상도·영역이 이미지 안
+PASS PROVENANCE.md(도구·지시문·손질 기록)가 있음
+
+92/92 passed

@@ -4,6 +4,7 @@
  * 규격: games/the-hollow-keep/docs/EXPLORATION_SPEC.md §2, §4, §6, §7
  *       games/the-hollow-keep/docs/EXPLORATION_REFINE_SPEC.md §3~§6 (출입문, 봉쇄물 모양, 방 밀도 D1~D6)
  *       games/the-hollow-keep/docs/TILE_MOSAIC_SPEC.md §4~§5 (back 격자, 다양성 V1~V4)
+ *       games/the-hollow-keep/docs/COMBAT2_SPEC.md §3·§4·§6 (적·쉼터 배치, 특정 적, 완주 중 둘 다 쓰러지지 않음)
  * 실행: node games/the-hollow-keep/next/tests/area-data.cjs
  * 환경 변수: HK_AREA(구역 파일, 기본 next/areas/area1.json), HK_WALK(완주 기록, 기본 area1.walkthrough.json), HK_SIM
  *   HK_AREA_REQ=off  — 검사기 자체 검증용. §7 필수 요소·보완 §5 밀도·§6 출입문 개수 검사를 끈다(형식·연결·배치·모양·완주 검사는 그대로).
@@ -36,7 +37,7 @@ if (!area) { console.log(`\n0/${results.length} passed`); process.exit(1); }
 const rooms = Object.entries(area.rooms);
 const objects = rooms.flatMap(([rid, r]) => (r.objects || []).map((o) => ({ ...o, room: rid })));
 const byPos = new Map(rooms.map(([id, r]) => [String(r.pos), id]));
-const size = (o) => ({ w: o.w || (o.type === 'entrance' ? 2 : 1), h: o.h || (o.type === 'target' ? 2 : o.type === 'entrance' ? 3 : 1) });
+const size = (o) => ({ w: o.w || (o.type === 'entrance' || o.type === 'shelter' ? 2 : 1), h: o.h || (o.type === 'target' ? 2 : o.type === 'entrance' || o.type === 'shelter' ? 3 : 1) });
 const rectHit = (a, b) => { const A = size(a), B = size(b); return a.x < b.x + B.w && b.x < a.x + A.w && a.y < b.y + B.h && b.y < a.y + A.h; };
 // 열쇠를 쓰는 곳: 열쇠 봉쇄물 + 잠긴 출입문 짝(짝 양쪽이 잠겨 있어도 한 번만 연다)
 const keyUses = (name) => objects.filter((o) => (o.type === 'door' && o.open && o.open.key === name)
@@ -84,7 +85,7 @@ check('시작 위치: 방이 있고 Ethan 몸이 벽과 겹치지 않음', () =>
 });
 
 check('물건: 종류·id 유일·좌표·문 조건 참조가 올바름', () => {
-  const types = ['door', 'switch', 'key', 'breakable', 'target', 'entrance'];
+  const types = ['door', 'switch', 'key', 'breakable', 'target', 'entrance', 'enemy', 'shelter'];
   const ids = new Set();
   for (const o of objects) {
     assert.ok(types.includes(o.type), `${o.room}: 알 수 없는 type ${o.type}`);
@@ -100,13 +101,14 @@ check('물건: 종류·id 유일·좌표·문 조건 참조가 올바름', () =>
     }
     if (o.type === 'key') assert.ok(typeof o.name === 'string' && o.name, `${o.id}.name 필요`);
     if (o.type === 'target') assert.ok(o.hp > 0, `${o.id}.hp 필요`);
+    if (o.type === 'enemy') assert.ok(['crawler', 'wisp', 'shield'].includes(o.kind), `${o.id}.kind는 crawler·wisp·shield(COMBAT2 §4)`);
   }
   for (const d of objects.filter((o) => o.type === 'door')) {
     const k = d.open || {}; const keys = Object.keys(k);
     assert.equal(keys.length, 1, `${d.id}.open 조건은 하나`);
     if (k.switch) assert.ok(objects.some((o) => o.type === 'switch' && o.id === k.switch), `${d.id}: 스위치 ${k.switch} 없음`);
     else if (k.key) assert.ok(objects.filter((o) => o.type === 'key' && o.name === k.key).length >= keyUses(k.key), `${d.id}: 열쇠 ${k.key}가 쓰는 곳 수보다 적음`);
-    else if (k.cleared) assert.ok(Array.isArray(k.cleared) && k.cleared.length && k.cleared.every((id) => objects.some((o) => o.type === 'target' && o.id === id)), `${d.id}: cleared 표적이 없음`);
+    else if (k.cleared) assert.ok(Array.isArray(k.cleared) && k.cleared.length && k.cleared.every((id) => objects.some((o) => (o.type === 'target' || o.type === 'enemy') && o.id === id)), `${d.id}: cleared 표적·적이 없음`);
     else assert.fail(`${d.id}: 알 수 없는 open 조건 ${keys[0]}`);
   }
   for (const e of objects.filter((o) => o.type === 'entrance' && o.lock && o.lock.key)) {
@@ -341,18 +343,46 @@ if (REQ) {
   });
 }
 
+// ── COMBAT2_SPEC §4·§6: 적·쉼터 배치 ──
+check('적 배치(COMBAT2 §4): 적 몸이 벽과 겹치지 않고, 땅 위 적은 발밑이 바닥칸', () => {
+  const bad = [];
+  for (const o of objects.filter((x) => x.type === 'enemy')) {
+    const g = area.rooms[o.room].grid, k = (HK.CONFIG.enemies || {})[o.kind];
+    if (!k) { bad.push(`${o.id}: CONFIG.enemies.${o.kind} 없음`); continue; }
+    const cxp = o.x * T + T / 2, x0 = cxp - k.width / 2, x1 = cxp + k.width / 2;
+    const y1 = o.kind === 'wisp' ? (o.y + 0.5) * T + k.height / 2 : (o.y + 1) * T, y0 = y1 - k.height;
+    for (let r = Math.floor(y0 / T); r <= Math.floor((y1 - 0.01) / T); r++) for (let c = Math.floor(x0 / T); c <= Math.floor((x1 - 0.01) / T); c++) if (g[r] && g[r][c] === '#') bad.push(`${o.id}: ${r}행 ${c}열 벽과 겹침`);
+    if (o.kind !== 'wisp' && !(o.y + 1 < ROWS && '#-'.includes(g[o.y + 1][o.x]))) bad.push(`${o.id}: 발밑 ${o.y + 1}행 ${o.x}열이 바닥칸이 아님`);
+  }
+  assert.deepEqual(bad, [], bad.join(' / '));
+});
+if (REQ) check('COMBAT2 §6: 적 8마리 이상·3종 각 2 이상·두 종류가 함께 있는 방, 시작 방은 적 없고 쉼터 있음, 특정 적 봉쇄물(방패형 포함), 구역에 표적 없음', () => {
+  const es = objects.filter((o) => o.type === 'enemy'), bad = [];
+  if (es.length < 8) bad.push(`적 ${es.length}마리`);
+  for (const k of ['crawler', 'wisp', 'shield']) { const n = es.filter((e) => e.kind === k).length; if (n < 2) bad.push(`${k} ${n}마리`); }
+  const mixed = rooms.some(([id]) => new Set(es.filter((e) => e.room === id).map((e) => e.kind)).size >= 2);
+  if (!mixed) bad.push('두 종류가 함께 있는 방 없음');
+  if (es.some((e) => e.room === area.start.room)) bad.push('시작 방에 적이 있음');
+  if (!objects.some((o) => o.type === 'shelter' && o.room === area.start.room)) bad.push('시작 방에 쉼터 없음');
+  const refs = objects.filter((o) => o.type === 'door' && o.open.cleared).flatMap((d) => d.open.cleared);
+  const refEnemies = es.filter((e) => refs.includes(e.id));
+  if (!refEnemies.some((e) => e.kind === 'shield') || refEnemies.length < 2) bad.push(`특정 적 봉쇄물: ${refEnemies.map((e) => e.kind).join(', ') || '없음'}(방패형 포함 2마리 이상)`);
+  if (objects.some((o) => o.type === 'target')) bad.push('구역에 시험 표적이 남아 있음(시험 방에만)');
+  assert.deepEqual(bad, [], bad.join(' / '));
+});
+
 check('완주 기록 재생: 모든 방·스위치·문·벽·열쇠·표적·출입문 짝을 해내고 시작 방으로 돌아옴(두 주인공 사용)', () => {
   assert.ok(fs.existsSync(WALK), `${WALK} 없음`);
   const walk = JSON.parse(fs.readFileSync(WALK, 'utf8'));
   assert.ok(['ethan', 'noah'].includes(walk.hero) && Array.isArray(walk.inputs), 'hero와 inputs 필요');
   const w = HK.createWorld({ area: JSON.parse(JSON.stringify(area)), hero: walk.hero });
-  let ticks = 0, swaps = 0;
+  let ticks = 0, swaps = 0, defeats = 0;
   for (const seg of walk.inputs) {
     const keys = (seg.keys || '').split(',').map((k) => k.trim()).filter(Boolean);
     for (const k of keys) assert.ok(INPUTS.includes(k), `알 수 없는 입력 ${k}`);
     assert.ok(Number.isInteger(seg.ticks) && seg.ticks > 0, 'ticks는 양의 정수');
     const held = Object.fromEntries(INPUTS.map((k) => [k, keys.includes(k)]));
-    for (let i = 0; i < seg.ticks; i++) { swaps += HK.step(w, held).filter((e) => e.type === 'swap').length; ticks++; }
+    for (let i = 0; i < seg.ticks; i++) { const ev = HK.step(w, held); swaps += ev.filter((e) => e.type === 'swap' && e.reason !== 'down').length; defeats += ev.filter((e) => e.type === 'defeat').length; ticks++; }
     assert.ok(ticks <= MAX_TICKS, `완주 기록이 ${MAX_TICKS}틱(10분)을 넘음`);
   }
   const f = HK.getFlags(w), map = HK.getMap(w), miss = [];
@@ -364,6 +394,8 @@ check('완주 기록 재생: 모든 방·스위치·문·벽·열쇠·표적·�
     if (o.type === 'key' && !f.picked[o.id]) miss.push(`열쇠 ${o.id}`);
   }
   for (const o of objects.filter((x) => x.type === 'target')) if (!(f.cleared || {})[o.id]) miss.push(`표적 ${o.id}`);
+  const refs = new Set(objects.filter((o) => o.type === 'door' && o.open.cleared).flatMap((d) => d.open.cleared));
+  for (const o of objects.filter((x) => x.type === 'enemy' && refs.has(x.id))) if (!(f.cleared || {})[o.id]) miss.push(`특정 적 ${o.id}`);
   for (const o of objects.filter((x) => x.type === 'entrance')) {
     if (!(f.entered || {})[o.id] && !(f.entered || {})[o.to]) miss.push(`출입문 짝 ${o.id}`);
     if (o.lock && !(f.unlocked || {})[o.id]) miss.push(`잠긴 출입문 ${o.id}`);
@@ -371,6 +403,7 @@ check('완주 기록 재생: 모든 방·스위치·문·벽·열쇠·표적·�
   assert.deepEqual(miss, [], `완주 후 남은 것: ${miss.join(', ')}`);
   assert.equal(w.roomId, area.start.room, `완주 후 시작 방(${area.start.room})이 아니라 ${w.roomId}에 있음`);
   assert.ok(swaps >= 1, '교대를 한 번도 하지 않음(두 주인공을 모두 써야 함)');
+  assert.equal(defeats, 0, `완주 중 둘 다 쓰러짐 ${defeats}회(COMBAT2 §6)`);
   console.log(`     (재생 ${ticks}틱 = ${(ticks / 60).toFixed(1)}초, 교대 ${swaps}회)`);
 });
 

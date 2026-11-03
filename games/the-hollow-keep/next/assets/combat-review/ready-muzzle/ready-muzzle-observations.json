@@ -1,0 +1,38 @@
+[
+  {
+    "dir": "right",
+    "stop": 1,
+    "tick": 36,
+    "body": {
+      "file": "noah-attack.png",
+      "frame": 5
+    }
+  },
+  {
+    "dir": "right",
+    "stop": 2,
+    "tick": 59,
+    "body": {
+      "file": "noah-attack-2.png",
+      "frame": 6
+    }
+  },
+  {
+    "dir": "left",
+    "stop": 1,
+    "tick": 47,
+    "body": {
+      "file": "noah-attack.png",
+      "frame": 5
+    }
+  },
+  {
+    "dir": "left",
+    "stop": 2,
+    "tick": 70,
+    "body": {
+      "file": "noah-attack-2.png",
+      "frame": 6
+    }
+  }
+]
