@@ -1,3 +1,4 @@
+import { isSkin } from '../skins';
 // Versioned on-device data model. Bump SCHEMA_VERSION and add a migration step
 // in migrate() whenever the shape changes.
 export const SCHEMA_VERSION = 1;
@@ -60,7 +61,8 @@ export interface Profile {
   lang: Lang;
   aiLevel: number;
   aiColor: 'w' | 'b' | 'random';
-  skin: 'classic' | 'wizard' | 'gothic';
+  /** skin id from src/skins.ts */
+  skin: string;
   puzzles: Record<string, PuzzleRecord>;
   favorites: string[];
   lessons: Record<string, LessonRecord>;
@@ -147,7 +149,7 @@ export function validateData(raw: unknown): { ok: true; data: AppData } | { ok: 
       name: base.name,
       lang: base.lang,
       aiLevel: Math.min(5, Math.max(1, Number(p.aiLevel) || 2)),
-      skin: p.skin === 'wizard' || p.skin === 'gothic' ? p.skin : 'classic',
+      skin: isSkin(p.skin) ? p.skin : 'classic',
       puzzles: isObj(p.puzzles) ? (p.puzzles as Record<string, PuzzleRecord>) : {},
       favorites: Array.isArray(p.favorites) ? (p.favorites as unknown[]).filter((x): x is string => typeof x === 'string') : [],
       lessons: isObj(p.lessons) ? (p.lessons as Record<string, LessonRecord>) : {},

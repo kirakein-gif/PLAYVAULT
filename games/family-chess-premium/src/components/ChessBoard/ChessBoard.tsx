@@ -6,7 +6,7 @@ import type { Square } from 'chess.js';
 import { trackPieces, type TrackedPiece } from '../../game/pieceTracker';
 import './board.css';
 import { useApp } from '../../state';
-import { pieceUrl } from '../../skins';
+import { pieceUrl, skinById } from '../../skins';
 
 export interface Arrow {
   from: string;
@@ -36,6 +36,7 @@ export interface BoardProps {
 
 const FILES = 'abcdefgh';
 const PROMO: ('q' | 'r' | 'b' | 'n')[] = ['q', 'r', 'b', 'n'];
+const abs = (path: string) => new URL(path, document.baseURI).href;
 
 function sqToXY(sq: string, orientation: 'w' | 'b'): [number, number] {
   const f = FILES.indexOf(sq[0]);
@@ -54,6 +55,7 @@ const grain = (i: number) => `${(i * 37) % 100}% ${(i * 61 + 13) % 100}%`;
 export function ChessBoard(p: BoardProps) {
   const { skin } = useApp();
   const pieceSrc = (color: string, type: string) => pieceUrl(skin, `${color}${type.toUpperCase()}`);
+  const customBoard = skinById(skin)?.board;
   const animMs = p.animMs ?? 160;
   const frame = Math.round(p.size * (p.showCoords === false ? 0.025 : 0.045));
   const inner = p.size - frame * 2;
@@ -234,7 +236,23 @@ export function ChessBoard(p: BoardProps) {
     return out;
   }, [p.orientation]);
 
-  const style = { width: p.size, height: p.size, padding: frame, ['--sq' as string]: `${sqPx}px`, ['--anim' as string]: `${animMs}ms` } as React.CSSProperties;
+  const style = {
+    width: p.size,
+    height: p.size,
+    padding: frame,
+    ['--sq' as string]: `${sqPx}px`,
+    ['--anim' as string]: `${animMs}ms`,
+    ...(customBoard
+      ? {
+          // absolute URLs: a url() inside a CSS variable would otherwise resolve against the stylesheet folder
+          ['--light-img' as string]: `url('${abs(customBoard.light)}')`,
+          ['--dark-img' as string]: `url('${abs(customBoard.dark)}')`,
+          ['--frame-img' as string]: customBoard.frame ? `url('${abs(customBoard.frame)}')` : 'none',
+          ['--coord' as string]: customBoard.coord ?? '#e3c58f',
+          ['--outline' as string]: customBoard.outline ?? 'rgba(201,166,107,0.75)',
+        }
+      : {}),
+  } as React.CSSProperties;
 
   const flashes = [p.flash && { ...p.flash }, badFlash && { square: badFlash.square, kind: 'wrong' as const, key: badFlash.key }].filter(Boolean) as {
     square: string;
@@ -243,7 +261,7 @@ export function ChessBoard(p: BoardProps) {
   }[];
 
   return (
-    <div className="boardFrame" style={style}>
+    <div className={`boardFrame${customBoard ? ' customSkin' : ''}`} style={style}>
       {p.showCoords !== false && (
         <div className="coords" aria-hidden>
           {Array.from({ length: 8 }, (_, i) => (

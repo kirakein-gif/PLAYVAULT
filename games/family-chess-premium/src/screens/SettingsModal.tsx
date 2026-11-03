@@ -111,12 +111,13 @@ export function SettingsModal() {
                 }}
               >
                 <span className="skinBoard">
-                  <i className="sw l" />
-                  <i className="sw d" />
+                  <i className="sw l" style={s.board ? { background: `url('${s.board.light}') 20% 30% / 400%` } : undefined} />
+                  <i className="sw d" style={s.board ? { background: `url('${s.board.dark}') 60% 30% / 400%` } : undefined} />
                   <img src={pieceUrl(s.id, 'wK')} alt="" />
                   <img src={pieceUrl(s.id, 'bN')} alt="" />
                 </span>
                 <span className="skinName">{bi(lang, s.name)}</span>
+                {s.author && <span className="tag skinAuthor">{s.author}</span>}
                 <span className="skinDesc">{bi(lang, s.desc)}</span>
               </button>
             ))}

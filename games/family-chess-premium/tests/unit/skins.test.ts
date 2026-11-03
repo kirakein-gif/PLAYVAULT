@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { SKINS, pieceUrl, isSkin } from '../../src/skins';
 import { defaultData, validateData } from '../../src/storage/schema';
@@ -7,14 +7,21 @@ import { defaultData, validateData } from '../../src/storage/schema';
 const pub = join(__dirname, '../../public');
 
 describe('skins', () => {
-  it('every skin has all 12 piece images, each a non-empty SVG', () => {
-    for (const s of SKINS)
+  it('every registered skin has all 12 piece images (and its board files)', () => {
+    for (const s of SKINS) {
       for (const c of ['w', 'b'])
         for (const p of 'KQRBNP') {
           const f = join(pub, pieceUrl(s.id, `${c}${p}`));
           expect(existsSync(f), f).toBe(true);
-          expect(readFileSync(f, 'utf8')).toMatch(/^<svg[\s\S]*<\/svg>\s*$/);
+          if (f.endsWith('.svg')) expect(readFileSync(f, 'utf8')).toMatch(/^<svg[\s\S]*<\/svg>\s*$/);
+          else expect(statSync(f).size, f).toBeGreaterThan(1000);
         }
+      for (const b of [s.board?.light, s.board?.dark, s.board?.frame, s.menuArt?.two, s.menuArt?.ai, s.menuArt?.academy])
+        if (b) expect(existsSync(join(pub, b)), b).toBe(true);
+    }
+  });
+  it('skin ids are unique', () => {
+    expect(new Set(SKINS.map((s) => s.id)).size).toBe(SKINS.length);
   });
   it('classic keeps the original paths', () => {
     expect(pieceUrl('classic', 'wK')).toBe('pieces/wK.svg');
