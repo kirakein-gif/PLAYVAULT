@@ -1,0 +1,53 @@
+PASS contract: API와 CONFIG 필수 항목
+PASS contract: 두 주인공의 조작 특성이 구분됨
+PASS contract: snapshot은 JSON 직렬화 가능
+PASS determinism: 같은 입력 → 같은 결과(600틱)
+PASS ground[ethan]: 입력이 없으면 제자리에 서 있음
+PASS ground[ethan]: 높은 곳에서 떨어져도 바닥을 뚫지 않고 착지
+PASS ground[noah]: 입력이 없으면 제자리에 서 있음
+PASS ground[noah]: 높은 곳에서 떨어져도 바닥을 뚫지 않고 착지
+PASS run[ethan]: 최고 속도 = CONFIG.runSpeed(±5%), 방향 전환
+PASS run[ethan]: 키를 떼면 CONFIG.stopTicks 안에 멈춤
+PASS run[ethan]: 좌우를 동시에 누르면 가속하지 않음
+PASS run[noah]: 최고 속도 = CONFIG.runSpeed(±5%), 방향 전환
+PASS run[noah]: 키를 떼면 CONFIG.stopTicks 안에 멈춤
+PASS run[noah]: 좌우를 동시에 누르면 가속하지 않음
+PASS collision[ethan]: 벽을 통과하지 않음
+PASS collision[ethan]: 낮은 천장에 머리를 부딪히면 통과하지 않고 떨어짐
+PASS collision[noah]: 벽을 통과하지 않음
+PASS collision[noah]: 낮은 천장에 머리를 부딪히면 통과하지 않고 떨어짐
+PASS jump[ethan]: 길게 누른 점프 높이 = CONFIG.jumpHeight(±8%)
+PASS jump[ethan]: 짧게 누른 점프(variableJump 설정 준수)
+PASS jump[ethan]: 계속 누르고 있어도 착지 후 자동 연속 점프 없음
+PASS jump[ethan]: 공중에서 추가 점프 불가(이중 점프 없음)
+PASS jump[ethan]: 코요테 타임 — 발판을 벗어난 직후 CONFIG.coyoteTicks 안에는 점프 가능
+PASS jump[ethan]: 점프 버퍼 — 착지 직전 CONFIG.jumpBufferTicks 안의 입력은 착지 순간 점프
+PASS jump[noah]: 길게 누른 점프 높이 = CONFIG.jumpHeight(±8%)
+PASS jump[noah]: 짧게 누른 점프(variableJump 설정 준수)
+PASS jump[noah]: 계속 누르고 있어도 착지 후 자동 연속 점프 없음
+PASS jump[noah]: 공중에서 추가 점프 불가(이중 점프 없음)
+PASS jump[noah]: 코요테 타임 — 발판을 벗어난 직후 CONFIG.coyoteTicks 안에는 점프 가능
+PASS jump[noah]: 점프 버퍼 — 착지 직전 CONFIG.jumpBufferTicks 안의 입력은 착지 순간 점프
+PASS weapon[ethan]: 앞의 표적은 맞고 1회 공격 = 1회 피해(CONFIG.weapon.damage)
+PASS weapon[ethan]: 등 뒤의 표적은 맞지 않음, 판정은 바라보는 쪽에 생성
+PASS weapon[ethan]: 공격 키를 누르고 있어도 자동 연사 없음
+PASS weapon[ethan]: 연타해도 CONFIG.weapon.cooldownTicks보다 빠르게 공격하지 않음
+PASS weapon[noah]: 앞의 표적은 맞고 1회 공격 = 1회 피해(CONFIG.weapon.damage)
+PASS weapon[noah]: 등 뒤의 표적은 맞지 않음, 판정은 바라보는 쪽에 생성
+PASS weapon[noah]: 공격 키를 누르고 있어도 자동 연사 없음
+PASS weapon[noah]: 연타해도 CONFIG.weapon.cooldownTicks보다 빠르게 공격하지 않음
+PASS weapon[projectile]: 투사체는 첫 표적에 명중하면 사라짐(관통 없음, 2026-10-31 사용자 결정)
+PASS air[ethan]: 달리며 뛴 점프는 도약 속도를 공중에서 유지
+PASS air[ethan]: 제자리 점프 후 앞으로 누르면 airControlSpeed까지만 이동
+PASS air[ethan]: 달리며 뛴 점프 중 반대 방향은 airControlSpeed까지만
+PASS air[ethan]: 공중에서 방향키를 떼면 stopTicks 안에 수직 낙하(사용자 승인 동작)
+PASS air[ethan]: 점프 종류 표시 getPlayer().jumpKind (running / standing)
+PASS air[noah]: 달리며 뛴 점프는 도약 속도를 공중에서 유지
+PASS air[noah]: 제자리 점프 후 앞으로 누르면 airControlSpeed까지만 이동
+PASS air[noah]: 달리며 뛴 점프 중 반대 방향은 airControlSpeed까지만
+PASS air[noah]: 공중에서 방향키를 떼면 stopTicks 안에 수직 낙하(사용자 승인 동작)
+PASS air[noah]: 점프 종류 표시 getPlayer().jumpKind (running / standing)
+PASS swap: 교대 시 발 위치 유지, 쿨다운 동안 재교대 불가
+PASS swap: 교대 후 바뀐 주인공의 CONFIG로 움직임
+
+51/51 passed

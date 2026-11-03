@@ -1,0 +1,11 @@
+page.goto: net::ERR_CONNECTION_TIMED_OUT at http://127.0.0.1:8765/games/the-hollow-keep/next/?room=test
+Call log:
+  - navigating to "http://127.0.0.1:8765/games/the-hollow-keep/next/?room=test", waiting until "load"
+
+    at setup (C:\Users\Administrator\Documents\Codex\2026-11-03\codex-games-the-hollow-keep-docs\work\PLAYVAULT\games\the-hollow-keep\next\tests\browser-playtest.cjs:15:16)
+    at async C:\Users\Administrator\Documents\Codex\2026-11-03\codex-games-the-hollow-keep-docs\work\PLAYVAULT\games\the-hollow-keep\next\tests\browser-playtest.cjs:26:85 {
+  log: [
+    '  - navigating to "http://127.0.0.1:8765/games/the-hollow-keep/next/?room=test", waiting until "load"'
+  ],
+  name: 'Error'
+}

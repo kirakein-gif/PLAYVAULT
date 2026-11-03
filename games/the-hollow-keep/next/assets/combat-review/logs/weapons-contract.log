@@ -1,0 +1,17 @@
+PASS CONFIG: noah.weapon.combo 3단·comboWindowTicks, 1단 = 기존 weapon 값 / ethan.weapon.charge 단계·탄
+PASS Noah: 리듬에 맞춰 세 번 누르면 1·2·3단, 피해 22·22·44 (3단 뒤엔 다시 1단)
+PASS Noah: 회복 중에 누른 것은 미리 입력 — 다음 단은 정확히 recoveryTicks 뒤에 나감
+PASS Noah: 창을 넘겨 누르면 콤보가 끊겨 1단
+PASS Noah: 창 마지막 틱에 누르면 이어짐
+PASS Noah: 3단만 닿는 거리(1·2단 사거리 밖)의 표적은 3단에만 맞음
+PASS Noah: 3단 디딤은 앞으로 이동하고 벽은 뚫지 않음
+PASS Noah: 교대하면 콤보가 사라져 돌아와서 1단
+PASS Ethan: 짧게 누르면 1단 1발만 (놓아도 더 쏘지 않음)
+PASS Ethan: 누르고 있으면 40틱에 2단·80틱에 3단 charge 이벤트, getPlayer().charge 단계
+PASS Ethan: 2단에서 놓으면 2단 탄(피해 44), 관통하지 않음
+PASS Ethan: 3단에서 놓으면 3단 탄(66) + 반지름 안의 다른 표적에 빛 터짐(33), 반지름 밖은 무사
+PASS Ethan: 2단 전에 놓거나, 충전 중 교대하면 충전탄 없음
+PASS Ethan: 충전 중에도 걷기·점프 가능, 충전탄은 공격 대기를 다시 시작
+PASS 결정성: 같은 입력 → 같은 결과(두 주인공, 콤보·충전 섞음)
+
+15/15 passed

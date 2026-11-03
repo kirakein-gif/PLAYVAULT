@@ -1,0 +1,7 @@
+PASS Noah right: actual1/2/3 events, all12 body frames and all9 slash effect frames
+PASS Noah left: actual1/2/3 events, all12 body frames and all9 slash effect frames
+PASS Ethan level2: hold/release, distinct charge bank and projectile
+PASS Ethan level3: hold/release, distinct charge bank and projectile, all3 actual burst frames
+PASS mobile780x330: actual touch stays held through level3 and release fires
+PASS F2: combo/charge controls, synchronized first stage, export and defaults
+6/6 actual-input combat browser checks passed; captures: /tmp/hk09b-review

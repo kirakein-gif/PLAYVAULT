@@ -1,0 +1,10 @@
+page.goto: net::ERR_CONNECTION_TIMED_OUT at http://127.0.0.1:8765/games/the-hollow-keep/next/
+Call log:
+  - navigating to "http://127.0.0.1:8765/games/the-hollow-keep/next/", waiting until "load"
+
+    at C:\Users\Administrator\Documents\Codex\2026-11-03\codex-games-the-hollow-keep-docs\work\PLAYVAULT\games\the-hollow-keep\next\tests\tile-mosaic-render.cjs:47:16 {
+  log: [
+    '  - navigating to "http://127.0.0.1:8765/games/the-hollow-keep/next/", waiting until "load"'
+  ],
+  name: 'Error'
+}
