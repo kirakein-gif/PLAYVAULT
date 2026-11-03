@@ -54,6 +54,30 @@ test('Noah 동선(COMBAT_SPEC §2-3): 2단 파고들기(lunge ≥ 10)·위로 �
   assert.ok(!c[2].lunge, `3단 lunge ${c[2].lunge} (크게 내려치기는 발을 버팀)`);
   assert.ok(c[2].range >= 88, `3단 사거리 ${c[2].range}`);
 });
+test('Noah 준비 동작(COMBAT_SPEC §2-4): 1단 즉시, 2단 startupTicks 3~6, 3단 4~8(2단 이상)', () => {
+  const c = cfg('noah').weapon.combo, st = (k) => c[k].startupTicks || 0;
+  assert.equal(st(0), 0, '1단은 누르는 즉시(1단계 검사 유지)');
+  assert.ok(st(1) >= 3 && st(1) <= 6, `2단 startupTicks ${st(1)}`);
+  assert.ok(st(2) >= 4 && st(2) <= 8 && st(2) >= st(1), `3단 startupTicks ${st(2)}`);
+  assert.ok(st(1) + c[1].activeTicks <= c[1].recoveryTicks && st(2) + c[2].activeTicks <= c[2].recoveryTicks, '준비 + 판정이 회복 안에 끝나야 박자 유지');
+});
+
+test('Noah 준비 동작: 2·3단은 숙이기·칼 들기 동안 맞지 않고, 그 뒤 판정 시간 안에 맞음', () => {
+  const c = cfg('noah').weapon.combo;
+  for (const k of [1, 2]) {
+    const w = world('noah', [dummy('d', PX + cfg('noah').width + 20, 10000)]);
+    for (let j = 0; j < k; j++) { HK.step(w, I({ attack: true })); run(w, c[j].recoveryTicks - 1); }
+    const before = hp(w, 'd'), st = c[k].startupTicks || 0;
+    const ev = attacks([...HK.step(w, I({ attack: true }))]);
+    assert.deepEqual(ev.map((e) => e.step), [k + 1], `${k + 1}단이 나가야 함`);
+    run(w, st - 1);
+    assert.equal(hp(w, 'd'), before, `${k + 1}단 준비 ${st}틱 안에 이미 맞음`);
+    assert.equal(HK.getHitboxes(w).length, 0, `${k + 1}단 준비 중에 판정이 보임`);
+    run(w, c[k].activeTicks + 1);
+    assert.equal(before - hp(w, 'd'), c[k].damage, `${k + 1}단 판정 시간 안에 맞지 않음`);
+  }
+});
+
 test('Noah 콤보 창(COMBAT_SPEC §2-2): comboWindowTicks 20', () => {
   assert.equal(cfg('noah').weapon.comboWindowTicks, 20);
 });
@@ -124,7 +148,7 @@ test('Noah: 디딤(lunge)이 있는 단은 그만큼 앞으로 이동하고 벽�
       const extra = wallGap === null ? [] : [{ x: PX + cfg('noah').width + wallGap, y: 0, w: 40, h: FLOOR_Y }];
       const w = world('noah', [], extra);
       for (let j = 0; j < k; j++) { HK.step(w, I({ attack: true })); run(w, c[j].recoveryTicks - 1); }
-      const x0 = P(w).x; HK.step(w, I({ attack: true })); run(w, c[k].activeTicks + 2);
+      const x0 = P(w).x; HK.step(w, I({ attack: true })); run(w, (c[k].startupTicks || 0) + c[k].activeTicks + 2);
       return { w, dx: P(w).x - x0, x0 };
     };
     const want = c[k].lunge || 0, free = go(null);
