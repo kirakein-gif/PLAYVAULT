@@ -133,7 +133,7 @@
     "importConfirm": "{date}에 만든 백업({profiles})으로 지금의 모든 기록을 덮어씁니다. 계속할까요?", "importOk": "기록을 복원했습니다",
     "importFail": "복원할 수 없는 파일입니다 ({reason})", "uninstallWarn": "앱을 삭제하면 기기 안의 기록도 지워집니다. 가끔 백업을 내보내 두세요.",
     "about": "앱 정보", "licenses": "오픈소스 라이선스", "version": "버전 {v}", "offline": "인터넷 없이 모든 기능이 동작합니다. 기록은 이 기기에만 저장됩니다.",
-    "engine": "체스 엔진: {name}", "errors": { "notJson": "JSON 형식 아님", "wrongApp": "이 앱의 백업이 아님", "newerSchema": "더 새로운 버전의 백업", "noSchema": "버전 정보 없음", "noProfiles": "프로필 없음", "badProfile": "프로필 손상", "notObject": "형식 오류" }
+    "engine": "체스 엔진: {name}", "device": "기기 정보: {info}", "errors": { "notJson": "JSON 형식 아님", "wrongApp": "이 앱의 백업이 아님", "newerSchema": "더 새로운 버전의 백업", "noSchema": "버전 정보 없음", "noProfiles": "프로필 없음", "badProfile": "프로필 손상", "notObject": "형식 오류" }
   },
   "licenses": { "title": "오픈소스 라이선스와 출처" }
 }

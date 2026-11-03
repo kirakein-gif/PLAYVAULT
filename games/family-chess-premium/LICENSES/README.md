@@ -7,7 +7,8 @@
 | chess.js | 1.4.0 | BSD-2-Clause | https://github.com/jhlywa/chess.js |
 | React / React DOM | 19.3.1 | MIT | https://react.dev |
 | Capacitor core/android/app/preferences/filesystem/share/haptics | 8.x | MIT | https://capacitorjs.com |
-| Noto Serif KR (Fontsource) | 5.3.1 | SIL OFL 1.1 | https://fontsource.org/fonts/noto-serif-kr |
+| Gowun Dodum · Gowun Batang (Fontsource) | 5.3.0 | SIL OFL 1.1 | https://fontsource.org/fonts/gowun-dodum · https://fontsource.org/fonts/gowun-batang |
+| Nunito (Fontsource variable) | 5.3.0 | SIL OFL 1.1 | https://fontsource.org/fonts/nunito |
 | Cinzel (Fontsource) | 5.3.0 | SIL OFL 1.1 | https://fontsource.org/fonts/cinzel |
 
 ## 자체 제작 에셋

@@ -11,6 +11,20 @@ import type { AppData } from '../storage/schema';
 
 export const APP_VERSION = '1.0.0';
 
+/** One line a tester can photograph: WebView engine, Android version, CSS screen size. */
+export function deviceInfo(): string {
+  const ua = navigator.userAgent;
+  const chrome = ua.match(/Chrome\/(\d+)/)?.[1];
+  const android = ua.match(/Android ([\d.]+)/)?.[1];
+  const cq = typeof CSS !== 'undefined' && CSS.supports?.('width: 1cqi') ? 'cq' : 'no-cq';
+  return [
+    android ? `Android ${android}` : navigator.platform,
+    chrome ? `WebView ${chrome}` : 'WebView ?',
+    `${window.innerWidth}×${window.innerHeight} @${window.devicePixelRatio}x`,
+    cq,
+  ].join(' · ');
+}
+
 export function SettingsModal() {
   const app = useApp();
   const { t, settings, updateSettings, data, setData, lang, setLang, openSettings, click, toast } = app;
@@ -134,6 +148,7 @@ export function SettingsModal() {
           <p>{t('app.full')} · {t('settings.version', { v: APP_VERSION })}</p>
           <p className="hintText">{t('settings.offline')}</p>
           <p className="hintText">{t('settings.engine', { name: getEngine().engineName || 'Stockfish 19 Lite (WASM)' })}</p>
+          <p className="hintText" data-testid="device-info">{t('settings.device', { info: deviceInfo() })}</p>
           <Btn kind="ghost" onClick={() => { close(); app.go({ name: 'licenses' }); }} testId="licenses">{t('settings.licenses')}</Btn>
         </section>
       </div>
