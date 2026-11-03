@@ -1,6 +1,32 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(3단계 전투 2차 규격·검사 제출, 사용자 병합 승인 대기).
+확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Codex**(CHESS MASTER 비교용 고딕·중세·노블 제출). 아래 기존 이력은 보존합니다.
+
+## 제출 · CHESS MASTER Codex 고딕·중세·노블 / Claude Code 교차 검토 대기
+
+[Draft PR #23](https://github.com/kirakein-gif/PLAYVAULT/pull/23) · 기존 Claude 체스 구현 포함. main2605e46 통합 시 관리 문서 양쪽 이력 보존, 가족 판단 전 PR 병합 없음.
+
+2026-11-03 / Codex / ccr-6aa2a39e-1vn67a / 착수bfee4c9, 담당선언1e72867. 기준은 Claude Code의 family-chess-premium입니다. 사용자의 후속 결정으로 세 세트 고딕(gothic-codex)·중세(medieval-codex)·노블(noble-codex)를 추가했습니다. 중세는 성벽 위 방패병과 창을 든 기마 기사(앞발 들기), 노블은 마지막 사진의 전신 갑옷/웅크린 폰/높은 받침을 재구성하고 백석·흑석 색을 분리했습니다. 세트별 바닥6장 포함. 기존 Claude안·UI색·게임규칙·인수검사 보존.
+
+이번 실행: 단위396/396·타입/Vite빌드성공·원본오프라인E2E23/23(외부0)·실제스킨비교13/13(외부0). 기물36개256px·바닥6장1024px, 비교용걷는나이트2개, WebP44장922456bytes(약0.92MB), 파일당60/200KB이하. 동일수순의853×533@1.5/1280×800·60px양칸표·세트나열/바닥견본 첨부. 인계는 games/family-chess-premium/docs/CODEX_SKINS_HANDOFF.md, 상세검증/캡처는 docs/screenshots/skin-compare/README.md. 내장이미지생성·전체prompt/후처리기록 포함.
+
+다음은 Claude Code 교차검토와 가족 외형선택. 메뉴상세일러스트는 기물선택후 별도. 앱버전1.0.0유지, APK빌드·실기설치·main병합·배포없음. 아래 기존개발기록은 보존합니다.
+
+## 개발 완료·검토 대기 · 우리집 체스 PREMIUM v1.0.0 → 제목 CHESS MASTER (새 게임, `games/family-chess-premium/`)
+
+- 가족 스킨 선택 반영(2026-11-03): Codex 중세·노블 제외, Codex 고딕 윤곽 보완. 남은 비교: Claude 고딕 vs Codex 고딕. PR #23 draft 유지.
+- 스킨 확정(2026-11-03): Classic / Magic / Gothic(Codex 제작·Claude 윤곽 보완) 3종, 이름은 두 언어 모두 영문, 프로필별 저장, '화려하지 않게' 기준. 중세·노블·고딕 성채는 가족 결정으로 제외(구 `gothic` 프로필은 `gothic-codex`로 자동 전환). 새 debug APK는 Actions에서 빌드. 사용자 승인(2026-11-03 "합쳐주세요")으로 PR #23을 main에 병합. 배포 없음, 실기 확인 대기.
+- 저가형 태블릿 대응·글꼴 교체(2026-11-03): 구형 WebView 대체 CSS, 세로 메뉴 수정, 작은 화면 아카데미 정리, 설정에 기기 진단 줄, 글꼴 고운돋움·고운바탕·Nunito. 실기 확인 대기.
+- Lichess 문제 적용(2026-11-03): Lichess 퍼즐 DB(CC0)에서 201개 선별·깊이 20 재검증 201/201 → 문제 총 322개(기존 121개·ID·기록 유지, 122번부터 `LI-…`). 단위 391/391, E2E 22/22.
+- 필드테스트 1차 수정(2026-11-02): 제목을 한·영 모두 `CHESS MASTER`로, 메인 메뉴 글자 두 줄 넘침 수정(카드 폭 기준 글자·그림 크기, 단어 단위 줄바꿈, WebView 텍스트 배율 100%). 실기 재확인 대기. 앱 ID 유지.
+
+Claude Code / 브랜치 `ccr-6aa2a39e-1vn67a`(세션 지정) / 기준 main **4ec1cfa** / 2026-11-02. 사용자 개별 지시("코드에서도 충분히 가능하죠? 만들어주세요")로 역할 분담표의 "신규 기능 1차 구현 = Codex"보다 우선해 Claude Code가 구현. 범위: 새 폴더 `games/family-chess-premium/`와 새 CI `.github/workflows/family-chess-android.yml`(이 경로만 트리거). 다른 게임·공용 자산·루트 런처(`index.html`)·배포 설정 변경 없음.
+- 구현: Vite+React+TS+Capacitor 8, chess.js 규칙, Stockfish 19 Lite 단일 스레드 WASM(Web Worker, APK 내장), 자체 SVG 입체 기물·원목 텍스처·아이콘, 합성 효과음, 2인/컴퓨터 5단계/복기, 아카데미(검증 문제 121개·강의 17개·별 기록·오늘의 훈련), 한·영, 프로필 2개, JSON 백업. INTERNET 권한 없음.
+- 검증(이번 세션): 단위 190/190, 오프라인 브라우저 E2E 22/22(외부 요청 0), 문제 121개 깊이 20 재검증 121/121, 강의 과제 엔진 점검, 난이도 강도 측정(단계마다 강해짐). GitHub Actions 실행 #6(`c71a2ac`): debug APK 빌드 성공, Android 14 에뮬레이터 네트워크 차단 상태에서 설치·실행·Stockfish 5단계 응수·무르기·아카데미·재실행 통과(외부 요청 0). 상세: `games/family-chess-premium/docs/TEST_REPORT.md`.
+- 환경 제약: 이 세션은 `dl.google.com`(Android SDK)·`database.lichess.org` 접속 차단 → APK는 CI에서 빌드, 문제는 Lichess 대신 자체 생성·엔진 검증(`docs/PUZZLES.md`).
+- 미확인: 실제 태블릿 설치·조작감·청감·진동·백업 파일 저장 위치·뒤로가기. 릴리스 서명 없음(debug APK).
+- 다음: 사용자 실기기 설치·사용 피드백 → PR 제출 여부·main 병합 결정(사용자 승인 필요). PR 미제출, 병합·배포 없음.
+
 
 
 

@@ -6,6 +6,14 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 
 **근거 구분:** 표의 기능 요약은 관련 diff/소스 및 기존 기록에 근거한다. 각 바이너리의 외형·음질·저작권 및 모든 과거 버전의 실제 실행 결과를 재검증한 것은 아니다. Git 등록 전 작업, PC 미푸시 작업, 과거 담당 AI/요청 전문, 실제 릴리스 날짜·배포 버전·생략된 버전은 **확인 불가**다. 기존에 'Release'라는 커밋 제목이 있어도 배포 증거로 쓰지 않는다.
 
+## CHESS MASTER · 2026-11-03 스킨 3종 확정
+
+가족 결정으로 스킨을 **Classic / Magic / Gothic** 3종으로 정리했습니다(이름은 한국어·영어 모드 모두 영문). Codex 중세·노블과 Claude 고딕 성채는 제외, Codex 고딕에 윤곽선 보완. 이전 고딕 성채 프로필은 Gothic으로 자동 전환. 설정 카드의 제작자 표기 제거. 버전 1.0.0 유지. 단위 396/396·빌드·오프라인 E2E 23/23 통과. 새 debug APK는 GitHub Actions에서 빌드. 사용자 승인으로 PR #23을 main에 병합(배포 없음, 실기 확인 대기).
+
+## CHESS MASTER · 2026-11-03 Codex 비교용 스킨
+
+고딕·중세·노블3세트와각밝은/어두운바닥을추가했습니다. 중세는성벽위방패병/창을든기마기사,노블은사진기반전신갑옷석상/웅크린폰과백석·흑석구분입니다. 기존Claude스킨·UI색·게임규칙보존,버전1.0.0유지. 단위396/396·빌드·오프라인E2E23/23·실제비교13/13통과. [최종인계](games/family-chess-premium/docs/CODEX_SKINS_HANDOFF.md)와[자료/검증](games/family-chess-premium/docs/screenshots/skin-compare/README.md),WORK_LOG의2026-11-03Codex항목참조. Claude Code교차검토·가족선택대기,main병합·배포없음.
+
 ## ABYSSFALL: ECLIPSE
 
 경로: `games/abyssfall-eclipse/`, 공용 `assets/`, 회귀 `tests/`. 초기에는 캐시 쿼리만 있고 이후 README·커밋·화면 버전이 함께 등장한다. v1–v3이라는 독립 릴리스의 존재는 확인 불가다.
@@ -80,6 +88,18 @@ Noah 각 타를 같은 기본 자세로 끝내고 2·3타 준비4·6틱 뒤에 �
 | 2026-10-19 | v0.11(문서/화면) | 정수리 명중 영역·내려치기 아트, 3점 경기에서 100 에너지/-25 체계로 변경 | [dfc75d0](https://github.com/kirakein-gif/PLAYVAULT/commit/dfc75d03bf96ecc24683cc128ca5ff63df8f0680) |
 | 2026-10-19 | v0.12(문서/화면) | 3→2→1 예약 패와 다음 판 자동 진행, 미선택 대기·로딩 후 시작·미리보기 일시정지·에너지 0 종료 | [b5c3c5b](https://github.com/kirakein-gif/PLAYVAULT/commit/b5c3c5b8b8510b0d029b70b62482d480405f0804) |
 | 2026-10-19 | v0.13(문서/화면) | 수평 테이블과 타격 카메라 이동/축소 제거, 짧은 망치 머리·HUD 배치 조정. 정지 포즈 간 비례/앵커 정합은 남은 과제 | [e7b28cf](https://github.com/kirakein-gif/PLAYVAULT/commit/e7b28cfc1ce4e595cc7e8abfc6f55845543ca795) |
+
+## 우리집 체스 PREMIUM (FAMILY CHESS PREMIUM)
+
+경로: `games/family-chess-premium/`(독립 Vite·Capacitor 프로젝트), CI `.github/workflows/family-chess-android.yml`. 버전 표기는 개발 표식이며 배포를 뜻하지 않는다.
+
+| 날짜(KST) | 버전 | 주요 내용 | 관련 커밋 |
+| --- | --- | --- | --- |
+| 2026-11-03 | v1.0.0 수정 | 스킨 선택 추가: 마법사의 석실(대리석 판·석상 기물), 고딕 성채(석판·첨탑 기물), 프로필별 저장, 메뉴 일러스트 연결부 | 이 항목을 포함한 커밋 |
+| 2026-11-03 | v1.0.0 수정 | 글꼴 교체(한글 고운돋움·고운바탕, 영문 Nunito), 저가형·구형 WebView 대응 메뉴, 세로 메뉴 카드 수정, 작은 화면 아카데미 정리, 설정에 기기 진단 정보 | 이 항목을 포함한 커밋 |
+| 2026-11-03 | v1.0.0 수정 | Lichess 퍼즐 DB(CC0) 문제 201개 추가(신뢰도·레이팅 기준 선별, Stockfish 깊이 20 재검증 201/201), 총 322문제, 문제 화면에 Lichess 레이팅 표시, 메인 메뉴 카드 내용 세로 가운데 정렬 | 이 항목을 포함한 커밋 |
+| 2026-11-02 | v1.0.0 수정 | 제목 `CHESS MASTER`(한·영 공통, Android 앱 이름 `Chess Master`, 앱 ID 유지), 메인 메뉴 글자 넘침 수정, 한글 단어 단위 줄바꿈, WebView 텍스트 배율 100% | 이 항목을 포함한 커밋 |
+| 2026-11-02 | v1.0.0(신규) | 완전 오프라인 Android 태블릿 체스: 2인·컴퓨터 5단계(Stockfish 19 Lite WASM 내장)·복기, 아카데미(검증 문제 121·강의 17·별 기록·오늘의 훈련), 한·영, 프로필, JSON 백업, 자체 입체 기물·원목 보드·합성 효과음, debug APK CI 빌드. 상세 `games/family-chess-premium/README.md`, 테스트 `docs/TEST_REPORT.md` | 브랜치 `ccr-6aa2a39e-1vn67a`(435a935 … 이 항목을 포함한 커밋) |
 
 ## 플랫폼·공용 구조 및 병합
 

@@ -1,0 +1,43 @@
+
+> family-chess-premium@1.0.0 build
+> node scripts/copy-engine.mjs && tsc --noEmit -p tsconfig.json && vite build
+
+engine: stockfish-19-lite-single.js (28230 bytes)
+engine: stockfish-19-lite-single.wasm (1845971 bytes)
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 89 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                 1.56 kB │ gzip:   0.86 kB
+dist/assets/gothic-dark-FUT7uFLt.webp                           4.42 kB
+dist/assets/wizard-light-DGybtHsX.webp                          5.73 kB
+dist/assets/wizard-dark-B-Qf0fqx.webp                           5.83 kB
+dist/assets/gothic-light-NH6TBiJg.webp                          6.00 kB
+dist/assets/wizard-frame-WaAfYUbA.webp                          8.48 kB
+dist/assets/gothic-frame-DGYgJv7t.webp                          9.67 kB
+dist/assets/nunito-vietnamese-wght-normal-U01xdrZh.woff2       13.09 kB
+dist/assets/cinzel-latin-700-normal-Dkw14w9r.woff2             15.18 kB
+dist/assets/cinzel-latin-600-normal-Dd5YO2UX.woff2             15.20 kB
+dist/assets/cinzel-latin-600-normal-CH_LB4su.woff              17.50 kB
+dist/assets/cinzel-latin-700-normal-C-gK7hA8.woff              17.52 kB
+dist/assets/square-light-CC5tXYbo.webp                         18.85 kB
+dist/assets/nunito-cyrillic-wght-normal-CY6AOgYE.woff2         20.77 kB
+dist/assets/square-dark-E0xbTJK9.webp                          28.66 kB
+dist/assets/nunito-cyrillic-ext-wght-normal-D4X5GqEv.woff2     28.92 kB
+dist/assets/frame-BfSNaQF8.webp                                33.82 kB
+dist/assets/nunito-latin-ext-wght-normal-CXYtwYOx.woff2        35.58 kB
+dist/assets/nunito-latin-wght-normal-BzFMHfZw.woff2            39.12 kB
+dist/assets/gowun-dodum-korean-400-normal-kyfibGs5.woff2      406.47 kB
+dist/assets/gowun-batang-korean-700-normal-CH9Iz3IW.woff2     447.85 kB
+dist/assets/gowun-dodum-korean-400-normal-BH5HIN7-.woff     1,321.61 kB
+dist/assets/gowun-batang-korean-700-normal-B4_fsFB4.woff    1,476.97 kB
+dist/assets/index-B-awd4Ie.css                                 33.34 kB │ gzip:   8.57 kB
+dist/assets/web-DXmAI1xW.js                                     0.36 kB │ gzip:   0.25 kB
+dist/assets/web-CAyJvXF_.js                                     0.84 kB │ gzip:   0.40 kB
+dist/assets/web-xk6uWWEe.js                                     0.89 kB │ gzip:   0.45 kB
+dist/assets/web-B5IQSQhH.js                                     1.19 kB │ gzip:   0.54 kB
+dist/assets/web-DQseBpCW.js                                     8.43 kB │ gzip:   2.81 kB
+dist/assets/index-CxRZ_N6d.js                                 563.92 kB │ gzip: 167.07 kB
+
+✓ built in 506ms
