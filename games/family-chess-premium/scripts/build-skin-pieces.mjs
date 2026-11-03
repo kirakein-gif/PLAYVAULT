@@ -110,14 +110,20 @@ const WIZ = {
       part(s, c, id, 'M41.5,32 L42.5,20 L46,27 L50,16.5 L54,27 L57.5,20 L58.5,32 Q50,29.5 41.5,32 Z'); // crown
   },
   K(s, c, id) {
+    const M = MAT[s][c];
+    const rim = c === 'w' ? '#3a3b3e' : '#a9abb0';
+    const core = c === 'w' ? '#d4d5d6' : '#3c3d41';
     return plinth(s, c, id, 24, true) +
-      part(s, c, id, 'M30,81 L30,32 Q30,19 50,18 Q70,19 70,32 L70,81 Z') + // throne back (motif)
-      line(s, c, 'M35,32 Q35,24 50,23 Q65,24 65,32', 1, 0.4) +
-      part(s, c, id, 'M36,81 Q39,62 44,52 L56,52 Q61,62 64,81 Z') + // robed figure
-      line(s, c, 'M50,54 L50,80', 1, 0.4) +
-      `<ellipse cx="50" cy="44.5" rx="6.4" ry="7.2" fill="url(#${id}b)" stroke="${MAT[s][c].stroke}" stroke-width="${MAT[s][c].sw}"/>` +
-      part(s, c, id, 'M42.5,39 L42.5,31 L46,34.5 L50,29.5 L54,34.5 L57.5,31 L57.5,39 Q50,37 42.5,39 Z') + // crown
-      part(s, c, id, 'M48.3,29.5 L48.3,25 L45.6,25 L45.6,22 L48.3,22 L48.3,18.5 L51.7,18.5 L51.7,22 L54.4,22 L54.4,25 L51.7,25 L51.7,29.5 Z'); // cross
+      part(s, c, id, 'M28,81 Q31,62 37,51 Q42,46 50,46 Q58,46 63,51 Q69,62 72,81 Z') + // broad mantle
+      line(s, c, 'M37,51 Q34,66 32,80 M63,51 Q66,66 68,80', 1.1, 0.45) +
+      part(s, c, id, 'M39,50 Q50,56 61,50 L60,47 Q50,51 40,47 Z', 't') + // fur collar
+      `<ellipse cx="50" cy="39" rx="6.8" ry="7.6" fill="url(#${id}b)" stroke="${M.stroke}" stroke-width="${M.sw}"/>` +
+      part(s, c, id, 'M41.5,33.5 L41.5,24.5 L45.5,28.5 L50,23.5 L54.5,28.5 L58.5,24.5 L58.5,33.5 Q50,31 41.5,33.5 Z') + // crown
+      part(s, c, id, 'M48.4,23.5 L48.4,19 L45.6,19 L45.6,16 L48.4,16 L48.4,12.5 L51.6,12.5 L51.6,16 L54.4,16 L54.4,19 L51.6,19 L51.6,23.5 Z') + // cross
+      // sword held upright in front (the motif): blade, crossguard, grip, pommel
+      `<path d="M50,78 L50,62" stroke="${rim}" stroke-width="5.4" stroke-linecap="round"/><path d="M50,78 L50,62" stroke="${core}" stroke-width="3" stroke-linecap="round"/>` +
+      `<path d="M42.5,60.5 L57.5,60.5" stroke="${rim}" stroke-width="4.6" stroke-linecap="round"/><path d="M42.5,60.5 L57.5,60.5" stroke="${core}" stroke-width="2.4" stroke-linecap="round"/>` +
+      `<path d="M50,59 L50,54.5" stroke="${rim}" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="53" r="2.4" fill="${core}" stroke="${rim}" stroke-width="1.2"/>`;
   },
 };
 
