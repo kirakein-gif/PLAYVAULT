@@ -134,15 +134,16 @@ test('crawler: 높은 단에서 오가도 떨어지지 않음(벽·낭떠러지 
   const set = []; for (let c = 10; c <= 18; c++) set.push([12, c, '#']); // 12행 윗면 y 360에 단
   const w = world(area({ room: 'a', ...at('ethan', 2) }, { a: room([0, 0], { set, objects: [enemy('c1', 'crawler', 14, 11)] }) }));
   let minX = Infinity, maxX = -Infinity;
-  for (let i = 0; i < 900; i++) { HK.step(w, I()); const c = en(w, 'c1'); assert.ok(Math.abs(c.y + c.h - 360) <= 0.5, `${i}틱에 단에서 떨어짐(발 ${(c.y + c.h).toFixed(1)})`); minX = Math.min(minX, c.x); maxX = Math.max(maxX, c.x + c.w); }
+  for (let i = 0; i < 900; i++) { HK.step(w, I()); const c = en(w, 'c1'); assert.ok(Math.abs(c.y + c.h - 360) <= 0.5 && cx(c) >= 300 && cx(c) <= 570, `${i}틱에 단에서 벗어남(발 ${(c.y + c.h).toFixed(1)}, 가운데 ${cx(c).toFixed(1)} — 단 300~570)`); minX = Math.min(minX, c.x); maxX = Math.max(maxX, c.x + c.w); }
   assert.ok(maxX - minX > 90, `거의 움직이지 않음(${(maxX - minX).toFixed(1)})`);
 });
 
 test('crawler: 같은 바닥의 주인공이 앞 160 안이면 순찰보다 빠르게 돌진', () => {
   const w = world(area({ room: 'a', ...at('ethan', 6) }, { a: room([0, 0], { objects: [enemy('c1', 'crawler', 11)] }) }), { hp: { ethan: 6, noah: 5 } });
   let vmax = 0, x = en(w, 'c1').x;
-  for (let i = 0; i < 120 && en(w, 'c1'); i++) { HK.step(w, I()); const c = en(w, 'c1'); vmax = Math.max(vmax, Math.abs(c.x - x)); x = c.x; if (c.state === 'charge') break; }
-  run(w, I(), 5); const c = en(w, 'c1'); vmax = Math.max(vmax, Math.abs(c.x - x));
+  // 틱마다 이동 거리를 잰다(돌진을 시작한 뒤 5틱 더)
+  let after = -1;
+  for (let i = 0; i < 130 && en(w, 'c1') && after !== 0; i++) { HK.step(w, I()); const c = en(w, 'c1'); if (!c) break; vmax = Math.max(vmax, Math.abs(c.x - x)); x = c.x; if (after > 0) after--; else if (after < 0 && c.state === 'charge') after = 5; }
   assert.ok(vmax >= 2, `돌진 속도 ${vmax.toFixed(2)}`); assert.ok(vmax > E('crawler').speed * 1.5, '순찰보다 빠르지 않음');
 });
 
