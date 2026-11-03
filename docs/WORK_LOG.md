@@ -1299,3 +1299,40 @@
 - 실패/정정: 최초pixel-render구역/시험실각5/7. 효과 이미지의 투명왼쪽여백이 몸뒤까지그리는영역을차지했습니다. 원본검사는 유지하고 앞쪽192px로 자르고pivot0,215로 바꿔 실제픽셀/위치는 유지한 채각7/7로 재통과. 94/94/실제조작검사도 재통과. 좌우82틱+idle166장 수정전후RGBA동일 검증, 실패로그도before-trim에 보존했습니다. 효과그림의3단계중심검증도 실제그리기에서 시행했습니다.
 - 5개 관리 문서 검토: WORK_LOG/STATUS/CHANGELOG 갱신, AGENTS/CLAUDE 절차 변경 없음. next README/PROVENANCE 갱신. 이 항목 포함 `fix(hollow-keep): stage rising cut before overhead smash` 커밋을 일반 push, 같은 PR20 검토 가능으로 갱신합니다. main 병합·수동 배포·게임시간정지·효과음 없음.
 - 검토 담당/발견 문제 수: Claude Code 이번 수정 재검토 대기(미확인). 사용자 재요청 누적3회(박자/명중,연결,동선). 자동검사는통과했지만 자세 자연스러움·실기기 회전/터치/성능은 사용자 판단 필요. 다음은 PR20최신head의choreography/TEST_RESULTS 재현절차로 Claude Code 재검토, 회사 PC미리보기갱신은 사용자측 후속작업.
+### 2026-11-03 (Asia/Seoul) · Codex Noah 콤보 동선(PR #20 `eb1fdd2`) 재검토
+
+- 담당 AI: Claude Code(검토).
+- 범위: PR #21 규격 `abbcd8f` 병합 포함, 검사 원본 동일. combo 수치 §2-3과 일치(2단 range 64·height 80·lunge 12, 3단 range 90·디딤 없음).
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 18/18, weapons-edge 6/6, pixel-assets 94/94, combo-render 5/5(3회), foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과(polish-regression 단독 재실행). 무작위 입력(314곳, 47.1만 틱) 겹침 0건.
+- 베기 효과 무게중심 이동: 1단 가로 +75·세로 +5, 2단 세로 −84(올려 베기), 3단 세로 +123(내려치기). 시트에서 1단 끝 숙임 = 2단 시작, 2단 끝 머리 위 = 3단 시작 확인. 인물 크기 idle과 비슷(눈대중).
+- 회사 PC 미리보기 Artifact `eb1fdd2` 빌드로 갱신(버전 6).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛 확인 → 승인 시 PR #21 → PR #20 병합 → 2차(체력·피격·적 3종) 규격.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-03 (Asia/Seoul) · Noah 각 베기를 기본 자세로 끝내는 규격
+
+- 담당 AI: Claude Code. 사용자 의견(미리보기 `eb1fdd2`): "훨씬 나아졌다. 근데 1타를 치고 나서 2타 칠 준비로 바로 엎드린다. 1타 치면 그냥 서 있고, 2타 치면 엎드렸다가 올려치고 하는 게 좋겠다. 2타에서 3타도 마찬가지."
+- 측정: 서 있을 때 키 대비 1단 끝 0.58, 2단 끝 칼을 든 자세(3단 첫 프레임과 같음), 3단 끝 0.99. 원인은 §2-2 "앞 단 끝 = 다음 단 시작" 기준의 부작용 — Claude Code 규격 결함.
+- 판단: 준비 동작을 그 단 안으로 옮기면 누른 순간 바로 베는 그림이 아니게 되므로, 판정도 준비 시간만큼 늦춘다(startupTicks 2단 4·3단 6, 1단 0). 박자(회복)는 그대로.
+- 변경(`claude/hollow-keep-combat-review`, PR #21): COMBAT_SPEC §2-4, 기준 그림에 원칙 문장 추가·reference README, CODEX_TASK_09 추가 지시 4, `weapons-contract.cjs`(준비 시간 값·준비 중 판정 없음, 디딤 검사가 준비 시간을 기다리게 수정 → 20개), `pixel-assets.cjs`(끝 자세 높이·세 단 끝 자세 같음·숙이기·칼 들기 시작 시점, analyze에 프레임별 top 추가).
+- 검증: `eb1fdd2`는 weapons-contract 18/20, pixel-assets 94/95(1단 끝 0.58, 끝 자세 겹침 0.38·0.44·0.64, 3단 칼 들기 없음). 참조(시뮬레이션에 준비 시간 추가, 합성 동작 시트를 기본 자세로 시작·끝)는 weapons-contract 20/20, pixel-assets 95/95, foundation-contract 51/51, foundation-edge 16/16. 결함 변형 3종(준비 없음, 준비 중 판정 노출, 1단에 준비) 모두 검출.
+- 작성 중 바로잡은 것(Claude Code): 참조 구현이 판정을 준비 마지막 틱에 한 틱 일찍 보여 줌 → 참조 수정(검사는 맞음). 합성 시트가 2단 프레임을 3단에 재사용해 '세 단 그림이 서로 다름' 검사에 걸림 → 합성 문제로 확인.
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건.
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #20에서 추가 지시 4 처리 → 재검토 → 미리보기 갱신.
+- 종료 상태: 규격 보강.
+
+### 2026-11-03 (Asia/Seoul) · Ethan 발사 위치 규격
+
+- 담당 AI: Claude Code. 사용자 의견(작업 중): "에단의 경우 탄을 발사하는 위치는 손인데, 탄이 나가는 위치는 몸 중앙이네요. 검토할 필요가 있을 것 같습니다." 선택(질문): 그림을 낮춰 중간 높이에서.
+- 측정(`eb1fdd2`): manifest hands 기준 손은 발에서 51·앞 29(공격), 50.5·22(충전). 탄은 발에서 34·몸 앞면 21.
+- 판단: 탄을 손 높이로 올리면 키 약 45 미만의 적을 맞힐 수 없어 2차 적 설계를 제약 → 탄 높이 40으로 조금만 올리고 그림의 손을 내림.
+- 변경(`claude/hollow-keep-combat-review`, PR #21): COMBAT_SPEC §3-1, CODEX_TASK_09 추가 지시 5, `weapons-contract.cjs`(muzzle 값, 1·2·3단 탄 생성 위치 좌우 → 22개), `pixel-assets.cjs`(attack 발사 프레임·charge hands가 발사 위치 ±4).
+- 검증: `eb1fdd2`는 muzzle 검사 2개 실패, hands 검사 실패(앞 29·높이 51 등). 참조(muzzle 추가)는 weapons-contract 22/22, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16. 결함 변형 3종(높이 무시, 왼쪽 위치 오류, 충전탄만 옛 높이) 검출. hands 좌표를 발사 위치로 옮긴 합성 manifest는 pixel-assets 96/96.
+- 한계: pixel-assets는 hands 좌표를 검사하며 실제 그려진 손 픽셀은 재지 못함 → 발사 위치 표시를 겹친 캡처를 요구.
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건.
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 추가 지시 4·5를 함께 처리 → 재검토.
+- 종료 상태: 규격 보강.
