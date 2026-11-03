@@ -1165,3 +1165,209 @@
 - 다음: 규격 PR 병합 승인 → Codex `CODEX_TASK_09.md` → Claude Code 검토 → 사용자 손맛 확인 → 2차(체력·피격·적 3종) 규격.
 - 병합: 사용자 승인("병합하고 코덱스에 넘길게요")으로 PR #19를 main에 병합. 병합 후 weapons-contract·pixel-assets 새 항목은 Codex 구현 전 예상 실패.
 - 종료 상태: 규격 병합, Codex 구현 대기.
+
+### 2026-11-02 (Asia/Seoul) · TASK_09 전투 무기 1차 구현 제출
+
+- 담당 Codex / 재검토 Claude Code(대기). 사용자 요청대로 최신 `origin/main` **4ec1cfa**에서 새 `codex/hollow-keep-combat-weapons` 생성. fetch/prune·전체 PR·동일 원격 브랜치 확인: #17·#18·#19 병합, 중복 열린 작업 없음. 이전 사다리 브랜치를 이어 쓰거나 이전 과제를 재적용하지 않았습니다. 착수 **c4d07bf**로 STATUS 담당·범위를 먼저 푸시하고 [Draft PR #20](https://github.com/kirakein-gif/PLAYVAULT/pull/20)을 개설했습니다.
+- TASK_09 전체/전달 블록, COMBAT_SPEC, FOUNDATION_SPEC §4, ART_DIRECTION, 최신 AGENTS/STATUS/WORK_LOG/CHANGELOG·README·CLAUDE 및 sim/input/app/render/manifest/빌더·검사를 확인했습니다. 범위: next/sim.js·render.js·app.js, 게임 전용 새 무기 그림·효과·제작 도구·실제 입력 캡처·추가 경계 검사와 기록. 버전 전후: 번호 없는 next 시범 구역 유지. 체력·피격·적·보스, 기존 게임·공용 자산·런처·배포 설정은 변경하지 않았습니다.
+- Noah: 3단 설정(22/22/44 피해, 66/72/84 사거리, 18/18/30 회복)·14틱 연결 창, 회복 중 미리 입력, 창 만료 시 1단, 3단 뒤 1단, 교대 시 초기화. attack.step 이벤트. 3단의 총10단위 디딤은 수평 충돌을 지키며 공중·사다리에서도 콤보가 이어집니다. 사다리에서는 공격 중 디딤을 유지하고 매달림을 끊지 않으며 끝나면 가운데로 복귀합니다. 방을 넘어가면 이전 공격을 취소해 새 방 표적에 잔여 판정이 닿지 않습니다.
+- Ethan: 공격 가능할 때 누른 순간 기존 1단 탄과 충전 시작, 다음 틱부터 충전 틱 증가·40/80틱 단계 이벤트, 놓으면 2단 이상만 발사하고 공격 대기29틱 재시작. 공격 대기 중 새 누름은 충전도 시작하지 않습니다. charge={ticks,level}, 교대 시 취소. 충전탄은 첫 접촉에서 멈춥니다. 3단은 접촉 면의 겹친 세로 구간 가운데에서 반지름45/주변피해33, 직접 맞은 표적은 제외하며 부서지는 벽에 주변 피해를 주지 않습니다.
+- F2: 콤보 단계별 damage/range/recoveryTicks·연결 창, 충전 단계 시간·단계별 피해 추가. 기존 무기/콤보1단 값 동기화, CONFIG 복사·기본값 복원. 기존 input.js가 실제 키·포인터의 held를 보존하므로 수정하지 않고, 실제 모바일 터치로 3단까지 누름 유지/놓아 발사/pressed 해제를 검증했습니다. 이동 감속을 추가하지 않았습니다.
+- 그림: image_gen 생성 원본3개(combat-poses/finisher/effects-source.png), 경로A·기존64색·scale2·0/255알파·원래 해상도. 첫 보드에서 finisher 두 자세가 붙어 해당 행은 사용하지 않고 별도4자세 원본을 생성했습니다. build-combat-art.py로 배경/외곽 glow 제거, 원래 격자 샘플링, 팔레트·알파·윤곽/핀홀 정리, 얼굴/손 네이티브1픽셀 보강, 머리·발·손 기준 정렬. attack-2/3 각4자세·charge4자세, 새 효과6개 포함 총9PNG. 옷/칼을 자르지 않도록 프레임 여백을 확보했습니다. 전문 지시문·도구·과정·날짜는 PROVENANCE에 기록했습니다(모델/seed 미공개).
+- 렌더: 단계별 attack/fx-slash, charge와 3개 네이티브 크기의 빛 뱅크, fx-rune-2/3, 비반복3프레임 fx-burst. 베기는 손 위치에서 준비2틱 뒤 한 획으로 재생합니다. 2단 효과를2/2/3틱으로 맞춰 짧은9틱 판정 안에 마지막 프레임도 실제로 표시되게 했습니다. 이전 1단 그림·효과·애니메이션 manifest는 그대로입니다.
+- 실제 검사: weapons-contract **15/15**, 자체 weapons-edge **6/6**, 실제 입력 capture-combat **6/6**, pixel-assets **92/92**, foundation-contract **51/51**, foundation-edge **16/16**, exploration-contract **16/16**, entrance **9/9**, ladder-actions **10/10**, ladder-edge **4/4**, area-data **22/22**, exploration-edge **13/13**, pixel-render 구역/시험방 각각 **7/7**, ladder-render **7/7**, tile-mosaic-render **7/7**, keyboard-ime **7/7**, mobile-layout **20/20**, mobile-fullscreen **6/6**, exploration-browser **6/6**, browser-playtest(?room=test) **20/20**, room-traversal **4/4**, ABYSSFALL polish/audio/audio-wind **3종 통과**. 기존4159틱·교대2회 완주가 통과해 재기록하지 않았습니다. 경계 보완 후 규칙/이동/사다리·구역 검사들을 재실행해 위 결과를 확인했습니다.
+- 추가 경계: 공격 대기 중 충전 무시, 왼쪽 디딤·벽 충돌, 직접 표적 중복 피해 제외, 벽 너머 주변 피해와 퍼즐 벽 비파괴, 공중·사다리3단 콤보/사다리10디딤·중앙복귀, 방을 넘은 공격 취소. 실제 조작은 Noah 좌우 각12몸자세·9효과 프레임, Ethan2/3단 자세·빛 뱅크·탄·빛 터짐 전3프레임, 모바일780×330, F2/동기화/복사/복원을 확인합니다. 월드·좌표·그림 주입 없이 실제 키보드·CDP 터치와 스케줄링 시계만 사용합니다.
+- 캡처: 실제32장 → 2개 Noah12자세 보드+Ethan/모바일8장, **10개 무손실 WebP 총710890바이트**. 원래 픽셀 그대로 보드 배치, 각 원본 영역 및 저장/해독 RGBA 동일 확인. 보드는 시간 간격을 압축한 자세 비교이며 실제 회복 시간 동영상이 아닙니다. `next/assets/combat-review/README.md`, TEST_RESULTS.md, logs에 이번 결과와 재현을 분리해 기록했습니다. 이전 캡처는 보존했습니다.
+- 재현: 루트 HTTP8765, CHROMIUM_PATH=/usr/bin/chromium·HK_URL 지정으로 next/tests 실행. 시험방 렌더/browser-playtest는?room=test. 실제 조작/캡처 `tools/capture-combat.cjs`, 정리 `tools/pack-combat-review.py`, 제작 `tools/build-combat-art.py`. 새PNG9+manifest 재빌드 **10/10 SHA256 동일**. 원본 인수 검사 수정 없음, 기존 PNG 바이트 동일·기존 동작 manifest 동일·추가 필드 제외 모든 CONFIG 값 동일 확인. git diff --check 통과.
+- 자체 검토 보완: 효과 마지막 프레임 시간, 방 이동 중 공격 취소, 사다리에서 디딤 누적 유지. 자체 경계 검사 초안의 구문 오류는 수정 후 검증했습니다. 원본 검사 실패/약화 없음. 보존 확인 중 Node 자식 프로세스 EPERM은 Git 원본을 임시 파일로 읽어 비교하는 방식으로 확인했습니다. audio404는 기존 실패 복구 검사의 예상 경고입니다.
+- 5개 관리 문서 검토: STATUS/WORK_LOG/CHANGELOG 갱신, AGENTS/CLAUDE 규칙 변경 없음. nextREADME·PROVENANCE 갱신, 루트README 변경 필요 없음. 구현 SHA는 이 항목과 함께 제출한 PR #20 커밋 참조. 브랜치 푸시·Draft→Ready 제출, main 병합·수동 배포/게시 없음.
+- 다음: **Claude Code**가 PR #20의 원본 규칙·실제 입력·단계별 렌더·충전 취소/주변 피해/퍼즐 보존·미리 입력 창·패널을 교차 검토합니다. 사용자 손맛·외형·동작 판단 대기, 실제 휴대전화 회전·터치감·성능 미확인. 2차 체력·피격·적3종은 별도 규격 후 진행. 검토 담당/발견 문제 수: Claude Code / 이번 구현 재검토 전 미확인. 사용자 재요청: TASK_09 착수 후0회.
+
+### 2026-11-02 (Asia/Seoul) · Codex 전투 1차(PR #20 `bf87c75`) 검토
+
+- 담당 AI: Claude Code(검토). 구현: Codex `codex/hollow-keep-combat-weapons`.
+- 범위: 검사 원본·규격 main과 동일(Codex 자체 weapons-edge만 추가). 기존 게임·공용 자산 변경 없음.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 15/15(제 사본 HK_SIM으로도 15/15), weapons-edge 6/6, pixel-assets 92/92, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest(`?room=test`) 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱, 공격 포함) 겹침 0건.
+- 그림: Noah 1·2·3단 동작·베기 궤적이 서로 다르고 한 획. Ethan 충전 빛 9프레임 성장, 2·3단 탄이 1단보다 큼, 빛 터짐 3프레임 고리.
+- 관찰(차단 아님): 시험 방 피해 숫자가 같은 자리에 쌓여 표적 HP 글자를 가림 → 2차에서 피해 표시 정리 제안.
+- 회사 PC 미리보기 Artifact를 `bf87c75` 빌드로 갱신(버전 3). 미리보기 사본에서만 `#test`로 무기 시험 방을 열 수 있게 app.js 한 줄·링크 추가(claude.ai는 주소의 `?room=test`를 넘기지 않음). 저장소 코드는 변경 없음.
+- Git/PR: [PR #20 검토](https://github.com/kirakein-gif/PLAYVAULT/pull/20) (COMMENT).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건(관찰 1건).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛·외형 확인 → 승인 시 PR #20 병합(이 기록 브랜치 함께) → 2차(체력·피격·적 3종, 둘 다 쓰러졌을 때 처리 제안) 규격.
+- 종료 상태: 검토 완료, 사용자 판단 대기.
+
+### 2026-11-02 (Asia/Seoul) · Noah 3단 베기 손맛 보완 규격
+
+- 담당 AI: Claude Code. 사용자 의견(미리보기 확인): "에단의 충전 공격은 괜찮다. 노아의 3단 베기는 너무 빨라서 움직임이 잘 안 보인다, 궤적만 여기저기 다른 느낌", 선택 "자세 멈춤 + 리듬 조금 느리게", 작업 중 추가 "촥~ 촥~ 촥 하는 느낌, 격투 게임의 3단 콤보처럼".
+- 측정(PR #20 `bf87c75`): 베기 동작 1·2단 9틱, 3단 12틱, 가장 긴 자세 3~4틱. 동작 뒤 다음 공격까지 9~18틱은 서 있는 자세.
+- 판단: 맞을 때 멈춤(히트스톱)을 게임 시간에 넣으면 콤보 타이밍 검사·완주 기록 재생이 모두 어긋나므로 그림 표시 효과(자세 붙잡기·표적 밝힘·밀림·3단 화면 흔들림)로 정함. 효과음이 "촥" 느낌에 가장 크지만 4단계 범위라 사용자 결정 대기.
+- 변경(`claude/hollow-keep-combat-review`): COMBAT_SPEC §2-1(2·3단 회복 22·34틱, 동작 길이 ≥ 회복-2, 핵심 자세 ≥4틱, 타격 연출), CODEX_TASK_09 추가 지시, `weapons-contract.cjs` 리듬 검사 1개(15 → 16), `pixel-assets.cjs` 동작 길이·자세 멈춤 검사.
+- 검증: PR #20 그대로면 weapons-contract 15/16, pixel-assets 91/92(동작 9틱 < 16틱). 회복 값과 ticks만 바꾼 사본은 weapons-contract 16/16, pixel-assets 92/92, foundation-contract 51/51, foundation-edge 16/16, area-data 22/22. Codex 자체 weapons-edge는 옛 타이밍 가정으로 실패 → Codex가 갱신하도록 지시.
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건(베기 동작이 안 보임 — 1차 규격에 동작 길이 기준이 없던 것은 Claude Code 누락).
+- 사용자 재요청 횟수: 0회.
+- 사용자 결정(후속): 효과음은 넣지 않음 — "소리가 안 나도 느낌으로 소리가 나는 것처럼 충분히 가능합니다". COMBAT_SPEC §2-1·CODEX_TASK_09 추가 지시의 금지 항목에 반영.
+- 다음: Codex가 PR #20에서 추가 지시 처리 → 재검토 → 미리보기 갱신.
+- 종료 상태: 규격 보강.
+
+### 2026-11-02 (Asia/Seoul) · PR #20 추가 수정: Noah 베기 박자·명중 연출
+
+- 담당 Codex / 재검토 Claude Code(대기). 사용자가 TASK_09 맨 아래 추가 지시를 같은 PR #20에서 처리하도록 요청했습니다. 최신 fetch·열린PR20/21·검토 확인: bf87c75 원본 검사는 모두 통과, Claude Code 차단 문제0·피해 숫자 관찰1건, 사용자 Noah 베기가 빨라 몸 동작이 잘 안 보인다는 의견. Ethan 충전은 승인한 상태입니다. 작업 중 같은 지시와 회사 PC 미리보기 인계를 재확인받았습니다.
+- `origin/claude/hollow-keep-combat-review` **097119f111cdfe5dfb6d6e457b83fd2a127da31b**의 TASK_09 전문/추가 블록·COMBAT_SPEC §2-1·최신 이력·정정검사를 읽고 **e1a4409**로 구현 브랜치에 병합했습니다. WORK_LOG 충돌은 양측 제출·검토·보완 규격 이력을 보존해 정리했습니다. STATUS 담당/범위를 공유하고 PR20을 Draft로 돌렸습니다. main/PR 병합이나 다른 원격 브랜치 덮어쓰기는 하지 않았습니다.
+- 범위: sim의 요청된2개 회복 값과 hit 메타데이터, render/app 표시 효과·피해 글자, manifest/제작 도구·3단 베기PNG, 자체 검사/캡처/기록. Noah 회복18/22/34틱, 몸 동작 ticks2/2/9/3·2/2/12/4·2/2/22/6(합16/20/32), 준비2틱 유지. 피해·사거리·판정 수명·연결 창·1단 무기·이동 값은 그대로입니다. 전체 CONFIG를 비교해 변경이 회복22/34뿐임을 확인했습니다.
+- 명중: 공격자/단계/방향을 hit 이벤트에 부가해 교대 후 남은 Ethan 탄을 Noah 명중으로 오인하지 않게 합니다. 렌더에서 준비가 남으면 첫 베기 프레임(최대2틱 뒤)에 명중 표시를 맞추며, 그 프레임을3/3/5틱 추가 유지합니다. 피해와 실제 시간은 원래 틱에서 처리됩니다. 베기 효과는 실제 tick 기준으로 진행해 모든 효과 프레임을 보여줍니다. 긴 핵심 자세 뒤 거두기로 이어지고 새 공격/교대/방 이동은 해당 자세를 끊습니다.
+- 표적은2틱 흰색, 그림만 타격 방향으로3→2→1→0픽셀 뒤로 갔다 돌아옵니다. 3단 명중에만6틱·최대3픽셀의 감쇠 화면 흔들림을 적용합니다. 세계 시간·표적 물리 좌표는 정지/이동하지 않으며 효과음은 추가하지 않았습니다. 피해 글자는14px로 HP 위에서0.55단위/틱씩 떠오르고 기존 글자와 겹치면 새 줄/열을 골라 표시합니다. UI나 다른 게임은 변경하지 않았습니다.
+- 아트: 기존 경로A combat-effects-source 원본을 네이티브 격자로 다시 샘플링해3단 효과를112×34/156×48/184×46으로 늘렸습니다. 연결된 한 획·64색·0/255알파를 유지합니다. 실제 불투명 가로폭은112/155/183px(2단46/86/109, 1단65/55/62). PNG 변경은 noah-fx-slash-3 하나뿐, 모든 Ethan PNG/manifest와 몸 동작 PNG는 bf87c75와 동일합니다. 기존 빌더가1단 manifest 시간까지 최종 보정하도록 해 재현을 유지했습니다. 새 생성 원본이나 효과음/음원은 없습니다. PROVENANCE에 최신 값과 과정을 앞에 추가하고 과거 기록은 보존했습니다.
+- 검사 원본: 정정 브랜치의 weapons-contract/pixel-assets와 바이트 동일, 다른 원본도 수정 없음. 자체 weapons-edge는 옛17틱 대기/52틱 종료를 CONFIG 회복값·58틱 종료로 갱신하며6개 확인 항목을 유지했습니다(공중·사다리·좌우 디딤·방 이동·충전·주변 피해 경계). 회복이 바뀌어도 기존4159틱·교대2회 완주는 통과해 재기록하지 않았습니다.
+- 이번 실제 검사: weapons-contract **16/16**, pixel-assets **92/92**, weapons-edge **6/6**, 실제 입력 capture-combat **6/6**, 새 capture-combat-feel **좌우2/2**, foundation-contract **51/51**, foundation-edge **16/16**, exploration-contract **16/16**, entrance **9/9**, ladder-actions **10/10**, ladder-edge **4/4**, area-data **22/22**, exploration-edge **13/13**, pixel-render 구역/시험방 각 **7/7**, ladder-render **7/7**, tile-mosaic-render **7/7**, keyboard-ime **7/7**, mobile-layout **20/20**, mobile-fullscreen **6/6**, exploration-browser **6/6**, browser-playtest(?room=test) **20/20**, room-traversal **4/4**, ABYSSFALL polish/audio/audio-wind **3종 통과**. 원본 검사 실패·약화 없음. audio404는 기존 실패 복구 검사의 예상 경고입니다.
+- 새 명중 검증은 실제 키 입력·원래 앱의 캔버스 출력/텍스트 폭/변환행렬을 읽어18·22틱 공격 간격, 정확한 추가3/3/5틱 유지와 복귀 경계, 흰색2틱, 밀림3/2/1/0, 3단만6틱 흔들림을 확인합니다. 모든 프레임에서 세계tick은1씩 증가하고 실제 표적x/y는 그대로, 피해 글자와 서로/HP 사이 겹침이 없음을 검사합니다. 기존 실제 입력 검사는 새 회복/동작 길이를 읽어 좌우 각12몸자세·9효과, Ethan2/3단·탄·빛 터짐·모바일held/release·F2/복사/복원을 그대로 확인합니다. 월드/좌표/그림 주입 없음.
+- 새 제출물: 별도 자세32장 + 좌우 각82틱 연속 프레임(총164)을 정지12/영상2, **14개 무손실 WebP 총1799778바이트**로 정리했습니다. 영상은 각1.367초, 원본 프레임/시간축 동등성을 검사했고 보드 원본 영역도 RGBA 동일합니다. 명중/붙잡은 베기/효과가 걷힌 핵심 자세와 카메라 흔들림을 함께 봅니다. 이전 캡처는 상위 폴더에 보존했습니다. `next/assets/combat-review/followup/`에 캡처·영상·관찰JSON·전체 로그·재현을 제공합니다. 영상은 반복 끝에서 처음 위치로 돌아오는 재생이며 실제 게임 초기화가 아닙니다.
+- 재현: 루트HTTP8765 후 HK_URL·CHROMIUM_PATH로 원본 next/tests 실행(시험방 pixel-render/browser-playtest는?room=test). 실제 캡처는 tools/capture-combat.cjs(HK_SHOT_DIR=/tmp/hk09b-review), capture-combat-feel.cjs, 정리는 pack-combat-review.py(출력 폴더 인자 지원)·pack-combat-feel.py. build-combat-art.py 재실행 시 모든 runtimePNG/manifest 해시 동일. 영상 정리 도구 초안의 구문 오류는 수정 후 포장했고 떠오르는 숫자까지 담도록 캡처 범위만 넓혔습니다. git diff --check 통과.
+- 5개 관리 문서 검토: STATUS/WORK_LOG/CHANGELOG 갱신, AGENTS/CLAUDE 규칙 변경 없음. nextREADME/PROVENANCE 갱신, 루트README 변경 불필요. 게임 버전 번호 유지. 구현 SHA는 이 항목과 함께 제출한 PR20 커밋 참조. 같은 브랜치 푸시·Ready 갱신, main 병합·수동 배포/게시 없음.
+- 다음: Claude Code가 같은 PR20을 재검토하고 사용자가 안내한 회사 PC 미리보기를 새 빌드로 갱신합니다. 손맛/외형 판단, 실제 기기 회전·터치감·성능은 대기/미확인입니다. 체력·적·보스는 2차 범위입니다. 검토 담당/발견 문제 수: Claude Code 이전 차단0·관찰1, 이번 재검토 전 미확인. 사용자 재요청: 최초 TASK_09 제출 후1회(이번 추가 수정).
+
+### 2026-11-02 (Asia/Seoul) · Codex Noah 베기 보완(PR #20 `091e41b`) 재검토
+
+- 담당 AI: Claude Code(검토).
+- 범위: PR #21 규격 `097119f` 병합 포함, 검사 원본 동일. 콤보 회복 18·22·34, 시뮬레이션 시간 정지 없음, 효과음 없음.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 16/16, weapons-edge 6/6, pixel-assets 92/92, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱) 겹침 0건.
+- 그림: 베기 동작 16·20·32틱, 핵심 자세 9·12·22틱. 캡처에서 명중 밝힘, 세 단 자세 구분, 피해 숫자 위아래 분리 확인.
+- 회사 PC 미리보기 Artifact를 `091e41b` 빌드로 갱신(버전 4, 미리보기 사본만 `#test` 링크 유지).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛 확인 → 승인 시 PR #21 → PR #20 병합 → 2차(체력·피격·적 3종) 규격.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-02 (Asia/Seoul) · Noah 콤보 연결 규격(끊김 원인 측정)
+
+- 담당 AI: Claude Code. 사용자 의견(미리보기 `091e41b`): "3단 콤보 연출이 좀 어렵네요. 촥 하는 느낌은 있는데 세 모션의 연결이 좀 부자연스럽다. 끊기기도 하고."
+- 측정: ① 동작 16·20틱 < 회복 18·22틱 → 맞히지 않으면 단 사이 2틱 idle/run(실제 화면 3~4프레임, 새 combo-render로 확인). §2-1의 "회복-2" 기준이 허용한 틈 — Claude Code 규격 결함. ② 기준점 맞춤 실루엣 겹침: 1단 끝→2단 시작 0.49, 2단 끝→3단 시작 0.48(한 동작 안 이웃 프레임도 0.46~0.69, 각 4프레임). ③ 창 14틱(0.23초).
+- 변경(`claude/hollow-keep-combat-review`, PR #21): COMBAT_SPEC §2-2(틈 없음: 동작 ≥ 회복 + 창 동안 마지막 프레임 유지, 연결 자세 겹침 0.7 이상, 각 단 6프레임 이상, 창 20틱), CODEX_TASK_09 추가 지시 2, `weapons-contract.cjs`(창 20, 16 → 17), `pixel-assets.cjs`(6프레임·동작 ≥ 회복·연결 자세, analyze가 첫·마지막 프레임 마스크 반환, 세 단 '서로 다른 그림' 검사는 가운데 프레임만 비교하도록 조정 — 연결 프레임은 같아도 됨), 새 `combo-render.cjs`(5).
+- 검증: `091e41b`는 pixel-assets 91/93(동작 16틱·연결 0.49/0.48), weapons-contract 16/17, combo-render 4/5(콤보 중 다른 자세 3~4프레임, 2회 반복 같은 결과). 참조 사본(창 20, 각 단 6프레임·연결 프레임 공유, 렌더러가 창 동안 마지막 프레임 유지)은 pixel-assets 93/93, weapons-contract 17/17, combo-render 5/5(2회), pixel-render 7/7, ladder-render 7/7, weapons-edge 6/6, foundation 51/51, area-data 22/22.
+- 작성 중 바로잡은 검사 결함(Claude Code): combo-render의 키 간격이 짧아 3번째 입력이 2단 미리 입력과 겹쳐 사라짐 → 각 입력이 앞 단 회복 중에 들어가게 간격 조정. (참조 사본 pixel-render 5/7은 참조 그림 파일 이름을 바꿔서 생긴 것으로, 이름을 되돌리자 7/7.)
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건(연결 끊김), 원인 4가지 측정.
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #20에서 추가 지시 2 처리 → 재검토 → 미리보기 갱신.
+- 종료 상태: 규격 보강.
+
+
+## 2026-11-02 · Codex · TASK_09 추가 수정 지시2 / PR #20 콤보 연결
+
+- 요청/담당: 사용자 최신 지시의 추가 수정2를 같은 PR #20에서 Codex가 구현, Claude Code는 읽기 검토 담당. 시작 전 최신 GitHub/main4ec1cfa·PR20 OPEN·규격 브랜치c77525a를 확인. 시작 기준091e41b, 병합3e85135에서 작업권/범위를 STATUS와 draft PR에 공유했습니다. 기존 WORK_LOG 양쪽 내용을 보존해 규격 브랜치를 병합했습니다. 과거 TASK_08 재적용 없음.
+- 범위: next/sim.js(창14→20만), render.js(마지막 자세·이동 해제 latch·명중 core 시간 배분), Noah 공격3장/manifest·새 경로A source·재현 빌더·캡처 도구·관리 문서. main·다른 게임·공용 자산·배포 설정 변경 없음. 게임 버전 번호 전후 동일(추가 번호 없음).
+- 구현: 각6프레임,18/22/34틱. 새 거두기9자세, 앞 단 끝=다음 단 첫 실제 RGBA 공유(1→2·2→3·3→1 IoU1.0). 기존 cut/core 두 프레임은 원본과 pivot 정렬 후 픽셀 동일. 모든 다른 runtime PNG와 Ethan manifest는091e41b와 동일. Route A image_gen의 실제 prompt·정리/원본 보존 방법을 PROVENANCE에 기록했습니다. 두 번 빌드한 runtime PNG/JSON 동일.
+- 표시: 연결 가능 중 끝 자세 유지, 움직임/38·42·54틱 만료 시 평소 자세. 다음 단은 바로 첫 자세. 명중3/3/5틱 추가 유지는 긴 핵심 자세의 표시 시간에서 배분하여 모든 거두기가 다음 타 전에 보입니다(명중 core6/9/17틱). 게임 tick·표적 실제 좌표·1단 무기/이동 수치·Ethan 유지, 효과음 없음.
+- 이번 실행 통과: weapons17/17, pixel-assets93/93, combo-render5/5, weapons-edge6/6; foundation51/51·edge16/16, exploration16/16·entrance9/9·ladder10/10·area22/22·exploration-edge13/13·ladder-edge4/4·traversal4/4(4159틱); pixel-render 시험실/구역 각7/7, ladder-render7/7·tile7/7·IME7/7·mobile-layout20/20·fullscreen6/6·exploration-browser6/6·browser-playtest20/20. ECLIPSE polish/audio/audio-wind 모두 PASS(다른 게임 회귀로 구분).
+- 실제 조작/화면: capture-combat6/6(좌우18몸프레임·9효과프레임/방향·Ethan·모바일·F2), 명중좌우2/2, 창/이동해제2/2.44원본 캡처→10무손실보드, 좌우82틱/1367ms 클립 디코딩 RGBA/시간 일치, 연결 -2/-1/0/+1틱 비교2보드. `next/assets/combat-review/linked/`에 캡처·관측·검사 결과·원본로그 첨부, 이전 자료 보존.
+- 실패/정정: 구역용 검사를 처음 시험실 URL로 실행하여 area 미존재/타일2/7/준비 실패. 원본 로그를 보존하고 올바른 구역 주소에서 전부 통과했습니다. 자체 창 만료 검사는 처음 경계를1틱 일찍 기대했고 관측 tick-started37→38을 명시해 정정했습니다. 인수 테스트 원본 약화/삭제 없음. 요구 검사는 규격c77525a와 동일합니다.
+- 5개 관리 문서 검토: WORK_LOG·STATUS·CHANGELOG 갱신, AGENTS·CLAUDE 절차 변경 없음. next README·PROVENANCE 갱신. 커밋/PR: 이 항목을 포함한 `fix(hollow-keep): connect Noah combo recovery poses` 커밋을 같은 브랜치로 일반 push, PR #20 재검토 제출. main 병합·수동 배포 없음.
+- 검토 담당/발견 문제 수: Claude Code의 이번 수정 재검토 대기(미확인). 사용자 재요청 횟수2회(박자/명중 보완 후 연결 보완). 외형 자연스러움·실기기 터치감/성능은 사용자 확인 필요. 다음 담당은 Claude Code, PR20 최신 head와 linked/TEST_RESULTS의 실제 재현 절차 기준으로 재검토. 회사 PC 미리보기 갱신은 사용자 측 후속 작업입니다.
+
+### 2026-11-02 (Asia/Seoul) · Codex Noah 콤보 연결(PR #20 `00479e7`) 재검토
+
+- 담당 AI: Claude Code(검토).
+- 범위: PR #21 규격 `c77525a` 병합 포함, 검사 원본 동일.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 17/17, weapons-edge 6/6, pixel-assets 93/93, combo-render 5/5(3회), foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱) 겹침 0건.
+- 그림: 각 단 6프레임, 동작 18·22·34틱, 연결 프레임 공유(겹침 1.0). 관찰: 단 안 이웃 프레임 겹침 0.43~0.73. 1단·3단 일부 프레임이 idle·2단 초반보다 커 보임(눈대중 약 1.2배, 시트마다 색·자세가 달라 자동 측정 실패 — 측정 시도: 몸 면적, 후드 색 영역 모두 신뢰 불가).
+- 회사 PC 미리보기 Artifact `00479e7` 빌드로 갱신(버전 5).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건(관찰 2건).
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛 확인 → 승인 시 PR #21 → PR #20 병합, 또는 그림 기준(자세 기준 그림) 추가 결정.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-02 (Asia/Seoul) · Noah 콤보 동선 다시 짜기 규격(치기 → 파고들어 올려 베기 → 크게 내려치기)
+
+- 담당 AI: Claude Code. 사용자 의견(미리보기 `00479e7`): "2타째 올려치는 느낌이 잘 안 난다. 1타를 치고, 2타 때는 좀 파고들어서 아래에서 위로 휘둘러 올리고, 3타째는 크게 휘둘러서 내려치는 느낌이 나야 하지 않을까?"
+- 측정: 베기 효과 프레임별 무게중심 이동 — 1단 아래로 82px(내려 베기), 2단 위로 5~10px, 3단 수평. 디딤이 3단. 원인은 1차 규격 §2의 동선 문구("2단 올려 베기, 3단 가로 베기 + 디딤") 자체 — Claude Code 규격 결함.
+- 변경(`claude/hollow-keep-combat-review`, PR #21): COMBAT_SPEC §2-3(동선 표, combo[1] range 64·height 80·lunge 12, combo[2] range 90·height 64·디딤 없음, 인물 크기 일정 검토 항목), 기준 그림 `docs/reference/noah-combo-keyposes.png`(막대 그림, 방향·박자만) + reference README, CODEX_TASK_09 추가 지시 3, `weapons-contract.cjs`(동선 검사 추가, '3단만 닿는 거리'를 디딤 포함 도달 거리로 다시 계산, 디딤 검사를 단별로 일반화 → 18개), `pixel-assets.cjs`(베기 궤적 방향 검사, analyze에 massY 추가).
+- 검증: `00479e7`은 weapons-contract 17/18, pixel-assets 93/94(1단 세로 82 > 가로 2, 2단 위로 5, 3단 아래로 4). 참조 사본(수치 변경, 궤적 시트를 바꿔 끼운 합성)은 weapons-contract 18/18, pixel-assets 94/94, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16.
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건(동선 반대).
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #20에서 추가 지시 3 처리 → 재검토 → 미리보기 갱신.
+- 종료 상태: 규격 보강.
+
+
+## 2026-11-02 · Codex · TASK_09 추가 수정 지시3 / PR #20 콤보 동선
+
+- 요청/담당: 사용자 최신 추가수정3을 같은 PR #20에서 구현. 원격 확인: main4ec1cfa, 구현00479e7, 규격abbcd8f, PR20/21 OPEN. 규격 §2-3·방향기준·검사를 ffe7736으로 병합(양쪽 WORK_LOG 보존), STATUS 작업권/범위를 원격 공유하고 PR20을 draft로 전환한 뒤 코드 수정. Codex 구현, Claude Code는 재검토 담당. 이전 과제 재적용 없음.
+- 버전 전후: 기존 게임 번호 동일(새 번호 없음). 대상 next/Noah 전투6PNG·manifest/sim/render·제작/실제캡처도구·자체weapons-edge·관리문서. 다른 게임·공용 자산·배포 설정 변경 없음.
+- 규칙:1타/이동/피해/회복/창20/Ethan 수치 유지,2타range64/height80/lunge12,3타range90/height64/디딤없음. 자체weapons-edge의 벽/좌향/공중/사다리/방경계6항목은 유지하며 파고들기 위치/거리만 새 규격에 맞추고3타제자리 추가 확인. 원본weapons-contract·pixel-assets·combo-render 등은abbcd8f와 동일(약화 없음).
+- 경로A image_gen: 실제idle·목표외형·방향막대그림을 참고해15자세 새 생성. 같은0.46배로 원래 픽셀에 한 번 샘플링, 칼 높이와 무관하게 발기준 정렬. 64색·알파0/255·몸frame352x256/pivot160,215. 각6프레임·18/22/34틱, 끝=다음첫 RGBA공유로1→2·2→3·3→1 IoU1.0. 실제 prompt/소스/정리를 PROVENANCE에 기록. Ethan manifest·전투6장 이외모든PNG00479e7와 동일, 재빌드 전체PNG/JSON해시 동일.
+- 표시:1타가로치기,2타낮게숙인준비→일어서며올려베기→높은준비,3타머리위→큰내려치기→거두기. 기존명중3/3/5틱·밝힘·그림밀림·3타흔들림·피해숫자분리/시간지속 유지. 효과를 발기준에 붙여 손 높이 변화가 궤적을 흐리지 않게 했습니다. 정적효과dy+5.17/-83.79/+123.41px, 실제좌우1타가로37.29/세로2.59단위·2타위41.90·3타아래60.71(흔들림포함),2/3타단조로운방향·2타정확히12파고들기/3타제자리 확인.
+- 이번 검사 통과: weapons18/18·pixel-assets94/94·combo-render5/5·weapons-edge6/6; foundation51/51·edge16/16·exploration16/16·entrance9/9·ladder10/10·area22/22(4159틱69.3초교대2회)·exploration-edge13/13·ladder-edge4/4·traversal4/4. pixel-render구역/시험실각7/7·ladder/tile/IME각7/7·mobilelayout20/20·fullscreen6/6·explorationbrowser6/6·browserplaytest20/20. ECLIPSE polish/audio/audio-wind 모두PASS(다른 게임 회귀로 구분).
+- 실제입력capture-combat6/6, 명중/동선좌우2/2(기존 확인 항목+세계좌표 효과 중심/12파고들기/제자리), 창/이동해제2/2. 좌우82틱1367ms영상 디코딩RGBA/시간동일,44장→10보드, 핵심자세를 방향기준과 나란히·idle과모든자세크기비교·단사이비교. 자료/원본로그: `next/assets/combat-review/choreography/`, 과거 자료 보존.
+- 실패/정정: 최초pixel-render구역/시험실각5/7. 효과 이미지의 투명왼쪽여백이 몸뒤까지그리는영역을차지했습니다. 원본검사는 유지하고 앞쪽192px로 자르고pivot0,215로 바꿔 실제픽셀/위치는 유지한 채각7/7로 재통과. 94/94/실제조작검사도 재통과. 좌우82틱+idle166장 수정전후RGBA동일 검증, 실패로그도before-trim에 보존했습니다. 효과그림의3단계중심검증도 실제그리기에서 시행했습니다.
+- 5개 관리 문서 검토: WORK_LOG/STATUS/CHANGELOG 갱신, AGENTS/CLAUDE 절차 변경 없음. next README/PROVENANCE 갱신. 이 항목 포함 `fix(hollow-keep): stage rising cut before overhead smash` 커밋을 일반 push, 같은 PR20 검토 가능으로 갱신합니다. main 병합·수동 배포·게임시간정지·효과음 없음.
+- 검토 담당/발견 문제 수: Claude Code 이번 수정 재검토 대기(미확인). 사용자 재요청 누적3회(박자/명중,연결,동선). 자동검사는통과했지만 자세 자연스러움·실기기 회전/터치/성능은 사용자 판단 필요. 다음은 PR20최신head의choreography/TEST_RESULTS 재현절차로 Claude Code 재검토, 회사 PC미리보기갱신은 사용자측 후속작업.
+### 2026-11-03 (Asia/Seoul) · Codex Noah 콤보 동선(PR #20 `eb1fdd2`) 재검토
+
+- 담당 AI: Claude Code(검토).
+- 범위: PR #21 규격 `abbcd8f` 병합 포함, 검사 원본 동일. combo 수치 §2-3과 일치(2단 range 64·height 80·lunge 12, 3단 range 90·디딤 없음).
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 18/18, weapons-edge 6/6, pixel-assets 94/94, combo-render 5/5(3회), foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과(polish-regression 단독 재실행). 무작위 입력(314곳, 47.1만 틱) 겹침 0건.
+- 베기 효과 무게중심 이동: 1단 가로 +75·세로 +5, 2단 세로 −84(올려 베기), 3단 세로 +123(내려치기). 시트에서 1단 끝 숙임 = 2단 시작, 2단 끝 머리 위 = 3단 시작 확인. 인물 크기 idle과 비슷(눈대중).
+- 회사 PC 미리보기 Artifact `eb1fdd2` 빌드로 갱신(버전 6).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛 확인 → 승인 시 PR #21 → PR #20 병합 → 2차(체력·피격·적 3종) 규격.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-03 (Asia/Seoul) · Noah 각 베기를 기본 자세로 끝내는 규격
+
+- 담당 AI: Claude Code. 사용자 의견(미리보기 `eb1fdd2`): "훨씬 나아졌다. 근데 1타를 치고 나서 2타 칠 준비로 바로 엎드린다. 1타 치면 그냥 서 있고, 2타 치면 엎드렸다가 올려치고 하는 게 좋겠다. 2타에서 3타도 마찬가지."
+- 측정: 서 있을 때 키 대비 1단 끝 0.58, 2단 끝 칼을 든 자세(3단 첫 프레임과 같음), 3단 끝 0.99. 원인은 §2-2 "앞 단 끝 = 다음 단 시작" 기준의 부작용 — Claude Code 규격 결함.
+- 판단: 준비 동작을 그 단 안으로 옮기면 누른 순간 바로 베는 그림이 아니게 되므로, 판정도 준비 시간만큼 늦춘다(startupTicks 2단 4·3단 6, 1단 0). 박자(회복)는 그대로.
+- 변경(`claude/hollow-keep-combat-review`, PR #21): COMBAT_SPEC §2-4, 기준 그림에 원칙 문장 추가·reference README, CODEX_TASK_09 추가 지시 4, `weapons-contract.cjs`(준비 시간 값·준비 중 판정 없음, 디딤 검사가 준비 시간을 기다리게 수정 → 20개), `pixel-assets.cjs`(끝 자세 높이·세 단 끝 자세 같음·숙이기·칼 들기 시작 시점, analyze에 프레임별 top 추가).
+- 검증: `eb1fdd2`는 weapons-contract 18/20, pixel-assets 94/95(1단 끝 0.58, 끝 자세 겹침 0.38·0.44·0.64, 3단 칼 들기 없음). 참조(시뮬레이션에 준비 시간 추가, 합성 동작 시트를 기본 자세로 시작·끝)는 weapons-contract 20/20, pixel-assets 95/95, foundation-contract 51/51, foundation-edge 16/16. 결함 변형 3종(준비 없음, 준비 중 판정 노출, 1단에 준비) 모두 검출.
+- 작성 중 바로잡은 것(Claude Code): 참조 구현이 판정을 준비 마지막 틱에 한 틱 일찍 보여 줌 → 참조 수정(검사는 맞음). 합성 시트가 2단 프레임을 3단에 재사용해 '세 단 그림이 서로 다름' 검사에 걸림 → 합성 문제로 확인.
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건.
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 PR #20에서 추가 지시 4 처리 → 재검토 → 미리보기 갱신.
+- 종료 상태: 규격 보강.
+
+### 2026-11-03 (Asia/Seoul) · Ethan 발사 위치 규격
+
+- 담당 AI: Claude Code. 사용자 의견(작업 중): "에단의 경우 탄을 발사하는 위치는 손인데, 탄이 나가는 위치는 몸 중앙이네요. 검토할 필요가 있을 것 같습니다." 선택(질문): 그림을 낮춰 중간 높이에서.
+- 측정(`eb1fdd2`): manifest hands 기준 손은 발에서 51·앞 29(공격), 50.5·22(충전). 탄은 발에서 34·몸 앞면 21.
+- 판단: 탄을 손 높이로 올리면 키 약 45 미만의 적을 맞힐 수 없어 2차 적 설계를 제약 → 탄 높이 40으로 조금만 올리고 그림의 손을 내림.
+- 변경(`claude/hollow-keep-combat-review`, PR #21): COMBAT_SPEC §3-1, CODEX_TASK_09 추가 지시 5, `weapons-contract.cjs`(muzzle 값, 1·2·3단 탄 생성 위치 좌우 → 22개), `pixel-assets.cjs`(attack 발사 프레임·charge hands가 발사 위치 ±4).
+- 검증: `eb1fdd2`는 muzzle 검사 2개 실패, hands 검사 실패(앞 29·높이 51 등). 참조(muzzle 추가)는 weapons-contract 22/22, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16. 결함 변형 3종(높이 무시, 왼쪽 위치 오류, 충전탄만 옛 높이) 검출. hands 좌표를 발사 위치로 옮긴 합성 manifest는 pixel-assets 96/96.
+- 한계: pixel-assets는 hands 좌표를 검사하며 실제 그려진 손 픽셀은 재지 못함 → 발사 위치 표시를 겹친 캡처를 요구.
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건.
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 추가 지시 4·5를 함께 처리 → 재검토.
+- 종료 상태: 규격 보강.
+
+## 2026-11-03 · Codex · TASK_09 추가 수정 지시4·5 / PR #20
+
+- 사용자 인계로 같은 브랜치 codex/hollow-keep-combat-weapons에서 두 지시를 함께 구현. 최신 main4ec1cfa/구현eb1fdd2/규격5740714·열린PR20/21 확인. 검토 브랜치를 e8d96c5로 병합했고 WORK_LOG 양쪽 기록을 보존. 담당 선언1aa82bf를 원격 공유하고 PR20을Draft로 돌린 뒤 구현. 별도 중복 기능 작업 없음. Codex 구현, Claude Code 재검토 예정.
+- 범위: next/sim·render, Noah공격3장·Ethan공격/충전2장·manifest, RouteA원화3장·빌더·실제입력 캡처/포장 도구, 자체weapons-edge, 관리문서. 다른게임·공용자산·배포설정·기존캡처 보존. 게임 번호 전후 동일(추가 번호 없음).
+- Noah:2/3타 startupTicks4/6. 준비 중 life소모·판정·피해·디딤 없음, getHitboxes도 숨김. 준비 후 active9/12틱, 2타전체12디딤·3타제자리. 효과는 준비 뒤 시작. 모든 타끝/다음첫은 같은 기본자세, 2타숙임·3타칼들기를 그 타안에. 6/7/6프레임·18/22/34틱, 회복·창20·피해·1타/이동 수치 유지. 렌더러는 긴 핵심자세 위치를 실제ticks로 찾아 명중3/3/5유지 뒤 복귀가 다음 타 전에 보이게 함.
+- Ethan:muzzle앞6/발40을1/2/3단·좌우공통 적용. 새RouteA내장이미지생성으로 팔/손을낮추고, 실제장갑/손끝에서hands샘플링. 충전빛도그손에붙음. 피해/속도/사거리/충전시점 동일. 양자화64색·알파0/255·네이티브scale2, 샘플링/전체prompt/입력원화/정리는PROVENANCE. 기존효과와다른PNG는바이트보존,전체runtime PNG/manifest재빌드SHA256동일.
+- 인수 검사 weapons-contract/pixel-assets/combo-render 등은5740714와동일(약화없음). 자체weapons-edge6항목은방경계검사가준비4틱기다리도록하고준비중제자리/방유지를추가확인. 자체capture-combat은6/7/6전체19자세를manifest로확인, capture-combat-feel은실제준비중효과/피해/디딤없음및새cut프레임의3/3/5유지검사로보강. 기존타격/좌우/모바일/F2확인은유지.
+- 이번 실행: weapons22/22·pixel-assets96/96·combo-render5/5·weapons-edge6/6; foundation51/51·edge16/16, exploration16/16·entrance9/9·ladder10/10·area22/22·exploration-edge13/13·ladder-edge4/4·traversal4/4. pixel-render구역/시험실각7/7·ladder/tile/IME각7/7·mobile-layout20/20·fullscreen6/6·exploration-browser6/6·browser-playtest시험실20/20. ECLIPSE polish/audio/audio-wind모두PASS(다른게임회귀). 실제구역완주4159틱69.3초교대2회그대로통과해재기록불필요.
+- 실제입력: 전투6/6(좌우전체19몸/9효과·Ethan2/3·모바일·F2), 명중/준비좌우2/2(게임틱지속·표적물리좌표유지·밝힘·밀림·3타흔들림·숫자분리), 연결해제2/2, 멈춤/발사십자6/6.1타/2타멈춤좌우·1→2→3연속좌우·Ethan발사1/충전2/3손과독립muzzle십자·idle크기비교. 무손실포장/82틱1367ms영상은RGBA/시간동일확인. 자료/로그next/assets/combat-review/ready-muzzle/.
+- 실패/정정: 최초아트조립94/96(Ethan미교체·3타칼높이부족)은새손/높은칼소스로96/96. 최초브라우저는격리서버8765연결시간초과로실패,Chrome과같은권한8766서버에서전부통과. 연결실패로그를*-connection-failure로보존. 테스트원본수정으로회피하지않음.
+- 5개관리문서검토: STATUS/WORK_LOG/CHANGELOG갱신,AGENTS/CLAUDE절차변경없음. nextREADME/PROVENANCE/검증문서갱신. 같은PR20으로일반push/Ready제출,main병합·수동배포·효과음·게임시간정지없음.
+- 다음담당Claude Code: PR20최신head와ready-muzzle/TEST_RESULTS재현. 이번교차검토/발견문제수미확인, 사용자추가수정요청누적5건(박자·연결·동선·기본복귀·Ethan발사위치). 외형자연스러움/손맛/실기기회전·성능·터치는사용자판단대기. 회사PC미리보기갱신은사용자측후속작업.
+
+### 2026-11-03 (Asia/Seoul) · Codex 기본 자세·Ethan 발사 위치(PR #20 `26dfa80`) 재검토
+
+- 담당 AI: Claude Code(검토).
+- 범위: PR #21 규격 `5740714` 병합 포함, 검사 원본 동일. startupTicks 2단 4·3단 6, muzzle {forward 6, height 40}.
+- 테스트(`git archive` 사본, 로컬 HTTP 서버): weapons-contract 22/22, weapons-edge 6/6, pixel-assets 96/96, combo-render 5/5(3회), foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, area-data 22/22, exploration-edge 13/13, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, exploration-browser 6/6, browser-playtest 20/20, room-traversal 4/4, ABYSSFALL 회귀 3종 통과. 무작위 입력(314곳, 47.1만 틱) 겹침 0건.
+- 그림: Noah 세 단 끝 키 0.99(같은 기본 자세), 2단 숙이기 0.58, 3단 칼 들기 1.6. Ethan 손(hands) 앞 24·높이 40 / 충전 앞 23.5~24.5·높이 40.5~41.5, 시트에 발사 위치 표시를 겹쳐 실제 그려진 주먹과 일치 확인.
+- 회사 PC 미리보기 Artifact `26dfa80` 빌드로 갱신(버전 7).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛 확인 → 승인 시 PR #21 → PR #20 병합 → 2차(체력·피격·적 3종) 규격.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-03 (Asia/Seoul) · PR #21·#20 병합(3단계 전투 1차)
+
+- 담당 AI: Claude Code. 사용자: "병합하고 2차로 넘어갑시다".
+- 순서: PR #21 브랜치에 PR #20 head `26dfa80`을 병합(WORK_LOG 양쪽 추가 충돌, Codex 제출 → Claude Code 재검토 순으로 정리) → PR #21을 main에 병합 → PR #20은 head가 main에 포함되어 병합 처리됨을 확인.
+- 병합 내용: Noah 3단 콤보(치기 → 파고들어 올려 베기 → 크게 내려치기, 각 단 기본 자세로 끝남, 준비 시간, 미리 입력·창 20틱, 그림 표시 타격 연출), Ethan 3단계 충전 사격(1단 즉시·40·80틱 충전·3단 빛 터짐, 발사 위치 발에서 40), 관련 검사(weapons-contract 22, combo-render 5, pixel-assets 새 항목).
+- 다음: 2차(체력·피격·적 3종) 규격 — 둘 다 쓰러졌을 때 처리 제안·결정 포함.
+- 검토 담당 / 발견 문제 수: 해당 없음(병합 작업).
+- 사용자 재요청 횟수: 0회.
+- 종료 상태: 병합.

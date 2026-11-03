@@ -110,14 +110,24 @@ async function analyze(page, file, opts) {
     const frameStats = [];
     if (opts.frameW) {
       for (let f = 0; f < Math.floor(W / opts.frameW); f++) {
-        let sx = 0, n = 0, top = -1;
+        let sx = 0, sy = 0, n = 0, top = -1;
         for (let y = 0; y < Math.min(H, opts.frameH); y++) for (let x = 0; x < opts.frameW; x++) {
-          if (d[(y * W + f * opts.frameW + x) * 4 + 3]) { sx += x; n++; if (top < 0) top = y; }
+          if (d[(y * W + f * opts.frameW + x) * 4 + 3]) { sx += x; sy += y; n++; if (top < 0) top = y; }
         }
         let tx = 0, tn = 0;
         if (top >= 0) for (let y = top; y < Math.min(top + 6, H); y++) for (let x = 0; x < opts.frameW; x++) if (d[(y * W + f * opts.frameW + x) * 4 + 3]) { tx += x; tn++; }
-        frameStats.push({ massX: n ? sx / n : null, topX: tn ? tx / tn : null });
+        frameStats.push({ massX: n ? sx / n : null, massY: n ? sy / n : null, topX: tn ? tx / tn : null, top });
       }
+    }
+    // 첫·마지막 프레임 불투명 마스크(기준점 기준 좌표 문자열) — 콤보 연결 자세 비교용(COMBAT_SPEC §2-2)
+    let edgeMasks = null;
+    if (opts.frameW && opts.edgeMasks) {
+      const n = Math.floor(W / opts.frameW), pick = (f) => {
+        const out = [];
+        for (let y = 0; y < Math.min(H, opts.frameH); y++) for (let x = 0; x < opts.frameW; x++) if (d[(y * W + f * opts.frameW + x) * 4 + 3]) out.push((x - opts.pivot.x) + ',' + (y - opts.pivot.y));
+        return out;
+      };
+      edgeMasks = { first: pick(0), last: pick(n - 1) };
     }
     let h = 0; for (let i = 0; i < d.length; i++) h = (h * 31 + d[i]) >>> 0;
     const frameHashes = [];
@@ -154,7 +164,7 @@ async function analyze(page, file, opts) {
         parts.push(big);
       }
     }
-    return { W, H, alphaMid, off, offSample, upscaled, boxes, cells, cellLum, hash: h, frameHashes, parts, frameStats };
+    return { W, H, alphaMid, off, offSample, upscaled, boxes, cells, cellLum, hash: h, frameHashes, parts, frameStats, edgeMasks };
   }, { b64, opts });
 }
 
@@ -203,6 +213,14 @@ async function analyze(page, file, opts) {
           assert.ok(Array.isArray(a.ticks) && a.ticks.length === a.frames && a.ticks.every(isInt), `${name} ticks는 프레임 수만큼의 양의 정수`);
         }
         if (name === 'idle' || name === 'run' || name === 'climb' || name === 'charge') assert.equal(a.loop, true, `${name}.loop는 true`);
+        if (hero === 'noah' && /^attack(-[23])?$/.test(name) && SIM.CONFIG.heroes.noah.weapon.combo) {
+          // COMBAT_SPEC §2-1: 다음 공격 직전까지 동작이 이어지고, 핵심 자세가 4틱 이상 보임
+          const k = name === 'attack' ? 0 : Number(name.slice(-1)) - 1, rec = SIM.CONFIG.heroes.noah.weapon.combo[k].recoveryTicks;
+          const total = a.ticks.reduce((x, y) => x + y, 0);
+          assert.ok(total >= rec, `${name} 동작 길이 ${total}틱 < ${rec}틱(${k + 1}단 회복) — 다음 단 전에 서 있는 자세가 끼어듦(§2-2)`);
+          assert.ok(a.frames >= 6, `${name} ${a.frames}프레임 < 6 — 자세 사이가 뚝뚝 끊김(§2-2)`);
+          assert.ok(Math.max(...a.ticks) >= 4, `${name} 가장 오래 보이는 자세 ${Math.max(...a.ticks)}틱 < 4틱`);
+        }
         if (name.startsWith('attack')) assert.ok(a.ticks[0] <= 2, `attack 첫(준비) 프레임 ${a.ticks[0]}틱 > 2틱 — 판정은 누르는 즉시 생기므로 휘두르기 전에 피해가 먼저 보임`);
         assert.ok(/\.png$/i.test(a.file || ''), `${name} 파일은 .png`);
       }
@@ -241,7 +259,7 @@ async function analyze(page, file, opts) {
       });
       if (!fs.existsSync(file) || !fs.readFileSync(file).subarray(0, 8).equals(PNG_SIG)) continue;
       let r;
-      try { r = await analyze(page, file, { palette, frameW: s.a.frameW, frameH: s.a.frameH, minPart: s.name.startsWith('fx-slash') ? 6 : 0 }); }
+      try { r = await analyze(page, file, { palette, frameW: s.a.frameW, frameH: s.a.frameH, minPart: s.name.startsWith('fx-slash') ? 6 : 0, edgeMasks: s.hero === 'noah' && /^attack(-[23])?$/.test(s.name), pivot: s.a.pivot }); }
       catch (e) { check(`${s.label}: 이미지 해석`, () => assert.fail(`해석 실패: ${e.message.split('\n')[0]}`)); continue; }
       results2[s.label] = r;
       check(`${s.label}: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음`, () => {
@@ -303,12 +321,72 @@ async function analyze(page, file, opts) {
         assert.ok(a.W !== b.W || a.H !== b.H || a.hash !== b.hash, '두 점프 시트가 픽셀까지 같음');
       });
     }
+    if (!TRIAL && heroes.ethan) check('ethan: 탄을 내보내는 손이 발사 위치에 있음(COMBAT_SPEC §3-1) — attack 발사 프레임·charge 모든 프레임의 hands가 muzzle ±4단위', () => {
+      const m = SIM.CONFIG.heroes.ethan.weapon.muzzle, c = SIM.CONFIG.heroes.ethan;
+      assert.ok(m, 'sim.js CONFIG.heroes.ethan.weapon.muzzle 없음');
+      const want = { x: c.width / 2 + m.forward, y: m.height }, bad = [];
+      const at = (n, i) => { const a = heroes.ethan.animations[n], h = a.hands && a.hands[i]; return h ? { x: (h.x - a.pivot.x) / SCALE, y: (a.pivot.y - h.y) / SCALE } : null; };
+      const chk = (n, i) => { const h = at(n, i); if (!h) { bad.push(`${n} ${i}번 프레임 hands 없음`); return; } if (Math.abs(h.x - want.x) > 4 || Math.abs(h.y - want.y) > 4) bad.push(`${n} ${i}번 손 (앞 ${h.x.toFixed(1)}, 높이 ${h.y.toFixed(1)}) ≠ 발사 위치 (앞 ${want.x}, 높이 ${want.y})`); };
+      chk('attack', 1); // 첫(준비) 프레임 다음 = 탄이 보이기 시작하는 프레임
+      for (let i = 0; i < heroes.ethan.animations.charge.frames; i++) chk('charge', i);
+      assert.deepEqual(bad, [], bad.join(' / '));
+    });
+    if (!TRIAL && heroes.noah) check('noah: 기본 자세로 끝나고 준비 동작은 그 단 안에서(COMBAT_SPEC §2-4) — 세 단 끝 자세가 같고 서 있음, 2단 숙이기·3단 칼 들기는 준비 시간 안에 시작', () => {
+      const iou = (A, B) => { const a2 = new Set(A); let inter = 0; for (const p of B) if (a2.has(p)) inter++; return inter / (a2.size + B.length - inter); };
+      const anims = heroes.noah.animations, R = (n) => results2[`noah/${n}`];
+      const idle = R('idle'), idleH = anims.idle.pivot.y - idle.frameStats[0].top;
+      const H = (n, i) => (anims[n].pivot.y - R(n).frameStats[i].top) / idleH;
+      const bad = [];
+      for (const n of ['attack', 'attack-2', 'attack-3']) {
+        const h = H(n, anims[n].frames - 1);
+        if (h < 0.9 || h > 1.1) bad.push(`${n} 끝 자세 높이 ${h.toFixed(2)}(서 있을 때 0.9~1.1) — 다음 단 준비를 끝에 붙이면 멈췄을 때 그 자세로 남음`);
+      }
+      for (const [x, y] of [['attack', 'attack-2'], ['attack', 'attack-3'], ['attack-2', 'attack-3']]) {
+        const v = iou(R(x).edgeMasks.last, R(y).edgeMasks.last);
+        if (v < 0.7) bad.push(`${x}·${y} 끝 자세가 다름(겹침 ${v.toFixed(2)})`);
+      }
+      const combo = SIM.CONFIG.heroes.noah.weapon.combo || [];
+      const windup = (n, k, test, label) => {
+        const ticks = anims[n].ticks, st = (combo[k] && combo[k].startupTicks) || 0;
+        let t = 0, found = -1;
+        for (let i = 0; i < anims[n].frames; i++) { if (test(H(n, i))) { found = t; break; } t += ticks[i]; }
+        if (found < 0) bad.push(`${n}에 ${label} 프레임이 없음`);
+        else if (found >= Math.max(st, 1)) bad.push(`${n} ${label}이 ${found}틱에 시작(준비 시간 ${st}틱 안이어야 함)`);
+      };
+      windup('attack-2', 1, (h) => h <= 0.8, '숙이기(높이 0.8 이하)');
+      windup('attack-3', 2, (h) => h >= 1.15, '칼 들기(높이 1.15 이상)');
+      assert.deepEqual(bad, [], bad.join(' / '));
+    });
+    if (!TRIAL && heroes.noah) check('noah: 베기 궤적(COMBAT_SPEC §2-3) — 1단 수평 우세, 2단 아래→위 20단위 이상, 3단 위→아래 30단위 이상·2단보다 큼', () => {
+      const path = (n) => { const r2 = results2[`noah/${n}`]; assert.ok(r2, `${n} 시트 없음`); const f = r2.frameStats; return { dx: f[f.length - 1].massX - f[0].massX, dy: f[f.length - 1].massY - f[0].massY, ys: f.map((x) => x.massY) }; };
+      const p1 = path('fx-slash'), p2 = path('fx-slash-2'), p3 = path('fx-slash-3'), bad = [];
+      if (Math.abs(p1.dx) < Math.abs(p1.dy)) bad.push(`1단 세로 이동 ${p1.dy.toFixed(0)}px > 가로 ${p1.dx.toFixed(0)}px(치기는 수평 우세)`);
+      if (p2.dy > -20 * SCALE) bad.push(`2단 위로 ${(-p2.dy).toFixed(0)}px < ${20 * SCALE}px(올려 베기)`);
+      if (p2.ys.some((y, i) => i && y > p2.ys[i - 1] + 2 * SCALE)) bad.push(`2단 궤적이 중간에 내려감(${p2.ys.map((y) => y.toFixed(0)).join('→')})`);
+      if (p3.dy < 30 * SCALE) bad.push(`3단 아래로 ${p3.dy.toFixed(0)}px < ${30 * SCALE}px(내려치기)`);
+      if (p3.ys.some((y, i) => i && y < p3.ys[i - 1] - 2 * SCALE)) bad.push(`3단 궤적이 중간에 올라감(${p3.ys.map((y) => y.toFixed(0)).join('→')})`);
+      if (Math.abs(p3.dy) <= Math.abs(p2.dy)) bad.push(`3단 세로 이동 ${p3.dy.toFixed(0)}px가 2단 ${p2.dy.toFixed(0)}px보다 크지 않음(가장 큰 궤적)`);
+      assert.deepEqual(bad, [], bad.join(' / '));
+    });
+    if (!TRIAL && heroes.noah) check('noah: 콤보 연결 자세 — 1단 끝↔2단 시작, 2단 끝↔3단 시작 실루엣 겹침 0.7 이상(COMBAT_SPEC §2-2)', () => {
+      const iou = (A, B) => { const a2 = new Set(A); let inter = 0; for (const p of B) if (a2.has(p)) inter++; return inter / (a2.size + B.length - inter); };
+      const bad = [];
+      for (const [from, to] of [['attack', 'attack-2'], ['attack-2', 'attack-3']]) {
+        const A = results2[`noah/${from}`], B = results2[`noah/${to}`];
+        assert.ok(A && A.edgeMasks && B && B.edgeMasks, `${from}·${to} 시트가 모두 있어야 함`);
+        const v = iou(A.edgeMasks.last, B.edgeMasks.first);
+        if (v < 0.7) bad.push(`${from} 끝→${to} 시작 ${v.toFixed(2)}`);
+      }
+      assert.deepEqual(bad, [], `자세가 이어지지 않음: ${bad.join(', ')}`);
+    });
     if (!TRIAL && heroes.noah) check('noah: 1·2·3단 베기 효과(fx-slash, -2, -3)와 베기 동작(attack, -2, -3)이 서로 다른 그림(COMBAT_SPEC §4)', () => {
       for (const group of [['fx-slash', 'fx-slash-2', 'fx-slash-3'], ['attack', 'attack-2', 'attack-3']]) {
         const hs = group.map((n) => results2[`noah/${n}`]);
         assert.ok(hs.every(Boolean), `${group.join('·')} 시트가 모두 있어야 함`);
         for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) {
-          const shared = hs[i].frameHashes.filter((h) => hs[j].frameHashes.includes(h));
+          // 동작 시트는 연결 프레임(첫·마지막)이 이웃 단과 같아도 된다(§2-2) — 가운데 프레임만 비교
+          const mid = (r2) => (group[0] === 'attack' ? r2.frameHashes.slice(1, -1) : r2.frameHashes);
+          const shared = mid(hs[i]).filter((h) => mid(hs[j]).includes(h));
           assert.equal(shared.length, 0, `${group[i]}와 ${group[j]}가 같은 프레임 ${shared.length}개를 씀(궤적이 달라야 함)`);
         }
       }

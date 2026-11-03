@@ -1,0 +1,139 @@
+DEBUG {
+  tick: 67,
+  active: 'noah',
+  room: {
+    width: 960,
+    height: 540,
+    pit: { left: 470, right: 555 },
+    solids: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ],
+    dummies: [ [Object], [Object] ],
+    labels: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  player: {
+    x: 33.882,
+    y: 426,
+    w: 39,
+    h: 64,
+    vx: 0,
+    vy: 0,
+    face: -1,
+    onGround: true,
+    coyote: 8,
+    jumpBuffer: 0,
+    jumpStartFeet: null,
+    jumpCut: false,
+    takeoffVx: 0,
+    jumpKind: null,
+    climbing: false,
+    dropTicks: 0,
+    charge: { ticks: 0, level: 0 },
+    combo: { step: 1, started: 31, buffered: false },
+    ladderLock: 0
+  },
+  dummies: [
+    { id: 'near', x: 162, y: 430, w: 30, h: 60, hp: 1000 },
+    { id: 'far', x: 850, y: 430, w: 30, h: 60, hp: 1000 }
+  ],
+  previous: {
+    left: false,
+    right: false,
+    up: false,
+    down: false,
+    jump: false,
+    attack: false,
+    swap: false,
+    interact: false
+  },
+  swapCooldown: 0,
+  attackCooldowns: { ethan: 0, noah: 0 },
+  attacks: [],
+  nextAttackId: 2
+} { file: 'noah-attack.png', frame: 5 }
+DEBUGNEXT {
+  tick: 68,
+  active: 'noah',
+  room: {
+    width: 960,
+    height: 540,
+    pit: { left: 470, right: 555 },
+    solids: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ],
+    dummies: [ [Object], [Object] ],
+    labels: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  player: {
+    x: 33.882,
+    y: 426,
+    w: 39,
+    h: 64,
+    vx: 0,
+    vy: 0,
+    face: -1,
+    onGround: true,
+    coyote: 8,
+    jumpBuffer: 0,
+    jumpStartFeet: null,
+    jumpCut: false,
+    takeoffVx: 0,
+    jumpKind: null,
+    climbing: false,
+    dropTicks: 0,
+    charge: { ticks: 0, level: 0 },
+    combo: { step: 1, started: 31, buffered: false },
+    ladderLock: 0
+  },
+  dummies: [
+    { id: 'near', x: 162, y: 430, w: 30, h: 60, hp: 1000 },
+    { id: 'far', x: 850, y: 430, w: 30, h: 60, hp: 1000 }
+  ],
+  previous: {
+    left: false,
+    right: false,
+    up: false,
+    down: false,
+    jump: false,
+    attack: false,
+    swap: false,
+    interact: false
+  },
+  swapCooldown: 0,
+  attackCooldowns: { ethan: 0, noah: 0 },
+  attacks: [],
+  nextAttackId: 2
+} { file: 'noah-attack.png', frame: 5 }
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ 'noah-attack.png'
+- 'noah-idle.png'
+        ^
+
+    at /workspace/PLAYVAULT/games/the-hollow-keep/next/tools/check-combo-release.cjs:15:197 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'noah-attack.png',
+  expected: 'noah-idle.png',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

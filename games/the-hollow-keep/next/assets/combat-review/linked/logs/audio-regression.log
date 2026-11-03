@@ -1,0 +1,2 @@
+[PLAYVAULT] music unavailable; background remains silent: audio 404
+PASS audio: resume, latest-mode file loading, no loading overlap, stopped-load guard, silent failure, mute persistence, bounded voices

@@ -1,0 +1,17 @@
+PASS ethan records coyote jump speed and keeps kind through reversal
+PASS noah records coyote jump speed and keeps kind through reversal
+PASS ethan records buffered takeoff and clears kind at landing
+PASS noah records buffered takeoff and clears kind at landing
+PASS Noah can swap to Ethan against the left wall
+PASS Noah can swap to Ethan against the right wall
+PASS a corridor narrower than Ethan still blocks swapping
+PASS fast non-piercing shot hits the nearest target facing 1
+PASS fast non-piercing shot hits the nearest target facing -1
+PASS zero jump buffer disables buffering without disabling grounded jumps
+PASS a taller hero cannot swap into a low ceiling
+PASS swapping cancels melee but preserves existing projectiles
+PASS fast projectiles cannot skip thin walls or damage targets beyond
+PASS left-facing attacks hit left and never hit right
+PASS room input and returned snapshots cannot mutate simulation state
+PASS airborne no-input stopping respects the declared stop budget
+16/16 edge checks passed
