@@ -24,7 +24,8 @@ const MAX_COLORS = 64;
 const FULL = { idle: 4, run: 6, 'jump-standing': 3, 'jump-running': 3, land: 2, attack: 4, climb: 4 }; // climb: LADDER_ACTIONS_SPEC §3
 const TRIAL = process.env.HK_ART_REQUIRE || '';
 // COMBAT_SPEC §4: 주인공별 추가 동작(Noah 2·3단 베기, Ethan 충전 자세)
-const EXTRA = { ethan: { charge: 2 }, noah: { 'attack-2': 4, 'attack-3': 4 } };
+// COMBAT2_SPEC §7: 두 주인공 모두 맞는 자세 hurt 2프레임
+const EXTRA = { ethan: { charge: 2, hurt: 2 }, noah: { 'attack-2': 4, 'attack-3': 4, hurt: 2 } };
 const REQUIRE_BY_HERO = { ethan: { ...FULL, ...EXTRA.ethan }, noah: { ...FULL, ...EXTRA.noah } };
 // COMBAT_SPEC §4: 주인공별 필수 효과(최소 프레임)
 const REQUIRED_FX = { ethan: { 'fx-rune': 2, 'fx-charge': 3, 'fx-rune-2': 2, 'fx-rune-3': 2, 'fx-burst': 3 }, noah: { 'fx-slash': 3, 'fx-slash-2': 3, 'fx-slash-3': 3 } };
@@ -473,7 +474,7 @@ async function analyze(page, file, opts) {
     // ── 탐험 물건 그림 (EXPLORATION_SPEC §8 → EXPLORATION_REFINE_SPEC §7, 시험본 모드에서는 생략) ──
     if (!TRIAL) {
       const OBJ = ['barrier-v', 'barrier-h', 'mark-key', 'mark-lever', 'mark-light', 'mark-target', 'entrance', 'entrance-locked',
-        'lever-off', 'lever-on', 'light-off', 'light-on', 'key', 'breakable'];
+        'lever-off', 'lever-on', 'light-off', 'light-on', 'key', 'breakable', 'shelter', 'heal']; // shelter·heal: COMBAT2_SPEC §7
       const objs = manifest.objects || {};
       check(`objects: 필수 그림 ${OBJ.length}종이 manifest에 있음`, () => {
         const missing = OBJ.filter((n) => !objs[n]);
@@ -484,7 +485,8 @@ async function analyze(page, file, opts) {
         const cell = 30 * SCALE, bad = [];
         for (const n of ['barrier-v', 'barrier-h']) if (objs[n] && (objs[n].w !== cell || objs[n].h !== cell)) bad.push(`${n} ${objs[n].w}×${objs[n].h} (기준 ${cell}×${cell})`);
         for (const n of ['entrance', 'entrance-locked']) if (objs[n] && (objs[n].w !== 2 * cell || objs[n].h !== 3 * cell)) bad.push(`${n} ${objs[n].w}×${objs[n].h} (기준 ${2 * cell}×${3 * cell})`);
-        for (const n of ['mark-key', 'mark-lever', 'mark-light', 'mark-target']) if (objs[n] && (objs[n].w > cell || objs[n].h > cell)) bad.push(`${n} ${objs[n].w}×${objs[n].h} (최대 ${cell}×${cell})`);
+        if (objs.shelter && (objs.shelter.w !== 2 * cell || objs.shelter.h !== 3 * cell)) bad.push(`shelter ${objs.shelter.w}×${objs.shelter.h} (기준 ${2 * cell}×${3 * cell})`);
+        for (const n of ['mark-key', 'mark-lever', 'mark-light', 'mark-target', 'heal']) if (objs[n] && (objs[n].w > cell || objs[n].h > cell)) bad.push(`${n} ${objs[n].w}×${objs[n].h} (최대 ${cell}×${cell})`);
         assert.deepEqual(bad, [], bad.join(', '));
       });
       for (const file of [...new Set(OBJ.filter((n) => objs[n]).map((n) => objs[n].file))]) {
@@ -497,6 +499,73 @@ async function analyze(page, file, opts) {
           assert.equal(r.off, 0, `팔레트 밖 색 ${r.off} (예: ${r.offSample.join(', ')})`);
           assert.deepEqual(r.upscaled, [], '확대 저장된 이미지로 보임');
           for (const n of OBJ.filter((k) => objs[k] && objs[k].file === file)) { const o = objs[n]; assert.ok(o.x >= 0 && o.y >= 0 && o.x + o.w <= r.W && o.y + o.h <= r.H, `${n} 영역이 이미지 밖`); }
+        });
+      }
+    }
+
+    // ── 적 그림 (COMBAT2_SPEC §7, 시험본 모드에서는 생략) ──
+    if (!TRIAL) {
+      const ENEMY_ANIMS = {
+        crawler: { walk: 4, charge: 2, hurt: 1, die: 3 },
+        wisp: { hover: 4, dive: 2, hurt: 1, die: 3 },
+        shield: { walk: 4, guard: 1, windup: 2, bash: 2, stagger: 2, die: 3 },
+      };
+      const LOOP = ['walk', 'hover'], GROUND_ENEMY = ['crawler', 'shield'];
+      const enemies = manifest.enemies || {}, CE = SIM.CONFIG.enemies || {};
+      for (const [kind, req] of Object.entries(ENEMY_ANIMS)) {
+        const e = enemies[kind], anims = (e && e.animations) || {};
+        check(`enemy ${kind}: body가 sim.js CONFIG.enemies와 같음`, () => {
+          assert.ok(e, `manifest.enemies.${kind} 없음`);
+          assert.ok(CE[kind], `sim.js CONFIG.enemies.${kind} 없음`);
+          assert.deepEqual(e.body, { w: CE[kind].width, h: CE[kind].height }, `body ${JSON.stringify(e.body)} ≠ CONFIG ${CE[kind].width}×${CE[kind].height}`);
+        });
+        check(`enemy ${kind}: 필수 동작과 최소 프레임 수(${Object.entries(req).map(([n, k]) => `${n} ${k}`).join(', ')})·기준점·시간 형식`, () => {
+          for (const [name, min] of Object.entries(req)) {
+            const a = anims[name]; assert.ok(a, `${name} 없음`);
+            assert.ok(isInt(a.frames) && a.frames >= min, `${name} 프레임 ${a.frames} < ${min}`);
+            assert.ok(isInt(a.frameW) && isInt(a.frameH), `${name} frameW/frameH`);
+            assert.ok(a.pivot && Number.isInteger(a.pivot.x) && Number.isInteger(a.pivot.y) && a.pivot.x >= 0 && a.pivot.x < a.frameW && a.pivot.y >= 0 && a.pivot.y < a.frameH, `${name} pivot이 프레임 밖`);
+            assert.ok(Array.isArray(a.ticks) && a.ticks.length === a.frames && a.ticks.every(isInt), `${name} ticks는 프레임 수만큼의 양의 정수`);
+            if (LOOP.includes(name)) assert.equal(a.loop, true, `${name}.loop는 true`);
+            if (name === 'die') assert.notEqual(a.loop, true, 'die.loop가 true(한 번만 재생해야 함)');
+            assert.ok(/\.png$/i.test(a.file || ''), `${name} 파일은 .png`);
+          }
+        });
+        const R = {};
+        for (const name of Object.keys(req)) {
+          const a = anims[name]; if (!a || !a.file) continue;
+          const fp = path.join(DIR, a.file);
+          if (!fs.existsSync(fp) || !fs.readFileSync(fp).subarray(0, 8).equals(PNG_SIG)) { check(`enemy ${kind}/${name}: PNG 파일`, () => assert.fail(`${a.file} 없음 또는 PNG 아님`)); continue; }
+          let r;
+          try { r = await analyze(page, fp, { palette, frameW: a.frameW, frameH: a.frameH }); } catch (err) { check(`enemy ${kind}/${name}: 이미지 해석`, () => assert.fail(err.message.split('\n')[0])); continue; }
+          R[name] = r;
+          check(`enemy ${kind}/${name}: 크기·투명도 0/255·팔레트·원래 해상도·빈 프레임 없음`, () => {
+            assert.equal(r.W, a.frameW * a.frames, `폭 ${r.W} ≠ ${a.frameW}×${a.frames}`);
+            assert.equal(r.H, a.frameH, `높이 ${r.H} ≠ ${a.frameH}`);
+            assert.equal(r.alphaMid, 0, `중간 투명도 픽셀 ${r.alphaMid}개`);
+            assert.equal(r.off, 0, `팔레트 밖 색 ${r.off}픽셀 (예: ${r.offSample.join(', ')})`);
+            assert.deepEqual(r.upscaled, [], `${r.upscaled.join('/')}배 확대 저장된 이미지로 보임`);
+            const empty = r.boxes.findIndex((b) => !b);
+            assert.equal(empty, -1, `${empty}번 프레임이 비어 있음`);
+          });
+          if (a.frames > 1 && name !== 'die') check(`enemy ${kind}/${name}: 이웃 프레임 그림이 다름(움직임이 보임)`, () => {
+            r.frameHashes.forEach((hsh, i) => { if (i) assert.notEqual(hsh, r.frameHashes[i - 1], `${i - 1}·${i}번 프레임이 같은 그림`); });
+          });
+        }
+        const base = R.walk || R.hover, baseA = anims.walk || anims.hover;
+        if (base && CE[kind]) check(`enemy ${kind}: 몸 크기가 판정 상자와 맞음(가로·세로 ±15%, 가로 중심이 pivot 근처)`, () => {
+          const b = base.boxes[0], w = b.maxX - b.minX + 1, h = b.maxY - b.minY + 1, W = CE[kind].width * SCALE, H = CE[kind].height * SCALE;
+          assert.ok(Math.abs(h - H) <= H * 0.15, `높이 ${h}px, 판정 ${CE[kind].height}×scale = ${H}px`);
+          assert.ok(Math.abs(w - W) <= W * 0.15, `가로 ${w}px, 판정 ${CE[kind].width}×scale = ${W}px`);
+          assert.ok(Math.abs((b.minX + b.maxX) / 2 - baseA.pivot.x) <= W / 4, `몸 가로 중심 ${(b.minX + b.maxX) / 2}가 pivot.x ${baseA.pivot.x}에서 ${W / 4}px 넘게 벗어남`);
+        });
+        if (GROUND_ENEMY.includes(kind) && R.walk) check(`enemy ${kind}/walk: 모든 프레임의 발이 기준선(pivot.y-2 ~ pivot.y)에 있음`, () => {
+          R.walk.boxes.forEach((b, i) => assert.ok(b && b.maxY >= anims.walk.pivot.y - 2 && b.maxY <= anims.walk.pivot.y, `${i}번 프레임 발 y=${b && b.maxY}, 기준 ${anims.walk.pivot.y}`));
+        });
+        if (kind === 'shield' && R.walk) check('enemy shield: 막기·준비·경직이 걷기와 다른 그림(§5 "그림으로 알 수 있어야")', () => {
+          const walk = new Set(R.walk.frameHashes), same = [];
+          for (const n of ['guard', 'windup', 'stagger']) if (R[n] && R[n].frameHashes.some((h) => walk.has(h))) same.push(n);
+          assert.deepEqual(same, [], `걷기 프레임과 같은 그림: ${same.join(', ')}`);
         });
       }
     }
