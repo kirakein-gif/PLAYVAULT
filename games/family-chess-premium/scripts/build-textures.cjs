@@ -38,6 +38,27 @@ for(let y=0;y<o.h;y++)for(let x=0;x<o.w;x++){
  for(let k=0;k<3;k++){let base=o.a[k]+(o.b[k]-o.a[k])*Math.max(0,Math.min(1,t));base=base+(o.vein[k]-base)*vein*o.veinAmt;img.data[i+k]=base;}
  img.data[i+3]=255;}
 ctx.putImageData(img,0,0);return c.toDataURL('image/webp',0.9);}
+// marble2: veins that fade in and out (no crack-like lines), a soft secondary
+// vein layer, gentle cloudy base and a faint polished sheen
+function marble2(o){const c=document.getElementById('c');c.width=o.w;c.height=o.h;const ctx=c.getContext('2d');const img=ctx.createImageData(o.w,o.h);
+const n=makeNoise(o.seed),n2=makeNoise(o.seed+5),n3=makeNoise(o.seed+9),n4=makeNoise(o.seed+17);
+const fbm=(f,x,y,oct)=>{let v=0,a=1,q=1;for(let i=0;i<(oct||6);i++){v+=a*f(x*q,y*q);a*=.5;q*=2;}return v;};
+const sm=(e0,e1,x)=>{const t=Math.max(0,Math.min(1,(x-e0)/(e1-e0)));return t*t*(3-2*t);};
+for(let y=0;y<o.h;y++)for(let x=0;x<o.w;x++){
+ const w=fbm(n,x*o.scale,y*o.scale)*o.warp;
+ const v1=Math.abs(Math.sin((x*o.dx+y*o.dy)*o.scale*5+w));
+ const fade=sm(-0.1,0.45,fbm(n3,x*o.scale*0.8,y*o.scale*0.8,4));          // vein strength varies along its length
+ const main=Math.pow(1-v1,o.sharp)*fade;
+ const w2=fbm(n4,x*o.scale*1.3,y*o.scale*1.3)*o.warp*1.2;
+ const v2=Math.abs(Math.sin((x*o.dy-y*o.dx)*o.scale*3.2+w2));
+ const soft=Math.pow(1-v2,o.sharp2)*(0.5+0.5*fade);
+ const cloud=fbm(n2,x*o.scale*0.6,y*o.scale*0.6)*0.5+0.5;
+ const sheen=((x+y)/(o.w+o.h)-0.5)*o.sheen;
+ const t=Math.max(0,Math.min(1,cloud*o.cloud+sheen+(Math.random()-0.5)*o.grain));
+ const i=(y*o.w+x)*4;
+ for(let k=0;k<3;k++){let b=o.a[k]+(o.b[k]-o.a[k])*t;b+= (o.vein2[k]-b)*soft*o.vein2Amt;b+=(o.vein[k]-b)*main*o.veinAmt;img.data[i+k]=b;}
+ img.data[i+3]=255;}
+ctx.putImageData(img,0,0);return c.toDataURL('image/webp',0.92);}
 // stone: rough granular slab, no veins (gothic)
 function stone(o){const c=document.getElementById('c');c.width=o.w;c.height=o.h;const ctx=c.getContext('2d');const img=ctx.createImageData(o.w,o.h);
 const n=makeNoise(o.seed),n2=makeNoise(o.seed+3);
@@ -56,13 +77,21 @@ const TEX = {
   'square-dark': { w: 512, h: 512, seed: 23, wx: 0.003, wy: 0.018, warp: 2.8, freq: 0.03, sharp: 1.3, ringAmt: 0.3, fiberAmt: 0.22, pores: 0.4, blotch: 0.25, a: [86, 56, 36], b: [146, 104, 72] },
   // frame: deep polished walnut
   // ---- Wizard Stone (calm grey / black marble) ----
-  'wizard-light': { kind: 'marble', w: 512, h: 512, seed: 41, scale: 0.005, warp: 2.6, dx: 0.6, dy: 0.4, sharp: 14, cloud: 0.6, grain: 0.04, veinAmt: 0.16, a: [112, 114, 118], b: [146, 148, 151], vein: [176, 177, 179] },
-  'wizard-dark': { kind: 'marble', w: 512, h: 512, seed: 53, scale: 0.005, warp: 2.6, dx: 0.5, dy: 0.55, sharp: 16, cloud: 0.55, grain: 0.04, veinAmt: 0.14, a: [24, 25, 28], b: [48, 49, 53], vein: [92, 93, 97] },
+  'wizard-light': { kind: 'marble2', w: 512, h: 512, seed: 41, scale: 0.0045, warp: 3.0, dx: 0.6, dy: 0.4, sharp: 11, sharp2: 3, cloud: 0.7, sheen: 0.12, grain: 0.03, veinAmt: 0.4, vein2Amt: 0.18, a: [126, 127, 130], b: [162, 163, 165], vein: [210, 205, 186], vein2: [180, 177, 166] },
+  'wizard-dark': { kind: 'marble2', w: 512, h: 512, seed: 53, scale: 0.0045, warp: 3.0, dx: 0.5, dy: 0.55, sharp: 12, sharp2: 3, cloud: 0.65, sheen: 0.1, grain: 0.03, veinAmt: 0.42, vein2Amt: 0.16, a: [22, 23, 26], b: [46, 47, 51], vein: [126, 122, 108], vein2: [62, 61, 58] },
   'wizard-frame': { kind: 'stone', w: 1024, h: 256, seed: 61, scale: 0.01, mottle: 0.35, rough: 0.12, grain: 0.06, a: [34, 35, 38], b: [78, 79, 82] },
   // ---- Gothic Keep (muted slate / dark stone, cold tones) ----
-  'gothic-light': { kind: 'stone', w: 512, h: 512, seed: 71, scale: 0.008, mottle: 0.32, rough: 0.14, grain: 0.06, a: [92, 99, 112], b: [128, 135, 148] },
-  'gothic-dark': { kind: 'stone', w: 512, h: 512, seed: 83, scale: 0.008, mottle: 0.3, rough: 0.14, grain: 0.06, a: [30, 31, 41], b: [58, 58, 72] },
-  'gothic-frame': { kind: 'stone', w: 1024, h: 256, seed: 97, scale: 0.012, mottle: 0.3, rough: 0.16, grain: 0.07, a: [24, 24, 30], b: [62, 61, 70] },
+  ...(process.env.GOTHIC_VARIANT === 'B'
+    ? {
+        'gothic-light': { kind: 'stone', w: 512, h: 512, seed: 71, scale: 0.008, mottle: 0.32, rough: 0.14, grain: 0.06, a: [120, 108, 92], b: [156, 144, 126] },
+        'gothic-dark': { kind: 'stone', w: 512, h: 512, seed: 83, scale: 0.008, mottle: 0.3, rough: 0.14, grain: 0.06, a: [36, 31, 28], b: [66, 58, 52] },
+        'gothic-frame': { kind: 'stone', w: 1024, h: 256, seed: 97, scale: 0.012, mottle: 0.3, rough: 0.16, grain: 0.07, a: [30, 26, 22], b: [74, 64, 56] },
+      }
+    : {
+        'gothic-light': { kind: 'stone', w: 512, h: 512, seed: 71, scale: 0.008, mottle: 0.32, rough: 0.14, grain: 0.06, a: [104, 98, 124], b: [140, 134, 160] },
+        'gothic-dark': { kind: 'stone', w: 512, h: 512, seed: 83, scale: 0.008, mottle: 0.3, rough: 0.14, grain: 0.06, a: [30, 25, 42], b: [58, 50, 78] },
+        'gothic-frame': { kind: 'stone', w: 1024, h: 256, seed: 97, scale: 0.012, mottle: 0.3, rough: 0.16, grain: 0.07, a: [26, 22, 34], b: [66, 58, 80] },
+      }),
   frame: { w: 1024, h: 256, seed: 37, wx: 0.002, wy: 0.03, warp: 3.2, freq: 0.028, sharp: 1.2, ringAmt: 0.34, fiberAmt: 0.24, pores: 0.35, blotch: 0.3, a: [38, 22, 14], b: [104, 66, 40] },
 };
 
@@ -71,9 +100,10 @@ const TEX = {
   const p = await b.newPage();
   await p.setContent(page);
   for (const [name, o] of Object.entries(TEX)) {
-    const url = await p.evaluate((o) => (o.kind === 'marble' ? marble(o) : o.kind === 'stone' ? stone(o) : wood(o)), o);
+    const url = await p.evaluate((o) => (o.kind === 'marble2' ? marble2(o) : o.kind === 'marble' ? marble(o) : o.kind === 'stone' ? stone(o) : wood(o)), o);
     const buf = Buffer.from(url.split(',')[1], 'base64');
-    const out = path.join(__dirname, '..', 'src', 'assets', 'textures', name + '.webp');
+    if (process.env.ONLY && !name.startsWith(process.env.ONLY)) continue;
+    const out = path.join(process.env.OUT_DIR || path.join(__dirname, '..', 'src', 'assets', 'textures'), name + '.webp');
     fs.writeFileSync(out, buf);
     console.log(name, buf.length);
   }

@@ -7,7 +7,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'pieces');
+const root = process.env.OUT_DIR || join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'pieces');
 const f = (n) => Math.round(n * 100) / 100;
 
 const MAT = {
@@ -15,9 +15,12 @@ const MAT = {
     w: { stops: [[0, '#6c6e72'], [0.32, '#a6a8ab'], [0.32, '#dcdcda'], [0.6, '#ebebe9'], [0.6, '#c3c4c4'], [1, '#7c7e81']], top: ['#f1f1ef', '#b7b8b9'], stroke: '#2f3033', sw: 1.2, detail: '#55575b', inset: '#e8e9ea', speckle: 0.2 },
     b: { stops: [[0, '#0b0b0c'], [0.32, '#1c1d1f'], [0.32, '#3d3e42'], [0.6, '#4a4b4f'], [0.6, '#2a2b2e'], [1, '#0e0e0f']], top: ['#55565a', '#202124'], stroke: '#77797e', sw: 1.15, detail: '#7d7f84', inset: '#5c5e62', speckle: 0.28 },
   },
+  // Gothic: candle-lit bone vs dark iron. Variant A "violet night", B "candle stone".
   gothic: {
-    w: { stops: [[0, '#5f6676'], [0.18, '#9aa1ae'], [0.42, '#d7dbe3'], [0.55, '#e4e7ec'], [0.78, '#aab1bd'], [1, '#606777']], top: ['#eef0f4', '#a9b0bc'], stroke: '#2e323d', sw: 1.2, detail: '#4c5262', inset: '#f0f2f6', speckle: 0 },
-    b: { stops: [[0, '#08080c'], [0.18, '#1b1b24'], [0.42, '#3a3a48'], [0.55, '#454556'], [0.78, '#22222c'], [1, '#09090d']], top: ['#4b4b5a', '#1c1c25'], stroke: '#73778a', sw: 1.15, detail: '#7a7e90', inset: '#4f5163', speckle: 0 },
+    w: { stops: [[0, '#7a6c58'], [0.18, '#b5a68a'], [0.42, '#e8dcc4'], [0.55, '#f2e9d6'], [0.78, '#c4b496'], [1, '#7c6d58']], top: ['#f6efe0', '#c3b391'], stroke: '#3b3226', sw: 1.2, detail: '#6b5c47', inset: '#f4ecda', speckle: 0 },
+    b: process.env.GOTHIC_VARIANT === 'B'
+      ? { stops: [[0, '#0d0b09'], [0.18, '#25201a'], [0.42, '#4a3f32'], [0.55, '#57493a'], [0.78, '#2d2620'], [1, '#0d0b09']], top: ['#5e5244', '#241e18'], stroke: '#8a7a66', sw: 1.15, detail: '#9a8a74', inset: '#5a4d3e', speckle: 0 }
+      : { stops: [[0, '#0b0910'], [0.18, '#1f1a2b'], [0.42, '#3c3450'], [0.55, '#4a4160'], [0.78, '#261f33'], [1, '#0b0910']], top: ['#544a66', '#211b2c'], stroke: '#7d7290', sw: 1.15, detail: '#8a7fa0', inset: '#514767', speckle: 0 },
   },
 };
 
@@ -90,12 +93,13 @@ const WIZ = {
   },
   B(s, c, id) {
     return plinth(s, c, id, 21, true) +
-      `<path d="M66,82 L66,25" stroke="${MAT[s][c].stroke}" stroke-width="4.2" stroke-linecap="round"/><path d="M66,82 L66,25" stroke="url(#${id}b)" stroke-width="2.4" stroke-linecap="round"/>` + // staff
+      // staff: thick with a contrasting rim so it reads on both square colours
+      `<path d="M65.5,82 L65.5,26" stroke="${c === 'w' ? '#3a3b3e' : '#a9abb0'}" stroke-width="6.2" stroke-linecap="round"/><path d="M65.5,82 L65.5,26" stroke="${c === 'w' ? '#d4d5d6' : '#3c3d41'}" stroke-width="3.8" stroke-linecap="round"/>` +
       part(s, c, id, 'M34,80 L39,46 Q50,40 61,46 L66,80 Z') + // robe
       line(s, c, 'M44,50 L42,79 M56,50 L58,79', 1, 0.4) +
       part(s, c, id, 'M38.5,47 Q37,30 43,22 Q50,15 57,22 Q63,30 61.5,47 Q55,42 50,42 Q45,42 38.5,47 Z') + // hood
       hole(s, c, 'M44.5,38 Q44.5,28 50,26 Q55.5,28 55.5,38 Q53,36 50,36 Q47,36 44.5,38 Z') + // face shadow
-      `<circle cx="66" cy="22.5" r="3.8" fill="url(#${id}t)" stroke="${MAT[s][c].stroke}" stroke-width="1"/>`;
+      `<circle cx="65.5" cy="22" r="5" fill="${c === 'w' ? '#e6e7e8' : '#4a4b50'}" stroke="${c === 'w' ? '#3a3b3e' : '#a9abb0'}" stroke-width="1.4"/>`;
   },
   Q(s, c, id) {
     return plinth(s, c, id, 23, true) +

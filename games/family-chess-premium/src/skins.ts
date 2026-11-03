@@ -20,7 +20,7 @@ export interface Skin {
 export const SKINS: Skin[] = [
   { id: 'classic', name: { ko: '클래식 원목', en: 'Classic Walnut' }, desc: { ko: '아이보리·흑단 기물, 월넛 원목 판', en: 'Ivory and ebony on a walnut board' } },
   { id: 'wizard', name: { ko: '마법사의 석실', en: 'Wizard Stone' }, desc: { ko: '회색·검정 석상 기물, 대리석 판', en: 'Carved stone figures on a marble floor' } },
-  { id: 'gothic', name: { ko: '고딕 성채', en: 'Gothic Keep' }, desc: { ko: '달빛 석재·흑철 기물, 고딕 석판', en: 'Moonstone and black iron in a gothic hall' } },
+  { id: 'gothic', name: { ko: '고딕 성채', en: 'Gothic Keep' }, desc: { ko: '상아·흑보라 철 기물, 보랏빛 석판', en: 'Bone and violet iron on twilight stone' } },
 ];
 
 export const isSkin = (v: unknown): v is SkinId => v === 'classic' || v === 'wizard' || v === 'gothic';
