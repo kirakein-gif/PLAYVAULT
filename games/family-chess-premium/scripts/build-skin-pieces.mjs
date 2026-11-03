@@ -1,4 +1,5 @@
-// Original piece sets for the Wizard Stone and Gothic Keep skins.
+// Original piece set for the Wizard Stone skin. (A Gothic set was made here too;
+// the family chose the Codex Gothic skin instead, so it was removed 2026-11-03.)
 // Design rule (family request): calm, not flashy — muted stone/iron colours,
 // one signature motif per piece, no glow or gilding, strong silhouettes that
 // still read at ~60 px per square.
@@ -14,13 +15,6 @@ const MAT = {
   wizard: {
     w: { stops: [[0, '#6c6e72'], [0.32, '#a6a8ab'], [0.32, '#dcdcda'], [0.6, '#ebebe9'], [0.6, '#c3c4c4'], [1, '#7c7e81']], top: ['#f1f1ef', '#b7b8b9'], stroke: '#2f3033', sw: 1.2, detail: '#55575b', inset: '#e8e9ea', speckle: 0.2 },
     b: { stops: [[0, '#0b0b0c'], [0.32, '#1c1d1f'], [0.32, '#3d3e42'], [0.6, '#4a4b4f'], [0.6, '#2a2b2e'], [1, '#0e0e0f']], top: ['#55565a', '#202124'], stroke: '#77797e', sw: 1.15, detail: '#7d7f84', inset: '#5c5e62', speckle: 0.28 },
-  },
-  // Gothic: candle-lit bone vs dark iron. Variant A "violet night", B "candle stone".
-  gothic: {
-    w: { stops: [[0, '#7a6c58'], [0.18, '#b5a68a'], [0.42, '#e8dcc4'], [0.55, '#f2e9d6'], [0.78, '#c4b496'], [1, '#7c6d58']], top: ['#f6efe0', '#c3b391'], stroke: '#3b3226', sw: 1.2, detail: '#6b5c47', inset: '#f4ecda', speckle: 0 },
-    b: process.env.GOTHIC_VARIANT === 'B'
-      ? { stops: [[0, '#0d0b09'], [0.18, '#25201a'], [0.42, '#4a3f32'], [0.55, '#57493a'], [0.78, '#2d2620'], [1, '#0d0b09']], top: ['#5e5244', '#241e18'], stroke: '#8a7a66', sw: 1.15, detail: '#9a8a74', inset: '#5a4d3e', speckle: 0 }
-      : { stops: [[0, '#0b0910'], [0.18, '#1f1a2b'], [0.42, '#3c3450'], [0.55, '#4a4160'], [0.78, '#261f33'], [1, '#0b0910']], top: ['#544a66', '#211b2c'], stroke: '#7d7290', sw: 1.15, detail: '#8a7fa0', inset: '#514767', speckle: 0 },
   },
 };
 
@@ -127,62 +121,7 @@ const WIZ = {
   },
 };
 
-// ---------------- Gothic Keep: spires, lancets, pointed arches ----------------
-function lathe(points, cx = 50) {
-  const right = points.map(([y, w]) => [cx + w, y]);
-  const left = points.map(([y, w]) => [cx - w, y]).reverse();
-  const seg = (pts) => pts.slice(1).map(([x, y]) => ` L${f(x)},${f(y)}`).join('');
-  const top = points[0], bot = points[points.length - 1];
-  return `M${f(cx - top[1])},${f(top[0])} L${f(cx + top[1])},${f(top[0])}${seg(right)} A${f(bot[1])},3 0 0 1 ${f(cx - bot[1])},${f(bot[0])}${seg(left)} Z`;
-}
-const GOT = {
-  P(s, c, id) {
-    const M = MAT[s][c];
-    return plinth(s, c, id, 19) +
-      part(s, c, id, lathe([[44, 5.4], [52, 5.8], [62, 8.6], [72, 13], [80, 15.5]])) +
-      part(s, c, id, 'M40.5,46 L59.5,46 L58.5,49.5 L41.5,49.5 Z', 't') + // collar
-      `<circle cx="50" cy="35.5" r="10" fill="url(#${id}b)" stroke="${M.stroke}" stroke-width="${M.sw}"/>` + // round head
-      `<circle cx="50" cy="35.5" r="10" fill="url(#${id}s)"/>`;
-  },
-  R(s, c, id) {
-    return plinth(s, c, id, 23) +
-      part(s, c, id, 'M32,80 L34,36 L66,36 L68,80 Z') +
-      part(s, c, id, 'M29,37 L29,26 L34.5,17 L40,26 L44.5,26 L50,17 L55.5,26 L60,26 L65.5,17 L71,26 L71,37 Z') + // pointed merlons
-      hole(s, c, 'M45.5,66 L45.5,54 Q45.5,47.5 50,44 Q54.5,47.5 54.5,54 L54.5,66 Z') + // lancet window
-      line(s, c, 'M34.5,40 L65.5,40 M33,74 L67,74', 0.9, 0.4);
-  },
-  N(s, c, id) {
-    const head = 'M31,80 C30,68 33,60 39,54 C34,52.5 29,51.5 24.5,50.3 C21,49.6 18.6,48.6 17.2,46.4 C15.6,44 15.8,41 17.6,38.4 C20,34.6 24.2,30.4 28.4,25.6 C30.6,23 32,20.6 33.6,18.4 L36.4,8.6 C37.2,7 38.8,7.4 39.4,9 L41.8,15.6 L46,13.5 L48,18.5 L53,16.5 L54,21.5 L59,21 L59,26 L64,27 L63,32 L68,34.5 L66,38.5 L71,42 L69,46 C71,56 72,67 73.4,80 Z'; // saw-tooth gothic mane
-    return plinth(s, c, id, 23) + part(s, c, id, head) +
-      line(s, c, 'M39,54 C41.5,48 41.6,42 39.2,37', 1.4, 0.5) +
-      `<path d="M32.6,30.4 C34.5,28.6 37,28.6 38.4,30 C36.6,31.4 34.4,31.8 32.6,30.4 Z" fill="${c === 'w' ? '#2a2e38' : '#a9adbd'}"/>` +
-      `<ellipse cx="20.6" cy="42.4" rx="1.5" ry="1" fill="${MAT[s][c].detail}" transform="rotate(-30 20.6 42.4)"/>`;
-  },
-  B(s, c, id) {
-    return plinth(s, c, id, 21) +
-      part(s, c, id, lathe([[48, 6.2], [56, 6.6], [66, 10], [74, 14.5], [80, 16.5]])) +
-      part(s, c, id, 'M39.5,49 L39.5,31 Q39.5,19 50,9 Q60.5,19 60.5,31 L60.5,49 Z') + // ogive mitre
-      hole(s, c, 'M47.8,44 L47.8,30 Q47.8,25 50,22 Q52.2,25 52.2,30 L52.2,44 Z') + // lancet slit
-      part(s, c, id, 'M41,49 L59,49 L58,52.5 L42,52.5 Z', 't');
-  },
-  Q(s, c, id) {
-    return plinth(s, c, id, 23) +
-      part(s, c, id, lathe([[40, 8.5], [50, 7.5], [60, 9.5], [70, 14], [80, 19]])) +
-      part(s, c, id, 'M37.5,41 L38.5,23 L41.5,32 L44,16 L47,30 L50,11 L53,30 L56,16 L58.5,32 L61.5,23 L62.5,41 Z') + // crown of lancet spires
-      part(s, c, id, 'M37,41 L63,41 L62,45 L38,45 Z', 't');
-  },
-  K(s, c, id) {
-    return plinth(s, c, id, 24) +
-      part(s, c, id, lathe([[44, 9], [54, 8], [64, 10.5], [72, 15], [80, 20]])) +
-      part(s, c, id, 'M38,45 L38,33 L41,26 L44,33 L44,45 Z M56,45 L56,33 L59,26 L62,33 L62,45 Z') + // side pinnacles
-      part(s, c, id, 'M43,45 L43,30 L50,13 L57,30 L57,45 Z') + // central spire
-      hole(s, c, 'M48.4,41 L48.4,32 Q48.4,28.5 50,26.5 Q51.6,28.5 51.6,32 L51.6,41 Z') +
-      part(s, c, id, 'M48.4,14 L48.4,9.5 L45.6,9.5 L45.6,6.8 L48.4,6.8 L48.4,3.6 L51.6,3.6 L51.6,6.8 L54.4,6.8 L54.4,9.5 L51.6,9.5 L51.6,14 Z') + // cross
-      part(s, c, id, 'M37,45 L63,45 L62,48.5 L38,48.5 Z', 't');
-  },
-};
-
-for (const [skin, set] of [['wizard', WIZ], ['gothic', GOT]]) {
+for (const [skin, set] of [['wizard', WIZ]]) {
   mkdirSync(join(root, skin), { recursive: true });
   for (const c of ['w', 'b']) {
     for (const [k, fn] of Object.entries(set)) {

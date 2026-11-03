@@ -59,7 +59,7 @@ for(let y=0;y<o.h;y++)for(let x=0;x<o.w;x++){
  for(let k=0;k<3;k++){let b=o.a[k]+(o.b[k]-o.a[k])*t;b+= (o.vein2[k]-b)*soft*o.vein2Amt;b+=(o.vein[k]-b)*main*o.veinAmt;img.data[i+k]=b;}
  img.data[i+3]=255;}
 ctx.putImageData(img,0,0);return c.toDataURL('image/webp',0.92);}
-// stone: rough granular slab, no veins (gothic)
+// stone: rough granular slab, no veins (wizard frame)
 function stone(o){const c=document.getElementById('c');c.width=o.w;c.height=o.h;const ctx=c.getContext('2d');const img=ctx.createImageData(o.w,o.h);
 const n=makeNoise(o.seed),n2=makeNoise(o.seed+3);
 const fbm=(f,x,y)=>{let v=0,a=1,q=1;for(let i=0;i<6;i++){v+=a*f(x*q,y*q);a*=.5;q*=2;}return v;};
@@ -81,17 +81,6 @@ const TEX = {
   'wizard-dark': { kind: 'marble2', w: 512, h: 512, seed: 53, scale: 0.0045, warp: 3.0, dx: 0.5, dy: 0.55, sharp: 12, sharp2: 3, cloud: 0.65, sheen: 0.1, grain: 0.03, veinAmt: 0.42, vein2Amt: 0.16, a: [22, 23, 26], b: [46, 47, 51], vein: [126, 122, 108], vein2: [62, 61, 58] },
   'wizard-frame': { kind: 'stone', w: 1024, h: 256, seed: 61, scale: 0.01, mottle: 0.35, rough: 0.12, grain: 0.06, a: [34, 35, 38], b: [78, 79, 82] },
   // ---- Gothic Keep (muted slate / dark stone, cold tones) ----
-  ...(process.env.GOTHIC_VARIANT === 'B'
-    ? {
-        'gothic-light': { kind: 'stone', w: 512, h: 512, seed: 71, scale: 0.008, mottle: 0.32, rough: 0.14, grain: 0.06, a: [120, 108, 92], b: [156, 144, 126] },
-        'gothic-dark': { kind: 'stone', w: 512, h: 512, seed: 83, scale: 0.008, mottle: 0.3, rough: 0.14, grain: 0.06, a: [36, 31, 28], b: [66, 58, 52] },
-        'gothic-frame': { kind: 'stone', w: 1024, h: 256, seed: 97, scale: 0.012, mottle: 0.3, rough: 0.16, grain: 0.07, a: [30, 26, 22], b: [74, 64, 56] },
-      }
-    : {
-        'gothic-light': { kind: 'stone', w: 512, h: 512, seed: 71, scale: 0.008, mottle: 0.32, rough: 0.14, grain: 0.06, a: [104, 98, 124], b: [140, 134, 160] },
-        'gothic-dark': { kind: 'stone', w: 512, h: 512, seed: 83, scale: 0.008, mottle: 0.3, rough: 0.14, grain: 0.06, a: [30, 25, 42], b: [58, 50, 78] },
-        'gothic-frame': { kind: 'stone', w: 1024, h: 256, seed: 97, scale: 0.012, mottle: 0.3, rough: 0.16, grain: 0.07, a: [26, 22, 34], b: [66, 58, 80] },
-      }),
   frame: { w: 1024, h: 256, seed: 37, wx: 0.002, wy: 0.03, warp: 3.2, freq: 0.028, sharp: 1.2, ringAmt: 0.34, fiberAmt: 0.24, pores: 0.35, blotch: 0.3, a: [38, 22, 14], b: [104, 66, 40] },
 };
 

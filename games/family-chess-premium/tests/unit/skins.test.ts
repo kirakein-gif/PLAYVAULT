@@ -37,7 +37,11 @@ describe('skins', () => {
     (d.profiles.p1 as unknown as Record<string, unknown>).skin = 'neon';
     const w = validateData(JSON.parse(JSON.stringify(d)));
     expect(w.ok && w.data.profiles.p1.skin).toBe('classic');
-    expect(isSkin('gothic')).toBe(true);
+    expect(isSkin('gothic-codex')).toBe(true);
+    expect(isSkin('gothic')).toBe(false);
+    (d.profiles.p1 as unknown as Record<string, unknown>).skin = 'gothic';
+    const g = validateData(JSON.parse(JSON.stringify(d)));
+    expect(g.ok && g.data.profiles.p1.skin).toBe('gothic-codex');
     expect(isSkin('neon')).toBe(false);
   });
   it('skin names exist in both languages', () => {

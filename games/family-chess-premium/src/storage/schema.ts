@@ -149,7 +149,8 @@ export function validateData(raw: unknown): { ok: true; data: AppData } | { ok: 
       name: base.name,
       lang: base.lang,
       aiLevel: Math.min(5, Math.max(1, Number(p.aiLevel) || 2)),
-      skin: isSkin(p.skin) ? p.skin : 'classic',
+      // 'gothic' (Claude) was replaced by 'gothic-codex' after the family's choice
+      skin: p.skin === 'gothic' ? 'gothic-codex' : isSkin(p.skin) ? p.skin : 'classic',
       puzzles: isObj(p.puzzles) ? (p.puzzles as Record<string, PuzzleRecord>) : {},
       favorites: Array.isArray(p.favorites) ? (p.favorites as unknown[]).filter((x): x is string => typeof x === 'string') : [],
       lessons: isObj(p.lessons) ? (p.lessons as Record<string, LessonRecord>) : {},

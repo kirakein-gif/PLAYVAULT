@@ -1473,3 +1473,10 @@
 - 변경: `src/skins.ts`에서 `medieval-codex`·`noble-codex` 제거, `public/skins/medieval-codex|noble-codex` 삭제(저장된 프로필은 기존 복구 로직으로 classic). `scripts/outline-skin.cjs` 추가, Codex 고딕 기물 12개에 윤곽(흰 기물 어두운 보라 회색, 검은 기물 옅은 라벤더, 반경 5px/256px) — 원본은 `scripts/art-source/codex-skins/gothic-codex-original/` 보존. README·PROVENANCE 갱신. Codex 인계문·비교 캡처·제작 스크립트는 당시 기록으로 유지.
 - 테스트: Vitest 396/396, 빌드 성공. 853×533@1.5에서 Claude 고딕 / Codex 고딕 보완 전·후 비교 캡처를 사용자에게 제시. 실기 미확인.
 - 다음: 가족이 고딕 두 안 중 선택 → 남길 스킨 확정 → PR #23 정리.
+
+### 2026-11-03 (Asia/Seoul) · CHESS MASTER 스킨 3종 확정 · 영문 이름 (Claude Code)
+
+- 사용자 결정: "고딕은 이걸로 갑시다"(Codex 고딕 윤곽 보완판), 총 3종, 이름은 짧게 영문으로 — Classic / Magic / Gothic. 이어 "설정에서 스킨 선택하게 한 다음 APK 만들어주세요".
+- 변경: Claude `gothic` 항목·`public/pieces/gothic/`·고딕 텍스처·board.css/app.css 규칙·제작 스크립트 항목 삭제. `schema.ts`에서 저장된 `gothic`을 `gothic-codex`로 이전(그 외 알 수 없는 값은 classic). 스킨 이름을 두 언어 모두 영문으로, 설명은 언어별 유지. 설정 카드의 제작자(Claude/Codex) 표기 제거(기록용 `author` 필드는 유지). 단위 테스트에 이전 검사 추가. README·LICENSES 문구 갱신.
+- 검증: 타입 검사, Vitest 396/396, 빌드 성공, 오프라인 E2E 23/23(이름 영문화 전 실행, 이후 변경은 표시 문자열만). 설정 화면 스킨 선택 행 캡처로 3종 표시 확인. APK는 push 후 Actions `family-chess-android`에서 빌드·에뮬레이터 검사. 실기 미확인.
+- 사용자 재요청 횟수: 0회. 다음: Actions 결과 확인 → APK 설치 실기 확인 → PR #23 병합 여부 결정.

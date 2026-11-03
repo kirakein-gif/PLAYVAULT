@@ -117,7 +117,6 @@ export function SettingsModal() {
                   <img src={pieceUrl(s.id, 'bN')} alt="" />
                 </span>
                 <span className="skinName">{bi(lang, s.name)}</span>
-                {s.author && <span className="tag skinAuthor">{s.author}</span>}
                 <span className="skinDesc">{bi(lang, s.desc)}</span>
               </button>
             ))}

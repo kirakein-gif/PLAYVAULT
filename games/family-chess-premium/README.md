@@ -3,9 +3,11 @@
 아빠와 아들이 함께 두고 함께 배우는 **완전 오프라인 Android 태블릿 체스**입니다.
 로그인·광고·서버·유료 API가 없고, Stockfish 엔진·문제·글꼴·이미지·효과음이 모두 앱 안에 들어 있습니다.
 
-## Codex 비교용 스킨 (2026-11-03)
+## 스킨 (2026-11-03 확정)
 
-설정 → 스킨에서 **클래식 원목·마법사의 석실·고딕 성채(Claude안)**와 **고딕(Codex안)**을 선택할 수 있습니다. Codex가 함께 만든 중세·노블 세트는 가족 검토 결과(2026-11-03, 작은 화면에서 세부가 조악해 보임)로 앱에서 제외했고, 제작 기록은 아래 문서에 남아 있습니다. Codex 고딕 기물에는 판 위 가독성을 위해 윤곽선을 덧입혔습니다(`scripts/outline-skin.cjs`, 원본은 `scripts/art-source/codex-skins/gothic-codex-original/`). [기물 나열·같은 수순의 비교 캡처·검증](docs/screenshots/skin-compare/README.md), [최종 코드 인계/Claude Code 전달문](docs/CODEX_SKINS_HANDOFF.md)을 참고하세요. 메뉴 상세 일러스트는 기물 모양 선택 이후 별도로 진행합니다.
+설정 → 스킨에서 **Classic**(원목 판·아이보리/흑단 기물), **Magic**(대리석 판·석상 기물, Claude 제작), **Gothic**(보라 석판·첨탑 기물, Codex 제작·Claude 윤곽 보완) 세 가지 중 고를 수 있습니다. 스킨 이름은 한국어·영어 모드 모두 영문으로 표시하고, 설명만 언어에 따라 바뀝니다. 선택은 프로필별로 저장됩니다. 원칙은 "화려하지 않게"입니다.
+
+가족 검토 결과 Codex의 중세·노블 세트와 Claude의 고딕 성채 세트는 앱에서 뺐습니다. 이전 버전에서 고딕 성채를 쓰던 프로필은 Gothic으로 자동 전환됩니다. Codex 고딕 기물의 윤곽선은 `scripts/outline-skin.cjs`로 덧입혔고 원본은 `scripts/art-source/codex-skins/gothic-codex-original/`에 있습니다. 비교 과정 기록: [비교 캡처·검증](docs/screenshots/skin-compare/README.md), [Codex 인계문](docs/CODEX_SKINS_HANDOFF.md).
 
 ## 주요 기능
 

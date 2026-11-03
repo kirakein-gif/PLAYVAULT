@@ -6,6 +6,10 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 
 **근거 구분:** 표의 기능 요약은 관련 diff/소스 및 기존 기록에 근거한다. 각 바이너리의 외형·음질·저작권 및 모든 과거 버전의 실제 실행 결과를 재검증한 것은 아니다. Git 등록 전 작업, PC 미푸시 작업, 과거 담당 AI/요청 전문, 실제 릴리스 날짜·배포 버전·생략된 버전은 **확인 불가**다. 기존에 'Release'라는 커밋 제목이 있어도 배포 증거로 쓰지 않는다.
 
+## CHESS MASTER · 2026-11-03 스킨 3종 확정
+
+가족 결정으로 스킨을 **Classic / Magic / Gothic** 3종으로 정리했습니다(이름은 한국어·영어 모드 모두 영문). Codex 중세·노블과 Claude 고딕 성채는 제외, Codex 고딕에 윤곽선 보완. 이전 고딕 성채 프로필은 Gothic으로 자동 전환. 설정 카드의 제작자 표기 제거. 버전 1.0.0 유지. 단위 396/396·빌드·오프라인 E2E 23/23 통과. 새 debug APK는 GitHub Actions에서 빌드, 실기 확인과 main 병합은 아직입니다.
+
 ## CHESS MASTER · 2026-11-03 Codex 비교용 스킨
 
 고딕·중세·노블3세트와각밝은/어두운바닥을추가했습니다. 중세는성벽위방패병/창을든기마기사,노블은사진기반전신갑옷석상/웅크린폰과백석·흑석구분입니다. 기존Claude스킨·UI색·게임규칙보존,버전1.0.0유지. 단위396/396·빌드·오프라인E2E23/23·실제비교13/13통과. [최종인계](games/family-chess-premium/docs/CODEX_SKINS_HANDOFF.md)와[자료/검증](games/family-chess-premium/docs/screenshots/skin-compare/README.md),WORK_LOG의2026-11-03Codex항목참조. Claude Code교차검토·가족선택대기,main병합·배포없음.

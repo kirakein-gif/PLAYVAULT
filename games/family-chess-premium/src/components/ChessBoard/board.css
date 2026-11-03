@@ -111,14 +111,6 @@ html[data-skin='wizard'] .sq.dark { background-image: linear-gradient(160deg, rg
 html[data-skin='wizard'] .board { outline-color: rgba(170, 172, 176, 0.55); }
 html[data-skin='wizard'] .coord { color: #c3c5c9; }
 
-html[data-skin='gothic'] .boardFrame {
-  background-color: #221d2c;
-  background-image: linear-gradient(135deg, rgba(200, 210, 230, 0.07), rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.32)), url('../../assets/textures/gothic-frame.webp');
-}
-html[data-skin='gothic'] .sq.light { background-image: linear-gradient(160deg, rgba(220, 228, 240, 0.08), rgba(0, 0, 0, 0.04)), url('../../assets/textures/gothic-light.webp'); background-color: #78728e; }
-html[data-skin='gothic'] .sq.dark { background-image: linear-gradient(160deg, rgba(200, 200, 230, 0.04), rgba(0, 0, 0, 0.08)), url('../../assets/textures/gothic-dark.webp'); background-color: #2c253c; }
-html[data-skin='gothic'] .board { outline-color: rgba(160, 150, 182, 0.5); }
-html[data-skin='gothic'] .coord { color: #c9bfd9; }
 
 /* skins registered with image textures in src/skins.ts (e.g. Codex skins) */
 .boardFrame.customSkin { background-color: #26262b; background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.3)), var(--frame-img); }
