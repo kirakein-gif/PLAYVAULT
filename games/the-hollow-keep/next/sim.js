@@ -13,7 +13,7 @@
         gravity: .70, jumpHeight: 80, variableJump: true, minJumpHeight: 34,
         maxFall: 13.5, coyoteTicks: 6, jumpBufferTicks: 7,
         weapon: { kind: 'projectile', damage: 22, range: 1017.6, cooldownTicks: 29,
-          speed: 10.6, width: 18, height: 12, activeTicks: 96,
+          speed: 10.6, width: 18, height: 12, activeTicks: 96, muzzle:{forward:6,height:40},
           charge: { stage2Ticks:40, stage3Ticks:80, shots:[
             {damage:44,width:26,height:18,speed:11.5},
             {damage:66,width:34,height:24,speed:12.5,burstRadius:45,burstDamage:33}
@@ -26,8 +26,8 @@
           height: 46, activeTicks: 9, comboWindowTicks:20,
           combo:[
             {damage:22,range:66,height:46,activeTicks:9,recoveryTicks:18},
-            {damage:22,range:64,height:80,activeTicks:9,recoveryTicks:22,lunge:12},
-            {damage:44,range:90,height:64,activeTicks:12,recoveryTicks:34}
+            {damage:22,range:64,height:80,startupTicks:4,activeTicks:9,recoveryTicks:22,lunge:12},
+            {damage:44,range:90,height:64,startupTicks:6,activeTicks:12,recoveryTicks:34}
           ] } }
     }
   };
@@ -309,10 +309,10 @@
       const spec={...wp,...shot};
       w.attackCooldowns[w.active]=wp.kind==='melee'?spec.recoveryTicks:wp.cooldownTicks;
       const attack={id:w.nextAttackId++,hero:w.active,kind:wp.kind,level,step,
-        x:p.face>0?p.x+p.w:p.x-(wp.kind==='melee'?spec.range:spec.width),
-        y:p.y+(p.h-spec.height)/2,w:wp.kind==='melee'?spec.range:spec.width,h:spec.height,
+        x:p.face>0?p.x+p.w+(wp.muzzle?.forward||0):p.x-(wp.kind==='melee'?spec.range:spec.width)-(wp.muzzle?.forward||0),
+        y:wp.kind==='projectile'?p.y+p.h-wp.muzzle.height-spec.height/2:p.y+(p.h-spec.height)/2,w:wp.kind==='melee'?spec.range:spec.width,h:spec.height,
         face:p.face,damage:spec.damage,speed:spec.speed||0,range:spec.range,
-        traveled:0,life:spec.activeTicks,hit:[],lunge:spec.lunge||0,duration:spec.activeTicks,
+        traveled:0,life:spec.activeTicks,hit:[],lunge:spec.lunge||0,duration:spec.activeTicks,startup:spec.startupTicks||0,
         burstRadius:level===3?spec.burstRadius||0:0,burstDamage:spec.burstDamage||0};
       w.attacks.push(attack);
       ev.push({type:'attack',hero:w.active,...(wp.kind==='melee'?{step}:{level})});
@@ -342,6 +342,8 @@
     for (const a of w.attacks) {
       if (a.kind === 'melee') {
         // A swing stays attached to its owner; swapping cancels it.
+        if(a.startup>0){a.startup--;a.preparing=true;continue;}
+        a.preparing=false;
         if(a.lunge){
           // Collision-checked horizontal step; do not change jump/gravity velocity.
           const body={...p,vx:a.face*a.lunge/a.duration,vy:0};
@@ -408,6 +410,6 @@
   return { TICK, CONFIG, createWorld, step, getPlayer: w => w.player,
     getMap: w => ({current:w.roomId,rooms:w.area?Object.entries(w.area.rooms).map(([id,r])=>({id,pos:copy(r.pos),visited:!!w.visited[id]})):[]}),
     getFlags: w => copy(w.flags||{switches:{},doors:{},broken:{},keys:{},picked:{},cleared:{},entered:{},unlocked:{}}),
-    getHitboxes: w => w.attacks.filter(a => a.life > 0).map(a => ({ x: a.x, y: a.y, w: a.w, h: a.h })),
+    getHitboxes: w => w.attacks.filter(a => a.life > 0 && !a.preparing).map(a => ({ x: a.x, y: a.y, w: a.w, h: a.h })),
     snapshot: w => copy(w) };
 });

@@ -39,10 +39,19 @@ try{for(const direction of ['right','left']){
  }
  const events=await page.evaluate(()=>window.__events),attacks=events.filter(e=>e.type==='attack'),hits=events.filter(e=>e.type==='hit'&&e.hero==='noah');
  assert.deepEqual(attacks.map(e=>e.step),[1,2,3]);assert.equal(attacks[1].tick-attacks[0].tick,18);assert.equal(attacks[2].tick-attacks[1].tick,22);assert.equal(hits.length,3);
+ const startups=await page.evaluate(()=>HKSim.CONFIG.heroes.noah.weapon.combo.map(s=>s.startupTicks||0));
+ for(const attack of attacks.filter(a=>a.step>1)){
+  const st=startups[attack.step-1],prep=trace.filter(t=>t.tick>=attack.tick&&t.tick<attack.tick+st);
+  assert.equal(prep.length,st,'all wind-up ticks observed');
+  assert.ok(prep.every(t=>!t.paint.effects.some(e=>e.file==='noah-fx-slash-'+attack.step+'.png')),'no slash during wind-up');
+  assert.equal(new Set(prep.map(t=>t.player.x)).size,1,'no lunge during wind-up');
+  assert.ok(hits.filter(h=>h.step===attack.step).every(h=>h.tick>=attack.tick+st),'damage waits for startup');
+ }
  for(let i=1;i<trace.length;i++)assert.equal(trace[i].tick-trace[i-1].tick,1,'simulation tick continues during held drawing');
  for(const hit of hits){
   const attack=attacks.find(a=>a.step===hit.step),start=Math.max(hit.tick,attack.tick+2),hold=hit.step===3?5:3;
-  const frames=trace.filter(t=>t.tick>=start&&t.tick<start+hold+2).map(t=>t.paint.sprites[0]?.frame);assert.equal(frames.length,hold+2);assert.equal(frames[0],1);assert.equal(trace.find(t=>t.tick===start+hold+2).paint.sprites[0]?.frame,2,'held cut resumes at the exact3/3/5tick boundary');assert.equal(new Set(frames).size,1,'Noah pose held while ticks advance');
+  const cutIndex=hit.step>1?2:1;
+  const frames=trace.filter(t=>t.tick>=start&&t.tick<start+hold+2).map(t=>t.paint.sprites[0]?.frame);assert.equal(frames.length,hold+2);assert.equal(frames[0],cutIndex);assert.equal(trace.find(t=>t.tick===start+hold+2).paint.sprites[0]?.frame,cutIndex+1,'held cut resumes at the exact3/3/5tick boundary');assert.equal(new Set(frames).size,1,'Noah pose held while ticks advance');
   for(let dt=0;dt<4;dt++){const t=trace.find(t=>t.tick===start+dt),paint=t.paint.targets[0];assert.ok(paint);assert.equal(paint.color,dt<2?'#ffffff':'#987667');assert.equal(paint.x,171+(dt<3?hit.face*(3-dt):0));assert.equal(t.target.x,162,'physical target never moved');}
  }
  const third=hits.find(e=>e.step===3),shakeStart=Math.max(third.tick,attacks[2].tick+2);

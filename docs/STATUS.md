@@ -1,11 +1,13 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Codex**(PR #20 Noah 콤보 동선 보완, Claude Code 재검토 대기).
+확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Codex**(PR #20 추가 수정4·5, Claude Code 재검토 대기).
 
 
-## 진행 중 · TASK_09 추가 수정 지시 4·5
+## 수정 제출 · TASK_09 추가 수정 지시 4·5 / Claude Code 재검토 대기
 
-2026-11-03 / Codex / codex/hollow-keep-combat-weapons / 기준 eb1fdd2 + 규격 5740714 (병합 e8d96c5). 사용자 인계로 PR #20에서 Noah 준비 시간·기본 복귀 자세, Ethan 발사 위치·손 그림을 함께 수정합니다. 대상 next/sim.js·render.js·전투 자산/제작/캡처 도구·자체 경계 검사·관리 문서. Claude Code 재검토 예정. 구현·검증 진행 중.
+2026-11-03 / Codex / codex/hollow-keep-combat-weapons / 기준 eb1fdd2 + 규격5740714(병합e8d96c5), PR #20. Noah 각 타를 같은 기본 자세로 끝내고, 2타4틱·3타6틱 준비 중 판정·피해·디딤·효과를 막았습니다. 6/7/6프레임·18/22/34틱·연결창20·기존타격연출 유지. Ethan 모든 탄은 몸앞+6/발에서40, 새 손·팔 그림과 실제 hands를 맞췄습니다. 경로A 내장 image_gen,64색·알파0/255·scale2.
+
+이번 검증: weapons22/22·pixel-assets96/96·combo-render5/5·자체경계6/6 및 요구 전체 회귀 통과. 실제전투6/6·명중/준비좌우2/2·연결해제2/2·멈춤/발사십자6/6. 실제 구역4159틱 입력 유지. 캡처/영상·제작기록·재현·원본로그: next/assets/combat-review/ready-muzzle/ (이전 자료 보존). 초기 서버 연결 실패는 별도 로그로 구분. 실기기·외형/손맛은 사용자 판단 대기. 게임 버전 번호 변경·main 병합·수동 배포·효과음 없음. 다음 담당 Claude Code. 아래는 이전 제출 이력입니다.
 
 ## 수정 제출 · TASK_09 추가 지시3 / Noah 콤보 동선
 

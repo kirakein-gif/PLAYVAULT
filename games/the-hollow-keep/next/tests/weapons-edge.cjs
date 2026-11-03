@@ -24,6 +24,6 @@ test('a rising cut crossing a room boundary is cancelled before damaging the new
  const grid=Array.from({length:18},(_,r)=>r===17?'#'.repeat(32):'.'.repeat(32));
  const w=HK.createWorld({hero:'noah',area:{version:1,tile:30,cols:32,rows:18,start:{room:'a',x:940,y:446},rooms:{a:{pos:[0,0],name:'a',grid,objects:[]},b:{pos:[1,0],name:'b',grid,objects:[{id:'other-room',type:'target',x:0,y:15,hp:1000}]}}}});
  for(let i=0;i<1;i++){HK.step(w,I({attack:true}));run(w,HK.CONFIG.heroes.noah.weapon.combo[i].recoveryTicks-1);}
- HK.step(w,I({attack:true}));assert.equal(w.roomId,'b');assert.equal(w.dummies[0].hp,1000);assert.equal(w.attacks.length,0);
+ HK.step(w,I({attack:true}));run(w,HK.CONFIG.heroes.noah.weapon.combo[1].startupTicks-1);assert.equal(w.roomId,'a','wind-up must not step through the exit');assert.equal(w.dummies.length,0);HK.step(w,I());assert.equal(w.roomId,'b');assert.equal(w.dummies[0].hp,1000);assert.equal(w.attacks.length,0);
 });
 console.log(`${count}/${count} supplemental weapon checks passed`);

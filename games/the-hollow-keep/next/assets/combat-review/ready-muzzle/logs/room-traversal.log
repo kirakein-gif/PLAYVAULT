@@ -1,0 +1,5 @@
+PASS ethan crosses actual 85px pit: jump x=451.63, land x=543.08
+PASS noah crosses actual 85px pit: jump x=452.94, land x=630.04
+PASS ethan old 145px comparison: 0/111 crossing thresholds
+PASS noah old 145px comparison: 89/111 crossing thresholds
+4/4 room traversal checks passed

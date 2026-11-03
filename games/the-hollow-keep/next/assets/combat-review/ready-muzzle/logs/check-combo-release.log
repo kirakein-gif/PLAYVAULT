@@ -1,0 +1,3 @@
+PASS last pose retained until exact recovery18+window20 expiry
+PASS movement releases last pose; stopping does not restore it inside window
+2/2 actual-input combo release checks passed

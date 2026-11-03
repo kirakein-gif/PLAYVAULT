@@ -40,7 +40,10 @@ def clean(im,one=False):
 def sheet(hero,name,frames,size,pivot,ticks,loop=False,hands=None):
  fw,fh=size;image=Image.new('RGBA',(fw*len(frames),fh))
  for i,im in enumerate(frames):image.paste(im,(i*fw,0))
- file=f'{hero}-{name}.png';image.save(OUT/file,optimize=True)
+ file=f'{hero}-{name}.png'
+ # Preserve unchanged PNG bytes across Pillow versions/compression libraries.
+ existing=Image.open(OUT/file).convert('RGBA') if (OUT/file).exists() else None
+ if existing is None or existing.size!=image.size or existing.tobytes()!=image.tobytes():image.save(OUT/file,optimize=True)
  anim={'file':file,'frameW':fw,'frameH':fh,'frames':len(frames),'pivot':{'x':pivot[0],'y':pivot[1]},'ticks':ticks,'loop':loop}
  if hands:anim['hands']=hands
  manifest['heroes'][hero]['animations'][name]=anim
@@ -69,6 +72,23 @@ def poses(hero,name,parts,heights,headXs,handPoints,ticks):
 parts=objects('combat-poses-source.png',10000)
 eth=sorted([p for p in parts if p[0][1]>750],key=lambda p:p[0][0]);assert len(eth)==4
 poses('ethan','charge',eth,[136]*4,[208,548,919,1294],[(302,834),(646,845),(1009,845),(1369,839)],[8]*4)
+
+# TASK_09 4/5: new Route A source, constant body scale, low casting wrist.
+# Alpha >220 isolates opaque figures from the generated translucent fringe.
+parts=objects('ethan-mid-muzzle-source.png',10000)
+parts.sort(key=lambda p:(p[0][1]>350,p[0][0]));assert len(parts)==8
+roots=[(267,335),(765,335),(1317,335),(1869,335),
+       (266,697),(771,697),(1340,697),(1868,697)]
+wrists=[(320,176),(872,152),(1439,159),(1920,176),
+        (374,508),(882,508),(1451,508),(1980,513)]
+castFrames=[];castHands=[]
+for (box,im),foot,hand in zip(parts,roots,wrists):
+ scale=.44;im=clean(im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.BOX))
+ dx=160-round((foot[0]-box[0])*scale);dy=215-round((foot[1]-box[1])*scale)
+ frame=Image.new('RGBA',(352,256));frame.paste(im,(dx,dy))
+ castFrames.append(frame);castHands.append({'x':round(dx+(hand[0]-box[0])*scale),'y':round(dy+(hand[1]-box[1])*scale)})
+sheet('ethan','attack',castFrames[:4],(352,256),(160,215),[2,3,2,2],False,castHands[:4])
+sheet('ethan','charge',castFrames[4:],(352,256),(160,215),[8]*4,True,castHands[4:])
 
 source=Image.open(SRC/'combat-effects-source.png').convert('RGBA');W,H=source.size
 # Source rows have hand-spaced gutters, measured once on the generated board.
@@ -112,9 +132,17 @@ for (box,im),foot,hand in zip(parts,feet,handpoints):
  dx=160-round((foot[0]-box[0])*scale);dy=215-round((foot[1]-box[1])*scale)
  frame=Image.new('RGBA',(352,256));frame.paste(sample,(dx,dy));frames.append(frame)
  hands.append({'x':round(dx+(hand[0]-box[0])*scale),'y':round(dy+(hand[1]-box[1])*scale)})
-for name,indices,ticks in [('attack',[0,1,2,3,4,5],[2,2,9,2,1,2]),
- ('attack-2',[5,6,7,8,9,10],[2,2,12,2,2,2]),
- ('attack-3',[10,11,12,13,14,0],[2,2,22,3,3,2])]:
+# Raised overhead wind-up: align hood/feet to the same body height as idle;
+# sword bounds do not determine body scale.
+box,im=objects('noah-overhead-ready-source.png',10000)[0]
+scale=.16;foot=(610,1351);hand=(620,420)
+sample=clean(im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.BOX))
+dx=160-round((foot[0]-box[0])*scale);dy=215-round((foot[1]-box[1])*scale)
+frame=Image.new('RGBA',(352,256));frame.paste(sample,(dx,dy));frames.append(frame)
+hands.append({'x':round(dx+(hand[0]-box[0])*scale),'y':round(dy+(hand[1]-box[1])*scale)})
+for name,indices,ticks in [('attack',[0,1,2,3,14,0],[2,2,7,2,3,2]),
+ ('attack-2',[0,5,6,7,8,9,0],[2,2,2,7,3,3,3]),
+ ('attack-3',[0,15,11,12,13,0],[2,4,2,18,6,2])]:
  sheet('noah',name,[frames[i]for i in indices],(352,256),(160,215),ticks,False,[hands[i]for i in indices])
 # Single generated ribbon per phase, rooted at feet so its path does not jump
 # when the hands rise/fall. The existing effect source supplies shape/material.

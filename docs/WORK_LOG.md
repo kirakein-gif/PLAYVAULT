@@ -1336,3 +1336,16 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex가 추가 지시 4·5를 함께 처리 → 재검토.
 - 종료 상태: 규격 보강.
+
+## 2026-11-03 · Codex · TASK_09 추가 수정 지시4·5 / PR #20
+
+- 사용자 인계로 같은 브랜치 codex/hollow-keep-combat-weapons에서 두 지시를 함께 구현. 최신 main4ec1cfa/구현eb1fdd2/규격5740714·열린PR20/21 확인. 검토 브랜치를 e8d96c5로 병합했고 WORK_LOG 양쪽 기록을 보존. 담당 선언1aa82bf를 원격 공유하고 PR20을Draft로 돌린 뒤 구현. 별도 중복 기능 작업 없음. Codex 구현, Claude Code 재검토 예정.
+- 범위: next/sim·render, Noah공격3장·Ethan공격/충전2장·manifest, RouteA원화3장·빌더·실제입력 캡처/포장 도구, 자체weapons-edge, 관리문서. 다른게임·공용자산·배포설정·기존캡처 보존. 게임 번호 전후 동일(추가 번호 없음).
+- Noah:2/3타 startupTicks4/6. 준비 중 life소모·판정·피해·디딤 없음, getHitboxes도 숨김. 준비 후 active9/12틱, 2타전체12디딤·3타제자리. 효과는 준비 뒤 시작. 모든 타끝/다음첫은 같은 기본자세, 2타숙임·3타칼들기를 그 타안에. 6/7/6프레임·18/22/34틱, 회복·창20·피해·1타/이동 수치 유지. 렌더러는 긴 핵심자세 위치를 실제ticks로 찾아 명중3/3/5유지 뒤 복귀가 다음 타 전에 보이게 함.
+- Ethan:muzzle앞6/발40을1/2/3단·좌우공통 적용. 새RouteA내장이미지생성으로 팔/손을낮추고, 실제장갑/손끝에서hands샘플링. 충전빛도그손에붙음. 피해/속도/사거리/충전시점 동일. 양자화64색·알파0/255·네이티브scale2, 샘플링/전체prompt/입력원화/정리는PROVENANCE. 기존효과와다른PNG는바이트보존,전체runtime PNG/manifest재빌드SHA256동일.
+- 인수 검사 weapons-contract/pixel-assets/combo-render 등은5740714와동일(약화없음). 자체weapons-edge6항목은방경계검사가준비4틱기다리도록하고준비중제자리/방유지를추가확인. 자체capture-combat은6/7/6전체19자세를manifest로확인, capture-combat-feel은실제준비중효과/피해/디딤없음및새cut프레임의3/3/5유지검사로보강. 기존타격/좌우/모바일/F2확인은유지.
+- 이번 실행: weapons22/22·pixel-assets96/96·combo-render5/5·weapons-edge6/6; foundation51/51·edge16/16, exploration16/16·entrance9/9·ladder10/10·area22/22·exploration-edge13/13·ladder-edge4/4·traversal4/4. pixel-render구역/시험실각7/7·ladder/tile/IME각7/7·mobile-layout20/20·fullscreen6/6·exploration-browser6/6·browser-playtest시험실20/20. ECLIPSE polish/audio/audio-wind모두PASS(다른게임회귀). 실제구역완주4159틱69.3초교대2회그대로통과해재기록불필요.
+- 실제입력: 전투6/6(좌우전체19몸/9효과·Ethan2/3·모바일·F2), 명중/준비좌우2/2(게임틱지속·표적물리좌표유지·밝힘·밀림·3타흔들림·숫자분리), 연결해제2/2, 멈춤/발사십자6/6.1타/2타멈춤좌우·1→2→3연속좌우·Ethan발사1/충전2/3손과독립muzzle십자·idle크기비교. 무손실포장/82틱1367ms영상은RGBA/시간동일확인. 자료/로그next/assets/combat-review/ready-muzzle/.
+- 실패/정정: 최초아트조립94/96(Ethan미교체·3타칼높이부족)은새손/높은칼소스로96/96. 최초브라우저는격리서버8765연결시간초과로실패,Chrome과같은권한8766서버에서전부통과. 연결실패로그를*-connection-failure로보존. 테스트원본수정으로회피하지않음.
+- 5개관리문서검토: STATUS/WORK_LOG/CHANGELOG갱신,AGENTS/CLAUDE절차변경없음. nextREADME/PROVENANCE/검증문서갱신. 같은PR20으로일반push/Ready제출,main병합·수동배포·효과음·게임시간정지없음.
+- 다음담당Claude Code: PR20최신head와ready-muzzle/TEST_RESULTS재현. 이번교차검토/발견문제수미확인, 사용자추가수정요청누적5건(박자·연결·동선·기본복귀·Ethan발사위치). 외형자연스러움/손맛/실기기회전·성능·터치는사용자판단대기. 회사PC미리보기갱신은사용자측후속작업.

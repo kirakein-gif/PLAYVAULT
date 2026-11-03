@@ -144,7 +144,9 @@
       const duration=name=>anims?.[name]?.ticks?.reduce((a,b)=>a+b,0)||({attack:20,land:8}[name]||0);
       const attackAction=world.active==='noah'&&state.attackStep>1?'attack-'+state.attackStep:'attack';
       const rawAge=world.tick-state.attack;
-      const coreEnd=anims?.[attackAction]?.ticks.slice(0,3).reduce((a,b)=>a+b,0)||Infinity;
+      const attackTicks=anims?.[attackAction]?.ticks;
+      const coreIndex=attackTicks?attackTicks.indexOf(Math.max(...attackTicks)):2;
+      const coreEnd=attackTicks?.slice(0,coreIndex+1).reduce((a,b)=>a+b,0)||Infinity;
       // Impact holds borrow time from the long core stance so recovery frames
       // still arrive before the next buffered strike; the cut itself stays held.
       const hold=state.hold&&rawAge<coreEnd?Math.max(0,Math.min(state.hold.ticks,world.tick-state.hold.tick)):0;
@@ -190,9 +192,11 @@
           // One arc, only during the visible attack swing, rooted at its hand.
           // Trial sets without attack/fx keep their geometric fallback below.
           const animation=anims?.[attackAction],arc=anims?.[fx];
-          if(a.hero!==world.active||!attacking||age<(animation?.ticks?.[0]??2))continue;
+          const startup=HKSim.CONFIG.heroes.noah.weapon.combo[a.step-1].startupTicks||0;
+          const fxStart=Math.max(startup,animation?.ticks?.[0]??2);
+          if(a.hero!==world.active||!attacking||a.preparing||rawAge<fxStart)continue;
           if(animation&&arc&&HKPixel.image(animation.file)&&HKPixel.image(arc.file)){
-            const start=animation.ticks[0],fxAge=rawAge-start;
+            const fxAge=rawAge-fxStart;
             const life=arc.ticks.reduce((total,ticks)=>total+ticks,0);
             if(a.hero!==world.active||!attacking||attackIndex<1||fxAge<0||fxAge>=life)continue;
             const hand=animation.hands?.[attackIndex]||{x:animation.pivot.x+32,y:animation.pivot.y-70};
