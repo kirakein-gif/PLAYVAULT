@@ -4,6 +4,10 @@
 
 
 
+## 진행 중 · TASK_10 전투 2차
+
+2026-11-03 / Codex / codex/hollow-keep-combat-enemies / 기준 main2605e46. 사용자 인계·PR22병합 확인, 열린PR23은체스별도범위. 담당범위: next/sim·render·app, 체력/피격/회복/적3종, 구역배치/완주입력, 새전용그림/제작/캡처도구, 관리문서. 원본검사·이동/무기수치·다른게임/공용자산은보존. 구현/검증진행중, 다음Claude Code교차검토. PR은Draft제출, main병합·배포하지않음.
+
 ## 규격 제출 · 3단계 전투 2차(체력·피격·쓰러짐·회복·적 3종) / 사용자 병합 승인 대기
 
 2026-11-03 / Claude Code / `claude/hollow-keep-combat2-spec` (기준 main `f43cd1e`). `COMBAT2_SPEC.md`·`CODEX_TASK_10.md`, 검사 `enemies-contract`(16)·`area-data`(24)·`pixel-assets`(적·hurt·쉼터·회복 조각). 참조 구현으로 검사 검증(16/16, 오류 변형 18종 검출). 병합 승인 후 Codex가 `codex/hollow-keep-combat-enemies`에서 구현.
