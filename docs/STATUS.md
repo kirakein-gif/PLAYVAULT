@@ -3,6 +3,10 @@
 확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Codex**(PR #20 Noah 콤보 동선 보완, Claude Code 재검토 대기).
 
 
+## 진행 중 · TASK_09 추가 수정 지시 4·5
+
+2026-11-03 / Codex / codex/hollow-keep-combat-weapons / 기준 eb1fdd2 + 규격 5740714 (병합 e8d96c5). 사용자 인계로 PR #20에서 Noah 준비 시간·기본 복귀 자세, Ethan 발사 위치·손 그림을 함께 수정합니다. 대상 next/sim.js·render.js·전투 자산/제작/캡처 도구·자체 경계 검사·관리 문서. Claude Code 재검토 예정. 구현·검증 진행 중.
+
 ## 수정 제출 · TASK_09 추가 지시3 / Noah 콤보 동선
 
 2026-11-02(Asia/Seoul) / Codex / `codex/hollow-keep-combat-weapons` / 기준00479e7 + 규격abbcd8f(병합ffe7736) / [PR #20](https://github.com/kirakein-gif/PLAYVAULT/pull/20). 제자리 가로치기 → 12단위 파고들며 낮게→높게 올려 베기 → 발을 버티고 머리 위에서 크게 내려치기로 보강했습니다. 2단range64/height80/lunge12,3단range90/height64/디딤없음. 1단·이동·피해/회복/창20·Ethan·기존 타격 연출은 유지했습니다.15자세를 동일0.46비율로 새로 처리해 인물 크기를 맞췄고, 각6프레임·18/22/34틱·끝/다음첫 RGBA공유(IoU1.0)를 유지했습니다.
