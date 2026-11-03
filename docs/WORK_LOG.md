@@ -1264,3 +1264,16 @@
 - 사용자 재요청 횟수: 0회.
 - 다음: Codex가 PR #20에서 추가 지시 4 처리 → 재검토 → 미리보기 갱신.
 - 종료 상태: 규격 보강.
+
+### 2026-11-03 (Asia/Seoul) · Ethan 발사 위치 규격
+
+- 담당 AI: Claude Code. 사용자 의견(작업 중): "에단의 경우 탄을 발사하는 위치는 손인데, 탄이 나가는 위치는 몸 중앙이네요. 검토할 필요가 있을 것 같습니다." 선택(질문): 그림을 낮춰 중간 높이에서.
+- 측정(`eb1fdd2`): manifest hands 기준 손은 발에서 51·앞 29(공격), 50.5·22(충전). 탄은 발에서 34·몸 앞면 21.
+- 판단: 탄을 손 높이로 올리면 키 약 45 미만의 적을 맞힐 수 없어 2차 적 설계를 제약 → 탄 높이 40으로 조금만 올리고 그림의 손을 내림.
+- 변경(`claude/hollow-keep-combat-review`, PR #21): COMBAT_SPEC §3-1, CODEX_TASK_09 추가 지시 5, `weapons-contract.cjs`(muzzle 값, 1·2·3단 탄 생성 위치 좌우 → 22개), `pixel-assets.cjs`(attack 발사 프레임·charge hands가 발사 위치 ±4).
+- 검증: `eb1fdd2`는 muzzle 검사 2개 실패, hands 검사 실패(앞 29·높이 51 등). 참조(muzzle 추가)는 weapons-contract 22/22, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16. 결함 변형 3종(높이 무시, 왼쪽 위치 오류, 충전탄만 옛 높이) 검출. hands 좌표를 발사 위치로 옮긴 합성 manifest는 pixel-assets 96/96.
+- 한계: pixel-assets는 hands 좌표를 검사하며 실제 그려진 손 픽셀은 재지 못함 → 발사 위치 표시를 겹친 캡처를 요구.
+- 검토 담당 / 발견 문제 수: 사용자 발견 1건.
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex가 추가 지시 4·5를 함께 처리 → 재검토.
+- 종료 상태: 규격 보강.

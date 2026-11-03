@@ -166,6 +166,36 @@ test('Noah: 교대하면 콤보가 사라져 돌아와서 1단', () => {
   assert.ok(ev.every((e) => e.hero === 'noah'));
 });
 
+// ── Ethan 발사 위치(COMBAT_SPEC §3-1) ──
+test('Ethan 발사 위치: CONFIG.weapon.muzzle {forward, height}, 높이 38~44(가슴 아래 중간)', () => {
+  const m = cfg('ethan').weapon.muzzle;
+  assert.ok(m && typeof m.forward === 'number' && typeof m.height === 'number', 'ethan.weapon.muzzle {forward, height} 필요');
+  assert.ok(m.height >= 38 && m.height <= 44, `muzzle.height ${m.height}`);
+  assert.ok(m.forward >= 0 && m.forward <= 12, `muzzle.forward ${m.forward}`);
+});
+
+test('Ethan 발사 위치: 1·2·3단 탄이 모두 발사 위치(몸 앞 + forward, 발에서 height)에서 생김 — 좌우 모두', () => {
+  const m = cfg('ethan').weapon.muzzle, ch = cfg('ethan').weapon.charge;
+  for (const dir of [1, -1]) {
+    for (const [hold, level] of [[1, 1], [ch.stage2Ticks + 1, 2], [ch.stage3Ticks + 1, 3]]) {
+      const w = world('ethan');
+      if (dir < 0) { HK.step(w, I({ left: true })); run(w, 30); }
+      const p = P(w), feetY = p.y + p.h, frontX = dir > 0 ? p.x + p.w : p.x;
+      const seen = [];
+      for (let i = 0; i <= hold; i++) { HK.step(w, I({ attack: i < hold || hold === 1 })); seen.push(...w.attacks.filter((a) => a.kind === 'projectile' && !seen.some((s) => s.id === a.id)).map((a) => ({ ...a }))); }
+      HK.step(w, I()); seen.push(...w.attacks.filter((a) => a.kind === 'projectile' && !seen.some((s) => s.id === a.id)).map((a) => ({ ...a })));
+      const shot = seen.find((a) => (a.level || 1) === level);
+      assert.ok(shot, `${dir > 0 ? '오른쪽' : '왼쪽'} ${level}단 탄이 없음`);
+      const cy = shot.y + shot.h / 2;
+      assert.ok(Math.abs(feetY - cy - m.height) <= 0.5, `${dir > 0 ? '오른쪽' : '왼쪽'} ${level}단 탄 높이 ${(feetY - cy).toFixed(1)} ≠ ${m.height}`);
+      const near = dir > 0 ? shot.x : shot.x + shot.w; // 탄의 몸 쪽 끝
+      const firstStep = Math.min(shot.speed || 0, shot.traveled || 0) * dir; // 첫 틱에 이미 움직였을 수 있음
+      const want = frontX + dir * m.forward;
+      assert.ok(Math.abs(near - firstStep - want) <= 0.5 || Math.abs(near - want) <= 0.5, `${dir > 0 ? '오른쪽' : '왼쪽'} ${level}단 탄 시작 ${near.toFixed(1)} ≠ ${want.toFixed(1)}`);
+    }
+  }
+});
+
 // ── Ethan ──
 const E = () => cfg('ethan').weapon;
 const holdRelease = (w, ticks, extra = {}) => { const ev = []; for (let i = 0; i < ticks; i++) ev.push(...HK.step(w, I({ attack: true, ...extra }))); ev.push(...HK.step(w, I())); return ev; };

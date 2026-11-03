@@ -321,6 +321,16 @@ async function analyze(page, file, opts) {
         assert.ok(a.W !== b.W || a.H !== b.H || a.hash !== b.hash, '두 점프 시트가 픽셀까지 같음');
       });
     }
+    if (!TRIAL && heroes.ethan) check('ethan: 탄을 내보내는 손이 발사 위치에 있음(COMBAT_SPEC §3-1) — attack 발사 프레임·charge 모든 프레임의 hands가 muzzle ±4단위', () => {
+      const m = SIM.CONFIG.heroes.ethan.weapon.muzzle, c = SIM.CONFIG.heroes.ethan;
+      assert.ok(m, 'sim.js CONFIG.heroes.ethan.weapon.muzzle 없음');
+      const want = { x: c.width / 2 + m.forward, y: m.height }, bad = [];
+      const at = (n, i) => { const a = heroes.ethan.animations[n], h = a.hands && a.hands[i]; return h ? { x: (h.x - a.pivot.x) / SCALE, y: (a.pivot.y - h.y) / SCALE } : null; };
+      const chk = (n, i) => { const h = at(n, i); if (!h) { bad.push(`${n} ${i}번 프레임 hands 없음`); return; } if (Math.abs(h.x - want.x) > 4 || Math.abs(h.y - want.y) > 4) bad.push(`${n} ${i}번 손 (앞 ${h.x.toFixed(1)}, 높이 ${h.y.toFixed(1)}) ≠ 발사 위치 (앞 ${want.x}, 높이 ${want.y})`); };
+      chk('attack', 1); // 첫(준비) 프레임 다음 = 탄이 보이기 시작하는 프레임
+      for (let i = 0; i < heroes.ethan.animations.charge.frames; i++) chk('charge', i);
+      assert.deepEqual(bad, [], bad.join(' / '));
+    });
     if (!TRIAL && heroes.noah) check('noah: 기본 자세로 끝나고 준비 동작은 그 단 안에서(COMBAT_SPEC §2-4) — 세 단 끝 자세가 같고 서 있음, 2단 숙이기·3단 칼 들기는 준비 시간 안에 시작', () => {
       const iou = (A, B) => { const a2 = new Set(A); let inter = 0; for (const p of B) if (a2.has(p)) inter++; return inter / (a2.size + B.length - inter); };
       const anims = heroes.noah.animations, R = (n) => results2[`noah/${n}`];
