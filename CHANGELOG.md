@@ -8,7 +8,7 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 
 ## CHESS MASTER · 2026-11-03 스킨 3종 확정
 
-가족 결정으로 스킨을 **Classic / Magic / Gothic** 3종으로 정리했습니다(이름은 한국어·영어 모드 모두 영문). Codex 중세·노블과 Claude 고딕 성채는 제외, Codex 고딕에 윤곽선 보완. 이전 고딕 성채 프로필은 Gothic으로 자동 전환. 설정 카드의 제작자 표기 제거. 버전 1.0.0 유지. 단위 396/396·빌드·오프라인 E2E 23/23 통과. 새 debug APK는 GitHub Actions에서 빌드, 실기 확인과 main 병합은 아직입니다.
+가족 결정으로 스킨을 **Classic / Magic / Gothic** 3종으로 정리했습니다(이름은 한국어·영어 모드 모두 영문). Codex 중세·노블과 Claude 고딕 성채는 제외, Codex 고딕에 윤곽선 보완. 이전 고딕 성채 프로필은 Gothic으로 자동 전환. 설정 카드의 제작자 표기 제거. 버전 1.0.0 유지. 단위 396/396·빌드·오프라인 E2E 23/23 통과. 새 debug APK는 GitHub Actions에서 빌드. 사용자 승인으로 PR #23을 main에 병합(배포 없음, 실기 확인 대기).
 
 ## CHESS MASTER · 2026-11-03 Codex 비교용 스킨
 
