@@ -1,8 +1,20 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Codex**(CHESS MASTER 비교용 고딕·중세·노블 제출). 아래 기존 이력은 보존합니다.
+확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #23 병합 반영·리버시 아이디어 등록). 아래 기존 이력은 보존합니다.
 
-## 제출 · CHESS MASTER Codex 고딕·중세·노블 / Claude Code 교차 검토 대기
+## 아이디어 보류(찜) · 가족 리버시(오셀로) — CHESS MASTER와 같은 컨셉 / 착수 전
+
+사용자 요청(2026-11-03): "똑같은 컨셉으로 오셀로 만들 수 있지 않아?" → "우선 찜만 해두려구". **구현 착수 안 함, 담당 미정.**
+
+- 재활용: 오프라인 Android 구조(Vite·React·Capacitor), 프로필·저장·백업·한/영·설정, 홈 카드 3개·아카데미 틀, 글꼴·UI 색, 판 재질 텍스처, 스킨 3종 컨셉(Classic/Magic/Gothic), "화려하지 않게", CI·에뮬레이터 검사.
+- 새로 필요: 자체 AI(알파베타, 막판 빈칸 약 16 이하 완전 읽기, 5단계), 엔진으로 정답을 확정한 자체 문제(Lichess 같은 공개 DB 없음), 강의(모서리·X/C칸·둘 곳 수·변·홀짝), 복기. 판은 체크무늬 대신 단색 재질 + 격자선, 기물 대신 스킨별 양면 돌 3세트(같은 돌의 앞뒷면으로 보이게), 뒤집기 연출은 짧고 담백하게.
+- 착수 시 사용자 결정 필요: ① 이름 — "Othello"는 상표라 앱 표기는 Reversi 권장(예: REVERSI MASTER) ② 별도 앱(권장, 체스 무영향) 또는 체스와 통합 앱 ③ 1차 범위(대국·AI·복기 먼저 권장) ④ 담당 — 역할 분담상 신규 1차 구현은 Codex, 사용자 지시 시 Claude Code.
+
+## 병합됨 · CHESS MASTER v1.0.0 스킨 3종 (PR #23 → main `57fe108`, 2026-11-03)
+
+사용자 승인("합쳐주세요")·CI #19(`a318906`) 성공 확인 후 병합. 스킨 Classic/Magic/Gothic. debug APK: Actions 실행 41589835841의 `FamilyChessPremium-v1.0.0-debug-apk`. 배포 없음, 실제 태블릿 확인 대기. 아래 Codex 제출 기록은 당시 상태로 보존합니다.
+
+## (당시 기록) 제출 · CHESS MASTER Codex 고딕·중세·노블 → 이후 고딕만 채택·PR #23 병합
 
 [Draft PR #23](https://github.com/kirakein-gif/PLAYVAULT/pull/23) · 기존 Claude 체스 구현 포함. main2605e46 통합 시 관리 문서 양쪽 이력 보존, 가족 판단 전 PR 병합 없음.
 
@@ -12,7 +24,7 @@
 
 다음은 Claude Code 교차검토와 가족 외형선택. 메뉴상세일러스트는 기물선택후 별도. 앱버전1.0.0유지, APK빌드·실기설치·main병합·배포없음. 아래 기존개발기록은 보존합니다.
 
-## 개발 완료·검토 대기 · 우리집 체스 PREMIUM v1.0.0 → 제목 CHESS MASTER (새 게임, `games/family-chess-premium/`)
+## 병합됨(PR #23) · 우리집 체스 PREMIUM v1.0.0 → 제목 CHESS MASTER (새 게임, `games/family-chess-premium/`)
 
 - 가족 스킨 선택 반영(2026-11-03): Codex 중세·노블 제외, Codex 고딕 윤곽 보완. 남은 비교: Claude 고딕 vs Codex 고딕. PR #23 draft 유지.
 - 스킨 확정(2026-11-03): Classic / Magic / Gothic(Codex 제작·Claude 윤곽 보완) 3종, 이름은 두 언어 모두 영문, 프로필별 저장, '화려하지 않게' 기준. 중세·노블·고딕 성채는 가족 결정으로 제외(구 `gothic` 프로필은 `gothic-codex`로 자동 전환). 새 debug APK는 Actions에서 빌드. 사용자 승인(2026-11-03 "합쳐주세요")으로 PR #23을 main에 병합. 배포 없음, 실기 확인 대기.
