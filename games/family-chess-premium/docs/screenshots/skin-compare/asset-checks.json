@@ -1,0 +1,343 @@
+{
+  "gothic": {
+    "bB.webp": {
+      "bytes": 8668,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bK.webp": {
+      "bytes": 9304,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bN.webp": {
+      "bytes": 11604,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "board-dark.webp": {
+      "bytes": 58638,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "board-light.webp": {
+      "bytes": 84812,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "bP.webp": {
+      "bytes": 6824,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bQ.webp": {
+      "bytes": 10316,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bR.webp": {
+      "bytes": 9962,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wB.webp": {
+      "bytes": 8580,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wK.webp": {
+      "bytes": 9440,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wN.webp": {
+      "bytes": 11464,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wP.webp": {
+      "bytes": 6836,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wQ.webp": {
+      "bytes": 10778,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wR.webp": {
+      "bytes": 10324,
+      "size": [
+        256,
+        256
+      ]
+    }
+  },
+  "medieval": {
+    "bB.webp": {
+      "bytes": 10556,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bK.webp": {
+      "bytes": 10346,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bN-standing.webp": {
+      "bytes": 16368,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bN.webp": {
+      "bytes": 16654,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "board-dark.webp": {
+      "bytes": 63896,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "board-light.webp": {
+      "bytes": 53114,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "bP.webp": {
+      "bytes": 8226,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bQ.webp": {
+      "bytes": 10110,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bR.webp": {
+      "bytes": 9976,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wB.webp": {
+      "bytes": 11538,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wK.webp": {
+      "bytes": 11760,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wN-standing.webp": {
+      "bytes": 18486,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wN.webp": {
+      "bytes": 18444,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wP.webp": {
+      "bytes": 9426,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wQ.webp": {
+      "bytes": 11654,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wR.webp": {
+      "bytes": 11086,
+      "size": [
+        256,
+        256
+      ]
+    }
+  },
+  "noble": {
+    "bB.webp": {
+      "bytes": 10684,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bK.webp": {
+      "bytes": 10588,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bN.webp": {
+      "bytes": 11688,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "board-dark.webp": {
+      "bytes": 121074,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "board-light.webp": {
+      "bytes": 123170,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "bP.webp": {
+      "bytes": 8578,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bQ.webp": {
+      "bytes": 10428,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bR.webp": {
+      "bytes": 10818,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wB.webp": {
+      "bytes": 11228,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wK.webp": {
+      "bytes": 11478,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wN.webp": {
+      "bytes": 12690,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wP.webp": {
+      "bytes": 8916,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wQ.webp": {
+      "bytes": 10560,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "wR.webp": {
+      "bytes": 11366,
+      "size": [
+        256,
+        256
+      ]
+    }
+  },
+  "totalBitmapBytes": 922456,
+  "nobleSideSeparation": {
+    "K": {
+      "whiteMeanLuma": 179.0,
+      "blackMeanLuma": 63.8
+    },
+    "Q": {
+      "whiteMeanLuma": 185.9,
+      "blackMeanLuma": 66.9
+    },
+    "R": {
+      "whiteMeanLuma": 189.3,
+      "blackMeanLuma": 66.7
+    },
+    "B": {
+      "whiteMeanLuma": 182.2,
+      "blackMeanLuma": 63.6
+    },
+    "N": {
+      "whiteMeanLuma": 184.7,
+      "blackMeanLuma": 65.4
+    },
+    "P": {
+      "whiteMeanLuma": 170.7,
+      "blackMeanLuma": 62.8
+    }
+  }
+}

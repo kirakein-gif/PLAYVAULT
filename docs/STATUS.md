@@ -1,10 +1,14 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-02 (Asia/Seoul)** / 확인 AI: **Claude Code**(우리집 체스 PREMIUM v1.0.0 신규 개발). 아래 THE HOLLOW KEEP 항목은 Codex 기록 그대로입니다.
+확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Codex**(CHESS MASTER 비교용 고딕·중세·노블 제출). 아래 기존 이력은 보존합니다.
 
-## 진행 중 · CHESS MASTER Codex 비교용 스킨
+## 제출 · CHESS MASTER Codex 고딕·중세·노블 / Claude Code 교차 검토 대기
 
-2026-11-03 / Codex / ccr-6aa2a39e-1vn67a / 기준 bfee4c9. 사용자 인계에 따라 Claude Code가 만든 family-chess-premium에 wizard-codex·gothic-codex 두 비교용 스킨(판/기물)을 추가합니다. Claude 기존 스킨·UI/게임 규칙 보존. 메뉴 상세 일러스트는 가족의 기물 선택 뒤 별도 진행. 대상 public/skins 새 자산·src/skins.ts 항목 추가·비교 캡처/제작 기록·관리 문서, 구현/검증 진행 중. 다음 Claude Code 교차 검토·가족 선택, 병합하지 않습니다.
+2026-11-03 / Codex / ccr-6aa2a39e-1vn67a / 착수bfee4c9, 담당선언1e72867. 기준은 Claude Code의 family-chess-premium입니다. 사용자의 후속 결정으로 세 세트 고딕(gothic-codex)·중세(medieval-codex)·노블(noble-codex)를 추가했습니다. 중세는 성벽 위 방패병과 창을 든 기마 기사(앞발 들기), 노블은 마지막 사진의 전신 갑옷/웅크린 폰/높은 받침을 재구성하고 백석·흑석 색을 분리했습니다. 세트별 바닥6장 포함. 기존 Claude안·UI색·게임규칙·인수검사 보존.
+
+이번 실행: 단위396/396·타입/Vite빌드성공·원본오프라인E2E23/23(외부0)·실제스킨비교13/13(외부0). 기물36개256px·바닥6장1024px, 비교용걷는나이트2개, WebP44장922456bytes(약0.92MB), 파일당60/200KB이하. 동일수순의853×533@1.5/1280×800·60px양칸표·세트나열/바닥견본 첨부. 인계는 games/family-chess-premium/docs/CODEX_SKINS_HANDOFF.md, 상세검증/캡처는 docs/screenshots/skin-compare/README.md. 내장이미지생성·전체prompt/후처리기록 포함.
+
+다음은 Claude Code 교차검토와 가족 외형선택. 메뉴상세일러스트는 기물선택후 별도. 앱버전1.0.0유지, APK빌드·실기설치·main병합·배포없음. 아래 기존개발기록은 보존합니다.
 
 ## 개발 완료·검토 대기 · 우리집 체스 PREMIUM v1.0.0 → 제목 CHESS MASTER (새 게임, `games/family-chess-premium/`)
 

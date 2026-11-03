@@ -1,0 +1,1396 @@
+{
+  "checks": 13,
+  "external": [],
+  "results": [
+    {
+      "skin": "wizard",
+      "viewport": {
+        "width": 853,
+        "height": 533,
+        "scale": 1.5
+      },
+      "position": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6",
+      "pieces": [
+        {
+          "src": "pieces/wizard/bR.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bQ.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bK.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bR.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wR.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wQ.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wK.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wR.svg",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "skin": "medieval-codex",
+      "viewport": {
+        "width": 853,
+        "height": 533,
+        "scale": 1.5
+      },
+      "position": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6",
+      "pieces": [
+        {
+          "src": "skins/medieval-codex/bR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bQ.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bK.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wQ.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wK.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wR.webp",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "skin": "gothic",
+      "viewport": {
+        "width": 853,
+        "height": 533,
+        "scale": 1.5
+      },
+      "position": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6",
+      "pieces": [
+        {
+          "src": "pieces/gothic/bR.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bQ.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bK.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bR.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wR.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wQ.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wK.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wR.svg",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "skin": "gothic-codex",
+      "viewport": {
+        "width": 853,
+        "height": 533,
+        "scale": 1.5
+      },
+      "position": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6",
+      "pieces": [
+        {
+          "src": "skins/gothic-codex/bR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bQ.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bK.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wQ.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wK.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wR.webp",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "skin": "noble-codex",
+      "viewport": {
+        "width": 853,
+        "height": 533,
+        "scale": 1.5
+      },
+      "position": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6",
+      "pieces": [
+        {
+          "src": "skins/noble-codex/bR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bQ.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bK.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wQ.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wK.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wR.webp",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "skin": "wizard",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "scale": 1
+      },
+      "position": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6",
+      "pieces": [
+        {
+          "src": "pieces/wizard/bR.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bQ.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bK.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bR.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wR.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wQ.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wK.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/wizard/wR.svg",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "skin": "medieval-codex",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "scale": 1
+      },
+      "position": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6",
+      "pieces": [
+        {
+          "src": "skins/medieval-codex/bR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bQ.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bK.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wQ.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wK.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/medieval-codex/wR.webp",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "skin": "gothic",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "scale": 1
+      },
+      "position": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6",
+      "pieces": [
+        {
+          "src": "pieces/gothic/bR.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bQ.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bK.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bR.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/bP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wP.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wR.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wN.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wB.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wQ.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wK.svg",
+          "ok": true
+        },
+        {
+          "src": "pieces/gothic/wR.svg",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "skin": "gothic-codex",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "scale": 1
+      },
+      "position": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6",
+      "pieces": [
+        {
+          "src": "skins/gothic-codex/bR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bQ.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bK.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wQ.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wK.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/gothic-codex/wR.webp",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "skin": "noble-codex",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "scale": 1
+      },
+      "position": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6",
+      "pieces": [
+        {
+          "src": "skins/noble-codex/bR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bQ.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bK.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/bP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wP.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wR.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wN.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wB.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wQ.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wK.webp",
+          "ok": true
+        },
+        {
+          "src": "skins/noble-codex/wR.webp",
+          "ok": true
+        }
+      ]
+    }
+  ]
+}
