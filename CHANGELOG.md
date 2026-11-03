@@ -325,3 +325,7 @@ PR #20, 기준00479e7 + 정정 규격abbcd8f(병합ffe7736). Noah 제자리 가�
 ## THE HOLLOW KEEP · 3단계 전투 2차 규격 (2026-11-03, Asia/Seoul)
 
 - 규격·검사만. 주인공별 체력(Ethan 6·Noah 5), 맞음·밀림·무적, 한 명 쓰러지면 자동 교대 + 무적, 둘 다 쓰러지면 성문에서 다시 시작(진행 유지), 성문 쉼터·회복 조각(처치 4회마다, 무작위 없음), 적 3종(지상 돌격형·공중형·방패형, 일반 적은 방에 다시 들어오면 되살아남). `COMBAT2_SPEC.md`, `CODEX_TASK_10.md`, `enemies-contract.cjs`(16), `area-data.cjs`(적 배치·§6 요구·완주 중 쓰러짐 없음), `pixel-assets.cjs`(적 그림·hurt·쉼터·회복 조각). Codex 구현 대기. 게임 버전 번호 변경 없음.
+
+## THE HOLLOW KEEP · 전투 2차 규격 병합·교차 검토 (2026-11-03, Asia/Seoul)
+
+- PR #22(규격·검사) main 병합. PR #24 교차 검토: 쓰러짐 자동 교대 자리 보정 규칙(§2) 추가, `enemies-contract` 17번째 검사, 표적 → 특정 적 변경에 맞춰 `exploration-edge`·`exploration-browser` 정정. 게임 버전 번호 변경 없음.

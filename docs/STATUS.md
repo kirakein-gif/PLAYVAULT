@@ -1,6 +1,10 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Codex**(CHESS MASTER 비교용 고딕·중세·노블 제출). 아래 기존 이력은 보존합니다.
+확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(THE HOLLOW KEEP PR #24 교차 검토 완료, Codex 추가 수정 대기). 아래 기존 이력은 보존합니다.
+
+## 검토 완료 · THE HOLLOW KEEP PR #24(TASK_10 전투 2차) / Codex 추가 수정 대기
+
+2026-11-03 / Claude Code / 검토 브랜치 `claude/hollow-keep-combat2-review`. PR #22 main 병합(`2605e46`). PR #24 `812d362`: 요구 검사 통과, 원본 검사 2개(exploration-edge·exploration-browser)는 규격 변경에 맞춰 정정. 발견 1건 — 쓰러짐 자동 교대 시 Ethan이 벽·봉쇄물에 묻힘(규격 §2 보완, enemies-contract 17번째 검사). 다음: Codex `CODEX_TASK_10.md` 추가 수정 지시 1. 회사 PC 미리보기 버전 8(`812d362`).
 
 ## 제출 · CHESS MASTER Codex 고딕·중세·노블 / Claude Code 교차 검토 대기
 

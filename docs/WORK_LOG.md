@@ -1481,3 +1481,18 @@
 - 검증: 타입 검사, Vitest 396/396, 빌드 성공, 오프라인 E2E 23/23(이름 영문화 전 실행, 이후 변경은 표시 문자열만). 설정 화면 스킨 선택 행 캡처로 3종 표시 확인. APK는 push 후 Actions `family-chess-android`에서 빌드·에뮬레이터 검사. 실기 미확인.
 - 병합: 사용자 승인("합쳐주세요") 후 CI 성공을 확인하고 PR #23을 draft 해제·main 병합(merge commit). 배포는 별도이며 수행하지 않음.
 - 사용자 재요청 횟수: 0회. 다음: APK 설치 실기 확인, 메뉴 상세 일러스트 여부 결정.
+
+### 2026-11-03 (Asia/Seoul) · PR #22 병합(전투 2차 규격) 및 PR #24(TASK_10) 교차 검토
+
+- 담당 AI: Claude Code(검토). PR #22는 사용자 승인("속행합시다")으로 main `2605e46`에 병합.
+- 대상: PR #24 head `812d362`(`git archive` 사본, 로컬 HTTP 서버). 검사 원본은 main과 같음(새 검사 combat2-browser만 추가).
+- 테스트 통과: enemies-contract 16/16, area-data 24/24, pixel-assets 135/135, weapons-contract 22/22, weapons-edge 6/6, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, combo-render 5/5, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, browser-playtest 20/20, room-traversal 4/4, combat2-browser 4/4, ABYSSFALL 회귀 3종 exit 0.
+- 실패(Codex 보고와 같음): exploration-edge(`oath-west` 표적 참조), exploration-browser(쉼터·적의 진행 기록 분기 없음). 규격 §6이 표적을 특정 적으로 바꾼 데 따른 검사 쪽 결함 → 이 검토 브랜치에서 정정, main 구역과 PR #24 구역 양쪽에서 13/13·6/6 확인.
+- 발견 1건: 무작위 입력(314곳 × 1500틱, 47.1만 틱)에서 쓰러짐 자동 교대 시 Ethan이 벽·닫힌 봉쇄물에 1.5단위 묻힘 4곳, 최대 154틱 연속. 원인은 규격 §2 "공간 검사 무시"를 그대로 따른 것(규격 결함). §2에 자리 보정 규칙 추가, enemies-contract 17번째 검사 추가(PR #24 16/17, 보정을 넣은 사본 17/17·무작위 입력 겹침 0). 적이 벽·방 밖으로 나가는 경우 0건.
+- 처음 무작위 입력에서 나온 14곳 중 10곳은 검사 쪽 설정 오류(Noah 시작 좌표로 Ethan을 되살림)로 확인해 제외.
+- 그림: 적 3종·hurt·쉼터·회복 조각 시트 확인, 체력 칸(조작 중 강조·쓰러짐 어둡게) 캡처 확인. 외형 판단은 사용자.
+- 회사 PC 미리보기 Artifact를 PR #24 `812d362` 빌드로 갱신(버전 8).
+- 검토 담당 / 발견 문제 수: Claude Code / 1건(규격 결함) + 원본 검사 2개 정정.
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex 추가 수정 지시 1(TASK_10) → 재검토. 사용자 손맛 확인.
+- 종료 상태: 검토 완료, 수정 요청.
