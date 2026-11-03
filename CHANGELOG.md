@@ -305,3 +305,10 @@ PR #20, 기준00479e7 + 정정 규격abbcd8f(병합ffe7736). Noah 제자리 가�
 ## THE HOLLOW KEEP · 3단계 전투 2차 규격 (2026-11-03, Asia/Seoul)
 
 - 규격·검사만. 주인공별 체력(Ethan 6·Noah 5), 맞음·밀림·무적, 한 명 쓰러지면 자동 교대 + 무적, 둘 다 쓰러지면 성문에서 다시 시작(진행 유지), 성문 쉼터·회복 조각(처치 4회마다, 무작위 없음), 적 3종(지상 돌격형·공중형·방패형, 일반 적은 방에 다시 들어오면 되살아남). `COMBAT2_SPEC.md`, `CODEX_TASK_10.md`, `enemies-contract.cjs`(16), `area-data.cjs`(적 배치·§6 요구·완주 중 쓰러짐 없음), `pixel-assets.cjs`(적 그림·hurt·쉼터·회복 조각). Codex 구현 대기. 게임 버전 번호 변경 없음.
+
+## THE HOLLOW KEEP · TASK_10 체력·회복·기본 적 3종 (2026-11-03, Asia/Seoul)
+
+- 기준 main `2605e46`, 작업 `codex/hollow-keep-combat-enemies`, [PR #24](https://github.com/kirakein-gif/PLAYVAULT/pull/24). UI/게임 버전 번호 변경 없음, 병합·배포 없음.
+- 개별 체력·피격·무적·밀림·쓰러짐 자동 교대, 진행 유지 성문 재시작, 쉼터/결정적 회복 조각. 돌격형·공중형·방패형과 특정 적 영구 처치/일반 적 재생. 총8마리 배치, 완주4214틱 갱신.
+- 새 적/피격/회복 그림·체력 HUD·F2 수치 조절. 이전 PNG와 이동/무기 수치, 원본 인수 검사는 보존.
+- 새 규칙16/16·배치24/24·그림135/135·실제 입력 완주/모바일 보완4/4. 기존 exploration 검사2개는 표적/물건 계약 변경 때문에 실패, 상세는 [검증 기록](games/the-hollow-keep/next/assets/combat2-review/TEST_RESULTS.md). 다른 요구 회귀 통과. Claude Code 교차 검토·사용자 외형/손맛 판단 대기.

@@ -264,6 +264,21 @@
             3
           ],
           "loop": false
+        },
+        "hurt": {
+          "file": "ethan-hurt.png",
+          "frameW": 352,
+          "frameH": 256,
+          "frames": 2,
+          "pivot": {
+            "x": 160,
+            "y": 215
+          },
+          "ticks": [
+            6,
+            6
+          ],
+          "loop": false
         }
       }
     },
@@ -563,6 +578,21 @@
           ],
           "loop": false,
           "anchor": "feet"
+        },
+        "hurt": {
+          "file": "noah-hurt.png",
+          "frameW": 352,
+          "frameH": 256,
+          "frames": 2,
+          "pivot": {
+            "x": 160,
+            "y": 215
+          },
+          "ticks": [
+            6,
+            6
+          ],
+          "loop": false
         }
       }
     }
@@ -776,6 +806,262 @@
       "y": 0,
       "w": 120,
       "h": 180
+    },
+    "shelter": {
+      "file": "combat2-objects.png",
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 180
+    },
+    "heal": {
+      "file": "combat2-objects.png",
+      "x": 128,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    }
+  },
+  "enemies": {
+    "crawler": {
+      "body": {
+        "w": 32,
+        "h": 36
+      },
+      "animations": {
+        "walk": {
+          "file": "crawler-walk.png",
+          "frameW": 112,
+          "frameH": 92,
+          "frames": 4,
+          "pivot": {
+            "x": 56,
+            "y": 84
+          },
+          "ticks": [
+            8,
+            8,
+            8,
+            8
+          ],
+          "loop": true
+        },
+        "charge": {
+          "file": "crawler-charge.png",
+          "frameW": 112,
+          "frameH": 92,
+          "frames": 2,
+          "pivot": {
+            "x": 56,
+            "y": 84
+          },
+          "ticks": [
+            4,
+            4
+          ],
+          "loop": true
+        },
+        "hurt": {
+          "file": "crawler-hurt.png",
+          "frameW": 112,
+          "frameH": 92,
+          "frames": 1,
+          "pivot": {
+            "x": 56,
+            "y": 84
+          },
+          "ticks": [
+            8
+          ],
+          "loop": false
+        },
+        "die": {
+          "file": "crawler-die.png",
+          "frameW": 112,
+          "frameH": 92,
+          "frames": 3,
+          "pivot": {
+            "x": 56,
+            "y": 84
+          },
+          "ticks": [
+            6,
+            6,
+            6
+          ],
+          "loop": false
+        }
+      }
+    },
+    "wisp": {
+      "body": {
+        "w": 28,
+        "h": 28
+      },
+      "animations": {
+        "hover": {
+          "file": "wisp-hover.png",
+          "frameW": 104,
+          "frameH": 76,
+          "frames": 4,
+          "pivot": {
+            "x": 52,
+            "y": 68
+          },
+          "ticks": [
+            8,
+            8,
+            8,
+            8
+          ],
+          "loop": true
+        },
+        "dive": {
+          "file": "wisp-dive.png",
+          "frameW": 104,
+          "frameH": 76,
+          "frames": 2,
+          "pivot": {
+            "x": 52,
+            "y": 68
+          },
+          "ticks": [
+            5,
+            5
+          ],
+          "loop": true
+        },
+        "hurt": {
+          "file": "wisp-hurt.png",
+          "frameW": 104,
+          "frameH": 76,
+          "frames": 1,
+          "pivot": {
+            "x": 52,
+            "y": 68
+          },
+          "ticks": [
+            8
+          ],
+          "loop": false
+        },
+        "die": {
+          "file": "wisp-die.png",
+          "frameW": 104,
+          "frameH": 76,
+          "frames": 3,
+          "pivot": {
+            "x": 52,
+            "y": 68
+          },
+          "ticks": [
+            6,
+            6,
+            6
+          ],
+          "loop": false
+        }
+      }
+    },
+    "shield": {
+      "body": {
+        "w": 40,
+        "h": 64
+      },
+      "animations": {
+        "walk": {
+          "file": "shield-walk.png",
+          "frameW": 128,
+          "frameH": 148,
+          "frames": 4,
+          "pivot": {
+            "x": 64,
+            "y": 140
+          },
+          "ticks": [
+            10,
+            10,
+            10,
+            10
+          ],
+          "loop": true
+        },
+        "guard": {
+          "file": "shield-guard.png",
+          "frameW": 128,
+          "frameH": 148,
+          "frames": 1,
+          "pivot": {
+            "x": 64,
+            "y": 140
+          },
+          "ticks": [
+            6
+          ],
+          "loop": false
+        },
+        "windup": {
+          "file": "shield-windup.png",
+          "frameW": 128,
+          "frameH": 148,
+          "frames": 2,
+          "pivot": {
+            "x": 64,
+            "y": 140
+          },
+          "ticks": [
+            10,
+            10
+          ],
+          "loop": false
+        },
+        "bash": {
+          "file": "shield-bash.png",
+          "frameW": 128,
+          "frameH": 148,
+          "frames": 2,
+          "pivot": {
+            "x": 64,
+            "y": 140
+          },
+          "ticks": [
+            5,
+            5
+          ],
+          "loop": false
+        },
+        "stagger": {
+          "file": "shield-stagger.png",
+          "frameW": 128,
+          "frameH": 148,
+          "frames": 2,
+          "pivot": {
+            "x": 64,
+            "y": 140
+          },
+          "ticks": [
+            8,
+            8
+          ],
+          "loop": true
+        },
+        "die": {
+          "file": "shield-die.png",
+          "frameW": 128,
+          "frameH": 148,
+          "frames": 3,
+          "pivot": {
+            "x": 64,
+            "y": 140
+          },
+          "ticks": [
+            7,
+            7,
+            7
+          ],
+          "loop": false
+        }
+      }
     }
   }
 }

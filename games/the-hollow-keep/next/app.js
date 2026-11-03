@@ -53,8 +53,11 @@
   document.getElementById('reset').addEventListener('click',()=>{reset();canvas.focus();notice.textContent=area?'구역과 장치를 처음 상태로 되돌렸습니다.':'방과 표적을 초기화했습니다.';});
   function fields() {
     const container=document.getElementById('config-fields');container.replaceChildren();
-    const groups = [['공통', S.CONFIG, ['swapCooldownTicks']], ...Object.entries(S.CONFIG.heroes).map(([hero,c]) => [hero.toUpperCase(),c,
-      ['climbSpeed','runSpeed','airControlSpeed','stopTicks','jumpHeight','minJumpHeight','variableJump','gravity','maxFall','coyoteTicks','jumpBufferTicks','accelerationGround','accelerationAir','friction']]),
+    const groups = [['공통', S.CONFIG, ['swapCooldownTicks','hurtInvulnTicks','downSwapInvulnTicks','healDropEvery','healAmount']],
+      ['피격 밀림',S.CONFIG.knockback,['vx','vy']],
+      ...Object.entries(S.CONFIG.enemies).map(([kind,c])=>[kind.toUpperCase()+' 적',c,Object.keys(c)]),
+      ...Object.entries(S.CONFIG.heroes).map(([hero,c]) => [hero.toUpperCase(),c,
+      ['maxHp','climbSpeed','runSpeed','airControlSpeed','stopTicks','jumpHeight','minJumpHeight','variableJump','gravity','maxFall','coyoteTicks','jumpBufferTicks','accelerationGround','accelerationAir','friction']]),
       ...Object.entries(S.CONFIG.heroes).map(([hero,c])=>[hero.toUpperCase()+' 무기',c.weapon,['damage','range','cooldownTicks','activeTicks',...(c.weapon.kind==='projectile'?['speed']:['comboWindowTicks'])]]),
       ...S.CONFIG.heroes.noah.weapon.combo.map((stage,i)=>['NOAH 콤보 '+(i+1)+'단',stage,['damage','range','recoveryTicks']]),
       ['ETHAN 충전',S.CONFIG.heroes.ethan.weapon.charge,['stage2Ticks','stage3Ticks']],
@@ -64,12 +67,14 @@
       const group=document.createElement('fieldset'),legend=document.createElement('legend');legend.textContent=title;group.append(legend);
       for(const key of keys){
         const label=document.createElement('label'),control=document.createElement('input');
-        label.append(document.createTextNode(labels[key]));control.dataset.key=title+'.'+key;
+        label.append(document.createTextNode(labels[key]||key));control.dataset.key=title+'.'+key;
         const boolean=typeof obj[key]==='boolean';control.type=boolean?'checkbox':'number';
         if(boolean)control.checked=obj[key];else{
           control.value=obj[key];control.min=key==='runSpeed'?'.02':['coyoteTicks','jumpBufferTicks'].includes(key)?'0':key.includes('Ticks')?'1':'.01';
           control.max=['accelerationGround','accelerationAir','friction'].includes(key)?'1':key.includes('Ticks')?'240':key==='range'?'2000':'500';
           control.step=key.includes('Ticks')?'1':'.01';
+          if(key==='vy')control.min='-30';
+          if(['hp','maxHp','healDropEvery','healAmount','width','height'].includes(key))control.step='1';
           if (key==='airControlSpeed') control.max=(obj.runSpeed-.01).toFixed(2);
         }
         control.addEventListener('change',()=>{
@@ -121,15 +126,22 @@
         for(const event of S.step(world,input.sample())){
           draw.event(event,world);
           if(event.type==='swap'){name.textContent=world.active==='ethan'?'ETHAN · 빛 / 룬탄':'NOAH · 그림자 / 참격';notice.textContent='교대 · '+world.active.toUpperCase();}
-          if(event.type==='swapBlocked')notice.textContent='공간이 좁아 교대할 수 없습니다.';
-          if(event.type==='hit'){const d=world.dummies.find(d=>d.id===event.target);if(d){
+          if(event.type==='swapBlocked')notice.textContent=event.reason==='down'?'쓰러진 동료는 쉼터에서 회복해야 합니다.':'공간이 좁아 교대할 수 없습니다.';
+          if(event.type==='hurt')notice.textContent=event.hero.toUpperCase()+` · 피해 ${event.damage} · 체력 ${event.hp}`;
+          if(event.type==='down')notice.textContent=event.hero.toUpperCase()+' · 쓰러짐';
+          if(event.type==='respawn'){name.textContent=world.active==='ethan'?'ETHAN · 빛 / 룬탄':'NOAH · 그림자 / 참격';notice.textContent='두 사람 모두 쓰러졌습니다. 성문에서 다시 시작합니다. 진행은 유지됩니다.';effects=[];}
+          if(event.type==='rest')notice.textContent='쉼터 · 두 사람의 체력과 쓰러진 동료를 회복했습니다.';
+          if(event.type==='heal')notice.textContent=`회복 조각 · 체력 +${event.amount}`;
+          if(event.type==='blocked')notice.textContent='방패에 막혔습니다. 충전탄이나 마지막 참격을 사용해 보세요.';
+          if(event.type==='kill')notice.textContent='적을 쓰러뜨렸습니다.';
+          if(event.type==='hit'){const d=world.dummies.find(d=>d.id===event.target)||S.getEnemies(world).find(d=>d.id===event.target)||event.position;if(d){
             let x=d.x+d.w/2,y=d.y-28;
             // Reserve a separate floating label lane, above the static HP caption.
             while(effects.some(e=>Math.abs(e.x-x)<42&&Math.abs(e.y-(40-e.life)*.55-y)<18)){
               y-=20;if(y<20){x+=44;y=d.y-28;}
             }
             effects.push({x,y,damage:event.damage,life:40});
-          }notice.textContent=area?`시험 표적 · 피해 ${event.damage}`:`${event.target==='near'?'가까운':'먼'} 표적 · 피해 ${event.damage}`;}
+          }notice.textContent=area?`적 · 피해 ${event.damage}`:`${event.target==='near'?'가까운':'먼'} 표적 · 피해 ${event.damage}`;}
           if(event.type==='room'){effects=[];notice.textContent=area.rooms[world.roomId].hint;}
           if(event.type==='roomBlocked')notice.textContent='건너편 통로가 막혀 있습니다. 연결된 장치를 찾아보세요.';
           if(event.type==='switch')notice.textContent='장치가 켜졌습니다. 연결된 봉쇄물이 열립니다.';
@@ -142,7 +154,8 @@
         }
         if(area&&!completed&&world.roomId===area.start.room&&Object.keys(world.visited).length===Object.keys(area.rooms).length){
           const f=S.getFlags(world),buckets={switch:'switches',door:'doors',breakable:'broken',key:'picked',target:'cleared'};
-          completed=Object.values(area.rooms).every(r=>(r.objects||[]).every(o=>o.type==='entrance'?(f.entered[o.id]||f.entered[o.to])&&(!o.lock||f.unlocked[o.id]):f[buckets[o.type]][o.id]));
+          const specific=new Set(Object.values(area.rooms).flatMap(r=>r.objects||[]).flatMap(o=>o.open?.cleared||[]));
+          completed=Object.values(area.rooms).every(r=>(r.objects||[]).every(o=>o.type==='shelter'?true:o.type==='enemy'?!specific.has(o.id)||f.cleared[o.id]:o.type==='entrance'?(f.entered[o.id]||f.entered[o.to])&&(!o.lock||f.unlocked[o.id]):f[buckets[o.type]][o.id]));
           if(completed)notice.textContent='모든 방과 장치를 확인하고 성문으로 돌아왔습니다. M으로 지도를 확인하세요.';
         }
         effects=effects.filter(e=>--e.life>0);accumulator-=S.TICK;processed++;

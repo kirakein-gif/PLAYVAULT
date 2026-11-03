@@ -1383,3 +1383,16 @@
 - 검토 담당 / 발견 문제 수: 검토 대기(사용자 병합 승인).
 - 사용자 재요청 횟수: 0회.
 - 종료 상태: PR 제출, 사용자 병합 승인 대기 → 다음 담당 Codex(TASK_10).
+
+### 2026-11-03 (Asia/Seoul) · TASK_10 체력·회복·기본 적 3종 구현 제출
+
+- 담당 AI: Codex. 사용자 인계: PR #22 병합/main `2605e462d4c47435cab2ee632318c5e03a743604`. 시작 전 원격 fetch·열린 PR·실제 소스/규격/인수 검사 확인, 최종 원격 main도 같은 SHA. 다른 Hollow Keep 작업 없음 확인; 별도 체스 PR #23과 로컬 미추적 체스 폴더 보존.
+- 브랜치: `codex/hollow-keep-combat-enemies`; 담당 선언 `26f73a0`을 먼저 푸시한 뒤 Draft [PR #24](https://github.com/kirakein-gif/PLAYVAULT/pull/24) 개설. 이번 구현은 같은 PR에 제출하고 Ready로 전환, 병합·배포하지 않음. 게임/UI 버전 번호 변경 없음.
+- 범위: 개별 체력·피격/밀림/무적, 쓰러짐 자동 교대와 진행 유지 성문 재시작, shelter/매4처치 heal; 적3종 AI·방패/경직·처치/재생, API/F2/HUD/렌더. 적8마리(돌격3/공중3/방패2), 특정 적2, 타일 격자는 보존. 완주 입력4214틱/70.2초·71구간·수동 교대2·전멸0.
+- 그림: 내장 image_gen 경로A 소스5장과 네이티브 변환 도구, 새 적 동작·두 주인공 hurt·쉼터/회복 그림. 기존64색/scale2/알파0·255, 이전 런타임 PNG 바이트 보존. PROVENANCE에 도구·지시 요약·소스 ID·손질/재현 기록.
+- 통과: enemies16/16, area24/24, pixel-assets135/135, weapons22/22, foundation51/51·edge16/16, exploration-contract16/16, entrance9/9, ladder-actions10/10·edge4/4, weapons-edge6/6, combo-render5/5, pixel-render7/7(구역·시험 방 각각), ladder-render7/7, tile-mosaic7/7, keyboard-ime7/7, mobile-layout20/20·fullscreen6/6, browser-playtest20/20(시험 방), room-traversal4/4, 기존 ABYSSFALL/ECLIPSE 회귀3명령 exit0.
+- 새 검증: combat2-browser4/4(생산 앱 실제 키 입력4214틱·모든 장치/방/특정 적2·defeat0·완주 UI·F2·모바일); capture-enemies16/16(정식 createWorld 입력으로 만든 별도 시험 구역과 실제 step, 생성 후 상태 주입 없음). 실제 구역 캡처와 시험 구역 캡처를 명시적으로 구분.
+- 실패: 원본 exploration-edge는 처음5통과 후 6번째 `w.dummies`의 `oath-west` 참조 TypeError, 나머지 원본 사례 미실행. 원본 exploration-browser는 첫 지도 통과 후 완주 flag 검증에서 `gate-shelter` bucket 부재 TypeError, 후속 원본 사례 미실행. 요구된 표적 제거·새 shelter/enemy 계약과 충돌하며 원본은 수정/약화하지 않음. PR에 사유 인계; 적 재생/영구처치는 enemies-contract, 실제 완주는 새 보완 검사로 확인.
+- 캡처/로그/재현: `games/the-hollow-keep/next/assets/combat2-review/{README,TEST_RESULTS}.md`. 적3종 이동·공격·명중, 방패막기/경직, 체력·한 명 쓰러짐·쉼터/조각·모바일780x330. 브라우저는 가상 시계로 스케줄만 제어하며 게임 시간은 계속 진행. 외형/손맛은 사용자 판단, 실물 모바일 터치/성능 미확인.
+- 다음 담당: Claude Code 교차 검토·원본 검사 규격 충돌 검토 및 회사 PC 미리보기 갱신. 교차 검토 담당/발견 문제 수: 아직 미검토. 이번 작업 사용자 재요청:0.
+- 다섯 관리 문서 검토: STATUS/WORK_LOG/CHANGELOG 갱신; AGENTS/CLAUDE는 절차 변화가 없어 변경 없음. 루트 README와 대상 문서 검토, next/README 갱신. 다른 게임·공용 자산·배포 설정 변경 없음.

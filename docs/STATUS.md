@@ -1,12 +1,16 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(3단계 전투 2차 규격·검사 제출, 사용자 병합 승인 대기).
+확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Codex**(TASK_10 구현·검증 제출, Claude Code 교차 검토 대기).
 
 
 
-## 진행 중 · TASK_10 전투 2차
+## 검토 제출 · TASK_10 전투 2차 / PR #24
 
-2026-11-03 / Codex / codex/hollow-keep-combat-enemies / 기준 main2605e46. 사용자 인계·PR22병합 확인, 열린PR23은체스별도범위. 담당범위: next/sim·render·app, 체력/피격/회복/적3종, 구역배치/완주입력, 새전용그림/제작/캡처도구, 관리문서. 원본검사·이동/무기수치·다른게임/공용자산은보존. 구현/검증진행중, 다음Claude Code교차검토. PR은Draft제출, main병합·배포하지않음.
+2026-11-03 / Codex / `codex/hollow-keep-combat-enemies` / 기준 main `2605e46`(PR #22 병합 확인). [PR #24](https://github.com/kirakein-gif/PLAYVAULT/pull/24). 담당 범위: Hollow Keep next의 체력·피격·회복·적3종, 새 전용 그림, 구역 배치·완주, 제작/캡처/보완 검사, 공통 관리 문서. 총8마리·성문 쉼터·HUD·F2, 실제4214틱 완주(특정 적2, defeat0). 기존 이동/무기 수치와 PNG·원본 검사는 보존.
+
+검증: 새 규칙16/16·배치24/24·그림135/135, 실제 입력/모바일 보완4/4와 시뮬레이션 캡처16/16. 원본 exploration-edge는 제거된 `oath-west` 표적 참조, exploration-browser는 새 shelter/영역물건 flag 분기 부재로 실패; 두 원본은 수정하지 않음. 다른 요구 회귀 통과. [결과·실행 로그](../games/the-hollow-keep/next/assets/combat2-review/TEST_RESULTS.md), [장면·재현](../games/the-hollow-keep/next/assets/combat2-review/README.md).
+
+다음: Claude Code 교차 검토(원본 검사2곳의 규격 충돌 포함), 사용자 손맛·외형 판단, 회사 PC 미리보기는 기존 담당자가 갱신. 실물 모바일 성능/터치감 미확인. UI 버전 번호 변경·main 병합·배포 없음. 열린 체스 PR #23과 미추적 체스 로컬 파일은 별도 범위로 보존.
 
 ## 규격 제출 · 3단계 전투 2차(체력·피격·쓰러짐·회복·적 3종) / 사용자 병합 승인 대기
 

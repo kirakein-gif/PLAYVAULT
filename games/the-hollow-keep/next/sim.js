@@ -7,8 +7,14 @@
   const TICK = 1 / 60;
   const CONFIG = {
     swapCooldownTicks: 11, swapVelocityScale: .82,
+    hurtInvulnTicks:60, downSwapInvulnTicks:90, knockback:{vx:3,vy:-4}, healDropEvery:4, healAmount:1,
+    enemies:{
+      crawler:{width:32,height:36,hp:22,speed:.9,contactDamage:1,chargeSpeed:2.6,chargeRange:160,chargeTicks:40,restTicks:30,hurtTicks:8},
+      wisp:{width:28,height:28,hp:22,speed:.8,contactDamage:1,followRange:220,hoverHeight:65,hoverBob:5,diveEvery:150,diveTicks:40,diveDepth:40,hurtTicks:8},
+      shield:{width:40,height:64,hp:66,speed:.5,contactDamage:1,followRange:300,bashRange:50,windupTicks:20,bashTicks:10,bashDamage:2,recoveryTicks:30,staggerTicks:60,hurtTicks:8}
+    },
     heroes: {
-      ethan: { width: 42, height: 68, runSpeed: 2.95, airControlSpeed: 1.33, climbSpeed: 2, stopTicks: 8,
+      ethan: { maxHp:6, width: 42, height: 68, runSpeed: 2.95, airControlSpeed: 1.33, climbSpeed: 2, stopTicks: 8,
         accelerationGround: .42, accelerationAir: .22, friction: .82,
         gravity: .70, jumpHeight: 80, variableJump: true, minJumpHeight: 34,
         maxFall: 13.5, coyoteTicks: 6, jumpBufferTicks: 7,
@@ -18,7 +24,7 @@
             {damage:44,width:26,height:18,speed:11.5},
             {damage:66,width:34,height:24,speed:12.5,burstRadius:45,burstDamage:33}
           ] } } },
-      noah: { width: 39, height: 64, runSpeed: 3.85, airControlSpeed: 1.73, climbSpeed: 2.4, stopTicks: 5,
+      noah: { maxHp:5, width: 39, height: 64, runSpeed: 3.85, airControlSpeed: 1.73, climbSpeed: 2.4, stopTicks: 5,
         accelerationGround: .68, accelerationAir: .40, friction: .60,
         gravity: .57, jumpHeight: 145, variableJump: true, minJumpHeight: 56,
         maxFall: 13.8, coyoteTicks: 8, jumpBufferTicks: 8,
@@ -49,21 +55,23 @@
     }
     return (lo + hi) / 2;
   }
-  function createWorld({ room, spawn, area, hero = 'ethan' }) {
-    if (area) return createArea(area, hero);
+  function createWorld({ room, spawn, area, hero, hp }) {
+    hero=hero||area?.start.hero||'ethan';
+    if (area) return createArea(area, hero, hp);
     const c = CONFIG.heroes[hero];
     if (!c) throw new Error('Unknown hero: ' + hero);
     const r = copy(room);
     r.solids = r.solids || []; r.dummies = r.dummies || [];
     const player = { x: spawn.x, y: spawn.y, w: c.width, h: c.height,
       vx: 0, vy: 0, face: 1, onGround: false, coyote: 0, jumpBuffer: 0,
-      jumpStartFeet: null, jumpCut: false, takeoffVx: 0, jumpKind: null, climbing: false, dropTicks: 0, charge:{ticks:0,level:0}, combo:{step:0,started:0,buffered:false} };
+      jumpStartFeet: null, jumpCut: false, takeoffVx: 0, jumpKind: null, climbing: false, dropTicks: 0, invuln:0, knockTicks:0, hurtTicks:0, charge:{ticks:0,level:0}, combo:{step:0,started:0,buffered:false} };
     player.onGround = supported(player, r.solids);
-    return { tick: 0, active: hero, room: r, player, dummies: r.dummies,
+    const heroes=Object.fromEntries(Object.entries(CONFIG.heroes).map(([id,c])=>{const value=Math.max(0,Math.min(c.maxHp,hp?.[id]??c.maxHp));return [id,{hp:value,maxHp:c.maxHp,down:value===0}];}));
+    return { tick: 0, active: hero, room: r, player, dummies: r.dummies, heroes, enemies:[],pickups:[],killCount:0,origin:{...spawn,hero},
       previous: {}, swapCooldown: 0, attackCooldowns: { ethan: 0, noah: 0 }, attacks: [], nextAttackId: 1 };
   }
   // Area state is owned by the world; the legacy one-room path stays independent.
-  function createArea(data, hero) {
+  function createArea(data, hero, hp) {
     const area=copy(data), rooms={}, tile=area.tile;
     for(const [id,r] of Object.entries(area.rooms)) {
       const walls=[],platforms=[],ladders=[];
@@ -79,12 +87,12 @@
         ladders.push({x:x*tile,y:y*tile,w:tile,h:(end-y)*tile,openTop});
         if(y>0&&!openTop)platforms.push({x:x*tile,y:y*tile,w:tile,h:1,oneway:true});
       }
-      const objects=(r.objects||[]).map(o=>({...o,cellX:o.x,cellY:o.y,x:o.x*tile,y:o.y*tile,w:(o.w||(o.type==='entrance'?2:1))*tile,h:(o.h||(o.type==='target'?2:o.type==='entrance'?3:1))*tile}));
+      const objects=(r.objects||[]).map(o=>({...o,cellX:o.x,cellY:o.y,x:o.x*tile,y:o.y*tile,w:(o.w||(['entrance','shelter'].includes(o.type)?2:1))*tile,h:(o.h||(o.type==='target'?2:['entrance','shelter'].includes(o.type)?3:1))*tile}));
       rooms[id]={width:area.cols*tile,height:area.rows*tile,name:r.name,grid:r.grid,pos:r.pos,objects,walls,solids:walls.slice(),platforms,ladders,dummies:objects.filter(o=>o.type==='target')};
     }
-    const start=area.start,w=createWorld({room:rooms[start.room],spawn:start,hero});
+    const start=area.start,w=createWorld({room:rooms[start.room],spawn:start,hero,hp});
     Object.assign(w,{area,areaRooms:rooms,roomId:start.room,visited:{[start.room]:true},flags:{switches:{},doors:{},broken:{},keys:{},picked:{},cleared:{},entered:{},unlocked:{}}});
-    w.room=rooms[w.roomId];w.dummies=w.room.dummies;refreshArea(w);w.player.onGround=supported(w.player,[...w.room.solids,...w.room.platforms]);return w;
+    w.room=rooms[w.roomId];w.dummies=w.room.dummies;refreshArea(w);spawnEnemies(w);w.player.onGround=supported(w.player,[...w.room.solids,...w.room.platforms]);return w;
   }
   function refreshArea(w, ev=[]) {
     for(const room of Object.values(w.areaRooms))for(const o of room.objects)if(o.type==='target'&&o.hp<=0)w.flags.cleared[o.id]=true;
@@ -103,6 +111,10 @@
   function interact(w, held, edge, ev) {
     const p=w.player,f=w.flags;
     for(const o of w.room.objects) {
+      if(o.type==='shelter'&&edge('interact')&&overlap(p,o)){
+        for(const h of Object.values(w.heroes)){h.hp=h.maxHp;h.down=false;}
+        ev.push({type:'rest',id:o.id});
+      }
       if(o.type==='switch'&&edge('interact')&&overlap(p,o)&&!f.switches[o.id]) {
         if(o.hero&&o.hero!==w.active)ev.push({type:'denied',id:o.id});
         else {f.switches[o.id]=true;ev.push({type:'switch',id:o.id});}
@@ -126,6 +138,7 @@
       f.keys[lock.key]--;f.unlocked[source.id]=true;f.unlocked[pair.o.id]=true;ev.push({type:'unlock',id:source.id});
     }
     const from=w.roomId;w.roomId=pair.room;w.room=w.areaRooms[pair.room];w.dummies=w.room.dummies;w.visited[pair.room]=true;w.attacks=[];
+    if(from!==pair.room)spawnEnemies(w);
     Object.assign(p,{x:pair.o.x+(pair.o.w-p.w)/2,y:pair.o.y+pair.o.h-p.h,vx:0,vy:0,onGround:true,climbing:false,jumpKind:null,takeoffVx:0,jumpBuffer:0,coyote:0});
     f.entered[source.id]=true;ev.push({type:'enter',id:source.id,to:pair.o.id,room:pair.room});
     if(from!==pair.room)ev.push({type:'room',from,to:pair.room,dir:'entrance'});
@@ -134,7 +147,7 @@
     const p=w.player,center=p.x+p.w/2,feet=p.y+p.h;
     const ladder=w.room.ladders.find(l=>center>=l.x&&center<l.x+l.w&&p.y<l.y+l.h&&feet>=l.y-.01);
     if(p.climbing&&edge('jump')){p.climbing=false;p.ladderLock=17;p.onGround=true;return false;}
-    if(!p.climbing&&!p.ladderLock&&ladder&&!edge('jump')&&(held.down||(held.up&&feet>ladder.y+.01)))p.climbing=true;
+    if(!p.climbing&&!p.ladderLock&&!p.knockTicks&&ladder&&!edge('jump')&&(held.down||(held.up&&feet>ladder.y+.01)))p.climbing=true;
     if(!p.climbing)return false;
     if(!ladder){p.climbing=false;return false;}
     const dir=Number(!!held.right)-Number(!!held.left);
@@ -200,7 +213,121 @@
     if(!crossed)return;
     const from=w.roomId;w.roomId=entry[0];p.x=candidate.x;p.y=candidate.y;
     w.room=destination;w.dummies=w.room.dummies;w.visited[w.roomId]=true;w.attacks=[];
+    spawnEnemies(w);
     ev.push({type:'room',from,to:w.roomId,dir});
+  }
+  function spawnEnemies(w) {
+    w.pickups=[];
+    const specific=new Set(Object.values(w.areaRooms).flatMap(r=>r.objects.filter(o=>o.type==='door').flatMap(o=>o.open.cleared||[])));
+    w.enemies=w.room.objects.filter(o=>o.type==='enemy'&&!(specific.has(o.id)&&w.flags.cleared[o.id])).map(o=>{
+      const c=CONFIG.enemies[o.kind];
+      return {id:o.id,kind:o.kind,x:o.x+w.area.tile/2-c.width/2,y:o.kind==='wisp'?o.y+w.area.tile/2-c.height/2:o.y+w.area.tile-c.height,
+        w:c.width,h:c.height,hp:c.hp,face:o.face||-1,state:o.kind==='wisp'?'hover':'patrol',age:0,timer:0,hurt:0,stagger:0,guard:0,diveClock:0,cooldown:0,specific:specific.has(o.id)};
+    });
+  }
+  function floorAt(w,e,x=e.x+e.w/2) {
+    const surfaces=[...w.room.solids,...(w.room.platforms||[])].filter(s=>x>=s.x&&x<s.x+s.w&&s.y>=e.y+e.h-1);
+    return surfaces.length?Math.min(...surfaces.map(s=>s.y)):w.room.height;
+  }
+  function updateEnemies(w) {
+    const p=w.player;
+    for(const e of w.enemies){
+      const c=CONFIG.enemies[e.kind];e.age++;e.guard=Math.max(0,e.guard-1);e.cooldown=Math.max(0,e.cooldown-1);
+      if(e.stagger>0){e.stagger--;e.hurt=Math.max(0,e.hurt-1);e.state='stagger';continue;}
+      if(e.hurt>0){e.hurt--;e.state='hurt';continue;}
+      const dx=p.x+p.w/2-e.x-e.w/2,dist=Math.abs(dx),ground=floorAt(w,e);
+      if(e.kind==='wisp'){
+        const near=dist<c.followRange;
+        if(e.state!=='dive'&&near&&++e.diveClock>=c.diveEvery){e.state='dive';e.timer=c.diveTicks;e.diveClock=0;}
+        let bottom=ground-c.hoverHeight+Math.sin(e.age/20)*c.hoverBob;
+        if(e.state==='dive'){
+          const phase=(c.diveTicks-e.timer+1)/c.diveTicks;
+          bottom=ground-c.hoverHeight+(c.hoverHeight-c.diveDepth/2)*Math.sin(Math.PI*phase);
+          if(--e.timer<=0)e.state='hover';
+        }else e.state='hover';
+        if(near&&dx)e.face=Math.sign(dx);
+        e.vx=near?e.face*c.speed:0;e.vy=bottom-e.h-e.y;
+        move(e,w.room.solids,w.room.platforms);e.x=Math.max(0,Math.min(w.room.width-e.w,e.x));
+        continue;
+      }
+      let speed=c.speed;
+      if(e.kind==='crawler'){
+        if(e.state==='rest'){if(--e.timer<=0)e.state='patrol';continue;}
+        if(e.state!=='charge'){
+          e.state='patrol';
+          if(dx*e.face>0&&dist<c.chargeRange&&Math.abs(p.y+p.h-(e.y+e.h))<24){e.state='charge';e.timer=c.chargeTicks;}
+        }
+        if(e.state==='charge'){speed=c.chargeSpeed;if(--e.timer<=0){e.state='rest';e.timer=c.restTicks;}}
+      }else{
+        if(['windup','bash'].includes(e.state)){
+          if(--e.timer<=0){if(e.state==='windup'){e.state='bash';e.timer=c.bashTicks;}else{e.state='guard';e.cooldown=c.recoveryTicks;}}
+          continue;
+        }
+        if(dist<c.followRange&&dx)e.face=Math.sign(dx);
+        const gap=dist-(e.w+p.w)/2;
+        if(!e.cooldown&&dist<c.followRange&&gap<c.bashRange&&vertical(e,p)){e.state='windup';e.timer=c.windupTicks;continue;}
+        e.state=e.guard?'guard':'patrol';speed=dist<c.followRange?c.speed:0;
+      }
+      const nx=e.x+e.face*speed,probe=nx+(e.face>0?e.w:0),feet=e.y+e.h;
+      const ledge=[...w.room.solids,...(w.room.platforms||[])].some(s=>probe>=s.x&&probe<s.x+s.w&&Math.abs(s.y-feet)<1);
+      if(!ledge||nx<0||nx+e.w>w.room.width){e.face*=-1;if(e.kind==='crawler'&&e.state==='charge'){e.state='rest';e.timer=c.restTicks;}continue;}
+      const old=e.x;e.vx=e.face*speed;e.vy=0;move(e,w.room.solids,w.room.platforms);
+      if(speed&&Math.abs(e.x-old)<speed*.5)e.face*=-1;
+    }
+  }
+  function damageTarget(w,target,a,ev,burst=false) {
+    const enemy=!!target.kind;
+    if(enemy&&target.kind==='shield'&&!target.stagger&&!burst&&a.face===-target.face
+      &&(a.hero==='ethan'?a.level===1:a.step<3)){
+      target.guard=6;ev.push({type:'blocked',id:target.id,hero:a.hero,face:a.face});return;
+    }
+    target.hp=Math.max(0,target.hp-a.damage);
+    ev.push({type:'hit',target:target.id,damage:a.damage,hero:a.hero,level:a.level,step:a.step,face:a.face,position:{x:target.x,y:target.y,w:target.w,h:target.h}});
+    if(!enemy)return;
+    const c=CONFIG.enemies[target.kind];target.hurt=c.hurtTicks;
+    if(!burst&&target.kind==='shield'&&a.hero==='ethan'&&a.level>=2)target.stagger=c.staggerTicks;
+    target.state=target.stagger?'stagger':'hurt';
+    if(target.hp<=0){
+      ev.push({type:'kill',id:target.id,kind:target.kind,x:target.x,y:target.y,w:target.w,h:target.h,face:target.face});
+      if(target.specific)w.flags.cleared[target.id]=true;
+      w.killCount++;
+      if(w.killCount%CONFIG.healDropEvery===0)w.pickups.push({kind:'heal',x:target.x+target.w/2-10,y:target.y+target.h-20,w:20,h:20});
+    }
+  }
+  function respawn(w,ev) {
+    const start=w.area?w.area.start:w.origin,hero=w.area?(start.hero||'ethan'):start.hero,c=CONFIG.heroes[hero],p=w.player;
+    if(w.area){const from=w.roomId;w.roomId=start.room;w.room=w.areaRooms[start.room];w.dummies=w.room.dummies;w.visited[start.room]=true;refreshArea(w);spawnEnemies(w);if(from!==w.roomId)ev.push({type:'room',from,to:w.roomId,dir:'respawn'});}
+    for(const h of Object.values(w.heroes)){h.hp=h.maxHp;h.down=false;}
+    w.active=hero;w.attacks=[];w.pickups=[];w.swapCooldown=0;w.attackCooldowns={ethan:0,noah:0};
+    Object.assign(p,{x:start.x,y:start.y,w:c.width,h:c.height,vx:0,vy:0,face:1,climbing:false,ladderLock:0,knockTicks:0,hurtTicks:0,invuln:CONFIG.downSwapInvulnTicks,coyote:0,jumpBuffer:0,jumpKind:null,takeoffVx:0,charge:{ticks:0,level:0},combo:{step:0,started:0,buffered:false}});
+    p.onGround=supported(p,[...w.room.solids,...(w.room.platforms||[])]);ev.push({type:'respawn',hero});
+  }
+  function hurtPlayer(w,source,damage,ev) {
+    const p=w.player;if(p.invuln)return;
+    const hero=w.active,h=w.heroes[hero],dir=Math.sign(p.x+p.w/2-source.x-source.w/2)||-source.face||-1;
+    h.hp=Math.max(0,h.hp-damage);h.down=h.hp===0;
+    Object.assign(p,{invuln:CONFIG.hurtInvulnTicks,hurtTicks:12,knockTicks:6,knockVx:dir*CONFIG.knockback.vx,vx:dir*CONFIG.knockback.vx,vy:CONFIG.knockback.vy,climbing:false,ladderLock:12,onGround:false,coyote:0,jumpBuffer:0,jumpCut:true,jumpStartFeet:null});
+    ev.push({type:'hurt',hero,damage,hp:h.hp});
+    if(h.down){
+      ev.push({type:'down',hero});const to=hero==='ethan'?'noah':'ethan',next=w.heroes[to];
+      if(!next.down){const c=CONFIG.heroes[to];Object.assign(p,{x:p.x+(p.w-c.width)/2,y:p.y+p.h-c.height,w:c.width,h:c.height,invuln:CONFIG.downSwapInvulnTicks,charge:{ticks:0,level:0},combo:{step:0,started:0,buffered:false}});w.active=to;w.attacks=w.attacks.filter(a=>a.kind==='projectile');w.swapCooldown=CONFIG.swapCooldownTicks;ev.push({type:'swap',from:hero,to,reason:'down'});}
+      else {ev.push({type:'defeat'});respawn(w,ev);}
+    }
+  }
+  function combatContacts(w,ev) {
+    const p=w.player;
+    for(const e of w.enemies){
+      if(e.hp<=0||e.hurt||e.stagger)continue;
+      const c=CONFIG.enemies[e.kind];
+      const bash=e.kind==='shield'&&e.state==='bash'&&overlap(p,{x:e.face>0?e.x+e.w:e.x-c.bashRange,y:e.y,w:c.bashRange,h:e.h});
+      if(bash)hurtPlayer(w,e,c.bashDamage,ev);else if(overlap(p,e))hurtPlayer(w,e,c.contactDamage,ev);
+      if(ev.some(event=>event.type==='respawn'))return;
+    }
+    w.enemies=w.enemies.filter(e=>e.hp>0);
+    w.pickups=w.pickups.filter(item=>{
+      if(!overlap(p,item))return true;
+      const h=w.heroes[w.active],before=h.hp;h.hp=Math.min(h.maxHp,h.hp+CONFIG.healAmount);ev.push({type:'heal',hero:w.active,amount:h.hp-before});return false;
+    });
   }
   function move(p, solids, platforms = []) {
     let dx = p.vx;
@@ -223,6 +350,7 @@
     const ev = [], p = w.player;
     const edge = key => !!held[key] && !w.previous[key];
     w.tick++;
+    p.invuln=Math.max(0,p.invuln-1);p.hurtTicks=Math.max(0,p.hurtTicks-1);
     if (w.area) refreshArea(w);
     p.ladderLock = Math.max(0, (p.ladderLock || 0) - 1);
     p.dropTicks = Math.max(0, p.dropTicks - 1);
@@ -230,6 +358,8 @@
     for (const key of Object.keys(w.attackCooldowns)) w.attackCooldowns[key] = Math.max(0, w.attackCooldowns[key] - 1);
     if (edge('swap') && !w.swapCooldown) {
       const from = w.active, to = from === 'ethan' ? 'noah' : 'ethan', c = CONFIG.heroes[to];
+      if(w.heroes[to].down)ev.push({type:'swapBlocked',reason:'down'});
+      else {
       const candidate = { x: p.x + (p.w - c.width) / 2, y: p.y + p.h - c.height, w: c.width, h: c.height };
       const blocked = body => w.room.solids.some(s => overlap(body, s));
       if (blocked(candidate)) {
@@ -252,6 +382,7 @@
         w.attacks = w.attacks.filter(a => a.kind === 'projectile');
         ev.push({ type: 'swap', from, to });
       } else ev.push({ type: 'swapBlocked' });
+      }
     }
     const c = CONFIG.heroes[w.active];
     const ladderJump = p.climbing && edge('jump');
@@ -271,7 +402,7 @@
       ev.push({ type: 'jump' });
     };
     if (!dropping && (edge('jump') || p.jumpBuffer > 0) && (wasGround || p.coyote > 0)) jump();
-    if (c.variableJump && !held.jump && p.vy < 0 && !p.jumpCut && p.jumpStartFeet !== null) {
+    if (!p.knockTicks && c.variableJump && !held.jump && p.vy < 0 && !p.jumpCut && p.jumpStartFeet !== null) {
       const risen = p.jumpStartFeet - (p.y + p.h);
       p.vy = Math.max(p.vy, -launchSpeed(Math.max(0, c.minJumpHeight - risen), c.gravity)); p.jumpCut = true;
     }
@@ -281,6 +412,8 @@
     const launchDir = Math.sign(p.takeoffVx);
     const forwardCap = Math.max(c.airControlSpeed, Math.abs(p.takeoffVx));
     const cap = p.onGround ? c.runSpeed : dir && dir === launchDir ? forwardCap : c.airControlSpeed;
+    if(p.knockTicks){p.vx=p.knockVx;p.knockTicks--;}
+    else {
     p.vx += (dir * cap - p.vx) * accel;
     if (!p.onGround && dir) {
       const leftCap = launchDir < 0 ? forwardCap : c.airControlSpeed;
@@ -292,6 +425,7 @@
       // This linear cap guarantees the declared maximum stopping time even in air.
       p.vx = Math.sign(p.vx) * Math.max(0, Math.abs(p.vx) - c.runSpeed / c.stopTicks);
     }
+    }
     p.vy = Math.min(c.maxFall, p.vy + c.gravity);
     move(p, w.room.solids, w.room.platforms);
     if (p.onGround) { p.jumpKind = null; p.takeoffVx = 0; }
@@ -302,6 +436,7 @@
     }
     }
     if (w.area) { transition(w, ev); interact(w, held, edge, ev); enter(w, edge, ev); refreshArea(w, ev); }
+    updateEnemies(w);
     w.attacks = w.attacks.filter(a => a.life > 0);
     const wp=c.weapon;
     const fire=(level=1,step=1)=>{
@@ -364,7 +499,7 @@
       // Resolve a swept shot by spatial order, independent of room array order.
       // At the same distance a solid wins, so a target inside a wall is protected.
       const distanceTo = box => a.face > 0 ? box.x - hitbox.x : hitbox.x + hitbox.w - (box.x + box.w);
-      const targets = w.dummies.filter(d => d.hp > 0 && !a.hit.includes(d.id) && overlap(hitbox, d));
+      const targets = [...w.dummies,...w.enemies].filter(d => d.hp > 0 && !a.hit.includes(d.id) && overlap(hitbox, d));
       if (a.kind === 'projectile') {
         const contacts = [
           ...w.room.solids.filter(s => overlap(hitbox, s)).map(box => ({ box, solid: true })),
@@ -374,17 +509,16 @@
         if (first) {
           if (first.solid && first.box.breakable && w.area) { w.flags.broken[first.box.breakable] = true; ev.push({type:'break',id:first.box.breakable}); }
           if (!first.solid) {
-            first.box.hp = Math.max(0, first.box.hp - a.damage);
-            ev.push({ type: 'hit', target: first.box.id, damage: a.damage,hero:a.hero,level:a.level,face:a.face });
+            damageTarget(w,first.box,a,ev);
           }
           if(a.burstRadius){
             const x=a.face>0?first.box.x:first.box.x+first.box.w;
             const y=(Math.max(a.y,first.box.y)+Math.min(a.y+a.h,first.box.y+first.box.h))/2;
             ev.push({type:'burst',x,y,r:a.burstRadius});
-            for(const d of w.dummies)if(d.hp>0&&(first.solid||d.id!==first.box.id)){
+            for(const d of [...w.dummies,...w.enemies])if(d.hp>0&&(first.solid||d.id!==first.box.id)){
               const dx=x-Math.max(d.x,Math.min(x,d.x+d.w)),dy=y-Math.max(d.y,Math.min(y,d.y+d.h));
               if(dx*dx+dy*dy<=a.burstRadius*a.burstRadius){
-                d.hp=Math.max(0,d.hp-a.burstDamage);ev.push({type:'hit',target:d.id,damage:a.burstDamage,hero:a.hero,level:a.level,face:a.face});
+                damageTarget(w,d,{...a,damage:a.burstDamage},ev,true);
               }
             }
           }
@@ -395,8 +529,7 @@
           a.hit.push(box.breakable);w.flags.broken[box.breakable]=true;ev.push({type:'break',id:box.breakable});
         }
         for (const d of targets) {
-        a.hit.push(d.id); d.hp = Math.max(0, d.hp - a.damage);
-        ev.push({ type: 'hit', target: d.id, damage: a.damage,hero:a.hero,step:a.step,face:a.face });
+        a.hit.push(d.id);damageTarget(w,d,a,ev);
       }
       }
       a.life--;
@@ -404,10 +537,12 @@
       delete a.sweep;
     }
     if (w.area) refreshArea(w, ev);
+    combatContacts(w,ev);
     w.previous = Object.fromEntries(['left','right','up','down','jump','attack','swap','interact'].map(k => [k, !!held[k]]));
     return ev;
   }
   return { TICK, CONFIG, createWorld, step, getPlayer: w => w.player,
+    getHeroes:w=>copy(w.heroes),getEnemies:w=>copy(w.enemies.filter(e=>e.hp>0)),getPickups:w=>copy(w.pickups),
     getMap: w => ({current:w.roomId,rooms:w.area?Object.entries(w.area.rooms).map(([id,r])=>({id,pos:copy(r.pos),visited:!!w.visited[id]})):[]}),
     getFlags: w => copy(w.flags||{switches:{},doors:{},broken:{},keys:{},picked:{},cleared:{},entered:{},unlocked:{}}),
     getHitboxes: w => w.attacks.filter(a => a.life > 0 && !a.preparing).map(a => ({ x: a.x, y: a.y, w: a.w, h: a.h })),
