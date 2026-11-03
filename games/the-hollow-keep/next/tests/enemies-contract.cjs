@@ -187,7 +187,8 @@ test('shield: 앞에서 Ethan 1단·Noah 1·2단은 막힘(blocked, 피해 0) �
   const blocks = ev.filter((e) => e.type === 'blocked').length;
   assert.ok(blocks >= 2, `1·2단 막힘 ${blocks}회`);
   assert.ok(en(w, 's1') && sh.hp - en(w, 's1').hp >= c[2].damage, `3단 피해 ${sh.hp - (en(w, 's1') || { hp: 0 }).hp}`);
-  w = world(area({ room: 'a', ...at('ethan', 20) }, { a: room([0, 0], { objects: [enemy('s1', 'shield', 14, 16, { face: -1 })] }) }));
+  // 방패형은 300 안의 주인공 쪽으로 돌아서므로, 등 뒤 300 밖에서 쏜다
+  w = world(area({ room: 'a', ...at('ethan', 27) }, { a: room([0, 0], { objects: [enemy('s1', 'shield', 14, 16, { face: -1 })] }) }));
   HK.step(w, I({ left: true })); run(w, I(), 20);
   ev = run(w, (i) => I({ attack: i === 0 }), 50);
   assert.ok(has(ev, 'hit', { target: 's1' }) && !has(ev, 'blocked'), '뒤에서 친 룬탄이 막힘');
