@@ -14,6 +14,7 @@
 
 ## 개발 완료·검토 대기 · 우리집 체스 PREMIUM v1.0.0 → 제목 CHESS MASTER (새 게임, `games/family-chess-premium/`)
 
+- 가족 스킨 선택 반영(2026-11-03): Codex 중세·노블 제외, Codex 고딕 윤곽 보완. 남은 비교: Claude 고딕 vs Codex 고딕. PR #23 draft 유지.
 - 스킨 선택(2026-11-03): 클래식 원목 / 마법사의 석실 / 고딕 성채, 프로필별 저장, '화려하지 않게' 기준. 메뉴 상세 일러스트는 Codex 대기(`games/family-chess-premium/docs/CODEX_TASK_SKINS.md`). 사용자 외형 판단 대기.
 - 저가형 태블릿 대응·글꼴 교체(2026-11-03): 구형 WebView 대체 CSS, 세로 메뉴 수정, 작은 화면 아카데미 정리, 설정에 기기 진단 줄, 글꼴 고운돋움·고운바탕·Nunito. 실기 확인 대기.
 - Lichess 문제 적용(2026-11-03): Lichess 퍼즐 DB(CC0)에서 201개 선별·깊이 20 재검증 201/201 → 문제 총 322개(기존 121개·ID·기록 유지, 122번부터 `LI-…`). 단위 391/391, E2E 22/22.

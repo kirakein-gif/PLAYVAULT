@@ -43,25 +43,11 @@ export const SKINS: Skin[] = [
   { id: 'gothic', author: 'Claude', name: { ko: '고딕 성채', en: 'Gothic Keep' }, desc: { ko: '상아·흑보라 철 기물, 보랏빛 석판', en: 'Bone and violet iron on twilight stone' } },
   // Codex skins are appended here by the Codex task (see docs/CODEX_TASK_SKINS.md).
   {
-    id: 'medieval-codex', author: 'Codex',
-    name: { ko: '중세', en: 'Medieval' },
-    desc: { ko: '담백한 회색 석상과 옅은 대리석 결', en: 'Quiet gray stone figures and softly veined marble' },
-    pieces: { dir: 'skins/medieval-codex', ext: 'webp' },
-    board: { light: 'skins/medieval-codex/board-light.webp', dark: 'skins/medieval-codex/board-dark.webp', coord: '#c9cbcd', outline: 'rgba(172,175,180,0.55)' },
-  },
-  {
     id: 'gothic-codex', author: 'Codex',
     name: { ko: '고딕', en: 'Gothic' },
     desc: { ko: '간결한 첨탑 기물과 차분한 보라 석판', en: 'Simple spired pieces on muted violet slate' },
     pieces: { dir: 'skins/gothic-codex', ext: 'webp' },
     board: { light: 'skins/gothic-codex/board-light.webp', dark: 'skins/gothic-codex/board-dark.webp', coord: '#d0c8db', outline: 'rgba(171,159,190,0.55)' },
-  },
-  {
-    id: 'noble-codex', author: 'Codex',
-    name: { ko: '노블', en: 'Noble' },
-    desc: { ko: '백석·흑석 갑옷 석상과 묵직한 성채 바닥', en: 'White and black armored statues on quiet castle stone' },
-    pieces: { dir: 'skins/noble-codex', ext: 'webp' },
-    board: { light: 'skins/noble-codex/board-light.webp', dark: 'skins/noble-codex/board-dark.webp', coord: '#d5d8dd', outline: 'rgba(176,183,193,0.55)' },
   },
 ];
 

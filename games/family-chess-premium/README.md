@@ -5,7 +5,7 @@
 
 ## Codex 비교용 스킨 (2026-11-03)
 
-설정 → 스킨에서 **고딕·중세·노블**을 선택할 수 있습니다. 기존 Claude안도 함께 남겨 가족이 비교합니다. 세트별 밝은/어두운 판 텍스처가 있으며 노블은 백석/흑석 진영을 구분했습니다. [기물 나열·같은 수순의 비교 캡처·검증](docs/screenshots/skin-compare/README.md), [최종 코드 인계/Claude Code 전달문](docs/CODEX_SKINS_HANDOFF.md)을 참고하세요. 메뉴 상세 일러스트는 기물 모양 선택 이후 별도로 진행합니다.
+설정 → 스킨에서 **클래식 원목·마법사의 석실·고딕 성채(Claude안)**와 **고딕(Codex안)**을 선택할 수 있습니다. Codex가 함께 만든 중세·노블 세트는 가족 검토 결과(2026-11-03, 작은 화면에서 세부가 조악해 보임)로 앱에서 제외했고, 제작 기록은 아래 문서에 남아 있습니다. Codex 고딕 기물에는 판 위 가독성을 위해 윤곽선을 덧입혔습니다(`scripts/outline-skin.cjs`, 원본은 `scripts/art-source/codex-skins/gothic-codex-original/`). [기물 나열·같은 수순의 비교 캡처·검증](docs/screenshots/skin-compare/README.md), [최종 코드 인계/Claude Code 전달문](docs/CODEX_SKINS_HANDOFF.md)을 참고하세요. 메뉴 상세 일러스트는 기물 모양 선택 이후 별도로 진행합니다.
 
 ## 주요 기능
 

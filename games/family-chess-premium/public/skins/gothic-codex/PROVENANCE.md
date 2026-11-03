@@ -25,3 +25,7 @@ A square 1024x1024 flat PURPLE SLATE SURFACE MATERIAL texture for a restrained g
 ## Gothic dark texture → gothic-dark.png
 
 1024x1024 square seamless muted deep PLUM PURPLE SLATE material map, flat overhead one continuous slab. Base #494054 cool dusk purple, quiet broad areas with faint lavender mineral clouding and sparse fine slate grain. Matte honed stone, low contrast uniform ambient light, no specular highlights. A family chessboard dark square material under pale lavender and dark violet chess sculptures. Not black, not flashy. No checkerboard/grid/pieces/text/borders/runes/glow/fire/lightning/cracks/gold or perspective. Refined natural stone.
+
+## 2026-11-03 윤곽 보완 (Claude Code, 사용자 지시)
+
+가족 검토에서 판 위 윤곽이 약하다는 의견으로, 기물 12개에 윤곽선을 덧입혔습니다. 흰 기물은 `#2a2233`, 검은 기물은 `#c4b9d6`, 256px 기준 반경 5px, 32방향 실루엣 겹침. 재현: `NODE_PATH=$(npm root -g) node scripts/outline-skin.cjs scripts/art-source/codex-skins/gothic-codex-original public/skins/gothic-codex`. 원본은 `scripts/art-source/codex-skins/gothic-codex-original/`.
