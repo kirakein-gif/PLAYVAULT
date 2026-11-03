@@ -1,8 +1,12 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Codex**(PR #20 추가 수정4·5, Claude Code 재검토 대기).
+확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(3단계 전투 2차 규격·검사 제출, 사용자 병합 승인 대기).
 
 
+
+## 규격 제출 · 3단계 전투 2차(체력·피격·쓰러짐·회복·적 3종) / 사용자 병합 승인 대기
+
+2026-11-03 / Claude Code / `claude/hollow-keep-combat2-spec` (기준 main `f43cd1e`). `COMBAT2_SPEC.md`·`CODEX_TASK_10.md`, 검사 `enemies-contract`(16)·`area-data`(24)·`pixel-assets`(적·hurt·쉼터·회복 조각). 참조 구현으로 검사 검증(16/16, 오류 변형 18종 검출). 병합 승인 후 Codex가 `codex/hollow-keep-combat-enemies`에서 구현.
 
 ## 병합 완료 · 3단계 전투 1차 (PR #21 → PR #20, 2026-11-03) / 다음: 2차 규격
 

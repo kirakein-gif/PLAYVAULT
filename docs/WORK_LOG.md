@@ -1371,3 +1371,15 @@
 - 검토 담당 / 발견 문제 수: 해당 없음(병합 작업).
 - 사용자 재요청 횟수: 0회.
 - 종료 상태: 병합.
+
+### 2026-11-03 (Asia/Seoul) · 3단계 전투 2차 규격·검사(체력·피격·쓰러짐·회복·적 3종)
+
+- 담당 AI: Claude Code(규격·검사). 구현 담당: Codex(TASK_10).
+- 사용자 결정(2026-11-03): 둘 다 쓰러지면 성문에서 다시 시작·진행 유지, 적은 지상·공중·방패, 일반 적은 다시 나타남(봉쇄물을 여는 특정 적은 제외), 회복은 쉼터·회복 조각 둘 다. 이전 결정(주인공별 체력, 자동 교대 + 짧은 무적) 반영.
+- 기준: main `f43cd1e` / 작업 브랜치 `claude/hollow-keep-combat2-spec` (`63ca142`).
+- 변경: `games/the-hollow-keep/docs/COMBAT2_SPEC.md`(새), `CODEX_TASK_10.md`(새), `DESIGN_DIRECTION.md`(결정 표·단계 표), `next/tests/enemies-contract.cjs`(새, 16), `next/tests/area-data.cjs`(적·쉼터 형식, 적 배치, §6 요구, 완주 기록 defeat 0·쓰러짐 교대 제외·특정 적 처치), `next/tests/pixel-assets.cjs`(적 3종 동작·몸 크기·발 기준선·방패 상태 구분, 주인공 hurt 2, shelter·heal).
+- 검사 검증: 저장소 밖 참조 구현(main sim을 감싼 체력·적·회복)으로 enemies-contract 16/16, 오류 변형 18종 모두 검출, 기존 검사(foundation 51, weapons 22, exploration 16, entrance 9, ladder-actions 10) 영향 없음. 현재 main sim은 enemies-contract 1/16(구현 전 정상). area-data는 현재 구역에서 23/24(§6 요구만 실패, 구현 전 정상). pixel-assets는 현재 그림 93/102(새 그림 9항목만 실패), 합성 그림 135/135, 오류 변형 6종(방패 막기=걷기 그림, 발 위치, 몸 크기, 쉼터 크기, die 반복 등) 검출.
+- 미해결: 체력 칸 표시(HUD)는 자동 검사 없이 캡처·검토로 확인. 수치(속도·피해·무적 시간)는 시작값이며 사용자 손맛 확인 후 조정.
+- 검토 담당 / 발견 문제 수: 검토 대기(사용자 병합 승인).
+- 사용자 재요청 횟수: 0회.
+- 종료 상태: PR 제출, 사용자 병합 승인 대기 → 다음 담당 Codex(TASK_10).
