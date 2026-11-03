@@ -16,7 +16,7 @@ type Phase = 'intro' | 'solving' | 'replying' | 'solved' | 'revealed';
 
 export function PuzzleScreen({ id, list, daily }: { id: string; list: string[]; daily?: boolean }) {
   const app = useApp();
-  const { t, lang, profile, settings, updateProfile, replace, feel } = app;
+  const { t, lang, profile, settings, updateProfile, replace, feel, piece } = app;
   const puzzle = puzzleById(id) as Puzzle;
   const [boxRef, size] = useFitSize<HTMLDivElement>();
   const session = useRef<PuzzleSession | null>(null);
@@ -260,7 +260,7 @@ export function PuzzleScreen({ id, list, daily }: { id: string; list: string[]; 
           </span>
         </div>
         <div className="pzToMove">
-          <img src={`pieces/${color}K.svg`} alt="" />
+          <img src={piece(`${color}K`)} alt="" />
           {t('solve.toMove', { color: t(color === 'w' ? 'common.white' : 'common.black') })}
           {total > 1 && <small> · {s ? Math.min(total, Math.ceil(s.index / 2)) : 0}/{total}</small>}
         </div>

@@ -3,9 +3,11 @@ import { useApp } from '../state';
 import { Btn, Confirm, LangToggle, Modal, SettingsButton } from '../components/ui';
 import { Icon } from '../components/icons';
 import { SetupModal } from './SetupModal';
+import { SKINS } from '../skins';
 
 export function HomeScreen() {
-  const { t, go, profile, data, setData, click, updateProfile } = useApp();
+  const { t, go, profile, data, setData, click, updateProfile, piece, skin } = useApp();
+  const art = SKINS.find((s) => s.id === skin)?.menuArt ?? {};
   const [setup, setSetup] = useState(false);
   const [resumeFor, setResumeFor] = useState<'two' | 'ai' | null>(null);
   const [profiles, setProfiles] = useState(false);
@@ -23,8 +25,8 @@ export function HomeScreen() {
   return (
     <div className="screen home">
       <div className="homeBg" aria-hidden>
-        <img src="pieces/wK.svg" className="bgKing" alt="" />
-        <img src="pieces/bN.svg" className="bgKnight" alt="" />
+        <img src={piece("wK")} className="bgKing" alt="" />
+        <img src={piece("bN")} className="bgKnight" alt="" />
       </div>
       <header className="homeTop">
         <div className="brand">
@@ -38,16 +40,15 @@ export function HomeScreen() {
       </header>
       <main className="menu">
         <button className="menuCard" data-testid="menu-two" onClick={() => start('two')}>
-          <span className="menuArt two">
-            <img src="pieces/wN.svg" alt="" />
-            <img src="pieces/bN.svg" alt="" />
+          <span className={`menuArt two${art.two ? ' illus' : ''}`}>
+            {art.two ? <img src={art.two} alt="" /> : <><img src={piece("wN")} alt="" /><img src={piece("bN")} alt="" /></>}
           </span>
           <span className="menuLabel">{t('home.twoPlayers')}</span>
           <span className="menuSub">{t('home.twoPlayersSub')}</span>
         </button>
         <button className="menuCard" data-testid="menu-ai" onClick={() => start('ai')}>
-          <span className="menuArt ai">
-            <img src="pieces/bK.svg" alt="" />
+          <span className={`menuArt ai${art.ai ? ' illus' : ''}`}>
+            <img src={art.ai ?? piece("bK")} alt="" />
           </span>
           <span className="menuLabel">{t('home.vsComputer')}</span>
           <span className="menuSub">{t('home.vsComputerSub')}</span>
@@ -60,9 +61,8 @@ export function HomeScreen() {
             go({ name: 'academy' });
           }}
         >
-          <span className="menuArt academy">
-            <img src="pieces/wQ.svg" alt="" />
-            <img src="pieces/wB.svg" alt="" />
+          <span className={`menuArt academy${art.academy ? ' illus' : ''}`}>
+            {art.academy ? <img src={art.academy} alt="" /> : <><img src={piece("wQ")} alt="" /><img src={piece("wB")} alt="" /></>}
           </span>
           <span className="menuLabel">{t('home.academy')}</span>
           <span className="menuSub">{t('home.academySub')}</span>

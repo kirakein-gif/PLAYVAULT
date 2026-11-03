@@ -7,7 +7,7 @@ import { localDate, pickDaily } from '../academy/daily';
 import type { Screen } from '../state';
 
 export function AcademyScreen() {
-  const { t, profile, go, click, updateProfile } = useApp();
+  const { t, profile, go, click, updateProfile, piece } = useApp();
   const solvedIn = (c: Course) => {
     const list = puzzlesOfCourse(c);
     return { solved: list.filter((p) => profile.puzzles[p.id]?.solved).length, total: list.length };
@@ -36,7 +36,7 @@ export function AcademyScreen() {
 
   const tile = (key: string, art: string, sub: string, target: Screen, progress: string, testId: string) => (
     <button className="courseTile" data-testid={testId} onClick={() => { click(); go(target); }}>
-      <img className="courseArt" src={`pieces/${art}.svg`} alt="" />
+      <img className="courseArt" src={piece(art)} alt="" />
       <span className="courseName">{t(`academy.course.${key}`)}</span>
       <span className="courseDesc">{sub}</span>
       <span className="courseProgress">{progress}</span>

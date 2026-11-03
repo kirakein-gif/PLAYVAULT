@@ -127,7 +127,7 @@
   "settings": {
     "title": "Settings", "sound": "Sound effects", "volume": "Volume", "haptics": "Vibration", "lowPower": "Low-power mode",
     "lowPowerDesc": "Fewer animations and lighter engine work", "coords": "Show board coordinates", "autoRotate": "Two players: rotate every turn",
-    "otherLang": "Show Korean lines in the academy", "language": "Language", "profiles": "Profiles", "current": "In use", "rename": "Rename",
+    "otherLang": "Show Korean lines in the academy", "language": "Language", "skin": "Skin", "skinNote": "Saved separately for each profile", "profiles": "Profiles", "current": "In use", "rename": "Rename",
     "use": "Use this profile", "namePrompt": "New name", "data": "Data backup", "export": "Export records (JSON)", "import": "Import records",
     "exportOk": "Saved: {path}", "exportShare": "Send elsewhere", "exportFail": "Export failed",
     "importConfirm": "Replace ALL current records with the backup from {date} ({profiles})?", "importOk": "Records restored",

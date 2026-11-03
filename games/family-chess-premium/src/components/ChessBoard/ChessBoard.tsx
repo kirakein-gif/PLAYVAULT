@@ -5,6 +5,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import type { Square } from 'chess.js';
 import { trackPieces, type TrackedPiece } from '../../game/pieceTracker';
 import './board.css';
+import { useApp } from '../../state';
+import { pieceUrl } from '../../skins';
 
 export interface Arrow {
   from: string;
@@ -45,12 +47,13 @@ function xyToSq(x: number, y: number, orientation: 'w' | 'b'): Square {
   const r = orientation === 'w' ? 7 - y : y;
   return (FILES[f] + (r + 1)) as Square;
 }
-const pieceSrc = (color: string, type: string) => `pieces/${color}${type.toUpperCase()}.svg`;
 
 /** deterministic grain offset so neighbouring squares look like different wood */
 const grain = (i: number) => `${(i * 37) % 100}% ${(i * 61 + 13) % 100}%`;
 
 export function ChessBoard(p: BoardProps) {
+  const { skin } = useApp();
+  const pieceSrc = (color: string, type: string) => pieceUrl(skin, `${color}${type.toUpperCase()}`);
   const animMs = p.animMs ?? 160;
   const frame = Math.round(p.size * (p.showCoords === false ? 0.025 : 0.045));
   const inner = p.size - frame * 2;

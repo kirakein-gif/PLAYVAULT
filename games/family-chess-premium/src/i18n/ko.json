@@ -127,7 +127,7 @@
   "settings": {
     "title": "설정", "sound": "효과음", "volume": "음량", "haptics": "진동 피드백", "lowPower": "절전 모드",
     "lowPowerDesc": "애니메이션을 줄이고 엔진 계산을 가볍게 합니다", "coords": "체스판 좌표 표시", "autoRotate": "둘이서 대국: 매 턴 판 회전",
-    "otherLang": "아카데미에서 영어 문장 함께 보기", "language": "언어", "profiles": "프로필", "current": "사용 중", "rename": "이름 변경",
+    "otherLang": "아카데미에서 영어 문장 함께 보기", "language": "언어", "skin": "스킨", "skinNote": "프로필마다 따로 저장됩니다", "profiles": "프로필", "current": "사용 중", "rename": "이름 변경",
     "use": "이 프로필 사용", "namePrompt": "새 이름", "data": "데이터 백업", "export": "기록 내보내기 (JSON)", "import": "기록 불러오기",
     "exportOk": "저장했습니다: {path}", "exportShare": "다른 곳에 보내기", "exportFail": "내보내기에 실패했습니다",
     "importConfirm": "{date}에 만든 백업({profiles})으로 지금의 모든 기록을 덮어씁니다. 계속할까요?", "importOk": "기록을 복원했습니다",

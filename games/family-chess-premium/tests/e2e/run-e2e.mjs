@@ -358,6 +358,27 @@ await test('sound & display settings persist after restart', async () => {
   await p.context().close();
 });
 
+await test('skin choice changes board and pieces, stays per profile after restart', async () => {
+  const p = await newPage();
+  await p.click('[data-testid=settings-btn]');
+  await p.click('[data-testid=skin-wizard]');
+  await p.click('[data-testid=settings-close]');
+  assert((await p.evaluate(() => document.documentElement.dataset.skin)) === 'wizard', 'skin attribute');
+  await p.click('[data-testid=menu-two]');
+  if (await p.locator('[data-testid=confirm-no]').count()) await p.click('[data-testid=confirm-no]');
+  await p.waitForSelector('[data-square=e2]');
+  assert((await p.locator('.piece[data-sq=e1] img').getAttribute('src')) === 'pieces/wizard/wK.svg', 'wizard king on e1');
+  await p.waitForTimeout(700);
+  await p.reload();
+  await p.waitForSelector('[data-testid=profile-chip]');
+  assert((await p.evaluate(() => document.documentElement.dataset.skin)) === 'wizard', 'kept after restart');
+  await p.click('[data-testid=profile-chip]');
+  await p.click('[data-testid=profile-p2]');
+  await p.waitForTimeout(200);
+  assert((await p.evaluate(() => document.documentElement.dataset.skin)) === 'classic', 'other profile keeps its own skin');
+  await p.context().close();
+});
+
 await test('backup export -> import restores records after a confirmation', async () => {
   const p = await newPage();
   await openPuzzle(p, firstMate);

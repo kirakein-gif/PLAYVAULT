@@ -4,6 +4,7 @@ import { flushSave, scheduleSave } from './storage/store';
 import { makeT, type T } from './i18n/i18n';
 import { sound } from './audio/sound';
 import { haptic } from './platform/native';
+import { pieceUrl, type SkinId } from './skins';
 
 export type Screen =
   | { name: 'home' }
@@ -26,6 +27,8 @@ interface Ctx {
   settings: Settings;
   lang: Lang;
   t: T;
+  skin: SkinId;
+  piece: (code: string) => string;
   stack: Screen[];
   screen: Screen;
   screenKey: number;
@@ -67,13 +70,15 @@ export function AppProvider({ initial, children }: { initial: AppData; children:
   const profile = data.profiles[data.activeProfileId];
   const lang = profile.lang;
   const t = useMemo(() => makeT(lang), [lang]);
+  const skin: SkinId = profile.skin ?? 'classic';
 
   useEffect(() => {
     sound.enabled = data.settings.soundOn;
     sound.setVolume(data.settings.volume);
     document.documentElement.lang = lang;
     document.documentElement.classList.toggle('low-power', data.settings.lowPower);
-  }, [data.settings, lang]);
+    document.documentElement.dataset.skin = skin;
+  }, [data.settings, lang, skin]);
 
   useEffect(() => () => void flushSave(), []);
 
@@ -99,6 +104,8 @@ export function AppProvider({ initial, children }: { initial: AppData; children:
     settings: data.settings,
     lang,
     t,
+    skin,
+    piece: (code) => pieceUrl(skin, code),
     stack,
     screen: stack[stack.length - 1],
     screenKey: entries[entries.length - 1].k,

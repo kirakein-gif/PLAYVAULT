@@ -60,6 +60,7 @@ export interface Profile {
   lang: Lang;
   aiLevel: number;
   aiColor: 'w' | 'b' | 'random';
+  skin: 'classic' | 'wizard' | 'gothic';
   puzzles: Record<string, PuzzleRecord>;
   favorites: string[];
   lessons: Record<string, LessonRecord>;
@@ -104,6 +105,7 @@ export function newProfile(id: string, name: string, lang: Lang = 'ko'): Profile
     lang,
     aiLevel: 2,
     aiColor: 'w',
+    skin: 'classic',
     puzzles: {},
     favorites: [],
     lessons: {},
@@ -145,6 +147,7 @@ export function validateData(raw: unknown): { ok: true; data: AppData } | { ok: 
       name: base.name,
       lang: base.lang,
       aiLevel: Math.min(5, Math.max(1, Number(p.aiLevel) || 2)),
+      skin: p.skin === 'wizard' || p.skin === 'gothic' ? p.skin : 'classic',
       puzzles: isObj(p.puzzles) ? (p.puzzles as Record<string, PuzzleRecord>) : {},
       favorites: Array.isArray(p.favorites) ? (p.favorites as unknown[]).filter((x): x is string => typeof x === 'string') : [],
       lessons: isObj(p.lessons) ? (p.lessons as Record<string, LessonRecord>) : {},

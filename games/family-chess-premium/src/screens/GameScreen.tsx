@@ -26,7 +26,7 @@ function capturedBy(history: readonly MoveRecord[]) {
 
 export function GameScreen(props: GameScreenProps) {
   const app = useApp();
-  const { t, profile, settings, updateProfile, toast, feel, backGuard } = app;
+  const { t, profile, settings, updateProfile, toast, feel, backGuard, piece } = app;
   const engine = getEngine();
 
   // ----- game setup (new / resumed / from a position) -----
@@ -264,12 +264,12 @@ export function GameScreen(props: GameScreenProps) {
     const adv = c === 'w' ? material : -material;
     return (
       <div className={`playerCard${turn === c && !result ? ' active' : ''}`} data-testid={`player-${c}`}>
-        <img className="playerPiece" src={`pieces/${c}K.svg`} alt="" />
+        <img className="playerPiece" src={piece(`${c}K`)} alt="" />
         <div className="playerInfo">
           <div className="playerName">{nameOf(c)}</div>
           <div className="captured">
             {mine.map((p, i) => (
-              <img key={i} src={`pieces/${c === 'w' ? 'b' : 'w'}${p.toUpperCase()}.svg`} alt={p} />
+              <img key={i} src={piece(`${c === 'w' ? 'b' : 'w'}${p.toUpperCase()}`)} alt={p} />
             ))}
             {adv > 0 && <span className="adv">+{adv}</span>}
           </div>

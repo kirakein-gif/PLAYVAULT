@@ -4,7 +4,7 @@ import { Btn, Modal } from '../components/ui';
 import { LEVELS } from '../engine/difficulty';
 
 export function SetupModal({ onClose, replace }: { onClose: () => void; replace?: boolean }) {
-  const { t, profile, updateProfile, go, click, replace: replaceScreen } = useApp();
+  const { t, profile, updateProfile, go, click, replace: replaceScreen, piece } = useApp();
   const [level, setLevel] = useState(profile.aiLevel);
   const [color, setColor] = useState<'w' | 'b' | 'random'>(profile.aiColor);
   const start = () => {
@@ -52,11 +52,11 @@ export function SetupModal({ onClose, replace }: { onClose: () => void; replace?
             >
               {c === 'random' ? (
                 <span className="colorPair">
-                  <img src="pieces/wK.svg" alt="" />
-                  <img src="pieces/bK.svg" alt="" />
+                  <img src={piece("wK")} alt="" />
+                  <img src={piece("bK")} alt="" />
                 </span>
               ) : (
-                <img src={`pieces/${c}K.svg`} alt="" />
+                <img src={piece(`${c}K`)} alt="" />
               )}
               <span>{t(c === 'w' ? 'common.white' : c === 'b' ? 'common.black' : 'common.random')}</span>
             </button>

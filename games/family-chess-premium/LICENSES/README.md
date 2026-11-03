@@ -13,8 +13,8 @@
 
 ## 자체 제작 에셋
 
-- 기물 SVG: `scripts/build-pieces.mjs`가 생성한 원본(타사 기물 이미지 사용 없음).
-- 체스판 원목 텍스처: `scripts/build-textures.cjs`의 절차적 생성.
+- 기물 SVG: `scripts/build-pieces.mjs`(클래식), `scripts/build-skin-pieces.mjs`(마법사의 석실·고딕 성채)가 생성한 원본. 타사 기물 이미지·영화 소품 디자인을 사용하지 않음.
+- 체스판 텍스처(원목·대리석·석판): `scripts/build-textures.cjs`의 절차적 생성.
 - 앱 아이콘·스플래시: `scripts/build-icons.cjs`(자체 나이트 SVG 사용).
 - 효과음: `src/audio/sound.ts`에서 실행 시 합성(음원 파일 없음).
 - 전술 문제 1–121: 엔진 자체 대국에서 채굴 후 Stockfish 19로 검증(`scripts/puzzles/`).

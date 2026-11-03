@@ -8,6 +8,8 @@ import { pickTextFile, saveTextFile, shareFile, isNative } from '../platform/nat
 import { getEngine } from '../engine/stockfishAdapter';
 import { sound } from '../audio/sound';
 import type { AppData } from '../storage/schema';
+import { SKINS, pieceUrl } from '../skins';
+import { bi } from '../i18n/i18n';
 
 export const APP_VERSION = '1.0.0';
 
@@ -27,7 +29,7 @@ export function deviceInfo(): string {
 
 export function SettingsModal() {
   const app = useApp();
-  const { t, settings, updateSettings, data, setData, lang, setLang, openSettings, click, toast } = app;
+  const { t, settings, updateSettings, data, setData, lang, setLang, openSettings, click, toast, skin, updateProfile } = app;
   const [renaming, setRenaming] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [pending, setPending] = useState<{ data: AppData; text: string } | null>(null);
@@ -94,6 +96,31 @@ export function SettingsModal() {
               <button className={lang === 'en' ? 'on' : ''} onClick={() => { click(); setLang('en'); }}>English</button>
             </div>,
           )}
+        </section>
+        <section>
+          <h3>{t('settings.skin')} <small className="hintText">{t('settings.skinNote')}</small></h3>
+          <div className="skinRow">
+            {SKINS.map((s) => (
+              <button
+                key={s.id}
+                className={`skinCard skin-${s.id}${skin === s.id ? ' on' : ''}`}
+                data-testid={`skin-${s.id}`}
+                onClick={() => {
+                  click();
+                  updateProfile((p) => ({ ...p, skin: s.id }));
+                }}
+              >
+                <span className="skinBoard">
+                  <i className="sw l" />
+                  <i className="sw d" />
+                  <img src={pieceUrl(s.id, 'wK')} alt="" />
+                  <img src={pieceUrl(s.id, 'bN')} alt="" />
+                </span>
+                <span className="skinName">{bi(lang, s.name)}</span>
+                <span className="skinDesc">{bi(lang, s.desc)}</span>
+              </button>
+            ))}
+          </div>
         </section>
         <section>
           <h3>{t('settings.profiles')}</h3>
