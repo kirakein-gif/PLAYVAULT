@@ -1,6 +1,13 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
+확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(가족 블록 게임 작업지시서 작성, 기준 main `4e7abd0`). 아래 기존 이력은 보존합니다.
+
+## 작업지시서 제출 · 가족 블록 게임(가칭 BLOCK MASTER) 1차 혼자 하기 / ChatGPT 구현 대기
+
+2026-11-04 / Claude Code / `ccr-33a67370-6aa4yx` / 기준 main `4e7abd0`. 사용자 요청: "체스마스터 컨셉으로 테트리스를 앱으로", 1차는 **혼자 하기만**, Android APK + PC 웹, 아이가 체스와 **같은 태블릿**에서 사용. 사용자 지정으로 **구현 담당 ChatGPT**(역할 분담표보다 사용자 지시 우선).
+- 지시서: `games/family-blocks/docs/GPT_TASK_01.md` — 폴더 `games/family-blocks/`, 앱 ID `com.playvault.familyblocks`(영구 고정), 작업 브랜치 `chatgpt/family-blocks-solo`, 모드 3종(차근차근·도전·40줄), 원목 스킨 1종, 체스 공통 모듈 복사 재사용, 같은 가족 서명 키, CI 4단계, 단위·E2E 검사 목록.
+- 결정 대기(사용자): 화면 이름 — 지시서는 상표를 피한 가칭 `BLOCK MASTER`(상수 1곳). 배경음 — 자작곡 또는 민요 「코로베이니키」 선율 직접 편곡(기존 게임 편곡·음원 복사 금지).
+- 범위 밖: 2인·컴퓨터 대전·복기·아카데미·스킨 추가·PLAYVAULT 카드(메인 화면은 Codex 작업 중). 게임 코드 없음, 병합·배포 없음.
 
 ## 병합 완료 · CHESS MASTER PC 웹 버전 + PLAYVAULT 카드 + 고정 서명 키·Release (PR #26 → main `48440c9`, 2026-11-04)
 

@@ -1517,3 +1517,13 @@
 - 범위 조정: 사용자가 딸깍 배지 10회 목적지 변경과 PLAYVAULT 메인 분위기 정리를 Codex로 별도 진행하기로 함. 이 세션에서 `ddalkkak-hub`에 착수했던 목적지 변경(로컬)은 사용자 지시로 폐기, 원격 푸시 없음. 위치 안내만 전달: PLAYVAULT `index.html`(카드 `<section class="grid">`)·`assets/site.css`, ddalkkak-hub `site/index.html` 20행 `data-game-url`·`site/easter-egg.js`·`functions/[[path]].js`.
 - 관리 문서: STATUS·WORK_LOG·CHANGELOG·DEVELOPMENT_SUMMARY 갱신. AGENTS·CLAUDE 절차 변경 없음.
 - 사용자 재요청 횟수: 0회. 다음: 태블릿 1회 재설치·실기 확인.
+
+### 2026-11-04 (Asia/Seoul) · 가족 블록 게임 1차 작업지시서 (Claude Code → ChatGPT)
+
+- 요청: "체스마스터 만든 컨셉으로 테트리스를 앱으로 만들고 싶습니다" → 선택 답변: 1차 범위 "혼자 하기만 먼저", 배포 "Android APK + PC 웹", 담당 "ChatGPT에게 맡기려 함, 작업지시서를 만들어 달라. 아이가 같은 태블릿에서", 질문 "판매하지 않으면 이름 괜찮지 않을까요?", "테트리스 음악도 저작권 걸릴까요?".
+- 기준: main `4e7abd0`(fetch 확인), 작업 브랜치 `ccr-33a67370-6aa4yx`. 체스 `games/family-chess-premium/`의 package.json·capacitor·vite 설정·android 서명·storage·platform·audio·i18n·CI workflow를 읽고 재사용 범위를 지시서에 명시.
+- 변경: `games/family-blocks/docs/GPT_TASK_01.md` 신규(규칙 수치·조작·스킨·소리·데이터 구조·검사 목록·제출물). STATUS 맨 위 항목 추가. 게임 코드 없음.
+- 답변 요지(법률 자문 아님): 비판매여도 상표·저작권 침해 여부 자체는 남음. 가족 태블릿 개인 설치는 실질 위험 낮음, 공개 사이트(PLAYVAULT 웹)는 위험이 있어 상표 용어 미사용·외형 차별화 권장 → 지시서는 가칭 BLOCK MASTER. 「코로베이니키」 민요 선율은 공유 저작물이나 게임판 편곡·녹음은 보호 대상 → 직접 편곡 또는 자작곡, 출처 기록.
+- 검증: 문서 전용. `git diff --check` 확인. 지시서 수치(등장 열·고정 대기 15회·낙하 표)의 서로 간 일관성 검토. 실행 테스트 없음.
+- 관리 문서: STATUS·WORK_LOG 갱신. CHANGELOG는 게임이 아직 없어 변경 없음. AGENTS·CLAUDE 검토 — ChatGPT도 AGENTS 적용 대상이라 절차 변경 없음(역할 분담표 조정은 사용자 결정 사항으로 남김).
+- 사용자 재요청 횟수: 0회. 다음: 사용자가 지시서를 ChatGPT에 전달 → ChatGPT 구현·draft PR → 교차 검토.
