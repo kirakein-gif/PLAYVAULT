@@ -54,6 +54,12 @@
           "x": 11,
           "y": 14,
           "to": "vault-arch"
+        },
+        {
+          "type": "shelter",
+          "id": "gate-shelter",
+          "x": 2,
+          "y": 14
         }
       ],
       "back": [
@@ -115,6 +121,22 @@
           "open": {
             "key": "bronze"
           }
+        },
+        {
+          "type": "enemy",
+          "id": "gallery-crawler",
+          "kind": "crawler",
+          "x": 5,
+          "y": 4,
+          "face": -1
+        },
+        {
+          "type": "enemy",
+          "id": "gallery-wisp",
+          "kind": "wisp",
+          "x": 5,
+          "y": 2,
+          "face": -1
         }
       ],
       "back": [
@@ -167,18 +189,20 @@
       ],
       "objects": [
         {
-          "type": "target",
+          "type": "enemy",
           "id": "oath-west",
+          "kind": "shield",
           "x": 10,
-          "y": 15,
-          "hp": 22
+          "y": 16,
+          "face": -1
         },
         {
-          "type": "target",
+          "type": "enemy",
           "id": "oath-east",
+          "kind": "crawler",
           "x": 15,
-          "y": 15,
-          "hp": 22
+          "y": 16,
+          "face": 1
         },
         {
           "type": "door",
@@ -262,6 +286,14 @@
           "open": {
             "switch": "high-lever"
           }
+        },
+        {
+          "type": "enemy",
+          "id": "bell-wisp",
+          "kind": "wisp",
+          "x": 5,
+          "y": 4,
+          "face": -1
         }
       ],
       "back": [
@@ -455,6 +487,14 @@
           "lock": {
             "key": "sigil"
           }
+        },
+        {
+          "type": "enemy",
+          "id": "crypt-crawler",
+          "kind": "crawler",
+          "x": 5,
+          "y": 6,
+          "face": -1
         }
       ],
       "back": [
@@ -534,6 +574,22 @@
           "x": 9,
           "y": 14,
           "to": "gate-arch"
+        },
+        {
+          "type": "enemy",
+          "id": "vault-sentinel",
+          "kind": "shield",
+          "x": 5,
+          "y": 4,
+          "face": -1
+        },
+        {
+          "type": "enemy",
+          "id": "vault-wisp",
+          "kind": "wisp",
+          "x": 25,
+          "y": 5,
+          "face": -1
         }
       ],
       "back": [

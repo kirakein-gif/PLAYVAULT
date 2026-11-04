@@ -1,0 +1,6 @@
+PASS left wall: smallest 1.5-unit inward correction
+PASS unbroken masonry is solid during the swap
+PASS ceiling: lower immediately without changing horizontal center
+PASS ceiling and wall corner: both axes clear in the same tick
+PASS manual swap under a ceiling stays blocked
+5/5 down-swap edge checks passed

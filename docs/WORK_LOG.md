@@ -1384,6 +1384,18 @@
 - 사용자 재요청 횟수: 0회.
 - 종료 상태: PR 제출, 사용자 병합 승인 대기 → 다음 담당 Codex(TASK_10).
 
+### 2026-11-03 (Asia/Seoul) · TASK_10 체력·회복·기본 적 3종 구현 제출
+
+- 담당 AI: Codex. 사용자 인계: PR #22 병합/main `2605e462d4c47435cab2ee632318c5e03a743604`. 시작 전 원격 fetch·열린 PR·실제 소스/규격/인수 검사 확인, 최종 원격 main도 같은 SHA. 다른 Hollow Keep 작업 없음 확인; 별도 체스 PR #23과 로컬 미추적 체스 폴더 보존.
+- 브랜치: `codex/hollow-keep-combat-enemies`; 담당 선언 `26f73a0`을 먼저 푸시한 뒤 Draft [PR #24](https://github.com/kirakein-gif/PLAYVAULT/pull/24) 개설. 이번 구현은 같은 PR에 제출하고 Ready로 전환, 병합·배포하지 않음. 게임/UI 버전 번호 변경 없음.
+- 범위: 개별 체력·피격/밀림/무적, 쓰러짐 자동 교대와 진행 유지 성문 재시작, shelter/매4처치 heal; 적3종 AI·방패/경직·처치/재생, API/F2/HUD/렌더. 적8마리(돌격3/공중3/방패2), 특정 적2, 타일 격자는 보존. 완주 입력4214틱/70.2초·71구간·수동 교대2·전멸0.
+- 그림: 내장 image_gen 경로A 소스5장과 네이티브 변환 도구, 새 적 동작·두 주인공 hurt·쉼터/회복 그림. 기존64색/scale2/알파0·255, 이전 런타임 PNG 바이트 보존. PROVENANCE에 도구·지시 요약·소스 ID·손질/재현 기록.
+- 통과: enemies16/16, area24/24, pixel-assets135/135, weapons22/22, foundation51/51·edge16/16, exploration-contract16/16, entrance9/9, ladder-actions10/10·edge4/4, weapons-edge6/6, combo-render5/5, pixel-render7/7(구역·시험 방 각각), ladder-render7/7, tile-mosaic7/7, keyboard-ime7/7, mobile-layout20/20·fullscreen6/6, browser-playtest20/20(시험 방), room-traversal4/4, 기존 ABYSSFALL/ECLIPSE 회귀3명령 exit0.
+- 새 검증: combat2-browser4/4(생산 앱 실제 키 입력4214틱·모든 장치/방/특정 적2·defeat0·완주 UI·F2·모바일); capture-enemies16/16(정식 createWorld 입력으로 만든 별도 시험 구역과 실제 step, 생성 후 상태 주입 없음). 실제 구역 캡처와 시험 구역 캡처를 명시적으로 구분.
+- 실패: 원본 exploration-edge는 처음5통과 후 6번째 `w.dummies`의 `oath-west` 참조 TypeError, 나머지 원본 사례 미실행. 원본 exploration-browser는 첫 지도 통과 후 완주 flag 검증에서 `gate-shelter` bucket 부재 TypeError, 후속 원본 사례 미실행. 요구된 표적 제거·새 shelter/enemy 계약과 충돌하며 원본은 수정/약화하지 않음. PR에 사유 인계; 적 재생/영구처치는 enemies-contract, 실제 완주는 새 보완 검사로 확인.
+- 캡처/로그/재현: `games/the-hollow-keep/next/assets/combat2-review/{README,TEST_RESULTS}.md`. 적3종 이동·공격·명중, 방패막기/경직, 체력·한 명 쓰러짐·쉼터/조각·모바일780x330. 브라우저는 가상 시계로 스케줄만 제어하며 게임 시간은 계속 진행. 외형/손맛은 사용자 판단, 실물 모바일 터치/성능 미확인.
+- 다음 담당: Claude Code 교차 검토·원본 검사 규격 충돌 검토 및 회사 PC 미리보기 갱신. 교차 검토 담당/발견 문제 수: 아직 미검토. 이번 작업 사용자 재요청:0.
+- 다섯 관리 문서 검토: STATUS/WORK_LOG/CHANGELOG 갱신; AGENTS/CLAUDE는 절차 변화가 없어 변경 없음. 루트 README와 대상 문서 검토, next/README 갱신. 다른 게임·공용 자산·배포 설정 변경 없음.
 ### 2026-11-02 (Asia/Seoul) · 우리집 체스 PREMIUM v1.0.0 신규 개발
 
 - 담당 AI: Claude Code. 브랜치 `ccr-6aa2a39e-1vn67a`(세션 지정), 기준 main `4ec1cfa`. 사용자 요청: 완전 오프라인 Android 태블릿 체스 v1.0(요구서 전문은 세션 대화). 사용자 개별 지시로 신규 구현을 Claude Code가 담당(역할 분담표보다 우선).
@@ -1482,6 +1494,20 @@
 - 병합: 사용자 승인("합쳐주세요") 후 CI 성공을 확인하고 PR #23을 draft 해제·main 병합(merge commit). 배포는 별도이며 수행하지 않음.
 - 사용자 재요청 횟수: 0회. 다음: APK 설치 실기 확인, 메뉴 상세 일러스트 여부 결정.
 
+### 2026-11-03 (Asia/Seoul) · PR #22 병합(전투 2차 규격) 및 PR #24(TASK_10) 교차 검토
+
+- 담당 AI: Claude Code(검토). PR #22는 사용자 승인("속행합시다")으로 main `2605e46`에 병합.
+- 대상: PR #24 head `812d362`(`git archive` 사본, 로컬 HTTP 서버). 검사 원본은 main과 같음(새 검사 combat2-browser만 추가).
+- 테스트 통과: enemies-contract 16/16, area-data 24/24, pixel-assets 135/135, weapons-contract 22/22, weapons-edge 6/6, foundation-contract 51/51, foundation-edge 16/16, exploration-contract 16/16, entrance 9/9, ladder-actions 10/10, ladder-edge 4/4, combo-render 5/5, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, browser-playtest 20/20, room-traversal 4/4, combat2-browser 4/4, ABYSSFALL 회귀 3종 exit 0.
+- 실패(Codex 보고와 같음): exploration-edge(`oath-west` 표적 참조), exploration-browser(쉼터·적의 진행 기록 분기 없음). 규격 §6이 표적을 특정 적으로 바꾼 데 따른 검사 쪽 결함 → 이 검토 브랜치에서 정정, main 구역과 PR #24 구역 양쪽에서 13/13·6/6 확인.
+- 발견 1건: 무작위 입력(314곳 × 1500틱, 47.1만 틱)에서 쓰러짐 자동 교대 시 Ethan이 벽·닫힌 봉쇄물에 1.5단위 묻힘 4곳, 최대 154틱 연속. 원인은 규격 §2 "공간 검사 무시"를 그대로 따른 것(규격 결함). §2에 자리 보정 규칙 추가, enemies-contract 17번째 검사 추가(PR #24 16/17, 보정을 넣은 사본 17/17·무작위 입력 겹침 0). 적이 벽·방 밖으로 나가는 경우 0건.
+- 처음 무작위 입력에서 나온 14곳 중 10곳은 검사 쪽 설정 오류(Noah 시작 좌표로 Ethan을 되살림)로 확인해 제외.
+- 그림: 적 3종·hurt·쉼터·회복 조각 시트 확인, 체력 칸(조작 중 강조·쓰러짐 어둡게) 캡처 확인. 외형 판단은 사용자.
+- 회사 PC 미리보기 Artifact를 PR #24 `812d362` 빌드로 갱신(버전 8).
+- 검토 담당 / 발견 문제 수: Claude Code / 1건(규격 결함) + 원본 검사 2개 정정.
+- 사용자 재요청 횟수: 0회.
+- 다음: Codex 추가 수정 지시 1(TASK_10) → 재검토. 사용자 손맛 확인.
+- 종료 상태: 검토 완료, 수정 요청.
 ### 2026-11-03 (Asia/Seoul) · PR #23 병합 · 리버시 아이디어 등록 (Claude Code)
 
 - 병합: 사용자 승인("합쳐주세요"), CI #19(`a318906`, APK 빌드·에뮬레이터 오프라인 검사) 성공 확인 → draft 해제 → merge commit `57fe108`(head `78ba448`, 문서만 추가된 커밋이라 CI 미실행). 배포 없음.
@@ -1517,3 +1543,52 @@
 - 범위 조정: 사용자가 딸깍 배지 10회 목적지 변경과 PLAYVAULT 메인 분위기 정리를 Codex로 별도 진행하기로 함. 이 세션에서 `ddalkkak-hub`에 착수했던 목적지 변경(로컬)은 사용자 지시로 폐기, 원격 푸시 없음. 위치 안내만 전달: PLAYVAULT `index.html`(카드 `<section class="grid">`)·`assets/site.css`, ddalkkak-hub `site/index.html` 20행 `data-game-url`·`site/easter-egg.js`·`functions/[[path]].js`.
 - 관리 문서: STATUS·WORK_LOG·CHANGELOG·DEVELOPMENT_SUMMARY 갱신. AGENTS·CLAUDE 절차 변경 없음.
 - 사용자 재요청 횟수: 0회. 다음: 태블릿 1회 재설치·실기 확인.
+
+### 2026-11-04 (Asia/Seoul) · TASK_10 추가 수정 지시1 — 자동 교대 자리 보정
+
+- 담당: Codex. 사용자 명시 지시: `claude/hollow-keep-combat2-review` 병합 → 쓰러짐 교대 자리 보정 → 검사 → 같은 PR #24 푸시. 시작 HEAD/원격 작업 브랜치 `812d362`; 검토 브랜치 최신 `1d32619`, 원격 main `4e7abd0`. PR #24 검토 댓글의 결함1건·지시서 블록과 실제 코드/이력 대조. 작업 담당 선언 `9eb8dc3` 먼저 푸시, 같은 PR 본문에 작업 중임을 공유.
+- 병합: 검토 `1d32619` → `b4b4180`. STATUS·WORK_LOG·CHANGELOG 충돌은 양쪽 기록을 모두 남겨 정리. 최신 main은 홈페이지/체스/할로우킵 공개 진입의 출시 예정 안내가 바뀌어 있었으므로 작업 브랜치에도 보존 병합(`ca7ea74`). main으로 PR을 병합한 것이 아님. 최신 main 대비 다른 게임·공용 자산·홈 화면·할로우킵 공개 진입은 차이 없음.
+- 로컬 보존: main의 체스 파일과 충돌하는 기존 미추적 체스 자료는 같은 워크스페이스의 `preserved-chess-before-combat2-review-20261104`에 먼저 보존. 병합 후 기존 파일을 덮지 않고 없는 로컬 파일/의존성·dist를 원래 위치로 복구; 겹치는 자료는 보존 폴더에 남김. 강제 삭제·reset·clean 없음.
+- 재현: `812d362`의 sim을 저장소 밖 임시 파일로 꺼내 HK_SIM으로 정정된 enemies-contract에 연결 → 16/17 exit1, 새 자동 교대 검사만 실패(교대0틱부터 오른쪽 벽1.5 겹침). 수정 후17/17.
+- 구현 `ee8f57c`: hurtPlayer의 down 자동 교대 직후에만 몸/막힌 칸·방 경계 확인. 가장 짧은 좌우 이동 우선, 천장은 아래로, 천장/벽 모서리는 두 축 함께 보정. 소수 타일 경계 좌표를 그대로 써 필요한 만큼만 이동, 전체거리 최대8. 수동 swapBlocked·피격/무적 시간·이동/무기 CONFIG·진행 플래그·그림은 변경 없음.
+- 검토자가 정정한 enemies-contract17·exploration-edge·exploration-browser는 `1d32619` 파일과 동일함을 diff로 확인. Codex가 원본 인수 검사를 수정/약화하지 않음. 별도 down-swap-edge5개: 왼쪽벽1.5·부서지지 않은벽·천장·천장+벽모서리·수동교대거부. 교대한 틱/이후30틱 겹침 없음, 자동 교대 무적90 확인. 초기 보완 수동 검사 준비에 접촉 적을 함께 넣어 같은 틱 자동 교대가 일어나던 준비 오류는 적 없는 수동 시나리오로 분리하고 재실행5/5.
+- 이번 실행 통과: enemies17/17, down-swap-edge5/5, area-data24/24, pixel-assets135/135, weapons22/22, foundation51/51·edge16/16, exploration-contract16/16·edge13/13·browser6/6, entrance9/9, ladder-actions10/10·edge4/4, weapons-edge6/6, room-traversal4/4, combo-render5/5, pixel-render구역/시험방 각7/7, ladder-render7/7, tile-mosaic7/7, keyboard-ime7/7, mobile-layout20/20·fullscreen6/6, browser-playtest시험방20/20, combat2-browser4/4, capture-enemies16/16, 기존게임 polish/audio/audio-wind 3명령 exit0.
+- 완주: 입력 파일 변경 없음(4214틱/70.2초). 실제 앱 키 입력으로8방·모든 장치/열쇠/출입문·특정 적2처치·defeat0·성문 복귀 UI 재확인. 이전 탐험 검사2개 충돌은 검토 담당 정정으로 해소됨. 새 결과·원본 로그·재현은 next/assets/combat2-review/down-swap/TEST_RESULTS.md; 이전 보고/실패 로그·캡처는 덮어쓰지 않음. 그림 생성 없음, 실물 모바일 손맛/성능은 미확인.
+- 5개 관리 문서 검토: STATUS·WORK_LOG·CHANGELOG 갱신, AGENTS·CLAUDE는 절차 변경 없음. 루트 README와 대상 규격/추가지시/실제소스 검토, next/README와 검증 안내 갱신. 병합으로 들어온 기존 체스 라이선스의 CRLF/공백 검사 경고는 고치지 않았으며, 이번 변경과 PR 관련 경로는 diff --check로 확인.
+- 버전: UI/게임/자산 버전 번호 변경 없음. 종료: 같은 PR #24 수정 제출, 다음 Claude Code 재검토. 검토 담당 Claude Code / 이전 발견1건 / 이번 수정의 재검토 아직 미실행. 이번 사용자 수정 재요청1회. main에 PR 병합·수동 배포 없음.
+
+### 2026-11-04 (Asia/Seoul) · PR #24(TASK_10 추가 수정 지시 1, `d66bc41`) 재검토
+
+- 담당 AI: Claude Code(검토).
+- 대상: PR #24 head `d66bc41`(`git archive` 사본, 로컬 HTTP 서버). 검토 브랜치 `1d32619`와 main `4e7abd0` 포함 확인. 검사 원본은 검토 브랜치와 같음(Codex 보완 검사 combat2-browser·down-swap-edge 추가만). main의 홈 화면·공개 진입 변경 보존 확인.
+- 자리 보정: `correctDownSwapPosition` — 교대 틱에 막힌 칸과 겹치면 같은 발 높이에서 좌우 최대 8단위 중 가장 가까운 빈 자리로 옮김.
+- 테스트 통과: enemies-contract 17/17, down-swap-edge 5/5, area-data 24/24, pixel-assets 135/135, weapons 22/22·edge 6/6, foundation 51/51·edge 16/16, exploration-contract 16/16·edge 13/13·browser 6/6, entrance 9/9, ladder-actions 10/10·edge 4/4, combo-render 5/5, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, browser-playtest 20/20, room-traversal 4/4, combat2-browser 4/4, ABYSSFALL 회귀 3종 exit 0.
+- 무작위 입력: 2개 시드 × 314곳 × 1500틱(94.2만 틱) 주인공·적 겹침 0건, 방 밖 0건.
+- 회사 PC 미리보기 Artifact를 `d66bc41` 빌드로 갱신(버전 9, sim.js만 바뀜).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛 확인·병합 승인 → PR #25(이 브랜치, PR #24 head 포함) main 병합 → PR #24 자동 병합 처리 확인.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.
+
+### 2026-11-04 (Asia/Seoul) · 적 공격 판정이 그림보다 먼저 맞는 문제 — 규격 §2-1·§5-1 보완
+
+- 담당 AI: Claude Code(규격·검사). 사용자 손맛 확인(미리보기 버전 9): "적들의 공격 모션이 아군에게 닿지도 않았는데 충돌로 인식한다". 선택: 방패 밀치기는 "밀칠 때의 이펙트가 있고 그게 충돌하면 맞는다", "너무 자주 밀친다"; 주인공은 "맞는 판정만 좁힘". 방패 막기 범위는 그대로.
+- 측정(PR #24 `d66bc41`): 맞는 순간 그림 사이 간격 — 방패 밀치기 53~55단위(판정 방패 앞 50, 그림 3), 돌격형 2~3단위(주인공 그림 앞 끝 16 vs 몸 상자 21·19.5), 공중형은 겹친 뒤 맞음. 밀치기 주기 60틱.
+- 변경: COMBAT2_SPEC §2-1(hurtInset 4, getHurtbox), §5-1(bashReach 32, 높이 발에서 8~56, getEnemyHitboxes, recoveryTicks 30→90, fx-bash 그림 = 판정 자리), §7 표. `enemies-contract` 18·19번째(피격 판정, 밀치기 판정·빈도·물러나 피하기), `pixel-assets` fx-bash 위치 검사. CODEX_TASK_10 추가 수정 지시 2.
+- 검사 검증: 저장소 밖 보정 사본(PR #24 sim + 규칙)에서 enemies-contract 19/19, PR #24 그대로 17/19. 오류 변형 5종(회복 30, 판정 50, inset 0, 접촉에 몸 상자, 밀치기 옛 판정) 모두 검출. 보정 사본에서 area-data 24/24(완주 기록 그대로 통과), weapons·foundation·exploration·down-swap-edge 통과, 무작위 입력 47.1만 틱 겹침 0. fx-bash 검사는 합성 그림 138/138, 앞 끝 20단위 변형 검출. 처음 작성한 빈도 검사의 틱 계산 오류(앞 반복 80틱 누락)를 시뮬레이션 기록으로 확인해 정정.
+- 검토 담당 / 발견 문제 수: Claude Code / 2건(규격 결함: 판정과 그림 기준 없음, 밀치기 판정 길이 미정).
+- 사용자 재요청 횟수: 0회(새 손맛 의견).
+- 다음: Codex 추가 수정 지시 2 → 재검토 → 미리보기 갱신.
+- 종료 상태: 규격·검사 제출, Codex 수정 대기.
+
+### 2026-11-04 (Asia/Seoul) · 사다리 위에서 기다리는 적 — 규격 §4-1·§6-1 보완
+
+- 담당 AI: Claude Code(규격·검사). 사용자 손맛 확인(금 간 보관실 캡처): 방패형이 사다리 위에서 기다렸다가 올라오는 즉시 때려 오를 수 없음. 사용자 제안: 사다리 양옆으로 길이 있어 적이 오가고, 사다리는 그 길까지 이어져 오르내릴 수 있게.
+- 원인: 방패형이 층과 상관없이 가로 300 안의 주인공을 따라감(밖이면 정지). 구역 15개 사다리 모두 바닥 줄에 사다리 양옆 빈칸(3칸 구멍)이 있어 바닥이 끊김.
+- 변경: COMBAT2_SPEC §4-1(같은 층 판단 sameFloorTolerance 24, 다른 층·매달린 주인공 무시하고 순찰, 사다리에서 내린 뒤 ladderGraceTicks 30 공격 시작 안 함, 바닥 줄 사다리 칸 건너기), §6-1(사다리 층계참: 사다리 양옆 빈칸을 발판으로, 57칸). `enemies-contract` 20·21번째(반응·유예, 순찰·사다리 칸 건너기), `area-data` §6-1 검사. 기존 stagger 검사는 방패형 위치에 따라 공격 대기 중 누름이 무시되는 취약점이 있어 누름 반복으로 정정. 참고 그림 `docs/reference/vault-ladder-landing.png`. CODEX_TASK_10 추가 수정 지시 3(지시 2와 함께).
+- 검사 검증(저장소 밖 사본 = PR #24 sim + §2-1·§5-1·§4-1 규칙 + §6-1 구역): enemies-contract 21/21, area-data 25/25(기존 완주 기록 그대로 통과), exploration-contract 16/16·edge 13/13, entrance 9/9, ladder-actions 10/10·edge 4/4, foundation 51/51, weapons 22/22, down-swap-edge 5/5, ladder-render·tile-mosaic-render·pixel-render 7/7, room-traversal 4/4, exploration-browser 6/6, combat2-browser 4/4, keyboard-ime 7/7. 두 주인공 오르기·내려가기·층 건너기 확인. 무작위 입력 2시드 52.8만 틱 겹침 0. 오류 변형(유예 0, 사다리 칸 바닥 판단 없음, 다른 층으로 돌아섬, 예전 정지 순찰) 검출. 미검출 1종(같은 층 판단에서 매달림 조건만 빼기 — 유예 조건이 같은 효과를 내 행동 차이 없음).
+- PR #24 구역: area-data 24/25(§6-1만 실패, 구현 전 정상).
+- 검토 담당 / 발견 문제 수: Claude Code / 2건(규격 결함: 적 반응에 층 조건 없음, 사다리 양옆 바닥 규칙 없음).
+- 사용자 재요청 횟수: 0회(새 손맛 의견).
+- 다음: Codex 추가 수정 지시 2·3 → 재검토 → 미리보기 갱신.
+- 종료 상태: 규격·검사 제출, Codex 수정 대기.

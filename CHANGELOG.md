@@ -333,3 +333,31 @@ PR #20, 기준00479e7 + 정정 규격abbcd8f(병합ffe7736). Noah 제자리 가�
 ## THE HOLLOW KEEP · 3단계 전투 2차 규격 (2026-11-03, Asia/Seoul)
 
 - 규격·검사만. 주인공별 체력(Ethan 6·Noah 5), 맞음·밀림·무적, 한 명 쓰러지면 자동 교대 + 무적, 둘 다 쓰러지면 성문에서 다시 시작(진행 유지), 성문 쉼터·회복 조각(처치 4회마다, 무작위 없음), 적 3종(지상 돌격형·공중형·방패형, 일반 적은 방에 다시 들어오면 되살아남). `COMBAT2_SPEC.md`, `CODEX_TASK_10.md`, `enemies-contract.cjs`(16), `area-data.cjs`(적 배치·§6 요구·완주 중 쓰러짐 없음), `pixel-assets.cjs`(적 그림·hurt·쉼터·회복 조각). Codex 구현 대기. 게임 버전 번호 변경 없음.
+
+## THE HOLLOW KEEP · TASK_10 체력·회복·기본 적 3종 (2026-11-03, Asia/Seoul)
+
+- 기준 main `2605e46`, 작업 `codex/hollow-keep-combat-enemies`, [PR #24](https://github.com/kirakein-gif/PLAYVAULT/pull/24). UI/게임 버전 번호 변경 없음, 병합·배포 없음.
+- 개별 체력·피격·무적·밀림·쓰러짐 자동 교대, 진행 유지 성문 재시작, 쉼터/결정적 회복 조각. 돌격형·공중형·방패형과 특정 적 영구 처치/일반 적 재생. 총8마리 배치, 완주4214틱 갱신.
+- 새 적/피격/회복 그림·체력 HUD·F2 수치 조절. 이전 PNG와 이동/무기 수치, 원본 인수 검사는 보존.
+- 새 규칙16/16·배치24/24·그림135/135·실제 입력 완주/모바일 보완4/4. 기존 exploration 검사2개는 표적/물건 계약 변경 때문에 실패, 상세는 [검증 기록](games/the-hollow-keep/next/assets/combat2-review/TEST_RESULTS.md). 다른 요구 회귀 통과. Claude Code 교차 검토·사용자 외형/손맛 판단 대기.
+## THE HOLLOW KEEP · 전투 2차 규격 병합·교차 검토 (2026-11-03, Asia/Seoul)
+
+- PR #22(규격·검사) main 병합. PR #24 교차 검토: 쓰러짐 자동 교대 자리 보정 규칙(§2) 추가, `enemies-contract` 17번째 검사, 표적 → 특정 적 변경에 맞춰 `exploration-edge`·`exploration-browser` 정정. 게임 버전 번호 변경 없음.
+
+## THE HOLLOW KEEP · TASK_10 추가 수정1 — 쓰러짐 교대 자리 보정 (2026-11-04)
+
+- [PR #24](https://github.com/kirakein-gif/PLAYVAULT/pull/24), 검토 브랜치 `1d32619` 병합 후 `ee8f57c`: 큰 Ethan으로 자동 교대한 같은 틱에 벽·봉쇄물·부서지지 않은 벽 밖으로 가장 가까운 좌우→아래 자리 보정(최대8단위). 천장/모서리 포함, 수동 교대와 다른 수치는 유지.
+- enemies17/17·exploration-edge13/13·exploration-browser6/6 및 요구 회귀 재실행. 검토 담당의 검사 정정본은 그대로 병합, 이전 검사 충돌2개 해소. 완주4214틱 유지. [이번 결과·로그](games/the-hollow-keep/next/assets/combat2-review/down-swap/TEST_RESULTS.md).
+- 최신 main `4e7abd0` 변경은 작업 브랜치에 보존 반영. 다른 게임·홈 화면에 새 수정 없음. 버전 번호 변경·main에 PR 병합·수동 배포 없음. 다음 Claude Code 재검토.
+
+## THE HOLLOW KEEP · 전투 2차 재검토 (2026-11-04, Asia/Seoul)
+
+- PR #24 `d66bc41` 재검토: 쓰러짐 자동 교대 자리 보정 확인, 요구 검사 전체 통과, 무작위 입력 94.2만 틱 겹침 0건. 발견 문제 0건. 사용자 병합 승인 대기. 게임 버전 번호 변경 없음.
+
+## THE HOLLOW KEEP · 적 공격 판정과 그림 맞추기 규격 (2026-11-04, Asia/Seoul)
+
+- 규격·검사만. 적에게 맞는 판정을 주인공 몸 앞뒤 4단위 안쪽으로(§2-1), 방패 밀치기 판정을 보이는 충격파(방패 앞 32)와 같게 하고 밀치기 간격을 늘림(§5-1). `enemies-contract`(19), `pixel-assets`(fx-bash). Codex 수정 대기. 게임 버전 번호 변경 없음.
+
+## THE HOLLOW KEEP · 사다리 위 캠핑 없애기 규격 (2026-11-04, Asia/Seoul)
+
+- 규격·검사만. 지상 적은 같은 층 주인공에게만 반응하고 아니면 순찰, 사다리에서 내린 뒤 0.5초 공격 유예, 사다리 칸 건너기(§4-1). 사다리가 지나는 바닥 줄의 양옆 빈칸을 발판으로(§6-1). `enemies-contract`(21), `area-data`(25). Codex 수정 대기. 게임 버전 번호 변경 없음.

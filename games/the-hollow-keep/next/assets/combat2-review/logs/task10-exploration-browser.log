@@ -1,0 +1,5 @@
+PASS default is area; map shows only visited room and pauses simulation
+TypeError: Cannot read properties of undefined (reading 'gate-shelter')
+    at C:\Users\Administrator\Documents\Codex\2026-11-03\codex-games-the-hollow-keep-docs\work\PLAYVAULT\games\the-hollow-keep\next\tests\exploration-browser.cjs:56:372
+    at async check (C:\Users\Administrator\Documents\Codex\2026-11-03\codex-games-the-hollow-keep-docs\work\PLAYVAULT\games\the-hollow-keep\next\tests\exploration-browser.cjs:11:44)
+    at async C:\Users\Administrator\Documents\Codex\2026-11-03\codex-games-the-hollow-keep-docs\work\PLAYVAULT\games\the-hollow-keep\next\tests\exploration-browser.cjs:51:3

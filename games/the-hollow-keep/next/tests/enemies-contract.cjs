@@ -203,7 +203,8 @@ test('shield: 앞에서 맞은 2단 충전탄은 막지 못하고 stagger — �
   const hp1 = en(w, 's1').hp;
   assert.ok(hp1 < sh.hp, '충전탄 피해 없음');
   run(w, I(), 2);
-  const ev2 = until(w, (i) => I({ attack: i === 0 }), (W, e) => has(e, 'hit', { target: 's1' }) || has(e, 'blocked'), 50);
+  // 충전탄 뒤 공격 대기가 끝나는 대로 1단이 나가도록 눌렀다 뗐다 반복(방패형 위치에 따라 대기 중일 수 있음)
+  const ev2 = until(w, (i) => I({ attack: i % 2 === 0 }), (W, e) => has(e, 'hit', { target: 's1' }) || has(e, 'blocked'), 50);
   assert.ok(has(ev2, 'hit', { target: 's1' }) && !has(ev2, 'blocked'), 'stagger 중 1단이 막힘');
 });
 
@@ -234,6 +235,137 @@ test('되살아남: 일반 적은 방을 나갔다 오면 처음 체력, 봉쇄�
   assert.ok(!en(w, 'key1'), '특정 적이 되살아남');
   assert.ok(en(w, 'n1') && en(w, 'n1').hp === E('crawler').hp, '일반 적이 되살아나지 않음');
   assert.ok(HK.getFlags(w).doors.gate, '문이 다시 닫힘');
+});
+
+test('쓰러짐 교대: 더 큰 Ethan이 벽·닫힌 봉쇄물에 묻히지 않음(§2, 2026-11-03 보완)', () => {
+  // Noah(39×64)가 오른쪽 벽 / 닫힌 봉쇄물에 붙어 선 채 쓰러지면 Ethan(42×68)으로 바뀐다(무작위 입력 검사에서 실제로 발견).
+  const solidsOf = (a) => { const out = []; a.rooms.a.grid.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === '#') out.push({ x: c * T, y: r * T, w: T, h: T }); })); for (const o of a.rooms.a.objects) if (o.type === 'door') out.push({ x: o.x * T, y: o.y * T, w: (o.w || 1) * T, h: (o.h || 1) * T }); return out; };
+  const ov = (a, b) => a.x < b.x + b.w - 0.01 && a.x + a.w > b.x + 0.01 && a.y < b.y + b.h - 0.01 && a.y + a.h > b.y + 0.01;
+  const nw = cfg('noah').width, nh = cfg('noah').height;
+  const cases = [
+    ['오른쪽 벽', area({ room: 'a', hero: 'noah', x: 930 - nw, y: FLOOR - nh }, { a: room([0, 0], { objects: [enemy('c', 'crawler', 26, 16, { face: 1 })] }) })],
+    ['닫힌 봉쇄물', area({ room: 'a', hero: 'noah', x: 600 - nw, y: FLOOR - nh }, { a: room([0, 0], { objects: [{ type: 'door', id: 'd', x: 20, y: 14, h: 3, open: { key: 'never' } }, enemy('c', 'crawler', 16, 16, { face: 1 })] }) })],
+  ];
+  for (const [label, a] of cases) {
+    const w = world(a, { hero: 'noah', hp: { ethan: 6, noah: 1 } });
+    const solids = solidsOf(a);
+    let swapped = -1;
+    for (let t = 0; t < 600 && swapped < 0; t++) { const ev = HK.step(w, I()); if (has(ev, 'swap', { reason: 'down' })) swapped = t; }
+    assert.ok(swapped >= 0, `${label}: 쓰러짐 교대가 일어나지 않음(검사 준비)`);
+    for (let k = 0; k < 30; k++) {
+      const p = P(w), hit = solids.find((b) => ov(p, b));
+      assert.ok(!hit, `${label}: 교대 ${k}틱 뒤 Ethan(${p.x.toFixed(1)},${p.y.toFixed(1)} ${p.w}×${p.h})이 막힌 칸(${hit && hit.x},${hit && hit.y})에 겹침`);
+      HK.step(w, I());
+    }
+  }
+});
+
+test('피격 판정(§2-1, 2026-11-04 보완): getHurtbox는 몸에서 앞뒤 hurtInset 안쪽, 적 몸이 이 상자에 닿아야 맞음', () => {
+  const inset = HK.CONFIG.hurtInset;
+  assert.ok(Number.isFinite(inset) && inset >= 3 && inset <= 6, `CONFIG.hurtInset ${inset} (3~6)`);
+  for (const hero of ['ethan', 'noah']) {
+    const a = area({ room: 'a', hero, ...at(hero, 8) }, { a: room([0, 0], { objects: [enemy('c', 'crawler', 20)] }) });
+    const w = world(a, { hero });
+    HK.step(w, I({ right: true }));
+    const hb = HK.getHurtbox(w), p = P(w);
+    assert.ok(Math.abs(hb.x - (p.x + inset)) < 1e-6 && Math.abs(hb.w - (p.w - 2 * inset)) < 1e-6 && hb.y === p.y && hb.h === p.h, `${hero} getHurtbox ${JSON.stringify(hb)}`);
+    let found = false;
+    for (let t = 0; t < 600 && !found; t++) {
+      const before = { ...P(w) }; const ev = HK.step(w, I());
+      if (has(ev, 'hurt')) {
+        const e = en(w, 'c'), pen = Math.min(before.x + before.w, e.x + e.w) - Math.max(before.x, e.x);
+        assert.ok(pen >= inset - 0.01, `${hero}: 돌격형 몸이 주인공 몸에 ${pen.toFixed(2)}단위만 겹쳤는데 맞음(그림보다 먼저 맞음, 기준 ${inset} 이상)`);
+        found = true;
+      }
+    }
+    assert.ok(found, `${hero}: 돌격형에 맞지 않음(검사 준비)`);
+  }
+});
+
+test('shield 밀치기(§5-1, 2026-11-04 보완): 판정은 방패 앞 bashReach(그림 효과)만 — 준비 중 거리를 두면 피하고, 다음 준비까지 recoveryTicks 이상', () => {
+  const c = E('shield');
+  assert.ok(c.bashReach >= 24 && c.bashReach <= 40, `bashReach ${c.bashReach} (24~40)`);
+  assert.ok(c.bashRange > c.bashReach, `준비 시작 거리 bashRange ${c.bashRange}가 판정 bashReach ${c.bashReach}보다 커야 물러나 피할 수 있음`);
+  assert.ok(c.recoveryTicks >= 80, `recoveryTicks ${c.recoveryTicks} ≥ 80 (너무 자주 밀침)`);
+  const sx = 16 * T + T / 2 - c.width / 2; // 방패형 왼쪽 끝(앞)
+  const setup = (gap) => {
+    const a = area({ room: 'a', hero: 'ethan', x: sx - gap - cfg('ethan').width, y: FLOOR - cfg('ethan').height }, { a: room([0, 0], { objects: [enemy('s', 'shield', 16, 16, { face: -1 })] }) });
+    const w = world(a); HK.step(w, I({ right: true })); return w;
+  };
+  // 거리 45: 준비는 시작하지만 밀치기는 닿지 않는다
+  let w = setup(45), sawBash = false, bashEnd = -1;
+  for (let t = 0; t < 80; t++) {
+    const ev = HK.step(w, I()), boxes = HK.getEnemyHitboxes(w), s = en(w, 's');
+    assert.ok(!has(ev, 'hurt'), `거리 45에서 ${t}틱에 맞음(방패 앞 ${c.bashReach}만 닿아야 함)`);
+    if (s.state === 'bash') {
+      sawBash = true;
+      assert.equal(boxes.length, 1, 'bash 중 getEnemyHitboxes 1개');
+      const b = boxes[0];
+      assert.ok(Math.abs(b.x + b.w - s.x) < 0.01 && Math.abs(b.w - c.bashReach) < 0.01, `밀치기 판정 ${JSON.stringify(b)}이 방패 앞(왼쪽 ${s.x.toFixed(1)}) ${c.bashReach}가 아님`);
+    } else {
+      assert.equal(boxes.length, 0, `${s.state} 중에 적 공격 판정이 있음`);
+      if (sawBash && bashEnd < 0) bashEnd = t;
+    }
+  }
+  assert.ok(sawBash && bashEnd > 0, '거리 45에서 준비·밀치기가 일어나지 않음(검사 준비)');
+  // 다음 준비까지의 간격(맞아서 밀려나도 됨)
+  let next = -1;
+  for (let t = 80; t < bashEnd + 200 && next < 0; t++) { HK.step(w, I()); if ((en(w, 's') || {}).state === 'windup') next = t; } // 위 반복이 80틱을 이미 진행함
+  assert.ok(next < 0 || next - bashEnd >= c.recoveryTicks, `밀치기 끝 ${bashEnd}틱 → 다음 준비 ${next}틱, 간격 ${next - bashEnd} < recoveryTicks ${c.recoveryTicks}`);
+  // 거리 20: 밀치기에 맞는다(피해 2), 맞는 순간 판정이 피격 상자와 겹침
+  w = setup(20); let hurt = null;
+  for (let t = 0; t < 60 && !hurt; t++) { const ev = HK.step(w, I()); const h = ev.find((e) => e.type === 'hurt'); if (h) hurt = h; }
+  assert.ok(hurt && hurt.damage === c.bashDamage, `거리 20에서 밀치기 피해 ${c.bashDamage}를 받지 않음(${JSON.stringify(hurt)})`);
+});
+
+// 위층 바닥(12행, 윗면 y 360)을 사다리(15열)가 지나고 양옆은 발판 — COMBAT2 §6-1 사다리 층계참
+function twoFloors(objects, { from = 3, to = 28, through = false } = {}) {
+  const set = [];
+  if (through) for (let r = 8; r <= 11; r++) set.push([r, 15, 'H']); // 사다리가 위층 바닥을 지나 더 올라감(꼭대기가 아닌 층계참)
+  for (let c = from; c <= to; c++) set.push([12, c, c === 15 ? 'H' : c === 14 || c === 16 ? '-' : '#']);
+  for (let r = 13; r <= 16; r++) set.push([r, 15, 'H']);
+  return room([0, 0], { set, objects });
+}
+const UPPER = 360;
+
+test('적 반응(§4-1, 2026-11-04 보완): 사다리에 매달린 주인공에게는 반응하지 않고 순찰, 사다리에서 내린 뒤 ladderGraceTicks 동안 공격을 시작하지 않음', () => {
+  const grace = HK.CONFIG.ladderGraceTicks;
+  assert.ok(Number.isFinite(grace) && grace >= 20, `CONFIG.ladderGraceTicks ${grace} ≥ 20`);
+  for (const [kind, col] of [['shield', 18], ['crawler', 19]]) {
+    const a = area({ room: 'a', hero: 'ethan', ...at('ethan', 15) }, { a: twoFloors([enemy('s', kind, col, 11, { face: -1 })]) });
+    const w = world(a, { hp: { ethan: 6, noah: 5 } });
+    const xs = []; let left = -1, attackStart = -1;
+    for (let t = 0; t < 400 && attackStart < 0; t++) {
+      const climbingBefore = P(w).climbing, p0 = P(w);
+      const goingUp = left < 0 && !(p0.onGround && !p0.climbing && p0.y + p0.h <= UPPER + 0.5);
+      HK.step(w, I({ up: goingUp }));
+      const p = P(w), e = en(w, 's');
+      if (left < 0 && climbingBefore && !p.climbing && p.y + p.h <= UPPER + 0.5) left = t;
+      if (p.climbing) { xs.push(e.x); assert.ok(!['windup', 'bash', 'charge'].includes(e.state), `${kind}: 사다리에 매달린 주인공에게 ${e.state}(${t}틱)`); }
+      if (left >= 0 && ['windup', 'charge'].includes(e.state)) attackStart = t;
+    }
+    assert.ok(left >= 0, `${kind}: 주인공이 위층에 오르지 못함(검사 준비)`);
+    assert.ok(Math.max(...xs) - Math.min(...xs) >= 10, `${kind}: 주인공이 사다리를 오르는 동안 ${(Math.max(...xs) - Math.min(...xs)).toFixed(1)}단위만 움직임(순찰하지 않고 기다림)`);
+    assert.ok(attackStart < 0 || attackStart - left >= grace, `${kind}: 사다리에서 내린 ${left}틱 뒤 ${attackStart - left}틱 만에 공격 시작(기준 ${grace})`);
+  }
+});
+
+test('적 순찰(§4-1): 지상 적은 바닥 높이의 사다리 칸(양옆 바닥·발판)을 건너가고, 다른 층 주인공을 따라와 기다리지 않음', () => {
+  for (const kind of ['shield', 'crawler']) {
+    // 주인공은 아래층 왼쪽(다른 층), 적은 위층 사다리 오른쪽에서 왼쪽으로 순찰
+    const a = area({ room: 'a', hero: 'ethan', ...at('ethan', 4) }, { a: twoFloors([enemy('s', kind, 20, 11, { face: -1 })], { through: true }) });
+    const w = world(a);
+    let crossed = false, minX = Infinity, maxX = -Infinity;
+    const limit = Math.ceil((2 * 26 * T) / E(kind).speed); // 위층을 한 번 왕복할 시간
+    for (let t = 0; t < limit; t++) {
+      HK.step(w, I()); const e = en(w, 's');
+      assert.ok(Math.abs(e.y + e.h - UPPER) < 0.5, `${kind}: 위층에서 떨어짐(${t}틱, 발 ${(e.y + e.h).toFixed(1)})`);
+      if (e.x + e.w / 2 < 15 * T) crossed = true;
+      minX = Math.min(minX, e.x); maxX = Math.max(maxX, e.x);
+    }
+    assert.ok(crossed, `${kind}: 사다리 칸(15열)을 건너가지 못함(x ${minX.toFixed(0)}~${maxX.toFixed(0)})`);
+    assert.ok(minX <= 5 * T && maxX + E(kind).width >= 26 * T, `${kind}: 위층 양 끝까지 오가지 않음(x ${minX.toFixed(0)}~${(maxX + E(kind).width).toFixed(0)}, 바닥 3~28열)`);
+  }
 });
 
 test('결정성: 같은 입력 → 같은 결과(적·피격·교대 섞음)', () => {
