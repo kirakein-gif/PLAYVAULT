@@ -2,7 +2,20 @@
 
 확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(HANGMAN MASTER 1차 구현, 가족 블록 게임 작업지시서). 아래 기존 이력은 보존합니다.
 
-## 구현 · HANGMAN MASTER v1.0.0 (가족 행맨, `games/family-hangman/`) / CI APK 확인·사용자 실기 대기
+## 구현 · HANGMAN MASTER 발음 듣기(🔊) + 발음 속도 옵션 / CI 확인·병합 승인 대기
+
+2026-11-04 / Claude Code / `ccr-33a67370-6aa4yx`(main `2185514` 이후). 결과 창(정답·오답 모두)과 단어장에 🔊, 기기 음성 엔진(Android `@capacitor-community/text-to-speech` 8.0.2, 웹 speechSynthesis), 사용자별 발음 속도 느리게/보통/빠르게, 영어 음성 없으면 흐림·안내·설치 화면 버튼. INTERNET 권한 추가 없음. 단위 28/28, E2E 15/15(dist·play, 외부 0). 실제 소리는 태블릿 확인 필요. 앱 버전 1.0.0 → 병합 시 Release `family-hangman-v1.0.0` 파일이 교체됨(같은 키라 덮어 설치 가능).
+
+## 교차 검토 · BLOCK MASTER PR #28 (ChatGPT 구현) / 수정 요청 → 재검토 대기
+
+2026-11-04 / 검토 Claude Code / head `99d5e45`. 재현: tsc, Vitest 32/32, E2E 11/11(외부 0). SRS 표·고정·점수·레벨 등 규칙은 지시서와 일치. 수정 요청 3건(높음: 새 블록이 숨은 줄에서 생성돼 1~2초 안 보임 / 중간: Android 뒤로가기, E2E 약한 단언), 경미 4건(결과 문구 중복, 미사용 의존성, 미리보기 크기, main과 문서 3개 충돌). 구현 브랜치 수정 없음. 병합 보류.
+
+## 병합 완료 · HANGMAN MASTER v1.0.0 (PR #29 → main `2185514`, 2026-11-04) / 사용자 실기 대기
+
+- main CI #4 전체 통과, **Release `family-hangman-v1.0.0`** 생성: `FamilyHangman-v1.0.0-debug.apk`(12,318,895 bytes) + `.sha256`. https://github.com/kirakein-gif/PLAYVAULT/releases/tag/family-hangman-v1.0.0
+- 남은 일: 태블릿 설치·아이 피드백, PLAYVAULT 첫 화면 카드(Codex 메인 화면 작업 뒤). 블록 게임 지시서도 함께 main 반영(ChatGPT 구현 대기).
+
+### (당시 기록) 구현 · HANGMAN MASTER v1.0.0
 
 2026-11-04 / Claude Code / `ccr-33a67370-6aa4yx` / 기준 main `4e7abd0`. 사용자 요청: "같은 컨셉으로 행맨 게임 만들어줘요. 이건 코드에서 독자적으로 갑시다" → Claude Code 직접 구현(역할 분담표보다 사용자 지시 우선). 범위: 새 폴더 `games/family-hangman/`, 새 CI `.github/workflows/family-hangman-android.yml`, 루트 README 한 줄. 체스·다른 게임·루트 `index.html`·공용 자산 변경 없음.
 - 내용: 혼자 하기(기초 영어 358단어·10주제·한국어 뜻, 난이도=글자 수), 둘이서(단어+한글 힌트 입력 → 건네기), 단어장(통계·맞힌/놓친 단어·놓친 단어 다시 하기), 그림은 설정에서 사용자별 선택 — 풍선 바구니(기본)/클래식 행맨(2026-11-04 사용자 결정 "풍선 아이디어 좋다, 옵션에서 선택"), 단어는 영어만(사용자 확인), 힌트 2종, 별 1~3. 체스 공통 모듈(저장·백업·한영·효과음·Capacitor 래퍼·UI) 복사, 앱 ID `com.playvault.familyhangman`(영구), 같은 가족 서명 키.

@@ -4,6 +4,7 @@ import { TopBar } from '../components/ui';
 const ITEMS: [name: string, license: string, note: string][] = [
   ['React / React DOM', 'MIT', 'Meta Platforms, Inc.'],
   ['Capacitor (core, android, app, filesystem, haptics, preferences, share)', 'MIT', 'Drifty Co. (Ionic)'],
+  ['@capacitor-community/text-to-speech', 'MIT', 'Robin Genz (Capacitor Community)'],
   ['Nunito', 'SIL Open Font License 1.1', 'The Nunito Project Authors'],
   ['Gowun Dodum · Gowun Batang', 'SIL Open Font License 1.1', 'The Gowun Dodum / Gowun Batang Project Authors'],
   ['HANGMAN MASTER word list, pictures, sounds', 'Original', 'PLAYVAULT family project'],

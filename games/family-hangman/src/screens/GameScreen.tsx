@@ -3,6 +3,7 @@ import { useApp } from '../state';
 import { Btn, Confirm, Modal, TopBar } from '../components/ui';
 import { Stars } from '../components/icons';
 import { Scene } from '../components/Scene';
+import { SpeakButton } from '../components/SpeakButton';
 import { LetterKeyboard, letterFromKey } from '../components/LetterKeyboard';
 import { sound } from '../audio/sound';
 import {
@@ -206,7 +207,10 @@ export function GameScreen(props: Props) {
           }
         >
           <div className="result" data-testid="result" data-result={st}>
-            <p className="resultWord">{round.word.toUpperCase()}</p>
+            <div className="resultWordRow">
+              <p className="resultWord">{round.word.toUpperCase()}</p>
+              <SpeakButton word={round.word} />
+            </div>
             {info && <p className="resultMeaning">{info.ko}</p>}
             {st === 'won' && props.mode === 'solo' && <Stars n={stars} size="44px" />}
           </div>

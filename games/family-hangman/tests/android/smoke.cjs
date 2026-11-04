@@ -52,6 +52,14 @@ const log = (s, extra = {}) => { console.log(s, JSON.stringify(extra)); result.s
   await waitSel('[data-testid=result][data-result=won]');
   log('two-player round won');
   await device.screenshot({ path: path.join(out, '02-two-won.png') });
+  // pronunciation: the engine may or may not have English voice data on the
+  // emulator image, so record the status and make sure tapping never errors
+  await page.waitForFunction(() => document.querySelector('[data-testid=speak-cat]')?.dataset.status !== 'checking', null, { polling: 300, timeout: 20000 }).catch(() => undefined);
+  const voice = await page.evaluate(() => document.querySelector('[data-testid=speak-cat]')?.dataset.status);
+  await click('[data-testid=speak-cat]');
+  await page.waitForTimeout(1500);
+  result.voice = voice;
+  log('speak button tapped', { voice });
   await click('[data-testid=result-home]');
 
   // solo: play one full round with common letters

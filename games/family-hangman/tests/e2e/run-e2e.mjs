@@ -49,6 +49,7 @@ async function newPage(vp = { width: 1280, height: 800 }, opts = {}) {
     external.push({ test: current, url: u });
     return route.abort();
   });
+  if (opts.voices) await ctx.addInitScript(fakeSpeech, opts.voices);
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -58,6 +59,24 @@ async function newPage(vp = { width: 1280, height: 800 }, opts = {}) {
   await page.waitForSelector('[data-testid=menu-solo]', { timeout: 15000 });
   await page.waitForFunction(() => !document.getElementById('splash'), null, { timeout: 5000 });
   return page;
+}
+/** Replaces the browser's speech engine with a recorder (headless Chromium has no voices). */
+function fakeSpeech(voices) {
+  window.__spoken = [];
+  window.SpeechSynthesisUtterance = class {
+    constructor(text) {
+      this.text = text;
+    }
+  };
+  Object.defineProperty(window, 'speechSynthesis', {
+    configurable: true,
+    value: {
+      getVoices: () => voices.map((lang) => ({ lang, name: lang })),
+      speak: (u) => window.__spoken.push({ text: u.text, rate: u.rate, lang: u.lang }),
+      cancel: () => undefined,
+      addEventListener: () => undefined,
+    },
+  });
 }
 const click = async (page, id) => {
   await page.click(`[data-testid=${id}]`);
@@ -301,6 +320,65 @@ await test('picture option: classic hangman per player, kept after reload', asyn
   await click(page, 'settings-close');
   await startTwo(page, 'cat');
   assert((await page.getAttribute('[data-testid=scene]', 'data-picture')) === 'balloon', 'other player unchanged');
+});
+
+await test('pronunciation: 🔊 on the result and word book, speed option per player', async () => {
+  const page = await newPage({ width: 1280, height: 800 }, { voices: ['en-US', 'ko-KR'] });
+  await startTwo(page, 'cat');
+  await typeWord(page, 'cat');
+  await page.waitForSelector('[data-testid=speak-cat][data-status=ready]');
+  await click(page, 'speak-cat');
+  await page.waitForTimeout(100);
+  let spoken = await page.evaluate(() => window.__spoken);
+  assert(spoken.length === 1 && spoken[0].text === 'cat' && spoken[0].rate === 0.85 && spoken[0].lang === 'en-US', 'normal speed ' + JSON.stringify(spoken));
+  await page.screenshot({ path: join(out, 'speak-result.png') });
+  await click(page, 'result-home');
+  await click(page, 'settings-btn');
+  assert((await page.textContent('[data-testid=voice-status]')).includes('있음'), 'voice status shown');
+  await click(page, 'rate-slow');
+  await page.waitForTimeout(100);
+  spoken = await page.evaluate(() => window.__spoken);
+  assert(spoken.at(-1).text === 'apple' && spoken.at(-1).rate === 0.6, 'slow preview');
+  await click(page, 'settings-close');
+  // a lost solo round: the answer can still be heard, at the chosen speed
+  await click(page, 'menu-solo');
+  await click(page, 'level-easy');
+  await click(page, 'setup-start');
+  await page.waitForSelector('[data-testid=word]');
+  for (const l of 'qjxzvkwy') {
+    if (await page.$('[data-testid=result]')) break;
+    if (await page.isEnabled(`[data-testid=key-${l}]`)) await click(page, `key-${l}`);
+  }
+  await finishSolo(page);
+  const word = (await page.textContent('.resultWord')).toLowerCase();
+  await click(page, `speak-${word}`);
+  await page.waitForTimeout(100);
+  spoken = await page.evaluate(() => window.__spoken);
+  assert(spoken.at(-1).text === word && spoken.at(-1).rate === 0.6, 'result after a round at slow speed');
+  await click(page, 'result-home');
+  await click(page, 'menu-words');
+  await click(page, (await page.$('[data-testid=tab-missed]')) && (await page.textContent('[data-testid=tab-missed]')).includes('(') ? 'tab-missed' : 'tab-won');
+  await page.waitForSelector(`[data-testid=speak-${word}]`);
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: join(out, 'speak-words.png') });
+  // the other player keeps the normal speed
+  await page.reload();
+  await page.waitForSelector('[data-testid=settings-btn]');
+  await click(page, 'settings-btn');
+  await click(page, 'use-p2');
+  assert(await page.$('[data-testid=rate-normal].on'), 'player 2 normal');
+  await click(page, 'use-p1');
+  assert(await page.$('[data-testid=rate-slow].on'), 'player 1 slow kept after reload');
+});
+
+await test('pronunciation: no English voice → button dimmed with a notice', async () => {
+  const page = await newPage({ width: 1280, height: 800 }, { voices: ['ko-KR'] });
+  await startTwo(page, 'dog');
+  await typeWord(page, 'dog');
+  await page.waitForSelector('[data-testid=speak-dog][data-status=missing]');
+  await click(page, 'speak-dog');
+  await page.waitForSelector('[data-testid=toast]');
+  assert((await page.evaluate(() => window.__spoken.length)) === 0, 'nothing spoken');
 });
 
 await test('English UI and settings', async () => {

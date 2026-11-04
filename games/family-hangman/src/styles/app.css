@@ -241,3 +241,11 @@ input[type='range'] { width: 220px; accent-color: var(--gold); height: 32px; }
   .statRow { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   :root { --key: min(8.6vw, 64px); }
 }
+
+/* ---------- pronunciation ---------- */
+.resultWordRow { display: flex; align-items: center; gap: 16px; }
+.speakBtn { flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--gold); background: rgba(201, 166, 107, 0.16); color: var(--gold2); cursor: pointer; }
+.speakBtn.md { width: 60px; height: 60px; font-size: 28px; }
+.speakBtn.sm { width: 46px; height: 46px; font-size: 21px; }
+.speakBtn:active { background: rgba(201, 166, 107, 0.32); }
+.speakBtn.off { opacity: 0.4; border-color: var(--line); }

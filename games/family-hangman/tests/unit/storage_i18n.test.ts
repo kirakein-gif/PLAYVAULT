@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { defaultData, missedWords, newProfile, recordSolo, validateData, RECENT_MAX } from '../../src/storage/schema';
 import { makeBackup, parseBackup } from '../../src/storage/backup';
 import { allKeys, DICTS, translate } from '../../src/i18n/i18n';
+import { RATE_VALUE } from '../../src/platform/speechRates';
 
 describe('records', () => {
   it('recordSolo counts wins, streaks, best stars and the recent list', () => {
@@ -65,6 +66,18 @@ describe('storage', () => {
     delete d.profiles.p1.picture;
     const old = validateData(d);
     expect(old.ok && old.data.profiles.p1.picture).toBe('balloon');
+  });
+
+  it('speech rate: normal by default, valid choices kept, others repaired', () => {
+    const d = defaultData() as unknown as Record<string, any>;
+    expect(d.profiles.p1.speechRate).toBe('normal');
+    d.profiles.p1.speechRate = 'slow';
+    d.profiles.p2.speechRate = 'turbo';
+    const v = validateData(d);
+    expect(v.ok && v.data.profiles.p1.speechRate).toBe('slow');
+    expect(v.ok && v.data.profiles.p2.speechRate).toBe('normal');
+    expect(RATE_VALUE.slow).toBeLessThan(RATE_VALUE.normal);
+    expect(RATE_VALUE.normal).toBeLessThan(RATE_VALUE.fast);
   });
 
   it('rejects broken or foreign data', () => {

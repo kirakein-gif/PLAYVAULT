@@ -147,5 +147,23 @@
   },
   "web": {
     "narrow": "Made for tablet and PC screens. Turn the device sideways or open it on a bigger screen."
+  },
+  "speech": {
+    "listen": "Listen",
+    "rate": "Speech speed",
+    "rateDesc": "How fast the 🔊 button reads words (per player, tap to preview)",
+    "rates": {
+      "slow": "Slow",
+      "normal": "Normal",
+      "fast": "Fast"
+    },
+    "missing": "No English voice on this device. Install one in Settings → Text-to-speech output.",
+    "install": "Get English voice",
+    "status": "English voice",
+    "statuses": {
+      "checking": "checking",
+      "ready": "available",
+      "missing": "missing"
+    }
   }
 }

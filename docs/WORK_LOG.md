@@ -1548,3 +1548,27 @@
 - 관리 문서: STATUS·CHANGELOG·WORK_LOG, 게임 README·TEST_REPORT 갱신. AGENTS·CLAUDE 변경 없음. 버전 1.0.0 유지(아직 main 미병합 첫 버전).
 - 사용자 재요청 횟수: 0회(기능 추가 요청 1회). 다음: CI 확인 → 사용자 승인 후 main 병합.
 - CI #3(`1cdad61`, run 41813876364, 그림 옵션 포함) 전체 성공. 사용자에게 APK 아티팩트 링크 전달(GitHub 로그인 필요, zip 안에 APK). 영구 Release 링크는 main 병합 후 생성.
+
+### 2026-11-04 (Asia/Seoul) · HANGMAN MASTER PR #29 병합 · Release 확인 (Claude Code)
+
+- 사용자 승인("병합해주세요"). main `4e7abd0` 변화 없음 확인 후 PR #29 생성 → merge commit `2185514`(head `e3cc8a0`, 블록 게임 지시서 포함).
+- main CI #4(run 41814988727) 전체 성공, release 작업이 Release `family-hangman-v1.0.0` 생성: APK 12,318,895 bytes(digest sha256:2a7a04f1…), `.sha256` 업로드 확인. 사이트 배포는 Cloudflare Pages의 main 자동 반영 방식(카드 없음, 직접 확인 못 함).
+- 이 기록은 병합 후 작업 브랜치에 추가한 커밋으로, main에는 다음 병합 때 반영.
+
+### 2026-11-04 (Asia/Seoul) · BLOCK MASTER PR #28 교차 검토 (검토 Claude Code / 구현 ChatGPT)
+
+- 요청: "태트리스 교차검증 해주세요". 대상 `chatgpt/family-blocks-solo` head `99d5e45`(base main `4e7abd0`). 검토 담당이므로 구현 브랜치 수정 없음 — 코드는 `git archive`로 scratchpad에 내보내 실행.
+- 재현: `npm ci`, tsc 통과, Vitest 32/32, build, PR E2E 11/11(외부 0, 오류 0). 범위 확인(게임 폴더·새 workflow·관리 문서 3개), 상표 용어 없음, chess.js·stockfish 번들 미포함.
+- 규칙 대조: SRS 벽 차기 16항목(y 반전 포함), 회전, 등장 열, 고정 30틱·15회, 드롭 점수, 레벨, 40줄, 홀드, 7개 묶음 — 모두 지시서와 일치.
+- 발견 7건: [높음] 생성 y=0이 숨은 2줄 안이라 새 블록이 레벨 1에서 1~2초 보이지 않음(seed 77, 48틱 캡처로 확인, 원인 일부는 지시서 문구 모호 — 기준 정정 전달). [중간] Android 뒤로가기(홈·설정에서 확인 없이 종료, 일시정지 중 나갈 수 없음). [중간] E2E 단언 약함(`after<=before`, 기록 유지 내용 미확인, 캔버스 글자 겹침 미검사). [경미] 차근차근 그만하기 결과 문구 중복, 미사용 의존성, 미리보기 작음(실기 판단), main과 문서 3개 충돌.
+- PR #28에 리뷰(COMMENT — 같은 계정 PR이라 변경 요청 불가)로 기록. 평가: 검토 담당 Claude Code, 발견 문제 7건(수정 요청 3), 사용자 재요청 0회.
+- 다음: ChatGPT 수정 → Claude Code 재검토 → 사용자 승인 후 병합.
+
+### 2026-11-04 (Asia/Seoul) · HANGMAN MASTER 발음 듣기 + 발음 속도 옵션 (Claude Code)
+
+- 요청: "정답이 나오면 (오답도 답이 나오나?) 스피커 버튼 있어서 누르면 발음이 나오게" → 답변(오답 때도 정답 표시됨, 기기 음성 엔진 방식, 오프라인은 기기 영어 음성 데이터에 달림, 게임 중 버튼은 답 노출이라 제외 권장) → "발음속도는 옵션으로 선택하게. 진행해주세요".
+- 기준: 작업 브랜치(main `2185514` + 기록 커밋 2개).
+- 변경: `@capacitor-community/text-to-speech@8.0.2`(MIT, 매니페스트에 TTS 서비스 queries만 추가, 권한 없음) 설치·`cap sync`로 gradle 2개 갱신, `src/platform/speech.ts`(Android 영어 지원 여부 `isLanguageAvailable` 기반 확인·재시도, 웹 voices 확인, speak, 음성 설치 화면 열기), `speechRates.ts`(느리게 0.6·보통 0.85·빠르게 1.0), `SpeakButton`(결과 창·단어장), 프로필 `speechRate`(기본 보통, 잘못된 값 복구), 설정 "발음 속도"(누르면 apple 미리 듣기)·영어 음성 없을 때 안내/설치 버튼·기기 정보 줄 '영어 음성' 상태, 한/영 문자열, 라이선스 표·파일, Android smoke에 🔊 상태 기록·탭, `play/` 재빌드.
+- 검증(이번 실행): tsc, Vitest 28/28, E2E 15/15(dist)·15/15(play), 외부 0. E2E는 speechSynthesis를 기록용 가짜로 대체해 호출 단어·언어·속도 확인(실제 음성 아님). APK·에뮬레이터는 push 후 CI.
+- 사용자 재요청 횟수: 0회(기능 추가 1회). 다음: CI → 사용자 승인 후 main 병합(Release 파일 교체) → 태블릿에서 소리 확인.
+- CI #6(`2d6e820`, run 41831202054) 전체 성공: 에뮬레이터(네트워크 차단)에서 영어 음성 상태 `ready`, 🔊 탭 오류 없음, 설치 권한은 VIBRATE뿐. 소리는 에뮬레이터 `-noaudio`라 확인 못 함. APK 아티팩트 13322798657.
