@@ -8,6 +8,9 @@ import { Share } from '@capacitor/share';
 
 export const isNative = Capacitor.isNativePlatform();
 
+/** Web build inside the PLAYVAULT site: link back to the game hub (set by `npm run build:web`). */
+export const hubUrl: string | undefined = isNative ? undefined : import.meta.env.VITE_HUB_URL || undefined;
+
 export function onBackButton(handler: () => void): () => void {
   if (!isNative) return () => undefined;
   const p = App.addListener('backButton', handler);

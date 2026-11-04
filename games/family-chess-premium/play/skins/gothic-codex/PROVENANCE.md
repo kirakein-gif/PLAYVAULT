@@ -1,0 +1,31 @@
+# Gothic · Codex provenance
+
+Date: 2026-11-03 (Asia/Seoul). Tool: built-in image_gen. Model version and seed were not exposed. Source art: `scripts/art-source/codex-skins/` (gothic-pieces.png, gothic-light.png, gothic-dark.png); outside public so not bundled in the app. Complete prompt history: `scripts/art-source/codex-skins/PROMPTS.md`.
+
+Runtime: twelve transparent WebP256x256 sculptures, base bottom at235px with horizontal base centring; two opaque WebP1024x1024 floor textures. Medieval includes two optional standing-knight comparison images, while the active knight rears with a visible spear. Existing Claude pieces/CSS/skin entries are preserved. No menu detail illustrations in this phase.
+
+Processing: `python scripts/build-codex-skins.py` with Pillow/numpy/scipy. Alpha>=200 connected-component extraction removes generated translucent fringe; each original sculpture is isolated without inventing replacement shapes or filling crown/arm gaps. Noble uses a deliberately flat green intermediate: RGB chroma key separates its background, removes green edge spill, and preserves stone geometry. LANCZOS downsampling to native256 canvas, plinth-centre/235px alignment, rank-relative heights, WebPquality92 (reduced only if a size limit requires). Texture sources are resized to exactly1024. No baked enlargement, no user photo included in public assets. Piece budget60KB, floor200KB, all three sets target under3MB. Captures at60 CSS pixels on both floor tones are supplied for family judgement.
+
+Noble follows the user-supplied photograph and explicit request to match its visible sculptural appearance as closely as possible, superseding the initial generic-design instruction for this additional set. Hidden parts were reconstructed; this is not a pixel-identical recovery. Its light side was made near-white and dark side near-black at the user's request. Gothic stays muted lavender/plum; Medieval uses neutral light/dark stone. No glow, gilding or UI recolouring.
+
+Full prompts used for this set follow.
+
+## Gothic sculpture source, initial
+
+Production chess piece SOURCE ATLAS, exactly TWELVE isolated ORIGINAL minimal gothic chess sculptures, SIX COLUMNS by TWO ROWS, transparent background no text/labels/scenery. TOP ROW pale lavender-gray stone with aged ivory highlights, BOTTOM ROW deep muted plum-violet iron/stone with cool lavender edge highlights. BOTH rows in exact order left to right KING QUEEN ROOK BISHOP KNIGHT PAWN. Clearly distinct classical chess silhouettes: KING tall tapered gothic spire with prominent simple cross top; QUEEN tall slender stem with open five-point crown, round tiny finials, no cross; ROOK short broad squared castle tower with unmistakable crenellations; BISHOP tall slender mitre head with a single deep diagonal slit; KNIGHT bold horse head and arched neck in profile facing left with simple chiseled mane; PAWN short with big smooth spherical head and flared collar. Six different instantly recognizable profiles, shared simple low octagonal bases with beveled edges, king tallest pawn shorter. Rich matte sculptural material in clean restrained broad surfaces and sparse shallow pointed arch carving. Cool dusky PURPLE family, subtle blue-gray shadows, soft moonlight upper left, NO glow or magical light. Finely rendered sculptural 3D asset not icon or outline. Orthographic slight three-quarter top view, same camera and scale all figures, each in its own large cell with generous transparent gutters. At60px readability more important than ornament. No flashy decoration, fire, lightning, glitter, gold gilding, polished gloss, jewelry, decorative borders, no logos or existing franchise design. Very gentle pale lavender rim allows dark pieces to read on both light/dark squares. Whole objects uncut including every base.
+
+## Gothic margin correction → gothic-pieces.png
+
+Technical sprite atlas correction only. Keep these exact12 gothic chess sculptures, materials, colors, silhouettes and 6columns x2rows order unchanged. Add generous TRANSPARENT margin at the top so the top-left king's cross is WHOLE and not clipped by canvas. Every piece needs transparent margin around its entire silhouette inclcross andbase. Move/reduce all pieces equally if needed to fit well inside cells, preserve detail and relative sizes. Remove stray magenta/red fringe specks and white translucent background halos, clean transparent silhouette edges. NO other redesign, no new objects, no labels. Entire top king cross fully visible is essential.
+
+## Gothic light texture → gothic-light.png
+
+A square 1024x1024 flat PURPLE SLATE SURFACE MATERIAL texture for a restrained gothic family chessboard. Single stone surface perfectly overhead, NO checkerboard or grid, NO pieces or objects, NO border, NO text. Soft muted lavender gray base about #a49bae, slight plum-blue undertone. Very subtle fine-grained honed slate cloudy mineral variation with sparse faint cool-gray seams, matte surface, uniform ambient moonlike illumination, no directional shadows. Clean large quiet areas; low contrast natural stone texture that will not compete with60px chess pieces. No gold, glow, lightning, cracks, runes, decorative pattern, symbols or shiny highlights. Not dramatic, not flashy, refined muted purple stone material.
+
+## Gothic dark texture → gothic-dark.png
+
+1024x1024 square seamless muted deep PLUM PURPLE SLATE material map, flat overhead one continuous slab. Base #494054 cool dusk purple, quiet broad areas with faint lavender mineral clouding and sparse fine slate grain. Matte honed stone, low contrast uniform ambient light, no specular highlights. A family chessboard dark square material under pale lavender and dark violet chess sculptures. Not black, not flashy. No checkerboard/grid/pieces/text/borders/runes/glow/fire/lightning/cracks/gold or perspective. Refined natural stone.
+
+## 2026-11-03 윤곽 보완 (Claude Code, 사용자 지시)
+
+가족 검토에서 판 위 윤곽이 약하다는 의견으로, 기물 12개에 윤곽선을 덧입혔습니다. 흰 기물은 `#2a2233`, 검은 기물은 `#c4b9d6`, 256px 기준 반경 5px, 32방향 실루엣 겹침. 재현: `NODE_PATH=$(npm root -g) node scripts/outline-skin.cjs scripts/art-source/codex-skins/gothic-codex-original public/skins/gothic-codex`. 원본은 `scripts/art-source/codex-skins/gothic-codex-original/`.
