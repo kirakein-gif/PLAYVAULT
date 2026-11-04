@@ -1,5 +1,9 @@
 # PLAYVAULT · 현재 개발 현황
 
+## 진행 중 · TASK_10 추가 수정 지시 1 (2026-11-04)
+
+Codex / `codex/hollow-keep-combat-enemies` / PR #24 / 시작 HEAD `812d362`. 사용자 승인으로 검토 브랜치 `claude/hollow-keep-combat2-review`(`1d32619`)를 병합하고 쓰러짐 자동 교대 시 벽·닫힌 봉쇄물 겹침을 최대8단위 좌우→아래 자리 보정으로 수정합니다. 규격·정정 검사와 양쪽 관리 기록을 보존하고, enemies17/17·탐험 경계/실제 입력 및 기존 회귀 전체를 재실행합니다. 담당 범위: Hollow Keep sim, 검증 자료와 관리 문서. main 병합·수동 배포 없음. 다음 Claude Code 재검토.
+
 확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Codex**(TASK_10 구현·검증 제출, Claude Code 교차 검토 대기).
 
 
