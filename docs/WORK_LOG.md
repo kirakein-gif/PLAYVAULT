@@ -1527,3 +1527,14 @@
 - 검증: 문서 전용. `git diff --check` 확인. 지시서 수치(등장 열·고정 대기 15회·낙하 표)의 서로 간 일관성 검토. 실행 테스트 없음.
 - 관리 문서: STATUS·WORK_LOG 갱신. CHANGELOG는 게임이 아직 없어 변경 없음. AGENTS·CLAUDE 검토 — ChatGPT도 AGENTS 적용 대상이라 절차 변경 없음(역할 분담표 조정은 사용자 결정 사항으로 남김).
 - 사용자 재요청 횟수: 0회. 다음: 사용자가 지시서를 ChatGPT에 전달 → ChatGPT 구현·draft PR → 교차 검토.
+
+### 2026-11-04 (Asia/Seoul) · HANGMAN MASTER v1.0.0 1차 구현 (Claude Code)
+
+- 요청: "같은 컨셉으로 행맨 게임 만들어줘요. 이건 코드에서 독자적으로 갑시다." → Claude Code가 직접 구현(작업지시서·다른 AI 없음). 사용자 개별 지시가 역할 분담표("신규 1차 구현 = Codex")보다 우선.
+- 기준: main `4e7abd0`(fetch 확인), 브랜치 `ccr-33a67370-6aa4yx`(앞 커밋 `77dfeb4` 블록 게임 지시서 포함). 다른 열린 작업과 경로 겹침 없음(새 폴더).
+- 판단(사용자에게 보고): ① 교수대 그림은 아이용으로 부적절하다고 보고 **풍선 바구니**로 대체(6번 기회, 다 날아가면 바구니가 언덕에 내려앉음). ② 한글 자모 행맨은 받침·조합 문제로 1차 제외, **영어 단어 + 한국어 뜻**(학습 겸용). ③ 난이도는 글자 수로 결정(검증 가능). ④ "둘이서"를 가족 대국 대응 모드로.
+- 변경: `games/family-hangman/` 전체 신규 — `src/game/hangman.ts`(순수 규칙), `words.ts`(358단어 자작 목록), `storage/schema.ts`(새 형식·검증·`recordSolo`), 화면 6개, `BalloonScene`·`LetterKeyboard`, CSS(체스 공통 규칙 복사 + 새 규칙), 체스에서 복사한 `platform/native.ts`·`audio/sound.ts`·`i18n.ts`·`ui.tsx`·`icons.tsx`·`store.ts`·`backup.ts`(저장 키 `fhm.*`, 백업 파일명·폴더명 변경), `android/`(체스 프로젝트 복사, 앱 ID `com.playvault.familyhangman`, 키 파일 복사), `scripts/build-icons.cjs`(풍선 아이콘·스플래시 생성 후 결과 커밋), `play/` 웹 빌드, 단위·E2E·Android smoke 테스트, README·LICENSES·`docs/TEST_REPORT.md`. 새 CI `.github/workflows/family-hangman-android.yml`(체스 workflow 복사, aapt2로 INTERNET 권한 없음 확인 단계 추가). 루트 README 게임 목록 한 줄.
+- 검증(이번 실행): tsc 통과, Vitest 26/26, `npm run build`·`build:web` 통과, `play/` 2회 빌드 해시 동일, 오프라인 E2E 12/12(dist)·12/12(play), 외부 요청 0, 저장소 루트 정적 서버 하위 경로·`← PLAYVAULT` 이동 확인. 첫 E2E 실행은 CSS 미닫힌 `@media` 괄호(체스 CSS 발췌 실수)로 10/12 실패 → 수정 후 통과. 853×533 스크린샷에서 자판 오른쪽 잘림을 발견(테스트가 자판 전체 상자만 검사해 통과했었음) → 키 크기·열 비율 수정, 줄 끝 키 검사 추가 후 통과.
+- 미실행: APK 빌드·에뮬레이터(이 환경 Android SDK 차단 → push 후 CI). 실제 태블릿 미확인.
+- 관리 문서: STATUS·WORK_LOG·CHANGELOG 갱신, 루트 README 한 줄. AGENTS·CLAUDE 검토, 절차 변경 없음. 루트 `index.html` 카드는 Codex 메인 화면 작업과 겹쳐 추가하지 않음.
+- 사용자 재요청 횟수: 0회. 다음: CI 결과 확인 → 사용자 승인 후 main 병합 → Release APK 태블릿 설치·피드백.

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#101820" />
+    <title>HANGMAN MASTER</title>
+    <link rel="icon" href="icons/icon-192.png" />
+    <style>
+      html, body { margin: 0; height: 100%; background: #101820; }
+      #splash { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vmin; background: radial-gradient(circle at 50% 40%, #1d2b36, #0b1218 70%); transition: opacity 420ms ease; }
+      #splash.out { opacity: 0; pointer-events: none; }
+      #splash img { width: 24vmin; height: 24vmin; border-radius: 22%; animation: rise 800ms cubic-bezier(.2,.8,.2,1) both; }
+      #splash .t { font: 700 max(28px, 5vmin)/1.1 Georgia, 'Noto Serif KR', serif; color: #e3c58f; letter-spacing: .08em; animation: fadeup 800ms 150ms ease both; }
+      @keyframes rise { from { opacity: 0; transform: translateY(4vmin) scale(.92); } }
+      @keyframes fadeup { from { opacity: 0; transform: translateY(1.6vmin); } }
+    </style>
+  </head>
+  <body>
+    <div id="splash"><img src="icons/icon-192.png" alt="" /><div class="t">HANGMAN MASTER</div></div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
