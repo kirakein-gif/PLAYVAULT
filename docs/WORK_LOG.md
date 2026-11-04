@@ -1617,3 +1617,9 @@
 ### 2026-11-04 (Asia/Seoul) · BLOCK MASTER PR #28 병합 (Claude Code, 사용자 승인)
 
 - 사용자: "직접 병합해주세요". 구현 브랜치 `chatgpt/family-blocks-solo`(`da52a22`)에 작업 브랜치(main `ef3aa54` + 검토 기록)를 병합해 문서 충돌 2개(CHANGELOG·WORK_LOG)를 양쪽 기록 모두 보존해 해결, STATUS 맨 위 갱신. 게임 코드 변경 없음. 이후 PR #28을 Ready로 바꾸고 main에 merge commit.
+
+### 2026-11-04 (Asia/Seoul) · BLOCK MASTER main CI 후속 수정 — Release 단계가 건너뛰어진 문제 (Claude Code)
+
+- 병합 결과: PR #28 → main merge `1ece577`. main CI #19는 unit-tests(단위·E2E·play 일치) 성공이나 build·emulator-offline-test·release가 **skipped** → Release `family-blocks-v1.0.0` 미생성(404 확인).
+- 원인: 첫 작업 `web-build-refresh`가 `chatgpt/family-blocks-solo`에서만 실행. main에서 skip되면 `build`(조건 없음)가 기본 `success()` 판정으로 함께 skip되어 뒤 작업 전체가 연쇄 skip. 브랜치 CI에서는 그 작업이 실행돼 드러나지 않았음.
+- 수정: build·emulator·release에 `!cancelled()` + 앞 작업 결과 `success` 명시 조건. 게임 코드 변경 없음. 작업 브랜치에서 build·에뮬레이터가 실제 실행되는지 확인 후 사용자 승인을 받아 main에 병합 예정.
