@@ -1548,3 +1548,9 @@
 - 관리 문서: STATUS·CHANGELOG·WORK_LOG, 게임 README·TEST_REPORT 갱신. AGENTS·CLAUDE 변경 없음. 버전 1.0.0 유지(아직 main 미병합 첫 버전).
 - 사용자 재요청 횟수: 0회(기능 추가 요청 1회). 다음: CI 확인 → 사용자 승인 후 main 병합.
 - CI #3(`1cdad61`, run 41813876364, 그림 옵션 포함) 전체 성공. 사용자에게 APK 아티팩트 링크 전달(GitHub 로그인 필요, zip 안에 APK). 영구 Release 링크는 main 병합 후 생성.
+
+### 2026-11-04 (Asia/Seoul) · HANGMAN MASTER PR #29 병합 · Release 확인 (Claude Code)
+
+- 사용자 승인("병합해주세요"). main `4e7abd0` 변화 없음 확인 후 PR #29 생성 → merge commit `2185514`(head `e3cc8a0`, 블록 게임 지시서 포함).
+- main CI #4(run 41814988727) 전체 성공, release 작업이 Release `family-hangman-v1.0.0` 생성: APK 12,318,895 bytes(digest sha256:2a7a04f1…), `.sha256` 업로드 확인. 사이트 배포는 Cloudflare Pages의 main 자동 반영 방식(카드 없음, 직접 확인 못 함).
+- 이 기록은 병합 후 작업 브랜치에 추가한 커밋으로, main에는 다음 병합 때 반영.

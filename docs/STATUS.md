@@ -2,7 +2,12 @@
 
 확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(HANGMAN MASTER 1차 구현, 가족 블록 게임 작업지시서). 아래 기존 이력은 보존합니다.
 
-## 구현 · HANGMAN MASTER v1.0.0 (가족 행맨, `games/family-hangman/`) / CI APK 확인·사용자 실기 대기
+## 병합 완료 · HANGMAN MASTER v1.0.0 (PR #29 → main `2185514`, 2026-11-04) / 사용자 실기 대기
+
+- main CI #4 전체 통과, **Release `family-hangman-v1.0.0`** 생성: `FamilyHangman-v1.0.0-debug.apk`(12,318,895 bytes) + `.sha256`. https://github.com/kirakein-gif/PLAYVAULT/releases/tag/family-hangman-v1.0.0
+- 남은 일: 태블릿 설치·아이 피드백, PLAYVAULT 첫 화면 카드(Codex 메인 화면 작업 뒤). 블록 게임 지시서도 함께 main 반영(ChatGPT 구현 대기).
+
+### (당시 기록) 구현 · HANGMAN MASTER v1.0.0
 
 2026-11-04 / Claude Code / `ccr-33a67370-6aa4yx` / 기준 main `4e7abd0`. 사용자 요청: "같은 컨셉으로 행맨 게임 만들어줘요. 이건 코드에서 독자적으로 갑시다" → Claude Code 직접 구현(역할 분담표보다 사용자 지시 우선). 범위: 새 폴더 `games/family-hangman/`, 새 CI `.github/workflows/family-hangman-android.yml`, 루트 README 한 줄. 체스·다른 게임·루트 `index.html`·공용 자산 변경 없음.
 - 내용: 혼자 하기(기초 영어 358단어·10주제·한국어 뜻, 난이도=글자 수), 둘이서(단어+한글 힌트 입력 → 건네기), 단어장(통계·맞힌/놓친 단어·놓친 단어 다시 하기), 그림은 설정에서 사용자별 선택 — 풍선 바구니(기본)/클래식 행맨(2026-11-04 사용자 결정 "풍선 아이디어 좋다, 옵션에서 선택"), 단어는 영어만(사용자 확인), 힌트 2종, 별 1~3. 체스 공통 모듈(저장·백업·한영·효과음·Capacitor 래퍼·UI) 복사, 앱 ID `com.playvault.familyhangman`(영구), 같은 가족 서명 키.
