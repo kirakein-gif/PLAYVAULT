@@ -44,7 +44,8 @@ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
      return {x,y,width:r.width,height:r.height,
        hit:document.elementFromPoint(x,y)?.closest('button')?.getAttribute('data-testid')};
    },q);
-   const id=q.match(/data-testid=([^\\]]+)/)?.[1];
+   const id=q.startsWith('[data-testid=') && q.endsWith(']')
+     ? q.slice('[data-testid='.length,-1) : null;
    if(target.hit!==id)throw Error('Touch target obscured or outside viewport: '+q+' '+JSON.stringify(target));
    // This CI emulator is an Android 14 1280x800 tablet at 160dpi.
    // The 24px top status bar is outside the WebView's 1280x716 CSS viewport;
