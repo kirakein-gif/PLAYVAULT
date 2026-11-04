@@ -2,7 +2,14 @@
 
 확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
 
-## 병합 승인(2026-11-04 "네 합쳐주세요") · CHESS MASTER PC 웹 버전 + PLAYVAULT 카드 + 고정 서명 키·Release
+## 병합 완료 · CHESS MASTER PC 웹 버전 + PLAYVAULT 카드 + 고정 서명 키·Release (PR #26 → main `48440c9`, 2026-11-04)
+
+- main CI #23 전체 통과(단위·웹 빌드 일치·APK·고정 키 지문·에뮬레이터 오프라인), release 작업이 **Release `family-chess-v1.0.0`** 생성: `FamilyChessPremium-v1.0.0-debug.apk`(14,526,495 bytes) + `.sha256`. https://github.com/kirakein-gif/PLAYVAULT/releases/tag/family-chess-v1.0.0
+- 사이트: 사용자가 `kirakein.pages.dev/playvault/`에서 체스 카드 표시 확인(이 세션 환경은 pages.dev 접속 차단으로 직접 확인 불가). 배포 버튼 수동 조작 없음(main 자동 반영).
+- 남은 일: 태블릿에서 1회 재설치(기록 내보내기 → 삭제 → Release APK 설치 → 불러오기), 실기 확인.
+- PLAYVAULT 메인 화면 분위기 정리·딸깍 배지 10회 목적지(`ddalkkak-hub/site/index.html`의 `data-game-url`)를 PLAYVAULT 메인으로 바꾸는 일은 사용자가 Codex로 별도 진행 예정. 이 세션은 ddalkkak-hub를 수정·푸시하지 않음.
+
+### (당시 기록) 병합 승인 · CHESS MASTER PC 웹 버전 + PLAYVAULT 카드 + 고정 서명 키·Release
 
 Claude Code / `ccr-6aa2a39e-1vn67a` / 2026-11-04. 사용자 결정: "웹버전은 PC기반으로" (휴대폰은 너무 작음). 판매·이름 변경(체스 아카데미 등)은 가능성으로 보류.
 - `npm run build:web` → `games/family-chess-premium/play/` 커밋(약 6.9MB, 빌드 재현성 확인), 루트 `index.html`에 카드 추가(루트 런처 첫 등록), 홈에 `← PLAYVAULT` 링크(웹만), 진동 설정은 앱에서만, 세로 좁은 화면 안내.

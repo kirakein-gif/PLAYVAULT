@@ -1508,3 +1508,12 @@
 - 다른 게임 변경 없음. 루트 런처는 이번에 처음 체스 카드 추가(사용자 요청 범위).
 - 사용자 재요청 횟수: 0회. 다음: CI 확인 → 사용자 승인 후 main 병합 → Release·Pages 확인.
 - 병합 승인: 사용자 "네 합쳐주세요"(2026-11-04). CI #21(`755182a`, 고정 키 지문 확인 포함) 성공, #22(`dd66981`) 확인 후 PR로 main 병합(merge commit). 병합 후 main CI의 release 작업으로 Release `family-chess-v1.0.0` 생성 확인 예정. 배포(사이트 반영)는 Cloudflare Pages가 main을 그대로 제공하는 기존 방식 — 실제 반영 확인 필요.
+
+### 2026-11-04 (Asia/Seoul) · CHESS MASTER PR #26 병합 · Release 확인 · 정리 마무리 (Claude Code)
+
+- 병합: CI #22(`dd66981`) 통과 확인 후 PR #26 → main merge commit `48440c9`(사용자 승인 "네 합쳐주세요"). 작업 브랜치를 main으로 fast-forward.
+- main CI #23(`48440c9`): unit-tests(웹 빌드 일치 포함)·build(고정 키 지문 확인)·emulator-offline-test·release 모두 성공. Release `family-chess-v1.0.0`에 APK(14,526,495 bytes, digest sha256:83400f05…)·`.sha256` 업로드 확인.
+- 사이트 반영: 사용자가 카드 표시 확인. 이 세션은 pages.dev 접속 불가(확인 불가로 기록).
+- 범위 조정: 사용자가 딸깍 배지 10회 목적지 변경과 PLAYVAULT 메인 분위기 정리를 Codex로 별도 진행하기로 함. 이 세션에서 `ddalkkak-hub`에 착수했던 목적지 변경(로컬)은 사용자 지시로 폐기, 원격 푸시 없음. 위치 안내만 전달: PLAYVAULT `index.html`(카드 `<section class="grid">`)·`assets/site.css`, ddalkkak-hub `site/index.html` 20행 `data-game-url`·`site/easter-egg.js`·`functions/[[path]].js`.
+- 관리 문서: STATUS·WORK_LOG·CHANGELOG·DEVELOPMENT_SUMMARY 갱신. AGENTS·CLAUDE 절차 변경 없음.
+- 사용자 재요청 횟수: 0회. 다음: 태블릿 1회 재설치·실기 확인.

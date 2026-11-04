@@ -47,7 +47,8 @@ PLAYVAULT 첫 화면 카드 → `games/family-chess-premium/play/`. 같은 소�
 | 11-03 | 가족 결정: 중세·노블·Claude 고딕 제외, Codex 고딕 윤곽 보완, 이름 Classic/Magic/Gothic | `e6b916b`, `a318906` |
 | 11-03 | PR #23 main 병합 | `57fe108` |
 | 11-04 | 고정 서명 키, GitHub Release 자동 보관, 이 정리 문서 | `755182a` |
-| 11-04 | PC 웹 버전(`play/`), PLAYVAULT 첫 화면 카드 | 이 커밋 |
+| 11-04 | PC 웹 버전(`play/`), PLAYVAULT 첫 화면 카드 | `dd66981` |
+| 11-04 | PR #26 main 병합, Release `family-chess-v1.0.0` 첫 생성(CI #23) | `48440c9` |
 
 ## 4. 가족이 정한 원칙
 
