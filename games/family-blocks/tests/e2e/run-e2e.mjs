@@ -103,6 +103,8 @@ try{
       assert(await page.getByTestId('pause-overlay').isVisible(),'background blur did not pause');
       await page.getByTestId('resume').click();
       // Multi-touch: hold left finger, then tap rotate with a second finger.
+      await page.touchscreen.tap(width/2,height/2); // touch the canvas to reveal auto-hidden controls
+      await page.getByTestId('ctrl-left').waitFor();
       const bounds=await page.evaluate(()=>{
         const centre=q=>{const r=document.querySelector(q).getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2};};
         return {a:centre('[data-testid=ctrl-left]'),b:centre('[data-testid=ctrl-cw]')};
