@@ -1,5 +1,14 @@
 # PLAYVAULT · 현재 개발 현황
 
+# 작업 중 · BLOCK MASTER 1차 (ChatGPT 전담)
+
+- 시작: 2026-11-04 (Asia/Seoul), 기준 main \`4e7abd0\`, 브랜치 \`chatgpt/family-blocks-solo\`.
+- 담당: ChatGPT. 범위: \`games/family-blocks/\`, \`.github/workflows/family-blocks-android.yml\`, 공통 작업 이력 문서(필요 항목에 한함).
+- 상태: 신규 게임 개발 중, APK·웹·테스트는 아직 완료/통과로 표기하지 않음. 다른 AI의 게임 폴더·루트 런처·공통 자산 불변.
+- 인계: 사용자 지정 1차 혼자 하기 3모드만, 작업 완료 시 초안 PR로 검토 요청. main 병합/배포는 사용자 승인 후.
+
+
+
 확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
 
 ## 병합 완료 · CHESS MASTER PC 웹 버전 + PLAYVAULT 카드 + 고정 서명 키·Release (PR #26 → main `48440c9`, 2026-11-04)
