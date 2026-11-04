@@ -22,7 +22,9 @@ export function blocks(piece: ActivePiece): Point[] {
   return shape(piece.kind,piece.rotation).map(([x,y]): Point => [x+piece.x,y+piece.y]);
 }
 export function spawn(kind: Kind): ActivePiece {
-  return { kind, x: 3, y: 0, rotation: 0 };
+  // New pieces appear in visible row 2 immediately (rows 0 and 1 are hidden).
+  // beginPiece() falls back to hidden rows only when this entrance is blocked.
+  return { kind, x: 3, y: 1, rotation: 0 };
 }
 // Super Rotation System (SRS) wall offsets, documented by Hard Drop Wiki ("SRS").
 // Coordinates here use downward-positive y, opposite the reference's y-up axes.

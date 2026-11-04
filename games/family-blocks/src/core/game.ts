@@ -58,12 +58,22 @@ function rescue(s: GameState) {
   for (let y=0;y<Math.ceil(BOARD_H/2);y++) s.board[y].fill(null);
   s.rescues++;s.events.push('rescue');
 }
+function chooseSpawn(s: GameState, kind: Kind): ActivePiece | null {
+  const visible=spawn(kind);
+  if (fits(s,visible)) return visible;
+  // Only if row 2 is blocked may the piece begin wholly in hidden rows.
+  const hidden={...visible,y:0};
+  return fits(s,hidden) ? hidden : null;
+}
 function beginPiece(s: GameState, kind: Kind) {
-  s.active=spawn(kind);resetMotion(s);
-  if (!fits(s,s.active)) {
-    if (s.mode==='gentle') rescue(s);
-    if (!fits(s,s.active)) { s.phase='over'; s.events.push('end'); }
+  resetMotion(s);
+  let place=chooseSpawn(s,kind);
+  if(!place && s.mode==='gentle') {
+    rescue(s);
+    place=chooseSpawn(s,kind);
   }
+  if(place) s.active=place;
+  else {s.active=spawn(kind);s.phase='over';s.events.push('end');}
 }
 export function nextPiece(s: GameState) {
   fillQueue(s);
