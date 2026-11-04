@@ -5,9 +5,9 @@
 - 2026-11-04 / **ChatGPT 구현 담당**, `chatgpt/family-blocks-solo` / [PR #28](https://github.com/kirakein-gif/PLAYVAULT/pull/28). 원래 `4e7abd0`에서 시작한 작업을 이어받아 Android APK·웹 버전 구현. 사용자의 승인 전 `main` 병합·공개 배포·Release 금지.
 - 2026-11-04 / Claude Code 교차 검토(헤드 `99d5e45`): 게임 규칙·SRS 표·빌드·브라우저 검사 재실행 성공, **초기 블록 가시성, Android 뒤로가기, 자동 검사 판정**의 수정 필요 판정. 그 밖에 결과 문구 중복·미사용 의존성 정리, 미리보기 글자 크기 실기 판단 권고.
 - 구현 담당 수정: 7종 블록 첫 등장 즉시 첫 가시 행(2행)에 아래 줄 표시, 가시 자리 점유 시에만 숨은 행 사용; Android 시스템 뒤로가기 게임 일시정지/재개·설정·기록 홈 이동·홈 종료 확인; 이동·블록 표시·기록 내용·HUD 겹침·Android 뒤로가기 검사 강화; 차근차근 결과 제목 중복 제거; 미사용 체스·글꼴 패키지 정리. 미리보기 크기는 실물 태블릿 조작 후 판정.
-- 기존 검증 근거: [Actions 41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763)에서 타입 검사·단위·브라우저·APK·오프라인 Android 14 에뮬레이터 성공(**수정 전 버전**). **이번 수정의 최종 CI는 별도로 확인해야 하며, 이전 성공을 새 버전에 적용하지 않음.**
+- 기존 검증 근거: [Actions 41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763)에서 타입 검사·단위·브라우저·APK·오프라인 Android 14 에뮬레이터 성공(**수정 전 버전**). **수정 후 통합 커밋 [Actions 41829962993](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41829962993) 전체 성공** — 타입 검사, 단위 34/34, 오프라인 브라우저 11/11(외부 요청·JS 오류 0), APK·가족 고정 서명·INTERNET 권한 없음, Android 14 오프라인 에뮬레이터 실제 터치·뒤로가기·앱 재시작 후 기록 유지.
 - 이번 브랜치에 PR #29(HANGMAN MASTER)가 반영된 `main` 이력을 함께 통합해 세 관리 문서 충돌을 정리. `games/family-blocks/` 및 전용 CI 외 기존 게임/메인 런처/공용 자산의 작업 내용을 변경하지 않음. 독립 교차 **재검토 대기**.
-- 남은 일: 수정 버전 전체 CI 결과 검증 → Claude Code 재검토 → 사용자 승인 후 병합·Release → 가족 태블릿 터치·소리·성능·미리보기 가독성 확인.
+- 남은 일: Claude Code 수정 사항 재검토 → 사용자 승인 후 병합·Release → 가족 태블릿 터치·소리·성능·미리보기 가독성 확인.
 
 확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(HANGMAN MASTER 1차 구현, 가족 블록 게임 작업지시서). 아래 기존 이력은 보존합니다.
 

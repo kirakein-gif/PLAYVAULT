@@ -1575,7 +1575,7 @@
 - 담당 ChatGPT; Claude Code 교차 검토 [PR #28](https://github.com/kirakein-gif/PLAYVAULT/pull/28), 검토 시점 head `99d5e45`(32/32 Vitest·11/11 오프라인 E2E·규칙·SRS 표 직접 확인). 구현 브랜치 `chatgpt/family-blocks-solo`, v1.0.0 유지.
 - 수정 이유: 최초 새 블록이 두 숨은 줄에 전부 들어가 게임 시작 후 1~2초간 보이지 않던 문제; Android 시스템 뒤로가기의 홈 무확인 종료·일시정지 재진입 불가; E2E의 이동·기록 단언 부족, HUD 겹침 확인 부족; 차근차근 결과 중복 텍스트; 불필요한 체스 관련 의존성.
 - 변경: `src/core/pieces.ts`의 기본 등장 높이를 첫 가시 행으로 수정하고 `src/core/game.ts`에 가시 위치 막힘 때만 숨은 행 대체, 실패 시 기존 차근차근 구조/도전 종료 적용. `src/App.tsx`·`src/screens/GameScreen.tsx`에 Android 뒤로가기 동작, `src/i18n/index.ts`의 종료 확인 문구, 결과 제목 차별화. `tests/unit/game.test.ts`에 7종 초기 가시/숨은 대체 테스트와 충돌 판정 보강, `tests/e2e/run-e2e.mjs`에 초기 실제 그림 픽셀·정확히 1칸 이동·기록값 비교·HUD 좌표 검사, `tests/android/smoke.cjs`에 실제 Android 뒤로가기·기록값 검사 추가. 패키지·잠금 파일의 chess.js/stockfish/Cinzel/Gowun Batang 미사용 항목 제거. 미리보기 확대는 실기 판단까지 보류.
-- 검증: 이전 성공 [Actions 41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763)은 수정 전. 이번 교차 검토 지적 수정 후 새 CI 검사 결과 **확인 전**으로 남김(기존 테스트를 약하게 바꾸지 않음).
+- 검증: 이전 성공 [Actions 41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763)은 수정 전. 이번 교차 검토 수정 후 [Actions 41829962993](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41829962993)에서 타입 검사·Vitest **34/34**·브라우저 E2E **11/11**·소스/웹 빌드 일치·Android APK/가족 고정 서명·INTERNET 권한 없음·Android 14 오프라인 에뮬레이터(ADB 실제 터치, 뒤로가기 4경로, 재실행 기록 유지) **모두 통과**. 외부 요청·JavaScript 오류 0. 기존 테스트를 약하게 바꾸지 않았음.
 - 기록 병합: PR #29로 main에 병합된 HANGMAN MASTER 이력을 보존하고, BLOCK MASTER WORK_LOG/STATUS/CHANGELOG를 추가하는 Git 병합 커밋. 다른 게임 코드를 임의 수정하거나 기본 브랜치를 병합하지 않음.
 - 현재 상태: 사용자 승인 전 Draft PR #28, 타 AI 재검토 대기. 실물 저가형 태블릿에서 프레임·터치·소리·진동 및 다음 미리보기 가독성 **확인 못 함**. AGENTS·CLAUDE 공통 규칙 검토 후 변경 불필요.
 
