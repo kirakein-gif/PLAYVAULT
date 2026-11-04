@@ -1549,6 +1549,36 @@
 - 사용자 재요청 횟수: 0회(기능 추가 요청 1회). 다음: CI 확인 → 사용자 승인 후 main 병합.
 - CI #3(`1cdad61`, run 41813876364, 그림 옵션 포함) 전체 성공. 사용자에게 APK 아티팩트 링크 전달(GitHub 로그인 필요, zip 안에 APK). 영구 Release 링크는 main 병합 후 생성.
 
+### 2026-11-04 (Asia/Seoul) · BLOCK MASTER 신규 게임 1차 구현 · 브라우저 인수 검사 (ChatGPT)
+
+- 담당: ChatGPT(사용자 지정; Claude Code 작업지시서 `GPT_TASK_01.md`). 시작 SHA main `4e7abd0`; 브랜치 `chatgpt/family-blocks-solo`; 최종 PR은 draft, 사용자 승인 전 병합/배포 금지.
+- 범위: `games/family-blocks/**`, `.github/workflows/family-blocks-android.yml`, `docs/WORK_LOG.md`, `docs/STATUS.md`, `CHANGELOG.md`. 다른 게임·`assets/`·루트 런처·Cloudflare 설정 변경하지 않음.
+- 신규 기능: 7종 7-bag 시드 난수, 10×22(보임20) 판, 60Hz 고정 틱, 회전/벽 차기·홀드·착지 예고, 3개 모드, 0.5초 고정, 터치/키보드, 세이브·2 프로필·JSON 백업, 2개 언어·원목 렌더링·자작곡, Android 별도 앱 ID·가족 고정 키, 웹 빌드 play/ 자동 생성 작업.
+- 검증(이번 실행): GitHub Actions run `41808095710`에서 TypeScript 컴파일·웹 빌드 성공, Vitest 31/31, 브라우저 오프라인 Playwright 11/11(853×533·1280×800·60초 고정시드 자동플레이), 외부 네트워크 요청 0·브라우저 오류 0. 수정 전 실패: 미사용 TS import 1건, E2E 시험 서버 연결 1건(모두 수정 후 위 검사 성공). Android 빌드·에뮬레이터는 확인 대기.
+- 미확인: 실물 저가형 태블릿 지연·화면·음량·진동·파일 공유. 게임의 출시/스토어 배포는 수행하지 않음.
+- 공통 관리 문서 5개 검토: STATUS/WORK_LOG/CHANGELOG 이번 작업 기록; AGENTS.md/CLAUDE.md 공통 절차 변경 없음.
+- 검토 담당/지적 수: 아직 교차 검토 전. 사용자 재요청 횟수: 0회. 다음: CI 최종 확인 → ChatGPT 초안 PR → Claude/Codex 교차 검토 → 사용자 병합 승인.
+
+### 2026-11-04 (Asia/Seoul) · BLOCK MASTER Android 오프라인 검증 통과·테스트 안정화
+
+- 담당/인계: ChatGPT(중단된 기존 세션의 `chatgpt/family-blocks-solo` 브랜치 인수). 최초 기준 main `4e7abd0`, 기존 작업·PR #28·원본 소스를 보존하고 신규 게임을 다시 만들지 않음.
+- 대상: `games/family-blocks/src/render/canvas.ts`, `tests/android/smoke.cjs`, `tests/e2e/run-e2e.mjs`, `docs/TEST_REPORT.md`, 개발 관리 문서. 버전 1.0.0 유지. 다른 게임·루트 런처·공용 자산·배포 설정 변경 없음.
+- 수정: (1) Android WebView에서 지원되지 않을 수 있는 Playwright `.tap()` 대신 실제 Android ADB `input tap`으로 앱 터치 검증, 터치 전후 상태·화면·결과·재실행 증거를 수집. (2) 브라우저 멀티터치 검사를 회전 가능한 고정 시드 T 블록으로 재현 가능하게 함(O 블록 회전 불변이라는 정상 규칙은 유지). (3) 화면 왼쪽 아래 이동 버튼과 겹치던 모드 이름 중복 렌더 제거.
+- 실패 이력 구분: 이전 실행 41808095710 Android 하드드롭 검사 실패, 41821010109 `.tap()` 지원 오류, 41822268923·41823050606 시험 선택자 파싱 오류, 41822593679 랜덤 O 블록의 회전 검사 오탐. 결함을 은폐하거나 검사를 생략하지 않고 수정 후 전체 CI 재실행.
+- 최종 실측 검증: GitHub Actions [41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763)에서 TypeScript 성공, Vitest 31/31, 오프라인 브라우저 E2E 11/11(853×533 및 1280×800, 60초 자동플레이, 외부 요청·JS 오류 각 0), 소스/웹 빌드 일치, Android APK 빌드·INTERNET 권한 없음·동일 가족 키 SHA-256 확인, Android 14 오프라인 에뮬레이터에서 실제 ADB 터치 이동/회전/하드드롭과 앱 완전 종료 후 기록 유지 성공. Android smoke 결과 errors 0/external 0.
+- 결과물: `FamilyBlocks-v1.0.0-debug-apk` Actions 아티팩트(13318451426, 임시 보관), `android-smoke-results`(13318571430), `family-blocks-browser-e2e`(13318266752). 소스는 Draft [PR #28](https://github.com/kirakein-gif/PLAYVAULT/pull/28)에 유지, 사용자 승인 전 main 병합·Release·배포 없음.
+- 미확인: 실물 저가형 Android 태블릿 조작 지연·프레임·소리 크기·진동·파일 공유, 타 AI(Claude Code/Codex) 교차 리뷰. GitHub Actions의 성공을 실제 태블릿 검증으로 확대하지 않음.
+- 다음 담당: 교차 검토(Claude/Codex) → 사용자 병합 승인 → main CI/Release → 실기 확인. 공통 관리 문서 5종 점검: STATUS/WORK_LOG/CHANGELOG 갱신, AGENTS.md/CLAUDE.md 변경 필요 없음. 사용자 추가 요청: 중단 후 이어서 진행 1회.
+
+### 2026-11-04 (Asia/Seoul) · BLOCK MASTER PR #28 교차 검토 지적 대응 · main 기록 통합 (ChatGPT)
+
+- 담당 ChatGPT; Claude Code 교차 검토 [PR #28](https://github.com/kirakein-gif/PLAYVAULT/pull/28), 검토 시점 head `99d5e45`(32/32 Vitest·11/11 오프라인 E2E·규칙·SRS 표 직접 확인). 구현 브랜치 `chatgpt/family-blocks-solo`, v1.0.0 유지.
+- 수정 이유: 최초 새 블록이 두 숨은 줄에 전부 들어가 게임 시작 후 1~2초간 보이지 않던 문제; Android 시스템 뒤로가기의 홈 무확인 종료·일시정지 재진입 불가; E2E의 이동·기록 단언 부족, HUD 겹침 확인 부족; 차근차근 결과 중복 텍스트; 불필요한 체스 관련 의존성.
+- 변경: `src/core/pieces.ts`의 기본 등장 높이를 첫 가시 행으로 수정하고 `src/core/game.ts`에 가시 위치 막힘 때만 숨은 행 대체, 실패 시 기존 차근차근 구조/도전 종료 적용. `src/App.tsx`·`src/screens/GameScreen.tsx`에 Android 뒤로가기 동작, `src/i18n/index.ts`의 종료 확인 문구, 결과 제목 차별화. `tests/unit/game.test.ts`에 7종 초기 가시/숨은 대체 테스트와 충돌 판정 보강, `tests/e2e/run-e2e.mjs`에 초기 실제 그림 픽셀·정확히 1칸 이동·기록값 비교·HUD 좌표 검사, `tests/android/smoke.cjs`에 실제 Android 뒤로가기·기록값 검사 추가. 패키지·잠금 파일의 chess.js/stockfish/Cinzel/Gowun Batang 미사용 항목 제거. 미리보기 확대는 실기 판단까지 보류.
+- 검증: 이전 성공 [Actions 41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763)은 수정 전. 이번 교차 검토 수정 후 [Actions 41829962993](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41829962993)에서 타입 검사·Vitest **34/34**·브라우저 E2E **11/11**·소스/웹 빌드 일치·Android APK/가족 고정 서명·INTERNET 권한 없음·Android 14 오프라인 에뮬레이터(ADB 실제 터치, 뒤로가기 4경로, 재실행 기록 유지) **모두 통과**. 외부 요청·JavaScript 오류 0. 기존 테스트를 약하게 바꾸지 않았음.
+- 기록 병합: PR #29로 main에 병합된 HANGMAN MASTER 이력을 보존하고, BLOCK MASTER WORK_LOG/STATUS/CHANGELOG를 추가하는 Git 병합 커밋. 다른 게임 코드를 임의 수정하거나 기본 브랜치를 병합하지 않음.
+- 현재 상태: 사용자 승인 전 Draft PR #28, 타 AI 재검토 대기. 실물 저가형 태블릿에서 프레임·터치·소리·진동 및 다음 미리보기 가독성 **확인 못 함**. AGENTS·CLAUDE 공통 규칙 검토 후 변경 불필요.
+
 ### 2026-11-04 (Asia/Seoul) · HANGMAN MASTER PR #29 병합 · Release 확인 (Claude Code)
 
 - 사용자 승인("병합해주세요"). main `4e7abd0` 변화 없음 확인 후 PR #29 생성 → merge commit `2185514`(head `e3cc8a0`, 블록 게임 지시서 포함).
@@ -1572,3 +1602,18 @@
 - 검증(이번 실행): tsc, Vitest 28/28, E2E 15/15(dist)·15/15(play), 외부 0. E2E는 speechSynthesis를 기록용 가짜로 대체해 호출 단어·언어·속도 확인(실제 음성 아님). APK·에뮬레이터는 push 후 CI.
 - 사용자 재요청 횟수: 0회(기능 추가 1회). 다음: CI → 사용자 승인 후 main 병합(Release 파일 교체) → 태블릿에서 소리 확인.
 - CI #6(`2d6e820`, run 41831202054) 전체 성공: 에뮬레이터(네트워크 차단)에서 영어 음성 상태 `ready`, 🔊 탭 오류 없음, 설치 권한은 VIBRATE뿐. 소리는 에뮬레이터 `-noaudio`라 확인 못 함. APK 아티팩트 13322798657.
+- 병합(추가 기록): 사용자 승인("병합해주세요")으로 PR #30 → main merge `ef3aa54`. main CI #7(run 41834930191) 성공, Release `family-hangman-v1.0.0` APK 교체(12,325,525 bytes, digest sha256:39c2fb7f…). 이 기록은 다음 병합 때 main 반영.
+
+### 2026-11-04 (Asia/Seoul) · BLOCK MASTER PR #28 재검토 (검토 Claude Code)
+
+- 대상 head `da52a22`(수정 커밋 `ee6928b`~`7904c17`, main 병합 `2c1724a`). 구현 브랜치 수정 없음, `git archive`로 내보내 실행.
+- 재현: npm ci, tsc, Vitest 34/34, `build:web` 결과가 커밋된 `play/`와 동일, PR E2E 11/11(외부 0). CI #17(`2c1724a`)·#18(`da52a22`) 성공 확인.
+- 확인: ① 생성 y=1, 세 모드 6연속 y=1·853×533 캡처에서 새 블록 첫 줄에 보임, 막힘 시 y=0 대체 ② 뒤로가기(게임 일시정지 토글, 하위 화면→홈, 홈→종료 확인) — 에뮬레이터 smoke `keyevent 4` 검사로 판단(웹에서 직접 실행 불가) ③ E2E 정확 비교·저장 내용 비교·HUD 겹침 ⑤ 미사용 패키지 제거.
+- 남은 것: 경미 — 차근차근 그만하기 결과의 eyebrow·h1이 모두 '이번 기록'. main과 CHANGELOG·WORK_LOG 충돌(PR #30 이후).
+- PR #28 리뷰(COMMENT)로 기록. 평가: 1차 7건 중 수정 요청 3건 모두 해결, 새 경미 1건. 사용자 재요청 0회.
+- 다음: 사용자 승인 → 문서 충돌 정리 → 병합 → Release `family-blocks-v1.0.0` 확인.
+
+
+### 2026-11-04 (Asia/Seoul) · BLOCK MASTER PR #28 병합 (Claude Code, 사용자 승인)
+
+- 사용자: "직접 병합해주세요". 구현 브랜치 `chatgpt/family-blocks-solo`(`da52a22`)에 작업 브랜치(main `ef3aa54` + 검토 기록)를 병합해 문서 충돌 2개(CHANGELOG·WORK_LOG)를 양쪽 기록 모두 보존해 해결, STATUS 맨 위 갱신. 게임 코드 변경 없음. 이후 PR #28을 Ready로 바꾸고 main에 merge commit.

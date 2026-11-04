@@ -1,12 +1,31 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(HANGMAN MASTER 1차 구현, 가족 블록 게임 작업지시서). 아래 기존 이력은 보존합니다.
+확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(BLOCK MASTER PR #28 재검토·병합, HANGMAN MASTER). 아래 기존 이력은 보존합니다.
 
-## 구현 · HANGMAN MASTER 발음 듣기(🔊) + 발음 속도 옵션 / CI 확인·병합 승인 대기
+## 병합 · BLOCK MASTER v1.0.0 (PR #28, Claude Code 재검토 통과·사용자 승인 "직접 병합해주세요" 2026-11-04) / Release 확인·실기 대기
+
+### (당시 기록) 수정 완료·재검토 대기 · BLOCK MASTER v1.0.0 (Draft PR #28)
+
+- 2026-11-04 / **ChatGPT 구현 담당**, `chatgpt/family-blocks-solo` / [PR #28](https://github.com/kirakein-gif/PLAYVAULT/pull/28). 원래 `4e7abd0`에서 시작한 작업을 이어받아 Android APK·웹 버전 구현. 사용자의 승인 전 `main` 병합·공개 배포·Release 금지.
+- 2026-11-04 / Claude Code 교차 검토(헤드 `99d5e45`): 게임 규칙·SRS 표·빌드·브라우저 검사 재실행 성공, **초기 블록 가시성, Android 뒤로가기, 자동 검사 판정**의 수정 필요 판정. 그 밖에 결과 문구 중복·미사용 의존성 정리, 미리보기 글자 크기 실기 판단 권고.
+- 구현 담당 수정: 7종 블록 첫 등장 즉시 첫 가시 행(2행)에 아래 줄 표시, 가시 자리 점유 시에만 숨은 행 사용; Android 시스템 뒤로가기 게임 일시정지/재개·설정·기록 홈 이동·홈 종료 확인; 이동·블록 표시·기록 내용·HUD 겹침·Android 뒤로가기 검사 강화; 차근차근 결과 제목 중복 제거; 미사용 체스·글꼴 패키지 정리. 미리보기 크기는 실물 태블릿 조작 후 판정.
+- 기존 검증 근거: [Actions 41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763)에서 타입 검사·단위·브라우저·APK·오프라인 Android 14 에뮬레이터 성공(**수정 전 버전**). **수정 후 통합 커밋 [Actions 41829962993](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41829962993) 전체 성공** — 타입 검사, 단위 34/34, 오프라인 브라우저 11/11(외부 요청·JS 오류 0), APK·가족 고정 서명·INTERNET 권한 없음, Android 14 오프라인 에뮬레이터 실제 터치·뒤로가기·앱 재시작 후 기록 유지.
+- 이번 브랜치에 PR #29(HANGMAN MASTER)가 반영된 `main` 이력을 함께 통합해 세 관리 문서 충돌을 정리. `games/family-blocks/` 및 전용 CI 외 기존 게임/메인 런처/공용 자산의 작업 내용을 변경하지 않음. 독립 교차 **재검토 대기**.
+- 남은 일: Claude Code 수정 사항 재검토 → 사용자 승인 후 병합·Release → 가족 태블릿 터치·소리·성능·미리보기 가독성 확인.
+
+## 병합 완료 · HANGMAN MASTER 발음 듣기(🔊) + 발음 속도 옵션 (PR #30 → main `ef3aa54`, 2026-11-04) / 태블릿 소리 확인 대기
+
+- main CI #7 전체 통과, Release `family-hangman-v1.0.0` APK 교체(12,325,525 bytes, ef3aa54 빌드). 같은 영구 링크, 덮어 설치로 기록 유지.
+
+### (당시 기록) 구현 · 발음 듣기
 
 2026-11-04 / Claude Code / `ccr-33a67370-6aa4yx`(main `2185514` 이후). 결과 창(정답·오답 모두)과 단어장에 🔊, 기기 음성 엔진(Android `@capacitor-community/text-to-speech` 8.0.2, 웹 speechSynthesis), 사용자별 발음 속도 느리게/보통/빠르게, 영어 음성 없으면 흐림·안내·설치 화면 버튼. INTERNET 권한 추가 없음. 단위 28/28, E2E 15/15(dist·play, 외부 0). 실제 소리는 태블릿 확인 필요. 앱 버전 1.0.0 → 병합 시 Release `family-hangman-v1.0.0` 파일이 교체됨(같은 키라 덮어 설치 가능).
 
-## 교차 검토 · BLOCK MASTER PR #28 (ChatGPT 구현) / 수정 요청 → 재검토 대기
+## 재검토 완료 · BLOCK MASTER PR #28 (head `da52a22`) / 병합 가능 판단 → 사용자 승인·문서 충돌 정리 대기
+
+2026-11-04 / 검토 Claude Code. 수정 요청 1~3 해결 확인(생성 즉시 보임·뒤로가기·E2E 단언), 미사용 패키지 제거 확인. 재현: Vitest 34/34, E2E 11/11(외부 0), `play/` 재빌드 일치, CI #17·#18 성공. 남은 경미 1건(차근차근 그만하기 결과 eyebrow·h1 모두 '이번 기록'), main과 `CHANGELOG.md`·`docs/WORK_LOG.md` 충돌(PR #30 이후).
+
+### (당시 기록) 교차 검토 · BLOCK MASTER PR #28 / 수정 요청
 
 2026-11-04 / 검토 Claude Code / head `99d5e45`. 재현: tsc, Vitest 32/32, E2E 11/11(외부 0). SRS 표·고정·점수·레벨 등 규칙은 지시서와 일치. 수정 요청 3건(높음: 새 블록이 숨은 줄에서 생성돼 1~2초 안 보임 / 중간: Android 뒤로가기, E2E 약한 단언), 경미 4건(결과 문구 중복, 미사용 의존성, 미리보기 크기, main과 문서 3개 충돌). 구현 브랜치 수정 없음. 병합 보류.
 
@@ -22,7 +41,7 @@
 - 검증(이번 세션): tsc, 단위 26/26, 오프라인 E2E 12/12(dist·play 각각, 외부 0), 웹 빌드 재현, 하위 경로·PLAYVAULT 링크. CI #1(`c158795`) 전체 통과 — APK 빌드·가족 키·INTERNET 없음·Android 14 에뮬레이터 오프라인 검사. 그림 옵션 포함 CI #3(`1cdad61`, run 41813876364)도 전체 통과. 최신 debug APK: 그 실행의 `FamilyHangman-v1.0.0-debug-apk`(아티팩트 13313108751, 2027-02-02 만료).
 - 남은 일: 사용자 승인 후 main 병합(Release `family-hangman-v1.0.0` 생성) → 태블릿 설치·아이 피드백. PLAYVAULT 첫 화면 카드는 Codex 메인 화면 작업 뒤 별도. PR 미제출, 병합·배포 없음.
 
-## 작업지시서 제출 · 가족 블록 게임(가칭 BLOCK MASTER) 1차 혼자 하기 / ChatGPT 구현 대기
+## (당시 기록) 작업지시서 제출 · 가족 블록 게임(가칭 BLOCK MASTER) 1차 혼자 하기 / ChatGPT 구현 전
 
 2026-11-04 / Claude Code / `ccr-33a67370-6aa4yx` / 기준 main `4e7abd0`. 사용자 요청: "체스마스터 컨셉으로 테트리스를 앱으로", 1차는 **혼자 하기만**, Android APK + PC 웹, 아이가 체스와 **같은 태블릿**에서 사용. 사용자 지정으로 **구현 담당 ChatGPT**(역할 분담표보다 사용자 지시 우선).
 - 지시서: `games/family-blocks/docs/GPT_TASK_01.md` — 폴더 `games/family-blocks/`, 앱 ID `com.playvault.familyblocks`(영구 고정), 작업 브랜치 `chatgpt/family-blocks-solo`, 모드 3종(차근차근·도전·40줄), 원목 스킨 1종, 체스 공통 모듈 복사 재사용, 같은 가족 서명 키, CI 4단계, 단위·E2E 검사 목록.
