@@ -1,0 +1,17 @@
+PASS crawler-walk
+PASS crawler-charge
+PASS crawler-hit
+PASS wisp-hover
+PASS wisp-dive
+PASS wisp-hit
+PASS shield-walk
+PASS shield-windup
+PASS shield-bash
+PASS shield-blocked
+PASS shield-stagger-hit
+PASS hero-hurt
+PASS hero-down-auto-swap
+PASS shelter-before-rest
+PASS shelter-after-rest
+PASS heal-fragment
+16/16 simulation capture scenarios passed

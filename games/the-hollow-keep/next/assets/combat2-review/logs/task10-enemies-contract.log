@@ -1,0 +1,18 @@
+PASS 계약: CONFIG(maxHp·무적·밀림·회복·적 3종)와 getHeroes·getEnemies·getPickups
+PASS 피격: 적에 닿으면 접촉 피해·적 반대쪽으로 밀림·무적 동안 추가 피해 없음
+PASS 쓰러짐(한 명): 체력 0 → down, 다른 주인공으로 자동 교대·무적, 쓰러진 쪽으로는 교대 불가
+PASS 쓰러짐(둘 다): defeat → respawn — 시작 방·위치, 두 주인공 가득, 진행(스위치) 유지, 일반 적 되살아남
+PASS 쉼터: 겹친 채 조사하면 둘 다 가득·쓰러짐 해제(rest)
+PASS 회복 조각: 적을 healDropEvery번째 쓰러뜨린 자리에 생기고, 닿으면 healAmount만큼 회복(최대 넘지 않음)
+PASS crawler: 높은 단에서 오가도 떨어지지 않음(벽·낭떠러지 앞에서 돌아섬)
+PASS crawler: 같은 바닥의 주인공이 앞 160 안이면 순찰보다 빠르게 돌진
+PASS crawler: Ethan 1단 룬탄·Noah 1단 베기 한 번에 쓰러짐(kill)
+PASS wisp: 떠 있는 동안 몸 아래가 바닥에서 60~70 — Ethan 서서 쏜 1단·Noah 1단은 빗나가고 Noah 2단 올려 베기는 맞음
+PASS wisp: 주인공이 가로 220 안이면 따라오고, 내리꽂기(dive) 때 몸 아래가 바닥 40 아래로 내려옴
+PASS shield: 앞에서 Ethan 1단·Noah 1·2단은 막힘(blocked, 피해 0) — Noah 3단 내려치기·뒤에서 치기는 들어감
+PASS shield: 앞에서 맞은 2단 충전탄은 막지 못하고 stagger — 그동안은 1단도 들어감
+PASS shield: 앞 50 안이면 준비(windup)가 15틱 이상 보인 뒤 밀치기(bash) 피해 2
+PASS 되살아남: 일반 적은 방을 나갔다 오면 처음 체력, 봉쇄물을 여는 특정 적은 다시 나오지 않고 문도 열린 채
+PASS 결정성: 같은 입력 → 같은 결과(적·피격·교대 섞음)
+
+16/16 passed

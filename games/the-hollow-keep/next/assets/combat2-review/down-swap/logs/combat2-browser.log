@@ -1,0 +1,5 @@
+PASS initial map reveals only gate and pauses simulation
+PASS exact real keyboard circuit: eight rooms, all mechanisms, two specific kills, zero defeats, completion UI
+PASS F2 health/invulnerability/knockback/enemy fields accept negative vertical knockback and restore defaults
+PASS mobile 780x330 loads new HUD and sprites without browser errors
+4/4 combat2 browser checks passed

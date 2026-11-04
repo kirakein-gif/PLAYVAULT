@@ -1,0 +1,1363 @@
+[
+  {
+    "name": "crawler-walk",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 6,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [
+        {
+          "id": "subject",
+          "kind": "crawler",
+          "x": 606.1999999999998,
+          "y": 474,
+          "w": 32,
+          "h": 36,
+          "hp": 22,
+          "face": 1,
+          "state": "patrol",
+          "age": 8,
+          "timer": 0,
+          "hurt": 0,
+          "stagger": 0,
+          "guard": 0,
+          "diveClock": 0,
+          "cooldown": 0,
+          "specific": false,
+          "vx": 0.9,
+          "vy": 0,
+          "onGround": true
+        }
+      ],
+      "pickups": [],
+      "player": {
+        "x": 174,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": 0,
+        "vy": 0,
+        "face": 1,
+        "onGround": true,
+        "coyote": 6,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": false,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [],
+      "tick": 8
+    }
+  },
+  {
+    "name": "crawler-charge",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 6,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [
+        {
+          "id": "subject",
+          "kind": "crawler",
+          "x": 319.8000000000002,
+          "y": 474,
+          "w": 32,
+          "h": 36,
+          "hp": 22,
+          "face": 1,
+          "state": "charge",
+          "age": 8,
+          "timer": 32,
+          "hurt": 0,
+          "stagger": 0,
+          "guard": 0,
+          "diveClock": 0,
+          "cooldown": 0,
+          "specific": false,
+          "vx": 2.6,
+          "vy": 0,
+          "onGround": true
+        }
+      ],
+      "pickups": [],
+      "player": {
+        "x": 384,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": 0,
+        "vy": 0,
+        "face": 1,
+        "onGround": true,
+        "coyote": 6,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": false,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [],
+      "tick": 8
+    }
+  },
+  {
+    "name": "crawler-hit",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 6,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [],
+      "pickups": [],
+      "player": {
+        "x": 175.5,
+        "y": 446,
+        "w": 39,
+        "h": 64,
+        "vx": 0,
+        "vy": 0,
+        "face": 1,
+        "onGround": true,
+        "coyote": 8,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": false,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 1,
+          "started": 1,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [
+        {
+          "type": "attack",
+          "hero": "noah",
+          "step": 1
+        },
+        {
+          "type": "hit",
+          "target": "subject",
+          "damage": 22,
+          "hero": "noah",
+          "level": 1,
+          "step": 1,
+          "face": 1,
+          "position": {
+            "x": 236.4,
+            "y": 474,
+            "w": 32,
+            "h": 36
+          }
+        },
+        {
+          "type": "kill",
+          "id": "subject",
+          "kind": "crawler",
+          "x": 236.4,
+          "y": 474,
+          "w": 32,
+          "h": 36,
+          "face": -1
+        }
+      ],
+      "tick": 1
+    }
+  },
+  {
+    "name": "wisp-hover",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 6,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [
+        {
+          "id": "subject",
+          "kind": "wisp",
+          "x": 294.5999999999999,
+          "y": 418.94709171154324,
+          "w": 28,
+          "h": 28,
+          "hp": 22,
+          "face": -1,
+          "state": "hover",
+          "age": 8,
+          "timer": 0,
+          "hurt": 0,
+          "stagger": 0,
+          "guard": 0,
+          "diveClock": 8,
+          "cooldown": 0,
+          "specific": false,
+          "vx": -0.8,
+          "vy": 0.23260267426599057,
+          "onGround": false
+        }
+      ],
+      "pickups": [],
+      "player": {
+        "x": 174,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": 0,
+        "vy": 0,
+        "face": 1,
+        "onGround": true,
+        "coyote": 6,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": false,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [],
+      "tick": 8
+    }
+  },
+  {
+    "name": "wisp-dive",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 6,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [
+        {
+          "id": "subject",
+          "kind": "wisp",
+          "x": 150.9999999999983,
+          "y": 420.530659307753,
+          "w": 28,
+          "h": 28,
+          "hp": 22,
+          "face": -1,
+          "state": "dive",
+          "age": 150,
+          "timer": 39,
+          "hurt": 0,
+          "stagger": 0,
+          "guard": 0,
+          "diveClock": 0,
+          "cooldown": 0,
+          "specific": false,
+          "vx": -0.8,
+          "vy": -1.0668565713918383,
+          "onGround": false
+        }
+      ],
+      "pickups": [],
+      "player": {
+        "x": 84,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": 0,
+        "vy": 0,
+        "face": 1,
+        "onGround": true,
+        "coyote": 6,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": false,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [],
+      "tick": 150
+    }
+  },
+  {
+    "name": "wisp-hit",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 6,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [],
+      "pickups": [],
+      "player": {
+        "x": 175.5,
+        "y": 370.5195652173914,
+        "w": 39,
+        "h": 64,
+        "vx": 0,
+        "vy": 0.569999999999998,
+        "face": 1,
+        "onGround": false,
+        "coyote": 0,
+        "jumpBuffer": 0,
+        "jumpStartFeet": 510,
+        "jumpCut": true,
+        "takeoffVx": 0,
+        "jumpKind": "standing",
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 1,
+          "started": 8,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [
+        {
+          "type": "jump"
+        },
+        {
+          "type": "attack",
+          "hero": "noah",
+          "step": 1
+        },
+        {
+          "type": "hit",
+          "target": "subject",
+          "damage": 22,
+          "hero": "noah",
+          "level": 1,
+          "step": 1,
+          "face": 1,
+          "position": {
+            "x": 234.5999999999999,
+            "y": 418.94709171154324,
+            "w": 28,
+            "h": 28
+          }
+        },
+        {
+          "type": "kill",
+          "id": "subject",
+          "kind": "wisp",
+          "x": 234.5999999999999,
+          "y": 418.94709171154324,
+          "w": 28,
+          "h": 28,
+          "face": -1
+        }
+      ],
+      "tick": 8
+    }
+  },
+  {
+    "name": "shield-walk",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 6,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [
+        {
+          "id": "subject",
+          "kind": "shield",
+          "x": 441,
+          "y": 446,
+          "w": 40,
+          "h": 64,
+          "hp": 66,
+          "face": -1,
+          "state": "patrol",
+          "age": 8,
+          "timer": 0,
+          "hurt": 0,
+          "stagger": 0,
+          "guard": 0,
+          "diveClock": 0,
+          "cooldown": 0,
+          "specific": false,
+          "vx": -0.5,
+          "vy": 0,
+          "onGround": true
+        }
+      ],
+      "pickups": [],
+      "player": {
+        "x": 174,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": 0,
+        "vy": 0,
+        "face": 1,
+        "onGround": true,
+        "coyote": 6,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": false,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [],
+      "tick": 8
+    }
+  },
+  {
+    "name": "shield-windup",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 6,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [
+        {
+          "id": "subject",
+          "kind": "shield",
+          "x": 295,
+          "y": 446,
+          "w": 40,
+          "h": 64,
+          "hp": 66,
+          "face": -1,
+          "state": "windup",
+          "age": 8,
+          "timer": 13,
+          "hurt": 0,
+          "stagger": 0,
+          "guard": 0,
+          "diveClock": 0,
+          "cooldown": 0,
+          "specific": false
+        }
+      ],
+      "pickups": [],
+      "player": {
+        "x": 234,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": 0,
+        "vy": 0,
+        "face": 1,
+        "onGround": true,
+        "coyote": 6,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": false,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [],
+      "tick": 8
+    }
+  },
+  {
+    "name": "shield-bash",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 4,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [
+        {
+          "id": "subject",
+          "kind": "shield",
+          "x": 295,
+          "y": 446,
+          "w": 40,
+          "h": 64,
+          "hp": 66,
+          "face": -1,
+          "state": "bash",
+          "age": 21,
+          "timer": 10,
+          "hurt": 0,
+          "stagger": 0,
+          "guard": 0,
+          "diveClock": 0,
+          "cooldown": 0,
+          "specific": false
+        }
+      ],
+      "pickups": [],
+      "player": {
+        "x": 234,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": -3,
+        "vy": -4,
+        "face": 1,
+        "onGround": false,
+        "coyote": 0,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": true,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 60,
+        "knockTicks": 6,
+        "hurtTicks": 12,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 12,
+        "knockVx": -3
+      },
+      "events": [
+        {
+          "type": "hurt",
+          "hero": "ethan",
+          "damage": 2,
+          "hp": 4
+        }
+      ],
+      "tick": 21
+    }
+  },
+  {
+    "name": "shield-blocked",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 6,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [
+        {
+          "id": "subject",
+          "kind": "shield",
+          "x": 292.5,
+          "y": 446,
+          "w": 40,
+          "h": 64,
+          "hp": 66,
+          "face": -1,
+          "state": "patrol",
+          "age": 5,
+          "timer": 0,
+          "hurt": 0,
+          "stagger": 0,
+          "guard": 6,
+          "diveClock": 0,
+          "cooldown": 0,
+          "specific": false,
+          "vx": -0.5,
+          "vy": 0,
+          "onGround": true
+        }
+      ],
+      "pickups": [],
+      "player": {
+        "x": 174,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": 0,
+        "vy": 0,
+        "face": 1,
+        "onGround": true,
+        "coyote": 6,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": false,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [
+        {
+          "type": "attack",
+          "hero": "ethan",
+          "level": 1
+        },
+        {
+          "type": "blocked",
+          "id": "subject",
+          "hero": "ethan",
+          "face": 1
+        }
+      ],
+      "tick": 5
+    }
+  },
+  {
+    "name": "shield-stagger-hit",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 6,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [
+        {
+          "id": "subject",
+          "kind": "shield",
+          "x": 326.5,
+          "y": 446,
+          "w": 40,
+          "h": 64,
+          "hp": 22,
+          "face": -1,
+          "state": "stagger",
+          "age": 57,
+          "timer": 0,
+          "hurt": 8,
+          "stagger": 60,
+          "guard": 0,
+          "diveClock": 0,
+          "cooldown": 0,
+          "specific": false,
+          "vx": -0.5,
+          "vy": 0,
+          "onGround": true
+        }
+      ],
+      "pickups": [],
+      "player": {
+        "x": 84,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": 0,
+        "vy": 0,
+        "face": 1,
+        "onGround": true,
+        "coyote": 6,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": false,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [
+        {
+          "type": "attack",
+          "hero": "ethan",
+          "level": 1
+        },
+        {
+          "type": "blocked",
+          "id": "subject",
+          "hero": "ethan",
+          "face": 1
+        },
+        {
+          "type": "charge",
+          "hero": "ethan",
+          "level": 2
+        },
+        {
+          "type": "attack",
+          "hero": "ethan",
+          "level": 2
+        },
+        {
+          "type": "hit",
+          "target": "subject",
+          "damage": 44,
+          "hero": "ethan",
+          "level": 2,
+          "step": 1,
+          "face": 1,
+          "position": {
+            "x": 326.5,
+            "y": 446,
+            "w": 40,
+            "h": 64
+          }
+        }
+      ],
+      "tick": 57
+    }
+  },
+  {
+    "name": "hero-hurt",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 5,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [
+        {
+          "id": "subject",
+          "kind": "crawler",
+          "x": 215.79999999999973,
+          "y": 474,
+          "w": 32,
+          "h": 36,
+          "hp": 22,
+          "face": -1,
+          "state": "charge",
+          "age": 32,
+          "timer": 8,
+          "hurt": 0,
+          "stagger": 0,
+          "guard": 0,
+          "diveClock": 0,
+          "cooldown": 0,
+          "specific": false,
+          "vx": -2.6,
+          "vy": 0,
+          "onGround": true
+        }
+      ],
+      "pickups": [],
+      "player": {
+        "x": 174,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": -3,
+        "vy": -4,
+        "face": 1,
+        "onGround": false,
+        "coyote": 0,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": true,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 60,
+        "knockTicks": 6,
+        "hurtTicks": 12,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 12,
+        "knockVx": -3
+      },
+      "events": [
+        {
+          "type": "hurt",
+          "hero": "ethan",
+          "damage": 1,
+          "hp": 5
+        }
+      ],
+      "tick": 32
+    }
+  },
+  {
+    "name": "hero-down-auto-swap",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 0,
+          "maxHp": 6,
+          "down": true
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [
+        {
+          "id": "subject",
+          "kind": "crawler",
+          "x": 215.79999999999973,
+          "y": 474,
+          "w": 32,
+          "h": 36,
+          "hp": 22,
+          "face": -1,
+          "state": "charge",
+          "age": 32,
+          "timer": 8,
+          "hurt": 0,
+          "stagger": 0,
+          "guard": 0,
+          "diveClock": 0,
+          "cooldown": 0,
+          "specific": false,
+          "vx": -2.6,
+          "vy": 0,
+          "onGround": true
+        }
+      ],
+      "pickups": [],
+      "player": {
+        "x": 175.5,
+        "y": 446,
+        "w": 39,
+        "h": 64,
+        "vx": -3,
+        "vy": -4,
+        "face": 1,
+        "onGround": false,
+        "coyote": 0,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": true,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 90,
+        "knockTicks": 6,
+        "hurtTicks": 12,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 12,
+        "knockVx": -3
+      },
+      "events": [
+        {
+          "type": "hurt",
+          "hero": "ethan",
+          "damage": 1,
+          "hp": 0
+        },
+        {
+          "type": "down",
+          "hero": "ethan"
+        },
+        {
+          "type": "swap",
+          "from": "ethan",
+          "to": "noah",
+          "reason": "down"
+        }
+      ],
+      "tick": 32
+    }
+  },
+  {
+    "name": "shelter-before-rest",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 2,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 0,
+          "maxHp": 5,
+          "down": true
+        }
+      },
+      "enemies": [],
+      "pickups": [],
+      "player": {
+        "x": 144,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": 0,
+        "vy": 0,
+        "face": 1,
+        "onGround": true,
+        "coyote": 6,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": false,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [],
+      "tick": 1
+    }
+  },
+  {
+    "name": "shelter-after-rest",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 6,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [],
+      "pickups": [],
+      "player": {
+        "x": 144,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": 0,
+        "vy": 0,
+        "face": 1,
+        "onGround": true,
+        "coyote": 6,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": false,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [
+        {
+          "type": "rest",
+          "id": "rest"
+        }
+      ],
+      "tick": 1
+    }
+  },
+  {
+    "name": "heal-fragment",
+    "state": {
+      "heroes": {
+        "ethan": {
+          "hp": 2,
+          "maxHp": 6,
+          "down": false
+        },
+        "noah": {
+          "hp": 5,
+          "maxHp": 5,
+          "down": false
+        }
+      },
+      "enemies": [],
+      "pickups": [
+        {
+          "kind": "heal",
+          "x": 356.9000000000025,
+          "y": 490,
+          "w": 20,
+          "h": 20
+        }
+      ],
+      "player": {
+        "x": 84,
+        "y": 442,
+        "w": 42,
+        "h": 68,
+        "vx": 0,
+        "vy": 0,
+        "face": 1,
+        "onGround": true,
+        "coyote": 6,
+        "jumpBuffer": 0,
+        "jumpStartFeet": null,
+        "jumpCut": false,
+        "takeoffVx": 0,
+        "jumpKind": null,
+        "climbing": false,
+        "dropTicks": 0,
+        "invuln": 0,
+        "knockTicks": 0,
+        "hurtTicks": 0,
+        "charge": {
+          "ticks": 0,
+          "level": 0
+        },
+        "combo": {
+          "step": 0,
+          "started": 0,
+          "buffered": false
+        },
+        "ladderLock": 0
+      },
+      "events": [
+        {
+          "type": "attack",
+          "hero": "ethan",
+          "level": 1
+        },
+        {
+          "type": "hit",
+          "target": "c0",
+          "damage": 22,
+          "hero": "ethan",
+          "level": 1,
+          "step": 1,
+          "face": 1,
+          "position": {
+            "x": 171.20000000000002,
+            "y": 474,
+            "w": 32,
+            "h": 36
+          }
+        },
+        {
+          "type": "kill",
+          "id": "c0",
+          "kind": "crawler",
+          "x": 171.20000000000002,
+          "y": 474,
+          "w": 32,
+          "h": 36,
+          "face": -1
+        },
+        {
+          "type": "attack",
+          "hero": "ethan",
+          "level": 1
+        },
+        {
+          "type": "hit",
+          "target": "c1",
+          "damage": 22,
+          "hero": "ethan",
+          "level": 1,
+          "step": 1,
+          "face": 1,
+          "position": {
+            "x": 211.90000000000035,
+            "y": 474,
+            "w": 32,
+            "h": 36
+          }
+        },
+        {
+          "type": "kill",
+          "id": "c1",
+          "kind": "crawler",
+          "x": 211.90000000000035,
+          "y": 474,
+          "w": 32,
+          "h": 36,
+          "face": -1
+        },
+        {
+          "type": "attack",
+          "hero": "ethan",
+          "level": 1
+        },
+        {
+          "type": "hit",
+          "target": "c2",
+          "damage": 22,
+          "hero": "ethan",
+          "level": 1,
+          "step": 1,
+          "face": 1,
+          "position": {
+            "x": 292.4000000000017,
+            "y": 474,
+            "w": 32,
+            "h": 36
+          }
+        },
+        {
+          "type": "kill",
+          "id": "c2",
+          "kind": "crawler",
+          "x": 292.4000000000017,
+          "y": 474,
+          "w": 32,
+          "h": 36,
+          "face": -1
+        },
+        {
+          "type": "attack",
+          "hero": "ethan",
+          "level": 1
+        },
+        {
+          "type": "hit",
+          "target": "c3",
+          "damage": 22,
+          "hero": "ethan",
+          "level": 1,
+          "step": 1,
+          "face": 1,
+          "position": {
+            "x": 350.9000000000025,
+            "y": 474,
+            "w": 32,
+            "h": 36
+          }
+        },
+        {
+          "type": "kill",
+          "id": "c3",
+          "kind": "crawler",
+          "x": 350.9000000000025,
+          "y": 474,
+          "w": 32,
+          "h": 36,
+          "face": -1
+        }
+      ],
+      "tick": 137
+    }
+  }
+]

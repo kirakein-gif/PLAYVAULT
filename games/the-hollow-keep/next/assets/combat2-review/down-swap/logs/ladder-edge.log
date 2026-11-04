@@ -1,0 +1,5 @@
+PASS down+jump leaves an attached ladder, including one-way support at feet
+PASS occupied body above an adjacent surface keeps the hero attached
+PASS surface outside the eight-unit foot tolerance does not dismount
+PASS climb distance stays fixed while hanging and survives a swap
+4/4 supplemental ladder checks passed

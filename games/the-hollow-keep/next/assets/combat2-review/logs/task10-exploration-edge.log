@@ -1,0 +1,22 @@
+PASS actual high lever: floor-launched Ethan cannot reach it; Noah can
+PASS actual bronze gate cannot be jumped over by either hero without its key
+PASS the bell barrier fills its lower corridor and cannot be jumped through
+PASS the upper gallery remains traversable with the bronze barrier still closed
+PASS the sealed lower vault holds both keys until its cracked masonry is broken
+C:\Users\Administrator\Documents\Codex\2026-11-03\codex-games-the-hollow-keep-docs\work\PLAYVAULT\games\the-hollow-keep\next\tests\exploration-edge.cjs:26
+ const a=copy(base);a.start={room:'reliquary',x:180,y:442};a.rooms.reliquary.objects.find(o=>o.id==='oath-west').hp=44;const w=HK.createWorld({area:a});run(w,{},5);HK.step(w,{attack:true});run(w,{},50);assert.equal(w.dummies.find(d=>d.id==='oath-west').hp,22);
+                                                                                                                                                                                                                                                            ^
+
+TypeError: Cannot read properties of undefined (reading 'hp')
+    at C:\Users\Administrator\Documents\Codex\2026-11-03\codex-games-the-hollow-keep-docs\work\PLAYVAULT\games\the-hollow-keep\next\tests\exploration-edge.cjs:26:253
+    at test (C:\Users\Administrator\Documents\Codex\2026-11-03\codex-games-the-hollow-keep-docs\work\PLAYVAULT\games\the-hollow-keep\next\tests\exploration-edge.cjs:4:24)
+    at Object.<anonymous> (C:\Users\Administrator\Documents\Codex\2026-11-03\codex-games-the-hollow-keep-docs\work\PLAYVAULT\games\the-hollow-keep\next\tests\exploration-edge.cjs:25:1)
+    at Module._compile (node:internal/modules/cjs/loader:1871:14)
+    at Object..js (node:internal/modules/cjs/loader:2002:10)
+    at Module.load (node:internal/modules/cjs/loader:1594:32)
+    at Module._load (node:internal/modules/cjs/loader:1396:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.18.0

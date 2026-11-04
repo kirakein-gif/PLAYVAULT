@@ -2,7 +2,7 @@
   'use strict';
   window.HKRender = function (canvas) {
     const ctx = canvas.getContext('2d');
-    let previousWorld = null, visual = {}, bursts = [], impacts = {}, shake = null;
+    let previousWorld = null, visual = {}, bursts = [], impacts = {}, deaths = [], shake = null;
     function backing() {
       const box = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
       const scale = HKPixel.status().scale, unit = 960 * scale;
@@ -16,8 +16,8 @@
       for(let i=0;i<ticks.length;i++){if(t<ticks[i])return i;t-=ticks[i];}
       return anim.frames-1;
     }
-    function sprite(hero, action, frame, x, y, face) {
-      const anim = HKPixel.manifest()?.heroes[hero]?.animations[action], img = anim && HKPixel.image(anim.file);
+    function sprite(hero, action, frame, x, y, face, enemy=false) {
+      const anim = HKPixel.manifest()?.[enemy?'enemies':'heroes'][hero]?.animations[action], img = anim && HKPixel.image(anim.file);
       if (!img) return false;
       const index = Math.min(anim.frames-1,Math.max(0,frame(anim)));
       const scale=HKPixel.status().scale;
@@ -47,6 +47,8 @@
       const flags=HKSim.getFlags(world),objects=HKPixel.manifest()?.objects||{};
       function prop(name,x,y,w,h){const art=objects[name],image=art&&HKPixel.image(art.file);if(!image)return false;ctx.drawImage(image,art.x,art.y,art.w,art.h,x,y,w,h);return true;}
       for(const o of world.room.objects){
+        if(o.type==='enemy')continue;
+        if(o.type==='shelter'){prop('shelter',o.x,o.y,o.w,o.h);text('E · 휴식',o.x,o.y-6,'#bce6dc',10);continue;}
         if(o.type==='target'||o.type==='key'&&flags.picked[o.id]||o.type==='breakable'&&flags.broken[o.id])continue;
         if(o.type==='door'){
           if(flags.doors[o.id])continue;
@@ -77,7 +79,7 @@
     }
     function draw(world, debug, effects) {
       backing();
-      if(previousWorld!==world){visual={};bursts=[];impacts={};shake=null;previousWorld=world;}
+      if(previousWorld!==world){visual={};bursts=[];impacts={};deaths=[];shake=null;previousWorld=world;}
       const p = HKSim.getPlayer(world), room = world.room;
       ctx.clearRect(0, 0, 960, 540); ctx.fillStyle = '#101320'; ctx.fillRect(0, 0, 960, 540);
       ctx.save();
@@ -138,6 +140,23 @@
         text(`${d.hp} HP`, d.x - 10, d.y - 10, '#d9b787', 10);
         if(impact&&age>6)delete impacts[d.id];
       }
+      for(const e of HKSim.getEnemies(world)){
+        const action=e.stagger?'stagger':e.hurt&&e.kind!=='shield'?'hurt':e.guard?'guard':
+          ({patrol:'walk',follow:e.kind==='wisp'?'hover':'walk',rest:'walk',recovery:'guard',hurt:'walk'}[e.state]||e.state);
+        ctx.save();if((e.hurt||e.guard)&&world.tick%4<2)ctx.filter='brightness(3)';
+        sprite(e.kind,action,a=>timed(a,e.age),e.x+e.w/2,e.y+e.h,e.face,true);ctx.restore();
+        if(debug)text(e.kind+' · '+e.state+' · '+e.hp,e.x-8,e.y-8,'#d9b787',10);
+      }
+      deaths=deaths.filter(e=>world.tick-e.tick<2+HKPixel.manifest()?.enemies[e.kind]?.animations.die.ticks.reduce((a,b)=>a+b,0));
+      for(const e of deaths){
+        const age=world.tick-e.tick,action=age<2&&e.kind!=='shield'?'hurt':'die';
+        ctx.save();if(age<2)ctx.filter='brightness(3)';
+        sprite(e.kind,action,a=>timed(a,Math.max(0,age-2)),e.x+e.w/2,e.y+e.h,e.face,true);ctx.restore();
+      }
+      for(const item of HKSim.getPickups(world)){
+        const art=HKPixel.manifest()?.objects.heal,img=art&&HKPixel.image(art.file);
+        if(img)ctx.drawImage(img,art.x,art.y,art.w,art.h,item.x+2,item.y+2,16,16);
+      }
       const light = world.active === 'ethan';
       let action = p.climbing ? 'climb' : p.onGround ? Math.abs(p.vx)>.1?'run':'idle' : p.jumpKind==='running'?'jump-running':'jump-standing';
       const state=visual[world.active]||{},anims=HKPixel.manifest()?.heroes[world.active]?.animations;
@@ -162,10 +181,12 @@
       if(showingAttack)action=attackAction;
       else if(p.charge.level)action='charge';
       else if(p.onGround&&state.land!==undefined&&world.tick-state.land<duration('land'))action='land';
-      const age=action.startsWith('attack')?attackAge:action==='land'?world.tick-state.land:world.tick;
+      if(p.hurtTicks)action='hurt';
+      const age=action==='hurt'?12-p.hurtTicks:action.startsWith('attack')?attackAge:action==='land'?world.tick-state.land:world.tick;
       const frame=anim=>action==='climb'?Math.floor((p.climbDistance||0)/8)%anim.frames:action.startsWith('jump-')?(p.vy < -1?0:p.vy > 1?2:1):timed(anim,age);
       const attackIndex=showingAttack&&anims?.[attackAction]?timed(anims[attackAction],age):-1;
       const displayFace=showingAttack?(state.attackFace??p.face):p.face;
+      ctx.save();if(p.invuln&&world.tick%8<4)ctx.globalAlpha=.25;
       if(!sprite(world.active,action,frame,p.x+p.w/2,p.y+p.h,displayFace)){
         // Preserve geometric fallback when the current animation cannot be loaded.
         ctx.save();ctx.translate(p.x + p.w / 2, p.y + p.h);ctx.scale(p.face,1);
@@ -177,6 +198,7 @@
         ctx.fillStyle = light ? '#f4cf76' : '#89d7e7';ctx.fillRect(-p.w*.42,-p.h*.66,p.w*.74,5);ctx.fillRect(4,-p.h+7,12,3);
         ctx.restore();
       }
+      ctx.restore();
       if(p.charge.level&&action==='charge'){
         const pose=anims?.charge,scale=HKPixel.status().scale;
         const hand=pose?.hands?.[timed(pose,world.tick)]||{x:144,y:90};
@@ -227,11 +249,24 @@
         text(`ground ${p.onGround}  coyote ${p.coyote}  buffer ${p.jumpBuffer}  ${p.jumpKind || 'ground'} takeoff ${p.takeoffVx.toFixed(2)}  tick ${world.tick}`,20,90,'#9ee9dc');
       }
       ctx.restore();
+      // Both heroes remain visible in the HUD, including the downed reserve.
+      const heroes=HKSim.getHeroes(world);
+      ['ethan','noah'].forEach((hero,i)=>{
+        const h=heroes[hero],x=42,y=68+i*24,active=world.active===hero;
+        ctx.fillStyle='#101320';ctx.globalAlpha=.85;ctx.fillRect(x-5,y-13,192,22);ctx.globalAlpha=1;
+        text((active?'▸ ':'  ')+hero.toUpperCase(),x,y+1,h.down?'#706c7d':active?'#f2d391':'#aaa8bb',11);
+        for(let j=0;j<h.maxHp;j++){
+          ctx.fillStyle=j<h.hp?(hero==='ethan'?'#e5bd78':'#88bccb'):'#333442';ctx.fillRect(x+70+j*15,y-9,11,11);
+          ctx.strokeStyle=active?'#eee4cb':'#676474';ctx.lineWidth=.5;ctx.strokeRect(x+70+j*15,y-9,11,11);
+        }
+        if(h.down)text('DOWN',x+70,y+1,'#b77e87',10);
+      });
     }
     draw.event=(event,world)=>{
-      if(previousWorld!==world){visual={};bursts=[];impacts={};shake=null;previousWorld=world;}
+      if(previousWorld!==world){visual={};bursts=[];impacts={};deaths=[];shake=null;previousWorld=world;}
       const state = visual[world.active] ||= {};
-      if(event.type==='room'){visual={};bursts=[];impacts={};shake=null;}
+      if(event.type==='room'||event.type==='respawn'){visual={};bursts=[];impacts={};deaths=[];shake=null;}
+      if(event.type==='kill')deaths.push({...event,tick:world.tick});
       if(event.type==='swap')visual={};
       if(event.type==='burst')bursts.push({...event,tick:world.tick});
       if(event.type==='attack'){state.attack=world.tick;state.attackFace=world.player.face;state.attackStep=event.step||1;state.hold=null;state.releaseLinkPose=false;}

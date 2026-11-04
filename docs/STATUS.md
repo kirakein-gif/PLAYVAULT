@@ -1,6 +1,20 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
+## 수정 제출 · TASK_10 추가 수정 지시 1 (2026-11-04) / PR #24
+
+확인일: **2026-11-04 (Asia/Seoul)** / Codex / `codex/hollow-keep-combat-enemies` / PR #24. 시작 `812d362`, 검토 `1d32619` 병합 `b4b4180`, 자리 보정 `ee8f57c`, 최신 main `4e7abd0` 보존 병합 `ca7ea74`. 사용자 지시로 검토 브랜치를 병합하고, 쓰러짐 교대 시 새 몸이 벽·닫힌 봉쇄물·부서지지 않은 벽에 묻히지 않도록 같은 틱에 최대8단위 좌우→아래 보정합니다. 수동 교대·무적·이동/무기 수치는 유지합니다.
+
+이번 검사: enemies17/17·탐험 경계13/13·탐험 브라우저6/6, 자리 보정 보완5/5, 실제 전투/모바일4/4, 캡처 시나리오16/16 및 요구 회귀 전체 통과. 기존 두 탐험 검사 충돌은 검토 담당 정정본 그대로 반영해 해소했습니다. 완주4214틱·defeat0 유지. [새 로그·재현](../games/the-hollow-keep/next/assets/combat2-review/down-swap/TEST_RESULTS.md). 아래 양쪽 제출·검토 기록은 당시 이력으로 보존합니다.
+
+다음: Claude Code 자리 보정 재검토·사용자 손맛 판단. 회사 PC 미리보기는 기존 담당자가 갱신. main에 PR 병합·수동 배포 없음. 최신 main의 홈 화면·체스·출시 예정 안내는 그대로이며 해당 파일은 이번 PR에서 차이가 없습니다.
+
+이전 확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Codex**(TASK_10 구현·검증 제출, Claude Code 교차 검토 대기).
+이전 확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(THE HOLLOW KEEP PR #24 교차 검토 완료, Codex 추가 수정 대기). 아래 기존 이력은 보존합니다.
+
+## 검토 완료 · THE HOLLOW KEEP PR #24(TASK_10 전투 2차) / Codex 추가 수정 대기
+
+2026-11-03 / Claude Code / 검토 브랜치 `claude/hollow-keep-combat2-review`. PR #22 main 병합(`2605e46`). PR #24 `812d362`: 요구 검사 통과, 원본 검사 2개(exploration-edge·exploration-browser)는 규격 변경에 맞춰 정정. 발견 1건 — 쓰러짐 자동 교대 시 Ethan이 벽·봉쇄물에 묻힘(규격 §2 보완, enemies-contract 17번째 검사). 다음: Codex `CODEX_TASK_10.md` 추가 수정 지시 1. 회사 PC 미리보기 버전 8(`812d362`).
+이전 확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
 
 ## 병합 완료 · CHESS MASTER PC 웹 버전 + PLAYVAULT 카드 + 고정 서명 키·Release (PR #26 → main `48440c9`, 2026-11-04)
 
@@ -67,6 +81,14 @@ Claude Code / 브랜치 `ccr-6aa2a39e-1vn67a`(세션 지정) / 기준 main **4ec
 
 
 
+
+## 검토 제출 · TASK_10 전투 2차 / PR #24
+
+2026-11-03 / Codex / `codex/hollow-keep-combat-enemies` / 기준 main `2605e46`(PR #22 병합 확인). [PR #24](https://github.com/kirakein-gif/PLAYVAULT/pull/24). 담당 범위: Hollow Keep next의 체력·피격·회복·적3종, 새 전용 그림, 구역 배치·완주, 제작/캡처/보완 검사, 공통 관리 문서. 총8마리·성문 쉼터·HUD·F2, 실제4214틱 완주(특정 적2, defeat0). 기존 이동/무기 수치와 PNG·원본 검사는 보존.
+
+검증: 새 규칙16/16·배치24/24·그림135/135, 실제 입력/모바일 보완4/4와 시뮬레이션 캡처16/16. 원본 exploration-edge는 제거된 `oath-west` 표적 참조, exploration-browser는 새 shelter/영역물건 flag 분기 부재로 실패; 두 원본은 수정하지 않음. 다른 요구 회귀 통과. [결과·실행 로그](../games/the-hollow-keep/next/assets/combat2-review/TEST_RESULTS.md), [장면·재현](../games/the-hollow-keep/next/assets/combat2-review/README.md).
+
+다음: Claude Code 교차 검토(원본 검사2곳의 규격 충돌 포함), 사용자 손맛·외형 판단, 회사 PC 미리보기는 기존 담당자가 갱신. 실물 모바일 성능/터치감 미확인. UI 버전 번호 변경·main 병합·배포 없음. 열린 체스 PR #23과 미추적 체스 로컬 파일은 별도 범위로 보존.
 
 ## 규격 제출 · 3단계 전투 2차(체력·피격·쓰러짐·회복·적 3종) / 사용자 병합 승인 대기
 
