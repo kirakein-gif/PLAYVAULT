@@ -34,11 +34,25 @@ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
  }
  async function tap(q){
    await waitSelector(q);
-   // Coordinate mapping through the WebView avoids mixing the Android
-   // status/task bars (physical 1280×800) with CSS viewport height (~716).
-   // Playwright sends a real touchscreen tap, not a JS-dispatched event.
-   await page.locator(q).tap({force:true,timeout:15000});
-   await wait(450);
+   // Android WebView pages do not consistently advertise hasTouch to Playwright
+   // (locator.tap can throw "page does not support tap"). ADB input tap sends
+   // real Android touchscreen input through the app's window instead of a
+   // synthesized DOM event, so the native APK acceptance remains meaningful.
+   const target=await page.evaluate(sel=>{
+     const el=document.querySelector(sel),r=el.getBoundingClientRect();
+     const x=r.left+r.width/2,y=r.top+r.height/2;
+     return {x,y,width:r.width,height:r.height,
+       hit:document.elementFromPoint(x,y)?.closest('button')?.getAttribute('data-testid')};
+   },q);
+   const id=q.match(/data-testid=([^\\]]+)/)?.[1];
+   if(target.hit!==id)throw Error('Touch target obscured or outside viewport: '+q+' '+JSON.stringify(target));
+   // This CI emulator is an Android 14 1280x800 tablet at 160dpi.
+   // The 24px top status bar is outside the WebView's 1280x716 CSS viewport;
+   // its bottom taskbar occupies the remaining area.
+   const physicalX=Math.round(target.x),physicalY=Math.round(target.y+24);
+   log('adb touch',{target:q,physicalX,physicalY});
+   await device.shell('input tap '+physicalX+' '+physicalY);
+   await wait(500);
  }
  await waitSelector('[data-testid=start-gentle]');
  log('home loaded',{size:await page.evaluate(()=>[innerWidth,innerHeight])});
