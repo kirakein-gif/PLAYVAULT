@@ -1,28 +1,45 @@
 # BLOCK MASTER · 1차 검증 보고서
 
-날짜: 2026-11-04 (Asia/Seoul) · 담당: ChatGPT · 브랜치: `chatgpt/family-blocks-solo` · 기준 main `4e7abd0`
+- 날짜: 2026-11-04 (Asia/Seoul)
+- 담당: ChatGPT / 작업 브랜치: `chatgpt/family-blocks-solo`
+- 최초 기준 main: `4e7abd0` / **검증 성공 커밋**: `f4797ee03422084924746c1b55f3796520cbdedc`
+- 증거: [GitHub Actions run 41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763) — 완료, **success**
+- 제출: [Draft PR #28](https://github.com/kirakein-gif/PLAYVAULT/pull/28), main 병합·GitHub Release·사이트 공개 배포는 수행하지 않음
 
-## 실행 결과
+## 실행한 검증
 
-| 검사 | 실제 결과 | 근거 |
+| 작업 / 명령 | 실행 결과 | 근거 |
 | --- | --- | --- |
-| TypeScript (`npx tsc --noEmit`) | **통과** | GitHub Actions 41808095710, unit-tests |
-| Vitest (`npx vitest run`) | **31개 통과 / 실패 0** | 동일 실행 로그 |
-| 웹 빌드 (`npm run build:web`) | **통과**, play/ 생성 및 소스 일치 | 동일 실행의 web-build-refresh·unit-tests |
-| 오프라인 브라우저 E2E (`node tests/e2e/run-e2e.mjs`) | **11개 통과 / 실패 0**, 외부 요청 0, JS 오류 0 | 동일 실행, 853×533 / 1280×800 |
-| 60초 고정 시드 자동 플레이 | **통과** (E2E에 포함) | 동일 실행, 프레임 시간은 참고 지표 |
-| Android APK / 고정 서명 지문 | **검증 중** | GitHub Actions 41808095710 build 작업 |
-| Android14 오프라인 에뮬레이터 | **실행 대기** | 빌드 선행 필요 |
-| GitHub Release | **미실행** | main 병합 이후에만 생성하도록 CI 제한 |
-| 실제 저가형 태블릿 감도·소리·진동 | **확인 못 함** | 사용자 실기 확인 필요 |
+| `npx tsc --noEmit -p tsconfig.json` | **통과** | run 41823354763 / unit-tests |
+| `npx vitest run` | **31/31 통과** | 동일 |
+| `npm run build:web` + `play/` 소스 일치 검사 | **통과** | 동일 / web-build-refresh, unit-tests |
+| `node tests/e2e/run-e2e.mjs` (Playwright Chromium) | **11/11 통과**, 실패 0, 외부 요청 0, JS 오류 0 | 동일 / unit-tests |
+| 853×533, 1280×800 홈/모드/회전/터치·동시 터치/키보드/일시정지/기록 | **통과** | 동일 / E2E 스크린샷 |
+| 60초 고정 시드 자동 플레이 | **통과**; 직전 성공 시각의 3604프레임, p95 약 16.8ms(참고 수치) | run 41823050606 / E2E 산출물. 최신 run 41823354763도 동일 테스트 통과 |
+| `npm run build`, `npx cap sync android`, `./gradlew assembleDebug --no-daemon` | **통과**, APK 생성 | run 41823354763 / build |
+| Android Manifest 및 패키징 APK의 INTERNET 권한 검사 | **통과** — INTERNET 권한 없음 | 동일 / build |
+| APK 서명 검증 (`apksigner`) | **통과** — 가족 서명 인증서 SHA-256 `bc658c0933d0a9cdedecd65926f5eb14c5c767882f65fc8317295772d53e8a6a` | 동일 / build |
+| Android 14 1280×800 오프라인 에뮬레이터 `node tests/android/smoke.cjs android-smoke` | **통과** — 실제 ADB 터치 이동/시계 방향 회전/즉시 떨어뜨리기, 그만하기, 앱 완전 재실행 후 기록 유지 | 동일 / emulator-offline-test |
+| Android smoke 외부 네트워크 요청 / JavaScript 오류 | **각 0건**, 전체 PASS | 동일 / android-smoke-results `result.json` |
+| GitHub Release | **미실행(정상)** — main 브랜치 병합 뒤에만 게시하도록 제한 | 동일 / release: skipped |
 
-## 수정한 실패 이력
+Android 입력 증거: ADB로 왼쪽 버튼(49,694), 회전 버튼(1155,694), 하드 드롭(1231,694)을 탭했습니다. 실제 게임 상태는 이동 X 3→2, 회전 1, 하드 드롭 후 판에 4칸이 고정되고 점수 32였으며, 앱 재시작 후 기록 유지가 확인됐습니다. 검증 도중 Wi-Fi와 데이터를 차단했습니다.
 
-- Actions 41807698434: TypeScript 미사용 import 오류 → 수정 후 `tsc` 통과.
-- Actions 41807800522: unit 31개 통과, 웹 서버 주소와 클라이언트 호스트 불일치로 E2E 시작 불가 → `127.0.0.1` 명시 및 준비 상태 polling; Actions 41808095710 E2E 11개 통과.
+## 실패 이력과 수정
 
-## 이번에 직접 수행한 것과 미확인 범위
+- **41808095710**: 웹 11/11, 단위 31/31, APK 서명·빌드 성공. Android 실기 시험에서 하드 드롭 판정 실패. 원인은 아직 확정하지 않음(후속 시험 수단 문제 확인).
+- **41821010109**: Android WebView의 Playwright `locator.tap()`이 `hasTouch`를 지원하지 않아 시험 자체 실패.
+- **41822268923**, **41823050606**: ADB 실제 터치 전 요소 확인 코드를 추가했지만 시험 선택자 파싱이 잘못되어 검사가 중단됨. 검증 코드를 수정.
+- **41822593679**: 브라우저 E2E에서 회전 불변인 O 블록이 무작위로 선택되어 동시 회전 검사가 오탐. 처음부터 T 블록이 나오는 고정 시드 77을 사용해 해결; O 블록 게임 규칙은 유지.
+- **41823354763**: 위 오류를 고친 뒤 **모든 필수 CI 단계 통과**. 다른 검사 기준을 약하게 하거나 생략하지 않았습니다.
 
-GitHub API로 원격 브랜치에 직접 커밋하고 Actions 로그로 검증했습니다. 개발 PC에서 로컬 Android Studio 실기 테스트를 수행했다고 주장하지 않습니다. 본 브랜치에서는 main에 병합하거나 웹사이트에 배포하지 않았습니다.
+## 화면 검사
 
-상세 증거: https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41808095710
+853×533 / 1280×800 스크린샷을 확인해, 하단 캔버스 모드 이름이 왼쪽 이동 버튼을 가리던 문제를 발견했습니다. 상단 모드 칩과 중복되므로 하단 글자를 제거했고, 수정 후 화면에서 겹침이 없음을 확인했습니다. 원목 스킨과 단정한 줄 지우기 연출의 실물 기기 표현은 아래 미확인 항목에 남깁니다.
+
+## 확인 못 함 / 후속
+
+- 실제 사용자의 저가형 Android 태블릿에서 **터치 지연·프레임·음향 크기·진동·공유/백업 파일 선택**은 확인하지 못했습니다. CI/에뮬레이터 통과를 실기 검증으로 확대하지 않습니다.
+- Claude Code 또는 Codex의 **독립 교차 리뷰**는 아직 미실행입니다.
+- `main` 병합·GitHub Release `family-blocks-v1.0.0` 생성·PLAYVAULT 카드 등록·사이트 배포 **미실행** (사용자 승인 필요). 현재 APK는 90일 만료되는 Actions 아티팩트이며, 영구 Release가 아닙니다.
+- AGENTS.md / CLAUDE.md 공통 규칙을 검토했으며 이번 작업에서는 변경하지 않았습니다.
