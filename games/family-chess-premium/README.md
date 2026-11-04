@@ -24,12 +24,14 @@
 
 ## APK 설치 방법 (Android 태블릿)
 
-1. GitHub 저장소 → **Actions** → `family-chess-android` → 성공한 실행을 엽니다.
-2. 아래 **Artifacts**의 `FamilyChessPremium-v1.0.0-debug-apk`를 내려받아 압축을 풀면 `FamilyChessPremium-v1.0.0-debug.apk`가 나옵니다.
-3. 파일을 태블릿으로 옮겨(USB·드라이브 등) 탭합니다. 처음이면 "출처를 알 수 없는 앱 설치"를 허용합니다.
-4. 설치 후 인터넷 없이 실행됩니다. 기록은 기기 안에만 저장되므로 앱을 지우기 전에는 설정 → **기록 내보내기**로 백업해 두세요.
+1. **영구 보관본:** GitHub 저장소 → **Releases** → `family-chess-v1.0.0`에서 `FamilyChessPremium-v1.0.0-debug.apk`를 내려받습니다(main에 반영될 때마다 테스트 통과 후 자동 갱신).
+   브랜치 빌드는 Actions → `family-chess-android` → Artifacts에 90일간 남습니다.
+2. 파일을 태블릿으로 옮겨(USB·드라이브 등) 탭합니다. 처음이면 "출처를 알 수 없는 앱 설치"를 허용합니다.
+3. 설치 후 인터넷 없이 실행됩니다. 기록은 기기 안에만 저장되므로 앱을 지우기 전에는 설정 → **기록 내보내기**로 백업해 두세요.
 
-디버그 서명 APK이므로 Play 스토어 배포용은 아닙니다(개인 설치용).
+**서명 키:** 2026-11-04부터 모든 빌드가 고정 키(`android/family-chess.keystore`, 인증서 SHA-256 `BC:65:8C:09…:3E:8A:6A`)로 서명되어 새 APK를 덮어 설치해도 기록이 유지됩니다. 그 이전 APK가 설치되어 있다면 한 번만 "기록 내보내기 → 앱 삭제 → 새 APK 설치 → 기록 불러오기"가 필요합니다. 개인 설치용 키이며 Play 스토어 배포용이 아닙니다.
+
+전체 개발 정리: [docs/DEVELOPMENT_SUMMARY.md](docs/DEVELOPMENT_SUMMARY.md)
 
 ## 개발·빌드
 

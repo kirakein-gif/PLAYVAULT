@@ -65,6 +65,13 @@ jobs:
           cp android/app/build/outputs/apk/debug/app-debug.apk out/FamilyChessPremium-v1.0.0-debug.apk
           ls -l out
           unzip -l out/FamilyChessPremium-v1.0.0-debug.apk | grep -E "engine/stockfish|puzzles|pieces/wK" || true
+      - name: Verify the fixed family signing key
+        run: |
+          APKSIGNER=$(ls -d $ANDROID_HOME/build-tools/*/apksigner | sort -V | tail -1)
+          $APKSIGNER verify --print-certs out/FamilyChessPremium-v1.0.0-debug.apk | tee out/signer.txt
+          grep -q "SHA-256 digest: $FAMILY_CERT_SHA256" out/signer.txt || { echo "APK is not signed with the family key"; exit 1; }
+        env:
+          FAMILY_CERT_SHA256: bc658c0933d0a9cdedecd65926f5eb14c5c767882f65fc8317295772d53e8a6a
       - uses: actions/upload-artifact@v4
         with:
           name: FamilyChessPremium-v1.0.0-debug-apk
@@ -118,3 +125,42 @@ jobs:
         with:
           name: android-smoke-results
           path: games/family-chess-premium/android-smoke
+
+  # Keeps the APK permanently: Actions artifacts expire after 90 days, release
+  # files do not. Runs only on main, and only after the emulator test passed.
+  release:
+    needs: [unit-tests, build, emulator-offline-test]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: FamilyChessPremium-v1.0.0-debug-apk
+          path: games/family-chess-premium/out
+      - name: Publish or update the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="family-chess-v$VERSION"
+          APK="out/FamilyChessPremium-v$VERSION-debug.apk"
+          ( cd out && sha256sum "$(basename "$APK")" > "$(basename "$APK").sha256" )
+          {
+            echo "CHESS MASTER v$VERSION - offline Android tablet chess (family build)."
+            echo ""
+            echo "Install: download $(basename "$APK"), copy it to the tablet and tap it (allow installs from this source)."
+            echo "Signed with the fixed family key (certificate SHA-256 bc658c09...3e8a6a), so later builds install over this one and keep the records."
+            echo ""
+            echo "Built from ${GITHUB_SHA::7} by run ${GITHUB_RUN_NUMBER}. Unit tests and the offline emulator test passed."
+            echo "Personal sideload build, not for the Play Store."
+          } > out/notes.md
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" "$APK.sha256" --clobber
+            gh release edit "$TAG" --notes-file out/notes.md
+          else
+            gh release create "$TAG" "$APK" "$APK.sha256" --target "$GITHUB_SHA" --title "CHESS MASTER v$VERSION" --notes-file out/notes.md
+          fi

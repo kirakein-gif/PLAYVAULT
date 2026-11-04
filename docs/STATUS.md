@@ -1,8 +1,20 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(PR #23 병합 반영·리버시 아이디어 등록). 아래 기존 이력은 보존합니다.
+확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
 
-## 아이디어 보류(찜) · 가족 리버시(오셀로) — CHESS MASTER와 같은 컨셉 / 착수 전
+## 제출 · CHESS MASTER 고정 서명 키 + GitHub Release 영구 보관 + 개발 정리 / 사용자 병합 승인 대기
+
+Claude Code / `ccr-6aa2a39e-1vn67a` / 기준 main `57fe108` / 2026-11-04. 사용자 요청: "apk 자료를 날아가지 않는 별도 자료에 정리하고 지금까지 개발한 내용도 정리".
+- 발견: 기존 CI APK는 빌드마다 임시 debug 키로 서명 → 새 APK 덮어 설치 불가(이전 안내 "덮어 설치해도 기록 유지"는 틀렸음, 정정). 사용자 결정(저장소에 키 보관)으로 `android/family-chess.keystore`(PKCS12, 30년) 추가, debug·release 빌드 모두 이 키로 서명, CI가 인증서 지문 확인.
+- Actions 아티팩트는 90일 만료 → workflow에 `release` 작업 추가: main에서 단위·빌드·에뮬레이터 통과 후 `family-chess-v<version>` Release에 APK·SHA-256 업로드(같은 버전은 교체). main 병합 후 첫 실행에서 실제 생성 확인 필요.
+- 정리 문서: `games/family-chess-premium/docs/DEVELOPMENT_SUMMARY.md`, README 설치 절차 갱신.
+- 남은 일: 사용자 승인 후 main 병합 → Release 생성 확인 → 태블릿에서 한 번 재설치(기록 내보내기·불러오기).
+
+## 가능성(찜) · CHESS MASTER와 같은 컨셉의 후속 게임 — 장기·리버시·오목·바둑 9줄 / 착수 전
+
+2026-11-04 사용자: "우선 가능성으로 놔두고". 후보 비교는 `games/family-chess-premium/docs/DEVELOPMENT_SUMMARY.md` 6절. 장기는 Fairy-Stockfish로 엔진 연결 재사용 가능, 바둑은 저가형 태블릿 AI가 가장 어려움. 두 번째 게임 착수 시 공통 바탕 분리 권장. 아래는 리버시 세부 메모.
+
+### 아이디어 보류(찜) · 가족 리버시(오셀로) — CHESS MASTER와 같은 컨셉 / 착수 전
 
 사용자 요청(2026-11-03): "똑같은 컨셉으로 오셀로 만들 수 있지 않아?" → "우선 찜만 해두려구". **구현 착수 안 함, 담당 미정.**
 

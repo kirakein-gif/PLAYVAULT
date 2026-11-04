@@ -16,8 +16,23 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Fixed family signing key (committed on purpose — family decision 2026-11-04).
+    // Every CI build is signed with the same key so a new APK installs over the
+    // old one and keeps the saved records. Personal sideload use only; not for Play.
+    signingConfigs {
+        family {
+            storeFile file('../family-chess.keystore')
+            storePassword 'familychess'
+            keyAlias 'familychess'
+            keyPassword 'familychess'
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.family
+        }
         release {
+            signingConfig signingConfigs.family
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

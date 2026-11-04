@@ -1489,3 +1489,12 @@
 - 사용자 아이디어: CHESS MASTER와 같은 컨셉의 오셀로(리버시) — "우선 찜만". STATUS 맨 위에 재활용 범위·새 작업·착수 시 결정 사항 기록. 코드 변경 없음.
 - 관리 문서: STATUS·WORK_LOG 갱신. CHANGELOG는 게임 변경이 없어 추가하지 않음(PR #23 항목에 병합 기록 있음). AGENTS·CLAUDE 절차 변경 없음.
 - 사용자 재요청 횟수: 0회.
+
+### 2026-11-04 (Asia/Seoul) · CHESS MASTER 고정 서명 키 · Release 영구 보관 · 개발 정리 (Claude Code)
+
+- 요청: "apk 자료를 날아가지 않는 별도 자료에 정리하고 지금까지 개발한 내용도 정리. 깃허브에 다 정리되어 있나요?" 후속 게임은 "가능성으로 놔두고".
+- 점검 결과: 코드·문서는 main(`57fe108`)에 있음. APK는 Actions 아티팩트뿐이라 2027-02-01 만료. CI APK가 매번 새 임시 debug 키로 서명되어 덮어 설치가 불가함을 발견 — 2026-11-03 "덮어 설치해도 기록 유지" 안내는 오류였음을 사용자에게 정정.
+- 결정(사용자, 선택지 중 "저장소에 같이 저장"): 고정 키를 공개 저장소에 보관. 위험(누구나 같은 서명의 APK 제작 가능, 사용자가 그 파일을 설치하지 않는 한 영향 없음)을 선택지에 명시함.
+- 변경: `android/family-chess.keystore`(PKCS12 RSA2048, 30년, SHA-256 BC:65:…:8A:6A), `app/build.gradle` signingConfigs.family를 debug·release에 적용, workflow에 apksigner 지문 확인 단계와 main 전용 `release` 작업(contents: write, gh release create/upload --clobber, SHA-256 파일). `docs/DEVELOPMENT_SUMMARY.md` 신규, README 설치 절차·STATUS·CHANGELOG 갱신.
+- 검증: workflow YAML 파싱 확인. 서명·Release 동작은 CI에서 확인 예정(브랜치 실행은 서명 지문 단계까지, Release 생성은 main 병합 후). 앱 코드 변경 없음.
+- 사용자 재요청 횟수: 0회. 다음: CI 확인 → 사용자 승인 후 main 병합 → Release 생성 확인 → 태블릿 1회 재설치.
