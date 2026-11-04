@@ -51,9 +51,29 @@ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
  const after=await page.evaluate(()=>window.__familyBlocksState.active.x);
  if(after!==before-1)throw Error('Physical left tap did not move the active piece by one cell: '+before+' → '+after);
  await tap('[data-testid=ctrl-cw]');
+ // Capture the state around the Android-only input failure. Do not retry the
+ // gesture: this test must prove that one physical touch locks a piece.
+ const beforeDrop=await page.evaluate(()=>({phase:window.__familyBlocksState.phase,
+   paused:!!document.querySelector('[data-testid=pause-overlay]'),
+   active:{...window.__familyBlocksState.active},
+   boardCells:window.__familyBlocksState.board.flat().filter(Boolean).length}));
+ log('before hard drop',beforeDrop);
+ await device.screenshot({path:path.join(out,'before-drop.png')});
  await tap('[data-testid=ctrl-drop]');
- const pieces=await page.evaluate(()=>window.__familyBlocksState.board.flat().filter(Boolean).length);
- if(pieces<4)throw Error('Hard drop did not lock a piece');
+ // Slow Android emulator boot can delay WebView input. Wait for the actual
+ // board change rather than assuming 450ms is always enough.
+ await page.waitForFunction(()=>window.__familyBlocksState.board.flat().filter(Boolean).length>=4,
+   null,{polling:100,timeout:6000}).catch(()=>{});
+ const afterDrop=await page.evaluate(()=>({phase:window.__familyBlocksState.phase,
+   paused:!!document.querySelector('[data-testid=pause-overlay]'),
+   active:{...window.__familyBlocksState.active},
+   score:window.__familyBlocksState.score,
+   ticks:window.__familyBlocksState.ticks,
+   boardCells:window.__familyBlocksState.board.flat().filter(Boolean).length}));
+ log('after hard drop',afterDrop);
+ await device.screenshot({path:path.join(out,'after-drop.png')});
+ const pieces=afterDrop.boardCells;
+ if(pieces<4)throw Error('Hard drop did not lock a piece: '+JSON.stringify({beforeDrop,afterDrop}));
  log('game touch movement and drop',{before,after,pieces});
  await device.screenshot({path:path.join(out,'game.png')});
  await click('[data-testid=pause]');
