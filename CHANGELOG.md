@@ -11,7 +11,8 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 - CHESS MASTER와 독립된 `games/family-blocks/`, 별도 Android 앱 ID, 같은 가족 서명 키를 복사한 개인 오프라인 APK.
 - `차근차근`(실패해도 판 비우고 계속), `도전`(점수·레벨), `40줄 달리기`(최단 시간), 7종 시드 기반 블록·벽 차기·홀드·고스트·점수, 캔버스 원목 스타일과 저음량 자작곡.
 - 가족 프로필 2개, 한/영, JSON 백업/복원, Android 태블릿 + PC 웹 빌드 `play/`. PLAYVAULT 루트 카드 등록은 이번 범위에서 제외.
-- 검증: 브랜치 Actions run 41808095710에서 TypeScript/웹 빌드, Vitest 31/31, 브라우저 인수 11/11 통과; 실제 Android·기기 테스트는 별도 확인 필요. `main` 병합/사이트 배포/Release는 사용자 승인 전 미수행.
+- 검증(2026-11-04): [브랜치 CI 41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763)에서 타입 검사, 단위 31/31, 브라우저 E2E 11/11, APK 생성·가족 고정 서명·INTERNET 권한 없음, Android 14 오프라인 에뮬레이터 실제 터치와 재실행 후 기록 유지 통과. 외부 요청·JS 오류 0. 실물 태블릿 검증과 타 AI 교차 리뷰는 대기. `main` 병합·Release·배포 없음.
+- 후속 수정: 터치 버튼과 겹치던 하단 중복 표기 제거, 멀티터치 E2E 고정 시드 적용, Android CI 터치 입력을 ADB로 검증. 게임 버전 v1.0.0 유지.
 ## CHESS MASTER · 2026-11-04 PC 웹 버전
 
 같은 소스로 PC 웹 버전을 만들어 PLAYVAULT 첫 화면에 카드로 등록했습니다(`games/family-chess-premium/play/`, `npm run build:web`). PC·태블릿 가로 화면 기준, 웹에서는 진동 설정 숨김·`← PLAYVAULT` 링크·세로 휴대폰 안내. 웹 빌드 대상 E2E 23/23. CI가 커밋된 웹 빌드와 소스 일치를 확인합니다. PR #26으로 main 병합(`48440c9`).
