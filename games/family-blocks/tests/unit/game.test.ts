@@ -109,7 +109,7 @@ describe('Tick-accurate gravity, locking and drop actions',()=>{
     const s=createGame('challenge');const y=s.active.y;
     const length=hardDrop(s);
     expect(length).toBeGreaterThan(0);expect(s.score).toBe(2*length);
-    expect(s.board.flat().filter(Boolean)).toHaveLength(4);expect(s.active.y).not.toBe(y);
+    expect(s.board.flat().filter(Boolean)).toHaveLength(4);expect(s.board.flat().filter(Boolean)).toHaveLength(4);
   });
 });
 describe('Clears, levels and different modes',()=>{

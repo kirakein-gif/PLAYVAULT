@@ -56,7 +56,7 @@ export function GameScreen({mode,level,lang,settings,onFinish,onRestart}:GameScr
   },[game]);
   const pressed=useCallback((id:ButtonId)=>{
     if(id==='left'||id==='right'){
-      if(!active(id))repeatStart(repeats.current[id]);
+      repeatStart(repeats.current[id]);
     }
     trigger(id);
   },[active,trigger]);
@@ -145,7 +145,7 @@ export function GameScreen({mode,level,lang,settings,onFinish,onRestart}:GameScr
   },[game,settings,lang,active,notice]);
   const visible=settings.touchButtons==='on'||settings.touchButtons==='auto'&&touchVisible;
   const finish=()=>{setPaused(false);handlers.current.onFinish(game);};
-  return <main className="game-page" data-testid="game-screen" data-mode={mode}>
+  return <main className="game-page" data-testid="game-screen" data-mode={mode} onPointerDown={e=>{if(e.pointerType==='touch')setTouchVisible(true);}}>
     <canvas ref={canvas} className="game-canvas" aria-label={lang==='ko'?'블록 퍼즐 게임판':'Block puzzle board'} />
     <div className="game-top"><span className="game-chip">{t(lang,mode)}</span>
       <button data-testid="pause" className="button-pause" onClick={()=>setPaused(true)}>Ⅱ <span>{t(lang,'pause')}</span></button>
