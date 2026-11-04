@@ -1547,3 +1547,4 @@
 - 검증(이번 실행): tsc 통과, Vitest 27/27(그림 설정 검증 1개 추가), E2E 13/13(dist)·13/13(play), 외부 요청 0. 새 E2E: 클래식 선택 → 2번 틀리면 부위 2개, 지면 6개, 맞히면 풀려난 그림, 새로고침 후 유지, 다른 사용자는 풍선 유지. CI는 push 후 다시 실행.
 - 관리 문서: STATUS·CHANGELOG·WORK_LOG, 게임 README·TEST_REPORT 갱신. AGENTS·CLAUDE 변경 없음. 버전 1.0.0 유지(아직 main 미병합 첫 버전).
 - 사용자 재요청 횟수: 0회(기능 추가 요청 1회). 다음: CI 확인 → 사용자 승인 후 main 병합.
+- CI #3(`1cdad61`, run 41813876364, 그림 옵션 포함) 전체 성공. 사용자에게 APK 아티팩트 링크 전달(GitHub 로그인 필요, zip 안에 APK). 영구 Release 링크는 main 병합 후 생성.
