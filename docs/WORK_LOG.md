@@ -1571,3 +1571,4 @@
 - 변경: `@capacitor-community/text-to-speech@8.0.2`(MIT, 매니페스트에 TTS 서비스 queries만 추가, 권한 없음) 설치·`cap sync`로 gradle 2개 갱신, `src/platform/speech.ts`(Android 영어 지원 여부 `isLanguageAvailable` 기반 확인·재시도, 웹 voices 확인, speak, 음성 설치 화면 열기), `speechRates.ts`(느리게 0.6·보통 0.85·빠르게 1.0), `SpeakButton`(결과 창·단어장), 프로필 `speechRate`(기본 보통, 잘못된 값 복구), 설정 "발음 속도"(누르면 apple 미리 듣기)·영어 음성 없을 때 안내/설치 버튼·기기 정보 줄 '영어 음성' 상태, 한/영 문자열, 라이선스 표·파일, Android smoke에 🔊 상태 기록·탭, `play/` 재빌드.
 - 검증(이번 실행): tsc, Vitest 28/28, E2E 15/15(dist)·15/15(play), 외부 0. E2E는 speechSynthesis를 기록용 가짜로 대체해 호출 단어·언어·속도 확인(실제 음성 아님). APK·에뮬레이터는 push 후 CI.
 - 사용자 재요청 횟수: 0회(기능 추가 1회). 다음: CI → 사용자 승인 후 main 병합(Release 파일 교체) → 태블릿에서 소리 확인.
+- CI #6(`2d6e820`, run 41831202054) 전체 성공: 에뮬레이터(네트워크 차단)에서 영어 음성 상태 `ready`, 🔊 탭 오류 없음, 설치 권한은 VIBRATE뿐. 소리는 에뮬레이터 `-noaudio`라 확인 못 함. APK 아티팩트 13322798657.
