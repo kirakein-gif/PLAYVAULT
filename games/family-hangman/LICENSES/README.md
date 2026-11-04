@@ -4,6 +4,7 @@
 | --- | --- | --- | --- |
 | React / React DOM | 19.3.1 | MIT | https://react.dev |
 | Capacitor core/android/app/preferences/filesystem/share/haptics | 8.x | MIT | https://capacitorjs.com |
+| @capacitor-community/text-to-speech | 8.0.2 | MIT | https://github.com/capacitor-community/text-to-speech (발음 — 기기의 음성 엔진 호출, 음성 데이터는 포함하지 않음) |
 | Gowun Dodum · Gowun Batang (Fontsource) | 5.3.0 | SIL OFL 1.1 | https://fontsource.org/fonts/gowun-dodum · https://fontsource.org/fonts/gowun-batang |
 | Nunito (Fontsource variable) | 5.3.0 | SIL OFL 1.1 | https://fontsource.org/fonts/nunito |
 
