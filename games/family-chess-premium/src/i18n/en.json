@@ -135,5 +135,6 @@
     "about": "About", "licenses": "Open-source licences", "version": "Version {v}", "offline": "Everything works without the internet. Records stay on this device only.",
     "engine": "Chess engine: {name}", "device": "Device: {info}", "errors": { "notJson": "not JSON", "wrongApp": "not a backup of this app", "newerSchema": "made by a newer version", "noSchema": "no version info", "noProfiles": "no profiles", "badProfile": "damaged profile", "notObject": "bad format" }
   },
-  "licenses": { "title": "Open-source licences and credits" }
+  "licenses": { "title": "Open-source licences and credits" },
+  "web": { "narrow": "This game is made for a PC or a landscape tablet screen. On a phone, turn it sideways." }
 }

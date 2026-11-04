@@ -135,5 +135,6 @@
     "about": "앱 정보", "licenses": "오픈소스 라이선스", "version": "버전 {v}", "offline": "인터넷 없이 모든 기능이 동작합니다. 기록은 이 기기에만 저장됩니다.",
     "engine": "체스 엔진: {name}", "device": "기기 정보: {info}", "errors": { "notJson": "JSON 형식 아님", "wrongApp": "이 앱의 백업이 아님", "newerSchema": "더 새로운 버전의 백업", "noSchema": "버전 정보 없음", "noProfiles": "프로필 없음", "badProfile": "프로필 손상", "notObject": "형식 오류" }
   },
-  "licenses": { "title": "오픈소스 라이선스와 출처" }
+  "licenses": { "title": "오픈소스 라이선스와 출처" },
+  "web": { "narrow": "이 게임은 PC나 태블릿의 가로 화면에 맞춰져 있습니다. 휴대폰에서는 화면을 가로로 돌려 주세요." }
 }

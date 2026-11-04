@@ -32,7 +32,9 @@ async function test(name, fn) {
 }
 const assert = (c, m) => { if (!c) throw new Error(m); };
 
-const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], { cwd: root, stdio: 'ignore' });
+// E2E_OUTDIR=play runs the same suite against the PLAYVAULT web build (npm run build:web)
+const outDirArgs = process.env.E2E_OUTDIR ? ['--outDir', process.env.E2E_OUTDIR] : [];
+const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort', ...outDirArgs], { cwd: root, stdio: 'ignore' });
 await new Promise((r) => setTimeout(r, 2500));
 const browser = await chromium.launch();
 

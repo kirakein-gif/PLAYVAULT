@@ -84,7 +84,7 @@ export function SettingsModal() {
               onPointerUp={() => { sound.unlock(); sound.play('move'); }}
             />,
           )}
-          {row(t('settings.haptics'), <Toggle on={settings.haptics} onChange={(v) => updateSettings({ haptics: v })} />)}
+          {isNative && row(t('settings.haptics'), <Toggle on={settings.haptics} onChange={(v) => updateSettings({ haptics: v })} />)}
           {row(t('settings.coords'), <Toggle on={settings.showCoords} onChange={(v) => updateSettings({ showCoords: v })} />)}
           {row(t('settings.autoRotate'), <Toggle on={settings.autoRotate} onChange={(v) => updateSettings({ autoRotate: v })} />)}
           {row(t('settings.otherLang'), <Toggle on={settings.showOtherLang} onChange={(v) => updateSettings({ showOtherLang: v })} />)}

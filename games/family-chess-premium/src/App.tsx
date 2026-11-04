@@ -15,7 +15,7 @@ import { GamesScreen } from './screens/GamesScreen';
 import { LicensesScreen } from './screens/LicensesScreen';
 import { SettingsModal } from './screens/SettingsModal';
 import { Btn, Confirm } from './components/ui';
-import { exitApp, onBackButton, onLifecycle } from './platform/native';
+import { exitApp, isNative, onBackButton, onLifecycle } from './platform/native';
 import { flushSave } from './storage/store';
 import { getEngine } from './engine/stockfishAdapter';
 import { sound } from './audio/sound';
@@ -104,6 +104,11 @@ function Shell() {
       {app.toastMsg && (
         <div className="toast" data-testid="toast" role="status">
           {app.toastMsg}
+        </div>
+      )}
+      {!isNative && (
+        <div className="narrowNote" role="note">
+          {app.t('web.narrow')}
         </div>
       )}
       {exitAsk && <Confirm text={app.t('home.exitTitle')} yes={app.t('home.exit')} onYes={() => exitApp()} onNo={() => setExitAsk(false)} />}
