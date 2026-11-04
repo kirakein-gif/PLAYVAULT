@@ -1,4 +1,8 @@
-# TASK_10 검증 · 2026-11-03 (Asia/Seoul)
+# TASK_10 검증
+
+최신: [2026-11-04 추가 수정1 · 쓰러짐 교대 자리 보정](down-swap/TEST_RESULTS.md). 검토 브랜치의 정정 검사와 구현 수정을 반영해 enemies17/17, exploration-edge13/13, exploration-browser6/6 및 요구 회귀를 통과했습니다. 아래는 이전 제출 시점의 기록이며, 당시 탐험 검사2개 실패는 최신 결과에서 해소됐습니다.
+
+## 최초 제출 · 2026-11-03 (Asia/Seoul)
 
 대상: main `2605e46`에서 만든 `codex/hollow-keep-combat-enemies`, PR #24. Windows / Node24.18 / Playwright / Chrome. 원본 인수 검사와 기존 이동·무기 수치는 수정하지 않았습니다. 아래는 이번 구현에 실제 실행한 결과입니다.
 

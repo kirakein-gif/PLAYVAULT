@@ -1,0 +1,14 @@
+PASS actual high lever: floor-launched Ethan cannot reach it; Noah can
+PASS actual bronze gate cannot be jumped over by either hero without its key
+PASS the bell barrier fills its lower corridor and cannot be jumped through
+PASS the upper gallery remains traversable with the bronze barrier still closed
+PASS the sealed lower vault holds both keys until its cracked masonry is broken
+PASS nonlethal target HP survives a round trip between rooms
+PASS closed doors absorb projectiles before a target behind them
+PASS a closed door at a ladder boundary still blocks the portal
+PASS flag/map snapshots and input area cannot mutate world progress
+PASS swap while on a ladder preserves attachment and releases safely with jump
+PASS down-jump at a ladder/solid-floor seam never nudges the body into masonry
+PASS actual loft ladder cannot cross the unopened gate seal [ethan], then passes after the lever
+PASS actual loft ladder cannot cross the unopened gate seal [noah], then passes after the lever
+13/13 exploration edge checks passed

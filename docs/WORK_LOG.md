@@ -1543,3 +1543,16 @@
 - 범위 조정: 사용자가 딸깍 배지 10회 목적지 변경과 PLAYVAULT 메인 분위기 정리를 Codex로 별도 진행하기로 함. 이 세션에서 `ddalkkak-hub`에 착수했던 목적지 변경(로컬)은 사용자 지시로 폐기, 원격 푸시 없음. 위치 안내만 전달: PLAYVAULT `index.html`(카드 `<section class="grid">`)·`assets/site.css`, ddalkkak-hub `site/index.html` 20행 `data-game-url`·`site/easter-egg.js`·`functions/[[path]].js`.
 - 관리 문서: STATUS·WORK_LOG·CHANGELOG·DEVELOPMENT_SUMMARY 갱신. AGENTS·CLAUDE 절차 변경 없음.
 - 사용자 재요청 횟수: 0회. 다음: 태블릿 1회 재설치·실기 확인.
+
+### 2026-11-04 (Asia/Seoul) · TASK_10 추가 수정 지시1 — 자동 교대 자리 보정
+
+- 담당: Codex. 사용자 명시 지시: `claude/hollow-keep-combat2-review` 병합 → 쓰러짐 교대 자리 보정 → 검사 → 같은 PR #24 푸시. 시작 HEAD/원격 작업 브랜치 `812d362`; 검토 브랜치 최신 `1d32619`, 원격 main `4e7abd0`. PR #24 검토 댓글의 결함1건·지시서 블록과 실제 코드/이력 대조. 작업 담당 선언 `9eb8dc3` 먼저 푸시, 같은 PR 본문에 작업 중임을 공유.
+- 병합: 검토 `1d32619` → `b4b4180`. STATUS·WORK_LOG·CHANGELOG 충돌은 양쪽 기록을 모두 남겨 정리. 최신 main은 홈페이지/체스/할로우킵 공개 진입의 출시 예정 안내가 바뀌어 있었으므로 작업 브랜치에도 보존 병합(`ca7ea74`). main으로 PR을 병합한 것이 아님. 최신 main 대비 다른 게임·공용 자산·홈 화면·할로우킵 공개 진입은 차이 없음.
+- 로컬 보존: main의 체스 파일과 충돌하는 기존 미추적 체스 자료는 같은 워크스페이스의 `preserved-chess-before-combat2-review-20261104`에 먼저 보존. 병합 후 기존 파일을 덮지 않고 없는 로컬 파일/의존성·dist를 원래 위치로 복구; 겹치는 자료는 보존 폴더에 남김. 강제 삭제·reset·clean 없음.
+- 재현: `812d362`의 sim을 저장소 밖 임시 파일로 꺼내 HK_SIM으로 정정된 enemies-contract에 연결 → 16/17 exit1, 새 자동 교대 검사만 실패(교대0틱부터 오른쪽 벽1.5 겹침). 수정 후17/17.
+- 구현 `ee8f57c`: hurtPlayer의 down 자동 교대 직후에만 몸/막힌 칸·방 경계 확인. 가장 짧은 좌우 이동 우선, 천장은 아래로, 천장/벽 모서리는 두 축 함께 보정. 소수 타일 경계 좌표를 그대로 써 필요한 만큼만 이동, 전체거리 최대8. 수동 swapBlocked·피격/무적 시간·이동/무기 CONFIG·진행 플래그·그림은 변경 없음.
+- 검토자가 정정한 enemies-contract17·exploration-edge·exploration-browser는 `1d32619` 파일과 동일함을 diff로 확인. Codex가 원본 인수 검사를 수정/약화하지 않음. 별도 down-swap-edge5개: 왼쪽벽1.5·부서지지 않은벽·천장·천장+벽모서리·수동교대거부. 교대한 틱/이후30틱 겹침 없음, 자동 교대 무적90 확인. 초기 보완 수동 검사 준비에 접촉 적을 함께 넣어 같은 틱 자동 교대가 일어나던 준비 오류는 적 없는 수동 시나리오로 분리하고 재실행5/5.
+- 이번 실행 통과: enemies17/17, down-swap-edge5/5, area-data24/24, pixel-assets135/135, weapons22/22, foundation51/51·edge16/16, exploration-contract16/16·edge13/13·browser6/6, entrance9/9, ladder-actions10/10·edge4/4, weapons-edge6/6, room-traversal4/4, combo-render5/5, pixel-render구역/시험방 각7/7, ladder-render7/7, tile-mosaic7/7, keyboard-ime7/7, mobile-layout20/20·fullscreen6/6, browser-playtest시험방20/20, combat2-browser4/4, capture-enemies16/16, 기존게임 polish/audio/audio-wind 3명령 exit0.
+- 완주: 입력 파일 변경 없음(4214틱/70.2초). 실제 앱 키 입력으로8방·모든 장치/열쇠/출입문·특정 적2처치·defeat0·성문 복귀 UI 재확인. 이전 탐험 검사2개 충돌은 검토 담당 정정으로 해소됨. 새 결과·원본 로그·재현은 next/assets/combat2-review/down-swap/TEST_RESULTS.md; 이전 보고/실패 로그·캡처는 덮어쓰지 않음. 그림 생성 없음, 실물 모바일 손맛/성능은 미확인.
+- 5개 관리 문서 검토: STATUS·WORK_LOG·CHANGELOG 갱신, AGENTS·CLAUDE는 절차 변경 없음. 루트 README와 대상 규격/추가지시/실제소스 검토, next/README와 검증 안내 갱신. 병합으로 들어온 기존 체스 라이선스의 CRLF/공백 검사 경고는 고치지 않았으며, 이번 변경과 PR 관련 경로는 diff --check로 확인.
+- 버전: UI/게임/자산 버전 번호 변경 없음. 종료: 같은 PR #24 수정 제출, 다음 Claude Code 재검토. 검토 담당 Claude Code / 이전 발견1건 / 이번 수정의 재검토 아직 미실행. 이번 사용자 수정 재요청1회. main에 PR 병합·수동 배포 없음.

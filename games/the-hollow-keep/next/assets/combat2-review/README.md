@@ -1,5 +1,7 @@
 # TASK_10 · 전투 2차 검토 자료
 
+2026-11-04 추가 수정1: 자동 교대 시 큰 몸이 막힌 칸 밖으로 같은 틱에 보정됩니다. [새 검사 결과·재현·로그](down-swap/TEST_RESULTS.md). 기존 캡처와 아래 최초 제출 자료는 보존합니다.
+
 PR [#24](https://github.com/kirakein-gif/PLAYVAULT/pull/24), 기준 main `2605e46`, 브랜치 `codex/hollow-keep-combat-enemies`. Claude Code 교차 검토 및 사용자 외형·손맛 판단 대기입니다. 병합·배포하지 않았습니다.
 
 ## 실제 구역 · 실제 키 입력

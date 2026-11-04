@@ -1,16 +1,20 @@
 # PLAYVAULT · 현재 개발 현황
 
-## 진행 중 · TASK_10 추가 수정 지시 1 (2026-11-04)
+## 수정 제출 · TASK_10 추가 수정 지시 1 (2026-11-04) / PR #24
 
-Codex / `codex/hollow-keep-combat-enemies` / PR #24 / 시작 HEAD `812d362`. 사용자 승인으로 검토 브랜치 `claude/hollow-keep-combat2-review`(`1d32619`)를 병합하고 쓰러짐 자동 교대 시 벽·닫힌 봉쇄물 겹침을 최대8단위 좌우→아래 자리 보정으로 수정합니다. 규격·정정 검사와 양쪽 관리 기록을 보존하고, enemies17/17·탐험 경계/실제 입력 및 기존 회귀 전체를 재실행합니다. 담당 범위: Hollow Keep sim, 검증 자료와 관리 문서. main 병합·수동 배포 없음. 다음 Claude Code 재검토.
+확인일: **2026-11-04 (Asia/Seoul)** / Codex / `codex/hollow-keep-combat-enemies` / PR #24. 시작 `812d362`, 검토 `1d32619` 병합 `b4b4180`, 자리 보정 `ee8f57c`, 최신 main `4e7abd0` 보존 병합 `ca7ea74`. 사용자 지시로 검토 브랜치를 병합하고, 쓰러짐 교대 시 새 몸이 벽·닫힌 봉쇄물·부서지지 않은 벽에 묻히지 않도록 같은 틱에 최대8단위 좌우→아래 보정합니다. 수동 교대·무적·이동/무기 수치는 유지합니다.
 
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Codex**(TASK_10 구현·검증 제출, Claude Code 교차 검토 대기).
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(THE HOLLOW KEEP PR #24 교차 검토 완료, Codex 추가 수정 대기). 아래 기존 이력은 보존합니다.
+이번 검사: enemies17/17·탐험 경계13/13·탐험 브라우저6/6, 자리 보정 보완5/5, 실제 전투/모바일4/4, 캡처 시나리오16/16 및 요구 회귀 전체 통과. 기존 두 탐험 검사 충돌은 검토 담당 정정본 그대로 반영해 해소했습니다. 완주4214틱·defeat0 유지. [새 로그·재현](../games/the-hollow-keep/next/assets/combat2-review/down-swap/TEST_RESULTS.md). 아래 양쪽 제출·검토 기록은 당시 이력으로 보존합니다.
+
+다음: Claude Code 자리 보정 재검토·사용자 손맛 판단. 회사 PC 미리보기는 기존 담당자가 갱신. main에 PR 병합·수동 배포 없음. 최신 main의 홈 화면·체스·출시 예정 안내는 그대로이며 해당 파일은 이번 PR에서 차이가 없습니다.
+
+이전 확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Codex**(TASK_10 구현·검증 제출, Claude Code 교차 검토 대기).
+이전 확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(THE HOLLOW KEEP PR #24 교차 검토 완료, Codex 추가 수정 대기). 아래 기존 이력은 보존합니다.
 
 ## 검토 완료 · THE HOLLOW KEEP PR #24(TASK_10 전투 2차) / Codex 추가 수정 대기
 
 2026-11-03 / Claude Code / 검토 브랜치 `claude/hollow-keep-combat2-review`. PR #22 main 병합(`2605e46`). PR #24 `812d362`: 요구 검사 통과, 원본 검사 2개(exploration-edge·exploration-browser)는 규격 변경에 맞춰 정정. 발견 1건 — 쓰러짐 자동 교대 시 Ethan이 벽·봉쇄물에 묻힘(규격 §2 보완, enemies-contract 17번째 검사). 다음: Codex `CODEX_TASK_10.md` 추가 수정 지시 1. 회사 PC 미리보기 버전 8(`812d362`).
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
+이전 확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
 
 ## 병합 완료 · CHESS MASTER PC 웹 버전 + PLAYVAULT 카드 + 고정 서명 키·Release (PR #26 → main `48440c9`, 2026-11-04)
 
