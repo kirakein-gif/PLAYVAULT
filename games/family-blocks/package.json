@@ -1,0 +1,43 @@
+{
+  "name": "family-blocks",
+  "private": true,
+  "version": "1.0.0",
+  "description": "BLOCK MASTER — offline family block puzzle for Android and web",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit -p tsconfig.json && vite build",
+    "build:web": "tsc --noEmit -p tsconfig.json && vite build --mode web --outDir play --emptyOutDir",
+    "preview": "vite preview --port 4173 --strictPort",
+    "test": "vitest run",
+    "test:e2e": "node tests/e2e/run-e2e.mjs",
+    "cap:sync": "npx cap sync android",
+    "android:debug": "npm run build && npx cap sync android && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.0",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.0",
+    "@capacitor/filesystem": "8.1.5",
+    "@capacitor/haptics": "8.0.2",
+    "@capacitor/preferences": "8.0.1",
+    "@capacitor/share": "8.0.3",
+    "@fontsource-variable/nunito": "5.3.0",
+    "@fontsource/cinzel": "5.3.0",
+    "@fontsource/gowun-batang": "5.3.0",
+    "@fontsource/gowun-dodum": "5.3.0",
+    "chess.js": "1.4.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.2.1",
+    "stockfish": "19.0.1",
+    "typescript": "6.0.2",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}
