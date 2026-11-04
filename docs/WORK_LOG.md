@@ -1624,3 +1624,4 @@
 - 원인: 첫 작업 `web-build-refresh`가 `chatgpt/family-blocks-solo`에서만 실행. main에서 skip되면 `build`(조건 없음)가 기본 `success()` 판정으로 함께 skip되어 뒤 작업 전체가 연쇄 skip. 브랜치 CI에서는 그 작업이 실행돼 드러나지 않았음.
 - 수정: build·emulator·release에 `!cancelled()` + 앞 작업 결과 `success` 명시 조건. 게임 코드 변경 없음. 작업 브랜치에서 build·에뮬레이터가 실제 실행되는지 확인 후 사용자 승인을 받아 main에 병합 예정.
 - 검증: 작업 브랜치 CI #20(`932eee1`, run 41840246818) — `web-build-refresh`가 main과 같이 skip된 상태에서도 build(APK 아티팩트 13328692893)·emulator-offline-test 실제 실행·성공. release는 main 전용이라 미실행(정상). main 병합은 사용자 승인 대기.
+- 병합(추가 기록): 사용자 승인("병합하세요")으로 PR #31 → main `8474c56`. main CI #21(run 기준 8474c56) build·emulator·release 실행·성공, Release `family-blocks-v1.0.0` 생성(APK 5,983,105 bytes, digest sha256:25305113…). 이 기록은 다음 병합 때 main 반영.
