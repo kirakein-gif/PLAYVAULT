@@ -10,8 +10,11 @@ const root=process.cwd();
 const dir=process.argv[2]||join(root,'test-results','e2e');
 mkdirSync(dir,{recursive:true});
 const port=4185,url='http://127.0.0.1:'+port+'/';
-const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--outDir','play','--port',String(port),'--strictPort'],
-  {cwd:root,stdio:'ignore'});
+const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--host','127.0.0.1','--outDir','play','--port',String(port),'--strictPort'],
+  {cwd:root,stdio:['ignore','pipe','pipe']});
+let serverOutput='';
+server.stdout.on('data',chunk=>{serverOutput+=String(chunk);});
+server.stderr.on('data',chunk=>{serverOutput+=String(chunk);});
 const result={started:new Date().toISOString(),tests:[],external:[],errors:[],frames:[]};
 async function check(name,fn){
   const started=Date.now();
@@ -19,7 +22,13 @@ async function check(name,fn){
   catch(e){result.tests.push({name,ok:false,ms:Date.now()-started,error:String(e)});console.error('FAIL',name,e);}
 }
 const assert=(ok,message)=>{if(!ok)throw Error(message);};
-await new Promise(resolve=>setTimeout(resolve,2500));
+let ready=false;
+for(let i=0;i<60;i++){
+  if(server.exitCode!==null)break;
+  try{if((await fetch(url)).ok){ready=true;break;}}catch{/* server still starting */}
+  await new Promise(resolve=>setTimeout(resolve,250));
+}
+if(!ready)throw new Error('Preview server did not start: '+serverOutput);
 let browser;
 try{
   browser=await chromium.launch({headless:true});
