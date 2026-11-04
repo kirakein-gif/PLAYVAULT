@@ -3,3 +3,38 @@
 @media(max-width:960px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-decoration{right:5%;opacity:.3}.hero{padding:60px 42px}}
 @media(max-width:640px){.wrap{width:calc(100% - 30px)}.site-header{height:68px}.brand{font-size:17px}.header-note{font-size:9px;letter-spacing:1px}.hero{margin:18px 0 45px;padding:46px 25px 42px;border-radius:20px}.hero-decoration{width:160px;height:160px;right:-24px;top:42%;opacity:.16}h1{letter-spacing:-1.6px}.lead{font-size:14px}.lead br{display:none}.sectionTitle h2{font-size:25px}.grid{grid-template-columns:1fr;gap:14px}.game{min-height:0}.game-visual{height:140px;margin:13px 0 20px}.footer{margin-top:43px;flex-wrap:wrap;font-size:10px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.game,.hero-link{transition:none}}
+
+
+/* Compact desktop layout: keep the full three-game library in one typical viewport. */
+@media(min-width:961px){
+  .site-header{height:58px}
+  .hero{margin:16px 0 25px;padding:29px 38px 30px;border-radius:20px}
+  .hero .eyebrow{font-size:10px}
+  .hero h1{font-size:clamp(30px,3.4vw,40px);line-height:1.26;margin:10px 0 9px;letter-spacing:-1.7px}
+  .lead{font-size:14px;line-height:1.55}
+  .hero-link{margin-top:14px;padding:8px 13px;font-size:13px}
+  .hero-decoration{width:170px;height:170px;right:10%}
+  .deco-square{width:84px;height:84px;left:44px;top:43px;border-width:12px;border-radius:20px}
+  .deco-dot{width:18px;height:18px;right:5px;bottom:14px}
+  .sectionTitle{margin-bottom:12px}
+  .sectionTitle h2{font-size:23px;margin-top:3px}
+  .grid{gap:14px}
+  .game{min-height:275px;padding:17px;border-radius:16px}
+  .game-visual{height:93px;margin:8px 0 13px}
+  .eclipse-ring{width:76px;height:76px;border-width:12px}
+  .eclipse-core{width:34px;height:34px}
+  .keepMark{transform:scale(.7)}
+  .chess-piece{font-size:70px}
+  .chess-piece.white{font-size:59px}
+  .game h3{font-size:17px;margin-bottom:6px}
+  .game p{font-size:12px;line-height:1.5;margin-bottom:10px}
+  .game-meta{font-size:11px}
+  .footer{margin-top:24px;padding:15px 0 20px}
+}
+@media(min-width:961px) and (max-height:740px){
+  .hero{padding-top:20px;padding-bottom:21px;margin-bottom:18px}
+  .hero h1{font-size:32px}
+  .game{min-height:245px}
+  .game-visual{height:75px}
+  .footer{margin-top:16px;padding-top:12px}
+}
