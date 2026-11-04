@@ -8,6 +8,7 @@
     "dev": "vite",
     "copy-engine": "node scripts/copy-engine.mjs",
     "build": "node scripts/copy-engine.mjs && tsc --noEmit -p tsconfig.json && vite build",
+    "build:web": "node scripts/copy-engine.mjs && tsc --noEmit -p tsconfig.json && vite build --mode web --outDir play --emptyOutDir",
     "preview": "vite preview --port 4173 --strictPort",
     "test": "vitest run",
     "test:e2e": "node tests/e2e/run-e2e.mjs",

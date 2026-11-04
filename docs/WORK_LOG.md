@@ -1498,3 +1498,12 @@
 - 변경: `android/family-chess.keystore`(PKCS12 RSA2048, 30년, SHA-256 BC:65:…:8A:6A), `app/build.gradle` signingConfigs.family를 debug·release에 적용, workflow에 apksigner 지문 확인 단계와 main 전용 `release` 작업(contents: write, gh release create/upload --clobber, SHA-256 파일). `docs/DEVELOPMENT_SUMMARY.md` 신규, README 설치 절차·STATUS·CHANGELOG 갱신.
 - 검증: workflow YAML 파싱 확인. 서명·Release 동작은 CI에서 확인 예정(브랜치 실행은 서명 지문 단계까지, Release 생성은 main 병합 후). 앱 코드 변경 없음.
 - 사용자 재요청 횟수: 0회. 다음: CI 확인 → 사용자 승인 후 main 병합 → Release 생성 확인 → 태블릿 1회 재설치.
+
+### 2026-11-04 (Asia/Seoul) · CHESS MASTER PC 웹 버전 · PLAYVAULT 카드 · 판매 가능성 검토 (Claude Code)
+
+- 요청: APK를 웹 버전으로도 가능한지·노력·저작권(무료 공개/스팀·구글플레이 판매) 검토 → 답변 후 "웹버전은 PC기반으로 합시다", 이름(체스 아카데미)·판매는 "가능성으로 놔둡시다".
+- 저작권 답변 요지(법률 자문 아님): 무료 공개는 현 상태로 문제 적음(GPL 소스는 공개 저장소로 제공). 판매 시 ① "Chessmaster" Ubisoft 상표 → 이름 변경 ② Stockfish GPL → 전체 소스 공개 또는 자체 엔진 ③ Play 비공개 키·가족 정책·개인정보처리방침. DEVELOPMENT_SUMMARY 6절에 기록.
+- 변경: `build:web`(mode web, outDir play, `.env.web`의 `VITE_HUB_URL=../../../`), `platform/native.ts` hubUrl, 홈 `← PLAYVAULT` 링크(웹만), 설정 진동 행 앱 전용, 세로 760px 이하 안내(`web.narrow` 한/영), E2E `E2E_OUTDIR` 지원, `play/` 빌드 커밋, 루트 `index.html` 카드·`assets/site.css` 한 줄, CI 웹 빌드 일치 검사, README(루트·게임)·DEVELOPMENT_SUMMARY.
+- 검증: tsc, Vitest 396/396, 웹 빌드 두 번 해시 동일, `E2E_OUTDIR=play` E2E 23/23(외부 0), 저장소 루트 정적 서버에서 `/games/family-chess-premium/play/` 1920×1080·1366×768 홈·대국 화면, 허브 링크→루트, 카드→게임 이동 확인(외부 요청 0). 실제 Cloudflare Pages·Android CI는 push/병합 후 확인.
+- 다른 게임 변경 없음. 루트 런처는 이번에 처음 체스 카드 추가(사용자 요청 범위).
+- 사용자 재요청 횟수: 0회. 다음: CI 확인 → 사용자 승인 후 main 병합 → Release·Pages 확인.

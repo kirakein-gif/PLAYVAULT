@@ -30,6 +30,11 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit -p tsconfig.json
       - run: npx vitest run
+      - name: Committed web build (play/) matches the source
+        run: |
+          npm run build:web
+          git status --porcelain -- play
+          test -z "$(git status --porcelain -- play)" || { echo "play/ is stale: run npm run build:web and commit"; exit 1; }
 
   build:
     runs-on: ubuntu-latest

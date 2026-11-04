@@ -9,6 +9,13 @@
 
 가족 검토 결과 Codex의 중세·노블 세트와 Claude의 고딕 성채 세트는 앱에서 뺐습니다. 이전 버전에서 고딕 성채를 쓰던 프로필은 Gothic으로 자동 전환됩니다. Codex 고딕 기물의 윤곽선은 `scripts/outline-skin.cjs`로 덧입혔고 원본은 `scripts/art-source/codex-skins/gothic-codex-original/`에 있습니다. 비교 과정 기록: [비교 캡처·검증](docs/screenshots/skin-compare/README.md), [Codex 인계문](docs/CODEX_SKINS_HANDOFF.md).
 
+## PC 웹 버전 (PLAYVAULT)
+
+PLAYVAULT 첫 화면의 **CHESS MASTER** 카드 → `games/family-chess-premium/play/`. 앱과 같은 소스이며 PC·태블릿 가로 화면 기준입니다(세로 휴대폰은 안내 문구 표시). 기록은 그 브라우저에만 저장되고 앱과 이어지지 않습니다. 홈 오른쪽 위 `← PLAYVAULT`로 돌아갑니다.
+
+- 생성: `npm run build:web` → `play/`(빌드 결과를 저장소에 커밋, 사이트가 저장소 파일을 그대로 제공). 소스를 바꾸면 반드시 다시 생성해 함께 커밋합니다. CI가 `play/`가 소스와 일치하는지 확인합니다.
+- 검사: `E2E_OUTDIR=play NODE_PATH=$(npm root -g) node tests/e2e/run-e2e.mjs`
+
 ## 주요 기능
 
 | 영역 | 내용 |

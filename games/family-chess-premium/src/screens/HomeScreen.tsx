@@ -4,6 +4,7 @@ import { Btn, Confirm, LangToggle, Modal, SettingsButton } from '../components/u
 import { Icon } from '../components/icons';
 import { SetupModal } from './SetupModal';
 import { SKINS } from '../skins';
+import { hubUrl } from '../platform/native';
 
 export function HomeScreen() {
   const { t, go, profile, data, setData, click, updateProfile, piece, skin } = useApp();
@@ -34,6 +35,7 @@ export function HomeScreen() {
           <span className="brandPremium">PREMIUM</span>
         </div>
         <div className="homeTopRight">
+          {hubUrl && <a className="hubLink" href={hubUrl} data-testid="hub-link">← PLAYVAULT</a>}
           <LangToggle />
           <SettingsButton />
         </div>
