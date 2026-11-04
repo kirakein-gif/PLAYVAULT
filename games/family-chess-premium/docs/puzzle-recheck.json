@@ -1,0 +1,3442 @@
+{
+ "when": "2026-11-02T12:24:57.046Z",
+ "engine": "Stockfish 19 single (full net), depth 20, MultiPV 2",
+ "total": 121,
+ "failed": 0,
+ "puzzles": [
+  {
+   "id": "FCP-001",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f7f8",
+     "best": "f7f8",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 3
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-002",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a6a8",
+     "best": "a6a8",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 2
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-003",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d3f1",
+     "best": "d3f1",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 1
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-004",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a4h4",
+     "best": "a4h4",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 3
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-005",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a3c3",
+     "best": "a3c3",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 3
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-006",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "g5g8",
+     "best": "g5g8",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 4
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-007",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e3e8",
+     "best": "e3e8",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 3
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-008",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f7g6",
+     "best": "f7f5",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 1
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-009",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f1g2",
+     "best": "f1g1",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 1
+     },
+     "gap": 0,
+     "pass": false
+    }
+   ]
+  },
+  {
+   "id": "FCP-010",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f6g8",
+     "best": "f6g4",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 1
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-011",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "g5g6",
+     "best": "g5g6",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 9
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d7d8",
+     "best": "d7d8",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 1
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-012",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c7c8",
+     "best": "c7c8",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 4
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "c8d8",
+     "best": "c8d8",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 5
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-013",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c6d5",
+     "best": "c6d5",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 6
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "f2g2",
+     "best": "f2g2",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 2
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-014",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f3d3",
+     "best": "f3d3",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 5
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "e8e1",
+     "best": "e8e1",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 3
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-015",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d5c4",
+     "best": "d5c4",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "cp": 2164
+     },
+     "gap": 0.05,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d8d3",
+     "best": "d8d3",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 7
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-016",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f7f6",
+     "best": "f7f6",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 5
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "a8g8",
+     "best": "a8g8",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 2
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-017",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d4d2",
+     "best": "d4d2",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "cp": 959
+     },
+     "gap": 0.06,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "e7h7",
+     "best": "e7h7",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 2
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-018",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "h8f6",
+     "best": "h8f6",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 6
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "h6h8",
+     "best": "h6h8",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 2
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-019",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "h5h6",
+     "best": "h5h6",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 5
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "h6g6",
+     "best": "h6g6",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 4
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-020",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "g4g5",
+     "best": "g4g5",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 6
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d4h8",
+     "best": "d4h8",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 2
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-021",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f4e5",
+     "best": "f4e5",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 4
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "f5d3",
+     "best": "f5d3",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 2
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-022",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e2d4",
+     "best": "e2d4",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 3
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "b5b7",
+     "best": "b5b7",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 3
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-023",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a7a8",
+     "best": "a7a8",
+     "score": {
+      "mate": 3
+     },
+     "second": {
+      "cp": 561
+     },
+     "gap": 0.22,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "a8d8",
+     "best": "a8d8",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "cp": 7
+     },
+     "gap": 0.99,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "h7h8q",
+     "best": "h7h8q",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "cp": 1237
+     },
+     "gap": 0.05,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-024",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e4f2",
+     "best": "e4f2",
+     "score": {
+      "mate": 3
+     },
+     "second": {
+      "mate": 4
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "g6e4",
+     "best": "g6e4",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 3
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "e4g2",
+     "best": "e4g2",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 1
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-025",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f5f3",
+     "best": "f5f3",
+     "score": {
+      "mate": 3
+     },
+     "second": {
+      "mate": 6
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "e8e2",
+     "best": "e8e2",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 3
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "f3f2",
+     "best": "f3g2",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 1
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-026",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e2d1",
+     "best": "e2d1",
+     "score": {
+      "mate": 3
+     },
+     "second": {
+      "mate": 5
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d1g1",
+     "best": "d1g1",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 3
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "g1h1",
+     "best": "g1h1",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 2
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-027",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f4g3",
+     "best": "f4g3",
+     "score": {
+      "mate": 3
+     },
+     "second": {
+      "cp": 1248
+     },
+     "gap": 0.05,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "c7g3",
+     "best": "c7g3",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "cp": 746
+     },
+     "gap": 0.12,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "g3f2",
+     "best": "g3f2",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "cp": 1265
+     },
+     "gap": 0.05,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-028",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c1c8",
+     "best": "c1c8",
+     "score": {
+      "mate": 3
+     },
+     "second": {
+      "cp": 820
+     },
+     "gap": 0.09,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "c8e8",
+     "best": "c8e8",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 4
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "e8h8",
+     "best": "h5g6",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 1
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-029",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d2d3",
+     "best": "d2d3",
+     "score": {
+      "mate": 3
+     },
+     "second": {
+      "cp": 1376
+     },
+     "gap": 0.05,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d4g1",
+     "best": "d4g1",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "mate": 4
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "d3h3",
+     "best": "d3h3",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "mate": 5
+     },
+     "gap": 0,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-030",
+   "category": "mate",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "h4h3",
+     "best": "h4h3",
+     "score": {
+      "mate": 3
+     },
+     "second": {
+      "mate": 7
+     },
+     "gap": 0,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "h3h2",
+     "best": "h3h2",
+     "score": {
+      "mate": 2
+     },
+     "second": {
+      "cp": 1159
+     },
+     "gap": 0.05,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "h2f2",
+     "best": "h2f2",
+     "score": {
+      "mate": 1
+     },
+     "second": {
+      "cp": 1085
+     },
+     "gap": 0.05,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-031",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f8f1",
+     "best": "f8f1",
+     "score": {
+      "cp": 359
+     },
+     "second": {
+      "cp": 14
+     },
+     "gap": 0.55,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-032",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "h4g3",
+     "best": "h4g3",
+     "score": {
+      "cp": 611
+     },
+     "second": {
+      "cp": -80
+     },
+     "gap": 0.96,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-033",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e5e4",
+     "best": "e5e4",
+     "score": {
+      "cp": 578
+     },
+     "second": {
+      "cp": 87
+     },
+     "gap": 0.63,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-034",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f3g5",
+     "best": "f3g5",
+     "score": {
+      "cp": 596
+     },
+     "second": {
+      "cp": 94
+     },
+     "gap": 0.63,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-035",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a5c3",
+     "best": "a5c3",
+     "score": {
+      "cp": 571
+     },
+     "second": {
+      "cp": -75
+     },
+     "gap": 0.92,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-036",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a5b3",
+     "best": "a5b3",
+     "score": {
+      "cp": 872
+     },
+     "second": {
+      "cp": 154
+     },
+     "gap": 0.65,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-037",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d4e2",
+     "best": "d4e2",
+     "score": {
+      "cp": 637
+     },
+     "second": {
+      "cp": 58
+     },
+     "gap": 0.72,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-038",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f5f1",
+     "best": "f5f1",
+     "score": {
+      "cp": 902
+     },
+     "second": {
+      "cp": 149
+     },
+     "gap": 0.66,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-039",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e5e6",
+     "best": "e5e6",
+     "score": {
+      "cp": 433
+     },
+     "second": {
+      "cp": 7
+     },
+     "gap": 0.65,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "e6d7",
+     "best": "e6d7",
+     "score": {
+      "cp": 442
+     },
+     "second": {
+      "cp": -2
+     },
+     "gap": 0.68,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-040",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e7e3",
+     "best": "e7e3",
+     "score": {
+      "cp": 611
+     },
+     "second": {
+      "cp": 241
+     },
+     "gap": 0.39,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "e8e3",
+     "best": "e8e3",
+     "score": {
+      "cp": 641
+     },
+     "second": {
+      "cp": -669
+     },
+     "gap": 1.67,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-041",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "b2a1",
+     "best": "b2a1",
+     "score": {
+      "cp": 555
+     },
+     "second": {
+      "cp": 11
+     },
+     "gap": 0.75,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "a1a4",
+     "best": "a1a4",
+     "score": {
+      "cp": 563
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.78,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-042",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a7f7",
+     "best": "a7f7",
+     "score": {
+      "cp": 795
+     },
+     "second": {
+      "cp": -442
+     },
+     "gap": 1.57,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "f7f6",
+     "best": "f7f6",
+     "score": {
+      "cp": 798
+     },
+     "second": {
+      "cp": -8
+     },
+     "gap": 0.91,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-043",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c3d5",
+     "best": "c3d5",
+     "score": {
+      "cp": 757
+     },
+     "second": {
+      "cp": 156
+     },
+     "gap": 0.6,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d5c7",
+     "best": "d5c7",
+     "score": {
+      "cp": 795
+     },
+     "second": {
+      "cp": 173
+     },
+     "gap": 0.59,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-044",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e5d6",
+     "best": "e5d6",
+     "score": {
+      "cp": 675
+     },
+     "second": {
+      "cp": -189
+     },
+     "gap": 1.18,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d6e7",
+     "best": "d6e7",
+     "score": {
+      "cp": 687
+     },
+     "second": {
+      "cp": -17
+     },
+     "gap": 0.88,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-045",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f4d5",
+     "best": "f4d5",
+     "score": {
+      "cp": 609
+     },
+     "second": {
+      "cp": 27
+     },
+     "gap": 0.76,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "c4c7",
+     "best": "c4c7",
+     "score": {
+      "cp": 617
+     },
+     "second": {
+      "cp": 37
+     },
+     "gap": 0.75,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-046",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e6f5",
+     "best": "e6f5",
+     "score": {
+      "cp": 610
+     },
+     "second": {
+      "cp": 123
+     },
+     "gap": 0.59,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d5e3",
+     "best": "d5e3",
+     "score": {
+      "cp": 624
+     },
+     "second": {
+      "cp": -55
+     },
+     "gap": 0.92,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-047",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e6e5",
+     "best": "e6e5",
+     "score": {
+      "cp": 346
+     },
+     "second": {
+      "cp": -10
+     },
+     "gap": 0.58,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d8a5",
+     "best": "d8a5",
+     "score": {
+      "cp": 351
+     },
+     "second": {
+      "cp": -254
+     },
+     "gap": 1.01,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "a5e5",
+     "best": "a5e5",
+     "score": {
+      "cp": 350
+     },
+     "second": {
+      "cp": -170
+     },
+     "gap": 0.87,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-048",
+   "category": "fork",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d4e6",
+     "best": "d4e6",
+     "score": {
+      "cp": 561
+     },
+     "second": {
+      "cp": 111
+     },
+     "gap": 0.57,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "e6c7",
+     "best": "e6c7",
+     "score": {
+      "cp": 554
+     },
+     "second": {
+      "cp": 212
+     },
+     "gap": 0.4,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "a1b1",
+     "best": "a1b1",
+     "score": {
+      "cp": 578
+     },
+     "second": {
+      "cp": 85
+     },
+     "gap": 0.63,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-049",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "g5e7",
+     "best": "g5e7",
+     "score": {
+      "cp": 336
+     },
+     "second": {
+      "cp": -288
+     },
+     "gap": 1.04,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-050",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c8d8",
+     "best": "c8d8",
+     "score": {
+      "cp": 973
+     },
+     "second": {
+      "cp": 218
+     },
+     "gap": 0.56,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-051",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c6c5",
+     "best": "c6c5",
+     "score": {
+      "cp": 792
+     },
+     "second": {
+      "cp": 35
+     },
+     "gap": 0.83,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-052",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d3d6",
+     "best": "d3d6",
+     "score": {
+      "cp": 336
+     },
+     "second": {
+      "cp": 64
+     },
+     "gap": 0.43,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-053",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a8e8",
+     "best": "a8e8",
+     "score": {
+      "cp": 646
+     },
+     "second": {
+      "cp": 21
+     },
+     "gap": 0.79,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-054",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c5d6",
+     "best": "c5d6",
+     "score": {
+      "cp": 389
+     },
+     "second": {
+      "cp": 173
+     },
+     "gap": 0.31,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-055",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "b7c7",
+     "best": "b7c7",
+     "score": {
+      "cp": 1354
+     },
+     "second": {
+      "cp": 206
+     },
+     "gap": 0.59,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-056",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c4f7",
+     "best": "c4f7",
+     "score": {
+      "cp": 358
+     },
+     "second": {
+      "cp": -317
+     },
+     "gap": 1.1,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-057",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "g5f4",
+     "best": "g5f4",
+     "score": {
+      "cp": 742
+     },
+     "second": {
+      "cp": -229
+     },
+     "gap": 1.28,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "f4d6",
+     "best": "f4d6",
+     "score": {
+      "cp": 741
+     },
+     "second": {
+      "cp": 214
+     },
+     "gap": 0.5,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "d6e7",
+     "best": "d6e7",
+     "score": {
+      "cp": 722
+     },
+     "second": {
+      "cp": 256
+     },
+     "gap": 0.43,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-058",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d4f2",
+     "best": "d4f2",
+     "score": {
+      "cp": 576
+     },
+     "second": {
+      "cp": 71
+     },
+     "gap": 0.66,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "g2e3",
+     "best": "g2e3",
+     "score": {
+      "cp": 593
+     },
+     "second": {
+      "cp": -60
+     },
+     "gap": 0.91,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-059",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "g4f3",
+     "best": "g4f3",
+     "score": {
+      "cp": 728
+     },
+     "second": {
+      "cp": -5
+     },
+     "gap": 0.88,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-060",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e5d5",
+     "best": "e5d5",
+     "score": {
+      "cp": 471
+     },
+     "second": {
+      "cp": -328
+     },
+     "gap": 1.24,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d5d4",
+     "best": "d5d4",
+     "score": {
+      "cp": 504
+     },
+     "second": {
+      "cp": -704
+     },
+     "gap": 1.59,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-061",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "g5h4",
+     "best": "g5h4",
+     "score": {
+      "cp": 411
+     },
+     "second": {
+      "cp": 9
+     },
+     "gap": 0.62,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "h4g3",
+     "best": "h4g3",
+     "score": {
+      "cp": 450
+     },
+     "second": {
+      "cp": 114
+     },
+     "gap": 0.47,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-062",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f3e5",
+     "best": "f3e5",
+     "score": {
+      "cp": 676
+     },
+     "second": {
+      "cp": -15
+     },
+     "gap": 0.87,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "c4f7",
+     "best": "c4f7",
+     "score": {
+      "cp": 661
+     },
+     "second": {
+      "cp": 96
+     },
+     "gap": 0.66,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-063",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d8h4",
+     "best": "d8h4",
+     "score": {
+      "cp": 550
+     },
+     "second": {
+      "cp": 41
+     },
+     "gap": 0.69,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "e4g3",
+     "best": "e4g3",
+     "score": {
+      "cp": 496
+     },
+     "second": {
+      "cp": 21
+     },
+     "gap": 0.68,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "h4h1",
+     "best": "h4h1",
+     "score": {
+      "cp": 499
+     },
+     "second": {
+      "cp": -429
+     },
+     "gap": 1.38,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-064",
+   "category": "pin",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c8g4",
+     "best": "c8g4",
+     "score": {
+      "cp": 428
+     },
+     "second": {
+      "cp": 37
+     },
+     "gap": 0.59,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "f8g7",
+     "best": "f8g7",
+     "score": {
+      "cp": 450
+     },
+     "second": {
+      "cp": -99
+     },
+     "gap": 0.86,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "g4h3",
+     "best": "g4h3",
+     "score": {
+      "cp": 470
+     },
+     "second": {
+      "cp": 62
+     },
+     "gap": 0.59,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-065",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c3d1",
+     "best": "c3d1",
+     "score": {
+      "cp": 772
+     },
+     "second": {
+      "cp": 273
+     },
+     "gap": 0.43,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-066",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f5e3",
+     "best": "f5e3",
+     "score": {
+      "cp": 473
+     },
+     "second": {
+      "cp": 79
+     },
+     "gap": 0.56,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-067",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e5f6",
+     "best": "e5f6",
+     "score": {
+      "cp": 605
+     },
+     "second": {
+      "cp": 226
+     },
+     "gap": 0.41,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-068",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e5f6",
+     "best": "e5f6",
+     "score": {
+      "cp": 706
+     },
+     "second": {
+      "cp": 17
+     },
+     "gap": 0.83,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-069",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e2f4",
+     "best": "e2f4",
+     "score": {
+      "cp": 805
+     },
+     "second": {
+      "cp": 11
+     },
+     "gap": 0.88,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-070",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d7c6",
+     "best": "d7c6",
+     "score": {
+      "cp": 512
+     },
+     "second": {
+      "cp": 47
+     },
+     "gap": 0.65,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-071",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f4f3",
+     "best": "f4f3",
+     "score": {
+      "cp": 821
+     },
+     "second": {
+      "cp": 401
+     },
+     "gap": 0.28,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-072",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e5e4",
+     "best": "e5e4",
+     "score": {
+      "cp": 465
+     },
+     "second": {
+      "cp": 94
+     },
+     "gap": 0.52,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "f5e4",
+     "best": "f5e4",
+     "score": {
+      "cp": 501
+     },
+     "second": {
+      "cp": 19
+     },
+     "gap": 0.69,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-073",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e4d6",
+     "best": "e4d6",
+     "score": {
+      "cp": 585
+     },
+     "second": {
+      "cp": 253
+     },
+     "gap": 0.36,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "g2d5",
+     "best": "g2d5",
+     "score": {
+      "cp": 609
+     },
+     "second": {
+      "cp": 8
+     },
+     "gap": 0.79,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-074",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c3d5",
+     "best": "c3d5",
+     "score": {
+      "cp": 625
+     },
+     "second": {
+      "cp": -31
+     },
+     "gap": 0.87,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "c1c7",
+     "best": "c1c7",
+     "score": {
+      "cp": 644
+     },
+     "second": {
+      "cp": -624
+     },
+     "gap": 1.65,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-075",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "g7e6",
+     "best": "g7e6",
+     "score": {
+      "cp": 465
+     },
+     "second": {
+      "cp": 95
+     },
+     "gap": 0.52,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "e6d8",
+     "best": "e6d8",
+     "score": {
+      "cp": 465
+     },
+     "second": {
+      "cp": -387
+     },
+     "gap": 1.31,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-076",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "g4e5",
+     "best": "g4e5",
+     "score": {
+      "cp": 504
+     },
+     "second": {
+      "cp": 144
+     },
+     "gap": 0.47,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "e5f7",
+     "best": "e5f7",
+     "score": {
+      "cp": 536
+     },
+     "second": {
+      "cp": -71
+     },
+     "gap": 0.89,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-077",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a8a6",
+     "best": "a8a6",
+     "score": {
+      "cp": 605
+     },
+     "second": {
+      "cp": 113
+     },
+     "gap": 0.6,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "c4a6",
+     "best": "c4a6",
+     "score": {
+      "cp": 601
+     },
+     "second": {
+      "cp": -852
+     },
+     "gap": 1.72,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-078",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e5b2",
+     "best": "e5b2",
+     "score": {
+      "cp": 631
+     },
+     "second": {
+      "cp": 90
+     },
+     "gap": 0.66,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d6a6",
+     "best": "d6a6",
+     "score": {
+      "cp": 634
+     },
+     "second": {
+      "cp": 294
+     },
+     "gap": 0.33,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "e8e3",
+     "best": "e8e3",
+     "score": {
+      "cp": 672
+     },
+     "second": {
+      "cp": -533
+     },
+     "gap": 1.6,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-079",
+   "category": "skewerDiscovered",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d5e3",
+     "best": "d5e3",
+     "score": {
+      "cp": 319
+     },
+     "second": {
+      "cp": 77
+     },
+     "gap": 0.39,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-080",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c1h6",
+     "best": "c1h6",
+     "score": {
+      "cp": 34
+     },
+     "second": {
+      "cp": -305
+     },
+     "gap": 0.57,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-081",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c7a8",
+     "best": "c7a8",
+     "score": {
+      "cp": 31
+     },
+     "second": {
+      "cp": -717
+     },
+     "gap": 0.92,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-082",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d3d4",
+     "best": "d3d4",
+     "score": {
+      "cp": -161
+     },
+     "second": {
+      "cp": -693
+     },
+     "gap": 0.57,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-083",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d7f6",
+     "best": "d7f6",
+     "score": {
+      "cp": 7
+     },
+     "second": {
+      "cp": -652
+     },
+     "gap": 0.85,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-084",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f7g7",
+     "best": "f7g7",
+     "score": {
+      "cp": 14
+     },
+     "second": {
+      "cp": -658
+     },
+     "gap": 0.86,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-085",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "b7b5",
+     "best": "b7b5",
+     "score": {
+      "cp": -78
+     },
+     "second": {
+      "cp": -493
+     },
+     "gap": 0.58,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-086",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "g5f4",
+     "best": "g5f4",
+     "score": {
+      "cp": 250
+     },
+     "second": {
+      "cp": -360
+     },
+     "gap": 1.01,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-087",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a8f8",
+     "best": "a8f8",
+     "score": {
+      "cp": -67
+     },
+     "second": {
+      "cp": -661
+     },
+     "gap": 0.72,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-088",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a4f4",
+     "best": "a4f4",
+     "score": {
+      "cp": -19
+     },
+     "second": {
+      "cp": -429
+     },
+     "gap": 0.62,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-089",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e2d3",
+     "best": "e2d3",
+     "score": {
+      "cp": -18
+     },
+     "second": {
+      "cp": -561
+     },
+     "gap": 0.74,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-090",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d4c4",
+     "best": "d4c4",
+     "score": {
+      "cp": 83
+     },
+     "second": {
+      "cp": -269
+     },
+     "gap": 0.61,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-091",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e4f6",
+     "best": "e4f6",
+     "score": {
+      "cp": -125
+     },
+     "second": {
+      "cp": -635
+     },
+     "gap": 0.6,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-092",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d3c5",
+     "best": "d3c5",
+     "score": {
+      "cp": -36
+     },
+     "second": {
+      "cp": -502
+     },
+     "gap": 0.66,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-093",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a5b5",
+     "best": "a5b5",
+     "score": {
+      "cp": 246
+     },
+     "second": {
+      "cp": -55
+     },
+     "gap": 0.53,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-094",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d4d1",
+     "best": "d4d1",
+     "score": {
+      "cp": -159
+     },
+     "second": {
+      "cp": -578
+     },
+     "gap": 0.5,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-095",
+   "category": "defense",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d4e3",
+     "best": "d4e3",
+     "score": {
+      "cp": 31
+     },
+     "second": {
+      "cp": -563
+     },
+     "gap": 0.83,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-096",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c7c8q",
+     "best": "c7c8q",
+     "score": {
+      "cp": 606
+     },
+     "second": {
+      "cp": -4
+     },
+     "gap": 0.81,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-097",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "h4h5",
+     "best": "h4h5",
+     "score": {
+      "cp": 611
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.81,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-098",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d4d5",
+     "best": "d4d5",
+     "score": {
+      "cp": 604
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.8,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-099",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "b2b4",
+     "best": "b2b4",
+     "score": {
+      "cp": 616
+     },
+     "second": {
+      "cp": -8
+     },
+     "gap": 0.83,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-100",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a6a7",
+     "best": "a6a7",
+     "score": {
+      "cp": 623
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.82,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-101",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a5a6",
+     "best": "a5a6",
+     "score": {
+      "cp": 631
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.82,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "a6a7",
+     "best": "a6a7",
+     "score": {
+      "cp": 643
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.83,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "a7a8q",
+     "best": "a7a8q",
+     "score": {
+      "cp": 1079
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.95,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-102",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "g2f2",
+     "best": "g2f2",
+     "score": {
+      "cp": 1173
+     },
+     "second": {
+      "cp": -693
+     },
+     "gap": 1.81,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "f2e1",
+     "best": "f2e1",
+     "score": {
+      "cp": 1420
+     },
+     "second": {
+      "cp": -985
+     },
+     "gap": 1.9,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-103",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c6c7",
+     "best": "c6c7",
+     "score": {
+      "cp": 493
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.72,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "c7c8q",
+     "best": "c7c8q",
+     "score": {
+      "cp": 498
+     },
+     "second": {
+      "cp": 70
+     },
+     "gap": 0.6,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-104",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "b6b7",
+     "best": "b6b7",
+     "score": {
+      "cp": 629
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.82,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "b7b8q",
+     "best": "b7b8q",
+     "score": {
+      "cp": 719
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.87,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-105",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "h4h5",
+     "best": "h4h5",
+     "score": {
+      "cp": 606
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.81,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "h5h6",
+     "best": "h5h6",
+     "score": {
+      "cp": 608
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.81,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-106",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a2b2",
+     "best": "a2b2",
+     "score": {
+      "cp": 595
+     },
+     "second": {
+      "cp": -847
+     },
+     "gap": 1.71,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "b2c1",
+     "best": "b2c1",
+     "score": {
+      "cp": 593
+     },
+     "second": {
+      "mate": -10
+     },
+     "gap": 1.8,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-107",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d5d4",
+     "best": "d5d4",
+     "score": {
+      "cp": 616
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.81,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "e6d6",
+     "best": "e6d6",
+     "score": {
+      "cp": 608
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.81,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-108",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d3c4",
+     "best": "d3c4",
+     "score": {
+      "cp": 604
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.8,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "c3b2",
+     "best": "c3b2",
+     "score": {
+      "cp": 598
+     },
+     "second": {
+      "cp": 12
+     },
+     "gap": 0.78,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "b2a1",
+     "best": "b2a1",
+     "score": {
+      "cp": 683
+     },
+     "second": {
+      "cp": -766
+     },
+     "gap": 1.74,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-109",
+   "category": "endgame",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "b5b6",
+     "best": "b5b6",
+     "score": {
+      "cp": 801
+     },
+     "second": {
+      "cp": 29
+     },
+     "gap": 0.85,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "b6b7",
+     "best": "b6b7",
+     "score": {
+      "cp": 780
+     },
+     "second": {
+      "cp": 13
+     },
+     "gap": 0.87,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "b7b8q",
+     "best": "b7b8q",
+     "score": {
+      "cp": 966
+     },
+     "second": {
+      "cp": 4
+     },
+     "gap": 0.94,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-110",
+   "category": "other",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f3d2",
+     "best": "f3d2",
+     "score": {
+      "cp": 526
+     },
+     "second": {
+      "cp": 114
+     },
+     "gap": 0.54,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-111",
+   "category": "other",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "b2b4",
+     "best": "b2b4",
+     "score": {
+      "cp": 517
+     },
+     "second": {
+      "cp": 115
+     },
+     "gap": 0.53,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-112",
+   "category": "other",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "a6b5",
+     "best": "a6b5",
+     "score": {
+      "cp": 590
+     },
+     "second": {
+      "cp": -13
+     },
+     "gap": 0.82,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-113",
+   "category": "other",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f5c2",
+     "best": "f5c2",
+     "score": {
+      "cp": 797
+     },
+     "second": {
+      "cp": -15
+     },
+     "gap": 0.93,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-114",
+   "category": "other",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c6d4",
+     "best": "c6d4",
+     "score": {
+      "cp": 433
+     },
+     "second": {
+      "cp": 125
+     },
+     "gap": 0.44,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-115",
+   "category": "other",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c2a1",
+     "best": "c2a1",
+     "score": {
+      "cp": 676
+     },
+     "second": {
+      "cp": 301
+     },
+     "gap": 0.34,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-116",
+   "category": "other",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "f6e4",
+     "best": "f6e4",
+     "score": {
+      "cp": 372
+     },
+     "second": {
+      "cp": 93
+     },
+     "gap": 0.43,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "e4d2",
+     "best": "e4d2",
+     "score": {
+      "cp": 362
+     },
+     "second": {
+      "cp": -679
+     },
+     "gap": 1.43,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-117",
+   "category": "other",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "b3b6",
+     "best": "b3b6",
+     "score": {
+      "cp": 595
+     },
+     "second": {
+      "cp": 0
+     },
+     "gap": 0.8,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "b2c3",
+     "best": "b2c3",
+     "score": {
+      "cp": 608
+     },
+     "second": {
+      "cp": 55
+     },
+     "gap": 0.71,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-118",
+   "category": "other",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c3c6",
+     "best": "c3c6",
+     "score": {
+      "cp": 697
+     },
+     "second": {
+      "cp": 53
+     },
+     "gap": 0.76,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "c1f4",
+     "best": "c1f4",
+     "score": {
+      "cp": 696
+     },
+     "second": {
+      "cp": 248
+     },
+     "gap": 0.43,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-119",
+   "category": "other",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "d3e3",
+     "best": "d3e3",
+     "score": {
+      "cp": 292
+     },
+     "second": {
+      "cp": 3
+     },
+     "gap": 0.49,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d2e3",
+     "best": "d2e3",
+     "score": {
+      "cp": 325
+     },
+     "second": {
+      "cp": -810
+     },
+     "gap": 1.44,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "e3d4",
+     "best": "e3d4",
+     "score": {
+      "cp": 329
+     },
+     "second": {
+      "cp": 139
+     },
+     "gap": 0.29,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-120",
+   "category": "other",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "e5e6",
+     "best": "e5e6",
+     "score": {
+      "cp": 610
+     },
+     "second": {
+      "cp": 181
+     },
+     "gap": 0.49,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "f5e7",
+     "best": "f5e7",
+     "score": {
+      "cp": 623
+     },
+     "second": {
+      "cp": 53
+     },
+     "gap": 0.72,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "id": "FCP-121",
+   "category": "other",
+   "ok": true,
+   "steps": [
+    {
+     "k": 1,
+     "exp": "c1e3",
+     "best": "c1e3",
+     "score": {
+      "cp": 1177
+     },
+     "second": {
+      "cp": 16
+     },
+     "gap": 0.92,
+     "pass": true
+    },
+    {
+     "k": 3,
+     "exp": "d8h4",
+     "best": "d8h4",
+     "score": {
+      "cp": 1514
+     },
+     "second": {
+      "cp": 9
+     },
+     "gap": 0.93,
+     "pass": true
+    },
+    {
+     "k": 5,
+     "exp": "e3e8",
+     "best": "e3e8",
+     "score": {
+      "mate": 9
+     },
+     "second": {
+      "cp": -1142
+     },
+     "gap": 1.95,
+     "pass": true
+    }
+   ]
+  }
+ ]
+}

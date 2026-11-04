@@ -1,0 +1,139 @@
+{
+  "app": { "name": "CHESS MASTER", "premium": "PREMIUM", "full": "CHESS MASTER PREMIUM", "tagline": "Play together, grow stronger together" },
+  "common": {
+    "back": "Back", "home": "Home", "close": "Close", "cancel": "Cancel", "confirm": "Confirm", "ok": "OK", "yes": "Yes", "no": "No",
+    "next": "Next", "prev": "Previous", "retry": "Retry", "start": "Start", "continue": "Continue", "save": "Save", "delete": "Delete",
+    "loading": "Loading…", "on": "On", "off": "Off", "white": "White", "black": "Black", "random": "Random",
+    "computer": "Computer", "settings": "Settings", "more": "More", "detail": "More detail", "hideDetail": "Less",
+    "langShort": "English", "otherLang": "한국어", "player": "Player"
+  },
+  "pieces": { "k": "King", "q": "Queen", "r": "Rook", "b": "Bishop", "n": "Knight", "p": "Pawn" },
+  "home": {
+    "twoPlayers": "Two Players", "twoPlayersSub": "둘이서 대국",
+    "vsComputer": "Play vs Computer", "vsComputerSub": "컴퓨터와 대국",
+    "academy": "Chess Academy", "academySub": "체스 아카데미",
+    "resumeTitle": "A game is in progress", "resumeBody": "{mode} · {moves} moves played. Continue this game?",
+    "resume": "Continue", "discard": "Start fresh", "profile": "Profile", "exitTitle": "Close the app?", "exit": "Exit"
+  },
+  "setup": {
+    "title": "Play vs Computer", "level": "Difficulty", "color": "My pieces", "start": "Start game",
+    "levels": {
+      "easy": "Easy", "normal": "Normal", "challenging": "Challenging", "hard": "Hard", "master": "Master",
+      "easyDesc": "A relaxed practice partner", "normalDesc": "Makes mistakes now and then", "challengingDesc": "Looks for tactics",
+      "hardDesc": "Rarely misses your mistakes", "masterDesc": "Full engine strength"
+    }
+  },
+  "game": {
+    "twoTitle": "Two Players", "aiTitle": "Play vs Computer", "turnW": "White to move", "turnB": "Black to move", "yourTurn": "Your move",
+    "aiThinking": "Computer is thinking…", "check": "Check!", "undo": "Undo", "newGame": "New game", "flip": "Flip board",
+    "resign": "Resign", "offerDraw": "Agree to a draw", "claimDraw": "Claim draw", "claimThreefold": "The same position has occurred three times. You may claim a draw.",
+    "claimFifty": "Fifty moves without a capture or pawn move. You may claim a draw.", "savePgn": "Save game (PGN)", "loadPgn": "Load game",
+    "autoRotate": "Rotate board every turn", "engineLoading": "Preparing the chess engine…", "engineError": "The chess engine is not responding.",
+    "engineRetry": "Restart engine", "illegal": "That piece can't go there", "mustEscape": "You must get out of check first",
+    "pinned": "Moving this piece would expose your king", "notYourPiece": "It is {color}'s turn", "promotion": "Choose a piece to promote to",
+    "confirmNew": "End this game and start a new one?", "confirmResign": "Do you really want to resign?", "confirmDraw": "Do both players agree to a draw?",
+    "moves": "Moves", "you": "You", "level": "Level {level} · {name}", "saved": "Game saved", "pgnInvalid": "Could not read that game file",
+    "loaded": "Game loaded", "noUndo": "Nothing to undo",
+    "result": {
+      "whiteWins": "White wins", "blackWins": "Black wins", "draw": "Draw", "youWin": "You won!", "youLose": "Computer wins",
+      "checkmate": "Checkmate", "stalemate": "Stalemate (no legal moves)", "insufficient": "Insufficient material",
+      "fivefold": "Fivefold repetition", "seventyFive": "75-move rule", "threefoldClaim": "Threefold repetition claimed", "fiftyClaim": "Fifty-move rule claimed",
+      "resign": "Resignation", "agreement": "Draw by agreement"
+    },
+    "review": "Review game", "again": "Play again", "savedGames": "Saved games"
+  },
+  "review": {
+    "title": "Game Review", "analyzing": "Stockfish is analysing… {done}/{total}", "analyzed": "Analysis done · depth {depth}", "start": "Start", "end": "End",
+    "best": "Best move", "good": "Good move", "ok": "Reasonable move", "inaccuracy": "Inaccuracy", "mistake": "Mistake", "blunder": "Blunder",
+    "uncertainNote": "The analysis was not deep enough to be sure",
+    "reason": {
+      "bestMove": "Same as the engine's choice.", "goodMove": "Almost as good as the engine's choice.", "fine": "No big difference.",
+      "missedMate": "{best} would have forced mate in {n}.", "allowsMate": "After this move the opponent can force mate in {n}.",
+      "losesPiece": "After this move the opponent can capture the {piece} on {square}. Better: {best}",
+      "evalDrop": "This move lost some advantage. Better: {best}", "stillWinning": "Still good, but there was a better move: {best}"
+    },
+    "recommend": "Recommended", "showBest": "Show best move", "playLine": "Play the line", "stopLine": "Stop", "retryHere": "Play again from here",
+    "summary": "{color}: inaccuracies {i} · mistakes {m} · blunders {b}", "noGames": "No saved games yet.", "pickGame": "Choose a game to review",
+    "eval": "Eval", "mine": "Only my moves", "moveN": "Move {n}", "uncertain": "(not certain)"
+  },
+  "academy": {
+    "title": "Chess Academy", "daily": "Today's 10-minute training", "dailyDesc": "3 tactics · 1 checkmate · 1 endgame", "dailyDone": "Today's training complete!",
+    "dailyCelebrate": "Great job! You finished today's training.", "records": "My records", "glossary": "Glossary", "solvedOf": "{solved}/{total} solved",
+    "lessonsDone": "{done}/{total} lessons done", "rules": "How the pieces move",
+    "course": {
+      "tactics": "Tactics", "tacticsDesc": "Fork · pin · skewer · discovered attack · defence",
+      "checkmate": "Checkmate", "checkmateDesc": "Mate in 1, 2 and 3",
+      "strategy": "Strategy", "strategyDesc": "Centre · development · king safety · activity",
+      "openings": "Openings", "openingsDesc": "Principles and why the moves are played",
+      "endgames": "Endgames", "endgamesDesc": "Pawn endings and basic mates",
+      "review": "Game Review", "reviewDesc": "Learn from the game you just played"
+    }
+  },
+  "puzzles": {
+    "title": "Puzzles", "filter": {
+      "all": "All", "untried": "Not tried", "unsolved": "Unsolved", "solved": "Solved", "below3": "Under 3 stars", "favorites": "Favourites"
+    },
+    "allThemes": "All themes", "allLevels": "All levels", "difficulty": { "easy": "Easy", "medium": "Medium", "hard": "Hard" },
+    "status": { "untried": "Not tried", "unsolved": "Unsolved", "solved": "Solved" }, "number": "Puzzle {n}", "empty": "No puzzles match.",
+    "cat": {
+      "mate": "Checkmate", "fork": "Fork · Double attack", "pin": "Pin", "skewerDiscovered": "Skewer · Discovered attack", "defense": "Defence", "endgame": "Endgame", "other": "Other tactics"
+    },
+    "theme": {
+      "mate": "Mate", "fork": "Fork", "pin": "Pin", "skewer": "Skewer", "discoveredAttack": "Discovered attack", "doubleAttack": "Double attack",
+      "defense": "Defence", "endgame": "Endgame", "hangingPiece": "Hanging piece", "sacrifice": "Sacrifice", "promotion": "Promotion", "backRankMate": "Back-rank mate"
+    },
+    "favAdd": "Add to favourites", "favRemove": "Remove favourite", "attempts": "{n} tries"
+  },
+  "solve": {
+    "toMove": "{color} to move", "opponentMoving": "Opponent is moving…",
+    "prompt": {
+      "mate1": "Checkmate in one move.", "mate2": "Checkmate in two moves.", "mate3": "Checkmate in three moves.",
+      "fork": "Find a move that attacks two pieces at once.", "pin": "Find a move that wins by using a pin.",
+      "skewer": "Attack the big piece in front and win the piece behind it.", "discoveredAttack": "Move one piece out of the way to unleash a hidden attack.",
+      "doubleAttack": "Find a move that makes two threats at once.", "defense": "Stop your opponent's threat and keep your pieces safe.",
+      "endgame": "Find the precise winning move in this endgame.", "tactic": "Find the best move to win material."
+    },
+    "hint": "Hint", "hintN": "Hint {n}", "restart": "Restart", "next": "Next puzzle", "showSolution": "Show solution",
+    "correct": "Good! Keep going.", "wrong": "Nice try. Think again.", "solved": "Correct!", "revealed": "Here is the solution. Try it again yourself.",
+    "stars3": "Solved first try with no hints!", "stars2": "You found it yourself", "stars1": "Solved with hints",
+    "best": "Best", "last": "Last", "explain": "Explanation", "hint1": {
+      "mate": "The enemy king has very few escape squares.", "fork": "Two enemy pieces can be hit by one of your pieces.",
+      "pin": "An enemy piece can't move freely because of a more important piece behind it.", "skewer": "A big piece and another piece stand on the same line.",
+      "discoveredAttack": "One of your pieces is blocking another piece's line of attack.", "doubleAttack": "One move can create two threats.",
+      "defense": "First ask what your opponent is threatening.", "endgame": "With few pieces left, every king and pawn step matters.",
+      "tactic": "Look for an enemy piece that is unprotected or weak.",
+      "check": "The first move is a check.", "capture": "The first move captures a piece.", "quiet": "The first move is a quiet move (no check, no capture)."
+    },
+    "hint2": "Look at the {piece} on {square}.", "hint2targets": "Targets: {targets}", "hint3": "Suggested move: {from} → {to}",
+    "explainT": {
+      "mate": "{line} is checkmate.", "fork": "{move}: the {piece} on {square} attacks {targets} at once — a fork.",
+      "pin": "{move}: the pinned {pinned} cannot move freely, and that wins material.",
+      "skewer": "{move}: the {front} must move away, and the {back} behind it is won — a skewer.",
+      "discoveredAttack": "{move}: a piece steps aside and opens the {attacker}'s line — a discovered attack.",
+      "doubleAttack": "{move}: one move threatens {targets} at the same time.",
+      "defense": "{move}: it stops the threat and saves material. Most other moves lose a piece.",
+      "endgame": "{line}: the only way to win (or hold) this endgame.", "tactic": "{line}: this sequence wins material."
+    }
+  },
+  "lesson": {
+    "step": "{n} / {total}", "yourTurn": "Your move", "tryAgain": "Think once more", "wellDone": "Well done!", "complete": "Lesson complete",
+    "completed": "Done", "replay": "Replay", "showMove": "Show the move", "lessons": "Lessons", "practice": "Practise vs computer"
+  },
+  "records": {
+    "title": "My records", "total": "{total} puzzles", "solved": "Solved {n}", "stars": "{n} stars", "untried": "Not tried {n}", "unsolved": "Unsolved {n}",
+    "games": "{n} games", "aiRecord": "vs Computer {w}W {l}L {d}D", "lessons": "Lessons done {n}"
+  },
+  "glossary": { "title": "Chess Glossary · 용어 사전" },
+  "settings": {
+    "title": "Settings", "sound": "Sound effects", "volume": "Volume", "haptics": "Vibration", "lowPower": "Low-power mode",
+    "lowPowerDesc": "Fewer animations and lighter engine work", "coords": "Show board coordinates", "autoRotate": "Two players: rotate every turn",
+    "otherLang": "Show Korean lines in the academy", "language": "Language", "skin": "Skin", "skinNote": "Saved separately for each profile", "profiles": "Profiles", "current": "In use", "rename": "Rename",
+    "use": "Use this profile", "namePrompt": "New name", "data": "Data backup", "export": "Export records (JSON)", "import": "Import records",
+    "exportOk": "Saved: {path}", "exportShare": "Send elsewhere", "exportFail": "Export failed",
+    "importConfirm": "Replace ALL current records with the backup from {date} ({profiles})?", "importOk": "Records restored",
+    "importFail": "This file cannot be restored ({reason})", "uninstallWarn": "Uninstalling the app deletes the records on this device. Export a backup now and then.",
+    "about": "About", "licenses": "Open-source licences", "version": "Version {v}", "offline": "Everything works without the internet. Records stay on this device only.",
+    "engine": "Chess engine: {name}", "device": "Device: {info}", "errors": { "notJson": "not JSON", "wrongApp": "not a backup of this app", "newerSchema": "made by a newer version", "noSchema": "no version info", "noProfiles": "no profiles", "badProfile": "damaged profile", "notObject": "bad format" }
+  },
+  "licenses": { "title": "Open-source licences and credits" }
+}

@@ -31,6 +31,7 @@ The first suite exercises 12 floors, hidden-altars, boss defeat/stairs/clear, co
 
 - **ABYSSFALL: ECLIPSE** — Ethan / Noah 듀얼 주인공 룸 서바이버
 - **THE HOLLOW KEEP** — Ethan / Noah 듀얼 주인공 횡스크롤 미궁 액션 어드벤처 (Chapter I prototype)
+- **우리집 체스 PREMIUM** — 완전 오프라인 Android 태블릿 체스(Stockfish 내장, 체스 아카데미) · `games/family-chess-premium/` (Vite·Capacitor 프로젝트, 루트 런처 미등록)
 
 ## Shared protagonists
 

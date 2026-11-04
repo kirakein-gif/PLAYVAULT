@@ -236,6 +236,29 @@ test('되살아남: 일반 적은 방을 나갔다 오면 처음 체력, 봉쇄�
   assert.ok(HK.getFlags(w).doors.gate, '문이 다시 닫힘');
 });
 
+test('쓰러짐 교대: 더 큰 Ethan이 벽·닫힌 봉쇄물에 묻히지 않음(§2, 2026-11-03 보완)', () => {
+  // Noah(39×64)가 오른쪽 벽 / 닫힌 봉쇄물에 붙어 선 채 쓰러지면 Ethan(42×68)으로 바뀐다(무작위 입력 검사에서 실제로 발견).
+  const solidsOf = (a) => { const out = []; a.rooms.a.grid.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === '#') out.push({ x: c * T, y: r * T, w: T, h: T }); })); for (const o of a.rooms.a.objects) if (o.type === 'door') out.push({ x: o.x * T, y: o.y * T, w: (o.w || 1) * T, h: (o.h || 1) * T }); return out; };
+  const ov = (a, b) => a.x < b.x + b.w - 0.01 && a.x + a.w > b.x + 0.01 && a.y < b.y + b.h - 0.01 && a.y + a.h > b.y + 0.01;
+  const nw = cfg('noah').width, nh = cfg('noah').height;
+  const cases = [
+    ['오른쪽 벽', area({ room: 'a', hero: 'noah', x: 930 - nw, y: FLOOR - nh }, { a: room([0, 0], { objects: [enemy('c', 'crawler', 26, 16, { face: 1 })] }) })],
+    ['닫힌 봉쇄물', area({ room: 'a', hero: 'noah', x: 600 - nw, y: FLOOR - nh }, { a: room([0, 0], { objects: [{ type: 'door', id: 'd', x: 20, y: 14, h: 3, open: { key: 'never' } }, enemy('c', 'crawler', 16, 16, { face: 1 })] }) })],
+  ];
+  for (const [label, a] of cases) {
+    const w = world(a, { hero: 'noah', hp: { ethan: 6, noah: 1 } });
+    const solids = solidsOf(a);
+    let swapped = -1;
+    for (let t = 0; t < 600 && swapped < 0; t++) { const ev = HK.step(w, I()); if (has(ev, 'swap', { reason: 'down' })) swapped = t; }
+    assert.ok(swapped >= 0, `${label}: 쓰러짐 교대가 일어나지 않음(검사 준비)`);
+    for (let k = 0; k < 30; k++) {
+      const p = P(w), hit = solids.find((b) => ov(p, b));
+      assert.ok(!hit, `${label}: 교대 ${k}틱 뒤 Ethan(${p.x.toFixed(1)},${p.y.toFixed(1)} ${p.w}×${p.h})이 막힌 칸(${hit && hit.x},${hit && hit.y})에 겹침`);
+      HK.step(w, I());
+    }
+  }
+});
+
 test('결정성: 같은 입력 → 같은 결과(적·피격·교대 섞음)', () => {
   const a = area({ room: 'a', ...at('ethan', 4) }, { a: room([0, 0], { objects: [enemy('c1', 'crawler', 14), enemy('w1', 'wisp', 20, 13), enemy('s1', 'shield', 26)] }) });
   const script = (i) => I({ right: (i % 90) < 40, left: (i % 90) > 70, attack: i % 17 === 0, jump: i % 60 === 0, swap: i % 200 === 0 });

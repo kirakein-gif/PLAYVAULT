@@ -1,0 +1,294 @@
+{
+ "when": "2026-11-02T12:40:22.987Z",
+ "engine": "Stockfish 19 depth 16",
+ "rows": [
+  {
+   "lesson": "st-center",
+   "step": 2,
+   "engineBest": "e4",
+   "acceptLoss": {
+    "e4": 0.009,
+    "d4": 0.026
+   }
+  },
+  {
+   "lesson": "st-develop",
+   "step": 1,
+   "engineBest": "Nf3",
+   "acceptLoss": {
+    "Nf3": 0
+   }
+  },
+  {
+   "lesson": "st-develop",
+   "step": 2,
+   "engineBest": "Bb5",
+   "acceptLoss": {
+    "Bc4": 0.04,
+    "Bb5": 0.015
+   }
+  },
+  {
+   "lesson": "st-develop",
+   "step": 4,
+   "engineBest": "c3",
+   "acceptLoss": {
+    "O-O": 0.002
+   }
+  },
+  {
+   "lesson": "st-king",
+   "step": 1,
+   "engineBest": "Rd8#",
+   "acceptLoss": {
+    "Rd8#": 0
+   }
+  },
+  {
+   "lesson": "st-king",
+   "step": 3,
+   "engineBest": "d4",
+   "acceptLoss": {
+    "Re2": 0.055,
+    "Rf1": 0.055,
+    "Qf3": 0.006,
+    "Qe2": 0.055,
+    "d4": 0.006
+   }
+  },
+  {
+   "lesson": "st-activity",
+   "step": 0,
+   "engineBest": "Rd1",
+   "acceptLoss": {
+    "Rd1": 0.028
+   }
+  },
+  {
+   "lesson": "st-activity",
+   "step": 1,
+   "engineBest": "Rd8+",
+   "acceptLoss": {
+    "Rd7": 0.01
+   }
+  },
+  {
+   "lesson": "st-activity",
+   "step": 2,
+   "engineBest": "Kf1",
+   "acceptLoss": {
+    "Nb3": 0.007,
+    "Nc2": 0.009
+   }
+  },
+  {
+   "lesson": "st-weakness",
+   "step": 1,
+   "engineBest": "Kf1",
+   "acceptLoss": {
+    "Nd4": 0.003
+   }
+  },
+  {
+   "lesson": "st-weakness",
+   "step": 2,
+   "engineBest": "Rxd5",
+   "acceptLoss": {
+    "Rxd5": -0.003
+   }
+  },
+  {
+   "lesson": "st-compare",
+   "step": 1,
+   "engineBest": "Nc6",
+   "acceptLoss": {
+    "Nc6": 0,
+    "d6": 0.055
+   }
+  },
+  {
+   "lesson": "op-principles",
+   "step": 1,
+   "engineBest": "Nf3",
+   "acceptLoss": {
+    "Nf3": 0.009
+   }
+  },
+  {
+   "lesson": "op-italian",
+   "step": 0,
+   "engineBest": "Bb5",
+   "acceptLoss": {
+    "Bc4": 0.004
+   }
+  },
+  {
+   "lesson": "op-italian",
+   "step": 2,
+   "engineBest": "d3",
+   "acceptLoss": {
+    "d3": -0.011,
+    "Nc3": 0.046
+   }
+  },
+  {
+   "lesson": "op-ruylopez",
+   "step": 0,
+   "engineBest": "d4",
+   "acceptLoss": {
+    "Bb5": 0.009
+   }
+  },
+  {
+   "lesson": "op-ruylopez",
+   "step": 1,
+   "engineBest": "Ba4",
+   "acceptLoss": {
+    "Ba4": 0.002,
+    "Bxc6": 0.046
+   }
+  },
+  {
+   "lesson": "op-ruylopez",
+   "step": 2,
+   "engineBest": "O-O",
+   "acceptLoss": {
+    "O-O": 0.011
+   }
+  },
+  {
+   "lesson": "op-qgambit",
+   "step": 0,
+   "engineBest": "c4",
+   "acceptLoss": {
+    "c4": -0.004
+   }
+  },
+  {
+   "lesson": "op-qgambit",
+   "step": 2,
+   "engineBest": "Nf3",
+   "acceptLoss": {
+    "Bg5": 0.006
+   }
+  },
+  {
+   "lesson": "op-defences",
+   "step": 0,
+   "engineBest": "e5",
+   "acceptLoss": {
+    "e5": 0,
+    "c5": 0.006,
+    "e6": 0.002,
+    "c6": 0.002
+   }
+  },
+  {
+   "lesson": "op-defences",
+   "step": 1,
+   "engineBest": "d5",
+   "acceptLoss": {
+    "d5": -0.011
+   }
+  },
+  {
+   "lesson": "op-defences",
+   "step": 2,
+   "engineBest": "d5",
+   "acceptLoss": {
+    "d5": 0
+   }
+  },
+  {
+   "lesson": "op-defences",
+   "step": 3,
+   "engineBest": "Nf6",
+   "acceptLoss": {
+    "d5": 0.006,
+    "Nf6": -0.006
+   }
+  },
+  {
+   "lesson": "eg-kingpawn",
+   "step": 1,
+   "engineBest": "Kd6",
+   "acceptLoss": {
+    "Kd6": 0.003,
+    "Kf6": 0.03
+   }
+  },
+  {
+   "lesson": "eg-kingpawn",
+   "step": 2,
+   "engineBest": "Kh2",
+   "acceptLoss": {
+    "g4": -0.004
+   }
+  },
+  {
+   "lesson": "eg-promotion",
+   "step": 1,
+   "engineBest": "b6",
+   "acceptLoss": {
+    "b6": -0.016
+   }
+  },
+  {
+   "lesson": "eg-promotion",
+   "step": 2,
+   "engineBest": "c8=Q",
+   "acceptLoss": {
+    "c8=Q": -0.049
+   }
+  },
+  {
+   "lesson": "eg-rookmate",
+   "step": 1,
+   "engineBest": "Rh8#",
+   "acceptLoss": {
+    "Rh8#": 0
+   }
+  },
+  {
+   "lesson": "eg-rookmate",
+   "step": 2,
+   "engineBest": "Rh8#",
+   "acceptLoss": {
+    "Rh8#": 0
+   }
+  },
+  {
+   "lesson": "eg-queenmate",
+   "step": 0,
+   "engineBest": "Qb7#",
+   "acceptLoss": {
+    "Qb7#": 0
+   }
+  },
+  {
+   "lesson": "eg-queenmate",
+   "step": 1,
+   "engineBest": "Qc8#",
+   "acceptLoss": {
+    "Qc8#": 0
+   }
+  },
+  {
+   "lesson": "eg-teamwork",
+   "step": 0,
+   "engineBest": "Ra7",
+   "acceptLoss": {
+    "Ra7": 0,
+    "Rb7": 0
+   }
+  },
+  {
+   "lesson": "eg-teamwork",
+   "step": 1,
+   "engineBest": "Rb8#",
+   "acceptLoss": {
+    "Rb8#": 0
+   }
+  }
+ ]
+}

@@ -62,3 +62,34 @@ PLAYVAULT — THE HOLLOW KEEP 3단계 전투 2차: 체력·피격·쓰러짐·�
        게임 시간 정지(히트스톱), 무작위 드롭, 기존 게임·공용 자산 수정, 병합·배포
 [완료] next/README.md 갱신, WORK_LOG·STATUS·CHANGELOG 갱신, Draft → Ready, 병합하지 않는다. 검토는 Claude Code.
 ```
+
+## 추가 수정 지시 1 (2026-11-03, PR #24 교차 검토 후)
+
+```text
+PLAYVAULT — THE HOLLOW KEEP: 쓰러짐 자동 교대 시 Ethan이 벽·봉쇄물에 묻히는 문제
+
+저장소: kirakein-gif/PLAYVAULT
+작업 브랜치: codex/hollow-keep-combat-enemies (PR #24를 이어서 수정한다)
+먼저 할 일: origin/claude/hollow-keep-combat2-review 를 이 브랜치에 병합한다(규격 §2 보완·검사 추가·원본 검사 2개 정정).
+
+[발견 — Claude Code 무작위 입력 검사, 314곳 × 1500틱]
+- Noah(39×64)가 벽·닫힌 봉쇄물에 붙은 채 쓰러지면 자동 교대한 Ethan(42×68)이 같은 발 가운데에 놓여 1.5단위 묻힌다.
+  reliquary oath-door, belfry bell-door, vault 왼쪽 벽 등 4곳, 최대 154틱 연속 겹침. hurtPlayer의 down 교대 분기.
+
+[규칙 — COMBAT2_SPEC §2 "자동 교대 자리 보정"]
+- 교대한 그 틱 안에 새 몸이 막힌 칸(벽·닫힌 봉쇄물·부서지지 않은 벽)과 겹치면 가장 가까운 빈 자리(좌우 → 아래 순, 최대 8단위)로 옮긴다.
+- 수동 교대 규칙(공간이 없으면 swapBlocked)과 다른 수치는 바꾸지 않는다.
+
+[검사 정정 — 이 브랜치를 병합하면 들어옴]
+- enemies-contract 17번째 "쓰러짐 교대: 더 큰 Ethan이 벽·닫힌 봉쇄물에 묻히지 않음" 추가(현재 16/17).
+- exploration-edge: 구역 표적이 특정 적으로 바뀌었으므로 시험용 표적을 직접 넣어 같은 의도(방 왕복 뒤 표적 체력 유지)를 확인.
+- exploration-browser: 완주 확인에서 쉼터·일반 적은 진행 기록 대상이 아니고, 특정 적은 cleared로 확인.
+- 보고해 준 두 원본 검사 충돌은 규격 쪽 결함이었다. 원본을 고치지 않고 보고한 처리가 맞다.
+
+[검증]
+1. enemies-contract 17/17, exploration-edge 13/13, exploration-browser 6/6
+2. 나머지 회귀 전체(이전 지시와 같음), combat2-browser·capture-enemies 유지
+3. 완주 기록이 바뀌면 다시 기록·보고
+
+[금지] 검사 원본 약화, 1단계 이동·1차 무기 수치 변경, 병합·배포
+```

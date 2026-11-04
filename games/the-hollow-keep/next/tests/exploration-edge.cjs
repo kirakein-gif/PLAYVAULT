@@ -23,7 +23,7 @@ test('the sealed lower vault holds both keys until its cracked masonry is broken
  const a=copy(base);a.start={room:'vault',x:530,y:442};const w=HK.createWorld({area:a});run(w,{right:true,jump:true},130);assert.ok(w.player.x+w.player.w<=600+.01);assert.deepEqual(HK.getFlags(w).keys,{});HK.step(w,{attack:true});run(w,{},20);assert.equal(HK.getFlags(w).broken['cracked-screen'],true);run(w,{right:true},100);assert.equal(HK.getFlags(w).picked['bronze-key'],true);assert.equal(HK.getFlags(w).picked['sigil-key'],true);
 });
 test('nonlethal target HP survives a round trip between rooms',()=>{
- const a=copy(base);a.start={room:'reliquary',x:180,y:442};a.rooms.reliquary.objects.find(o=>o.id==='oath-west').hp=44;const w=HK.createWorld({area:a});run(w,{},5);HK.step(w,{attack:true});run(w,{},50);assert.equal(w.dummies.find(d=>d.id==='oath-west').hp,22);
+ const a=copy(base);a.start={room:'reliquary',x:180,y:442};/* COMBAT2 §6: 구역의 표적이 특정 적으로 바뀌어 시험용 표적을 직접 넣는다(적은 빼서 왕복을 방해하지 않게) */a.rooms.reliquary.objects=a.rooms.reliquary.objects.filter(o=>o.type!=='enemy'&&o.id!=='oath-west');a.rooms.reliquary.objects.push({type:'target',id:'oath-west',x:10,y:15,hp:44});const w=HK.createWorld({area:a});run(w,{},5);HK.step(w,{attack:true});run(w,{},50);assert.equal(w.dummies.find(d=>d.id==='oath-west').hp,22);
  until(w,{left:true},()=>w.roomId==='nave');until(w,{right:true},()=>w.roomId==='reliquary');assert.equal(w.dummies.find(d=>d.id==='oath-west').hp,22);
 });
 test('closed doors absorb projectiles before a target behind them',()=>{

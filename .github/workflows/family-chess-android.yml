@@ -1,0 +1,120 @@
+# Builds the FAMILY CHESS PREMIUM debug APK and runs it on an Android emulator
+# with networking switched off. Scoped to games/family-chess-premium only.
+name: family-chess-android
+
+on:
+  push:
+    paths:
+      - 'games/family-chess-premium/**'
+      - '.github/workflows/family-chess-android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: games/family-chess-premium
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: games/family-chess-premium/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit -p tsconfig.json
+      - run: npx vitest run
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: games/family-chess-premium/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Android SDK packages (runner's preinstalled SDK)
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          SDKM=$(ls -d $ANDROID_HOME/cmdline-tools/*/bin | sort -V | tail -1)/sdkmanager
+          yes | $SDKM --licenses > /dev/null || true
+          $SDKM "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+      - run: npm ci
+      - name: Web build
+        run: npm run build
+      - name: Capacitor sync
+        run: npx cap sync android
+      - name: Assemble debug APK
+        working-directory: games/family-chess-premium/android
+        run: ./gradlew assembleDebug --no-daemon
+      - name: Name the APK
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk out/FamilyChessPremium-v1.0.0-debug.apk
+          ls -l out
+          unzip -l out/FamilyChessPremium-v1.0.0-debug.apk | grep -E "engine/stockfish|puzzles|pieces/wK" || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FamilyChessPremium-v1.0.0-debug-apk
+          path: games/family-chess-premium/out/FamilyChessPremium-v1.0.0-debug.apk
+          if-no-files-found: error
+
+  emulator-offline-test:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: FamilyChessPremium-v1.0.0-debug-apk
+          path: games/family-chess-premium/out
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Enable KVM
+        working-directory: .
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Playwright (Android driver only, no browsers; separate folder)
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw"
+          npm install --prefix "$RUNNER_TEMP/pw" --no-audit --no-fund playwright@1.63.0
+          echo "NODE_PATH=$RUNNER_TEMP/pw/node_modules" >> "$GITHUB_ENV"
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+      - name: Install and run on a tablet emulator (network off)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          ram-size: 4096M
+          heap-size: 512M
+          # landscape tablet-sized screen (1280x800 at 160 dpi)
+          emulator-options: -no-window -gpu swangle_indirect -noaudio -no-boot-anim -camera-back none -skin 1280x800 -prop qemu.sf.lcd_density=160
+          working-directory: games/family-chess-premium
+          script: |
+            adb install -r out/FamilyChessPremium-v1.0.0-debug.apk
+            adb shell dumpsys package com.playvault.familychess | grep -E "versionName|android.permission" || true
+            mkdir -p android-smoke; (adb logcat -v time > android-smoke/logcat-full.txt 2>&1 &); node tests/android/smoke.cjs android-smoke || { echo '--- logcat (crash related) ---'; grep -iE 'FATAL|crash|tombstone|died|lowmemory|lmkd|renderer|chromium.*(error|fatal)|AndroidRuntime|DEBUG   :|signal [0-9]' android-smoke/logcat-full.txt | tail -150; exit 1; }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-smoke-results
+          path: games/family-chess-premium/android-smoke

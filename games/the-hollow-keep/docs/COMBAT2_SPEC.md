@@ -27,7 +27,8 @@ CONFIG.knockback = { vx: 3, vy: -4 };  // 맞으면 적 반대쪽으로 밀림
 ```
 
 - **맞음:** 무적이 아닐 때 적 몸에 닿거나(접촉 피해) 적 공격 판정에 닿으면 그 피해만큼 체력이 준다. 적의 반대 방향으로 `knockback.vx`, 위로 `knockback.vy`만큼 튕기고, 사다리에 매달려 있었으면 떨어진다. `hurtInvulnTicks` 동안 무적. 이벤트 `{type:'hurt', hero, damage, hp}`.
-- **쓰러짐(한 명):** 체력이 0이 되면 `{type:'down', hero}`. 다른 주인공의 체력이 남아 있으면 그 자리에서 **자동 교대**(교대 대기·공간 검사 무시, 같은 발 위치)하고 `downSwapInvulnTicks` 동안 무적. 이벤트 `{type:'swap', from, to, reason:'down'}`. 쓰러진 주인공으로는 교대할 수 없다(`swapBlocked`, `reason:'down'`).
+- **쓰러짐(한 명):** 체력이 0이 되면 `{type:'down', hero}`. 다른 주인공의 체력이 남아 있으면 그 자리에서 **자동 교대**(교대 대기·공간 검사로 막지 않음, 같은 발 위치)하고 `downSwapInvulnTicks` 동안 무적. 이벤트 `{type:'swap', from, to, reason:'down'}`. 쓰러진 주인공으로는 교대할 수 없다(`swapBlocked`, `reason:'down'`).
+- **자동 교대 자리 보정(2026-11-03 보완):** 바뀐 몸(Noah 39×64 → Ethan 42×68)이 벽·닫힌 봉쇄물·부서지지 않은 벽과 겹치면, 교대한 그 틱 안에 가장 가까운 빈 자리(좌우 → 아래 순, 최대 8단위)로 옮긴다. 교대 직후 한 틱도 막힌 칸과 겹치지 않는다. 무작위 입력 검사에서 Noah가 벽·봉쇄물에 붙은 채 쓰러지면 Ethan이 1.5단위 묻히고 최대 154틱 빠져나오지 못하는 경우가 발견되어 추가했다(`enemies-contract` "쓰러짐 교대" 검사).
 - **쓰러짐(둘 다):** `{type:'defeat'}` 다음 같은 틱에 `{type:'respawn'}`. 시작 방·시작 위치로 돌아가고, 두 주인공 체력 가득, 쓰러짐 해제, 조작 주인공은 `area.start.hero`(없으면 ethan). `getFlags()`의 진행(스위치·문·벽·열쇠·출입문)은 그대로. 일반 적은 되살아난다.
 - `HKSim.getHeroes(world)` → `{ ethan:{hp, maxHp, down}, noah:{hp, maxHp, down} }`. `getPlayer(world).invuln` = 남은 무적 틱. `HKSim.getPickups(world)` → 현재 방의 회복 조각 `[{ kind:'heal', x, y, w, h }]`.
 - 밀림은 맞은 뒤 6틱 안에 적 반대쪽으로 3단위 이상 움직일 만큼 확실해야 한다(공중 조작 상한에 묻히지 않게).

@@ -1,0 +1,12 @@
+
+> family-chess-premium@1.0.0 test
+> vitest run
+
+
+ RUN  v5.0.5 C:/Users/Administrator/Documents/Codex/2026-11-03/codex-games-the-hollow-keep-docs/work/PLAYVAULT/games/family-chess-premium
+
+
+ Test Files  5 passed (5)
+      Tests  396 passed (396)
+   Start at  14:51:10
+   Duration  2.07s (tests 66%, transform 17%, import 15%, worker 2%)

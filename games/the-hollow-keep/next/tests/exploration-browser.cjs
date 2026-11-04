@@ -53,7 +53,8 @@ const codes={left:'ArrowLeft',right:'ArrowRight',up:'ArrowUp',down:'ArrowDown',j
    for(const key of previous)await page.keyboard.up(codes[key]);
    const state=await page.evaluate(()=>({world:HKPlaytest.snapshot(),map:HKPlaytest.map(),flags:HKPlaytest.flags()}));
    assert.equal(state.world.roomId,area.start.room);assert.equal(state.map.rooms.filter(r=>r.visited).length,Object.keys(area.rooms).length);
-   for(const room of Object.values(area.rooms))for(const o of room.objects){const bucket={switch:'switches',door:'doors',breakable:'broken',key:'picked',target:'cleared'}[o.type];if(o.type==='entrance'){assert.ok(state.flags.entered[o.id]||state.flags.entered[o.to],o.id);if(o.lock)assert.equal(state.flags.unlocked[o.id],true,o.id);}else assert.equal(state.flags[bucket][o.id],true,o.id);}
+   const specific=new Set(Object.values(area.rooms).flatMap(r=>r.objects).flatMap(o=>(o.open&&o.open.cleared)||[]));/* COMBAT2: 쉼터·일반 적은 진행 기록이 없고, 특정 적만 cleared에 남는다 */
+   for(const room of Object.values(area.rooms))for(const o of room.objects){if(o.type==='shelter'||(o.type==='enemy'&&!specific.has(o.id)))continue;const bucket={switch:'switches',door:'doors',breakable:'broken',key:'picked',target:'cleared',enemy:'cleared'}[o.type];if(o.type==='entrance'){assert.ok(state.flags.entered[o.id]||state.flags.entered[o.to],o.id);if(o.lock)assert.equal(state.flags.unlocked[o.id],true,o.id);}else assert.equal(state.flags[bucket][o.id],true,o.id);}
   });
   await check('map after circuit includes eight rooms, current room emphasized, mobile control labels present',async()=>{
    await page.keyboard.press('KeyM');assert.equal(await page.locator('.map-room').count(),8);assert.equal(await page.locator('.map-room.current').count(),1);await page.screenshot({path:path.join(output,'map-complete.png')});await page.keyboard.press('KeyM');
