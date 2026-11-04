@@ -32,6 +32,7 @@ The first suite exercises 12 floors, hidden-altars, boss defeat/stairs/clear, co
 - **ABYSSFALL: ECLIPSE** — Ethan / Noah 듀얼 주인공 룸 서바이버
 - **THE HOLLOW KEEP** — Ethan / Noah 듀얼 주인공 횡스크롤 미궁 액션 어드벤처 (Chapter I prototype)
 - **CHESS MASTER**(구 우리집 체스 PREMIUM) — 오프라인 체스(Stockfish 내장, 체스 아카데미). Android APK + PC 웹 버전 `games/family-chess-premium/play/`(루트 런처 등록, `npm run build:web`으로 생성한 빌드를 커밋) · 소스 `games/family-chess-premium/`
+- **HANGMAN MASTER**(가족 행맨) — CHESS MASTER와 같은 컨셉의 오프라인 영어 단어 맞히기(혼자·둘이서·단어장). Android APK + PC 웹 버전 `games/family-hangman/play/`(루트 런처 카드는 아직 없음) · 소스 `games/family-hangman/`
 
 ## Shared protagonists
 

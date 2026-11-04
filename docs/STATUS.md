@@ -1,14 +1,29 @@
 # PLAYVAULT · 현재 개발 현황
 
-## 구현·CI 검증 완료 · BLOCK MASTER v1.0.0 (Draft PR #28, 사용자 승인·교차검토 대기)
+## 수정 완료·재검토 대기 · BLOCK MASTER v1.0.0 (Draft PR #28)
 
-- 2026-11-04 / 담당 **ChatGPT** / 시작 main `4e7abd0` / 브랜치 `chatgpt/family-blocks-solo` / [Draft PR #28](https://github.com/kirakein-gif/PLAYVAULT/pull/28). 중단된 기존 세션의 코드를 인수하여 해당 브랜치에만 후속 수정. 게임 폴더·전용 CI·관리 문서만 변경하고 타 게임/루트 `index.html`/공용 자산/배포 설정 변경 없음.
-- 기능: 완전 오프라인 4칸 블록 퍼즐(7종 시드 묶음), 차근차근·도전·40줄 달리기, 60Hz 게임 엔진·회전 킥·홀드·고스트·점수, 터치·키보드, 한영·2프로필·기록·JSON 백업, 원목 스킨·자작 음악. Android 앱 ID `com.playvault.familyblocks`, 체스와 같은 가족 고정 서명 키, PC 웹 빌드 `play/`.
-- 최신 검증: [GitHub Actions 41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763) **전체 필수 단계 성공**(TypeScript, Vitest 31/31, 브라우저 E2E 11/11 / 853×533·1280×800·60초 자동 플레이 / 외부 요청 및 JS 오류 0, APK 생성·가족 키 지문·INTERNET 권한 없음, Android 14 오프라인 에뮬레이터 ADB 실제 터치 이동·회전·즉시 낙하·앱 재실행 후 기록 유지). Release 단계는 main이 아니므로 계획대로 건너뜀.
-- 화면·검사 개선: 게임 아래쪽 모드 이름이 좌하단 이동 버튼과 겹치던 문제 제거; 브라우저 멀티터치 고정 시드와 Android ADB 입력 테스트 안정화. 게임 버전 **1.0.0 유지**.
-- 남은 일: Claude Code/Codex 교차 리뷰(아직 안 함), 사용자 승인 후 main 병합·Release 영구 보관, 실물 저가형 태블릿 터치 지연·성능·소리·진동·파일 공유 확인. **main 병합·웹 공개 배포·Release 미수행**.
+- 2026-11-04 / **ChatGPT 구현 담당**, `chatgpt/family-blocks-solo` / [PR #28](https://github.com/kirakein-gif/PLAYVAULT/pull/28). 원래 `4e7abd0`에서 시작한 작업을 이어받아 Android APK·웹 버전 구현. 사용자의 승인 전 `main` 병합·공개 배포·Release 금지.
+- 2026-11-04 / Claude Code 교차 검토(헤드 `99d5e45`): 게임 규칙·SRS 표·빌드·브라우저 검사 재실행 성공, **초기 블록 가시성, Android 뒤로가기, 자동 검사 판정**의 수정 필요 판정. 그 밖에 결과 문구 중복·미사용 의존성 정리, 미리보기 글자 크기 실기 판단 권고.
+- 구현 담당 수정: 7종 블록 첫 등장 즉시 첫 가시 행(2행)에 아래 줄 표시, 가시 자리 점유 시에만 숨은 행 사용; Android 시스템 뒤로가기 게임 일시정지/재개·설정·기록 홈 이동·홈 종료 확인; 이동·블록 표시·기록 내용·HUD 겹침·Android 뒤로가기 검사 강화; 차근차근 결과 제목 중복 제거; 미사용 체스·글꼴 패키지 정리. 미리보기 크기는 실물 태블릿 조작 후 판정.
+- 기존 검증 근거: [Actions 41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763)에서 타입 검사·단위·브라우저·APK·오프라인 Android 14 에뮬레이터 성공(**수정 전 버전**). **이번 수정의 최종 CI는 별도로 확인해야 하며, 이전 성공을 새 버전에 적용하지 않음.**
+- 이번 브랜치에 PR #29(HANGMAN MASTER)가 반영된 `main` 이력을 함께 통합해 세 관리 문서 충돌을 정리. `games/family-blocks/` 및 전용 CI 외 기존 게임/메인 런처/공용 자산의 작업 내용을 변경하지 않음. 독립 교차 **재검토 대기**.
+- 남은 일: 수정 버전 전체 CI 결과 검증 → Claude Code 재검토 → 사용자 승인 후 병합·Release → 가족 태블릿 터치·소리·성능·미리보기 가독성 확인.
 
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
+확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(HANGMAN MASTER 1차 구현, 가족 블록 게임 작업지시서). 아래 기존 이력은 보존합니다.
+
+## 구현 · HANGMAN MASTER v1.0.0 (가족 행맨, `games/family-hangman/`) / CI APK 확인·사용자 실기 대기
+
+2026-11-04 / Claude Code / `ccr-33a67370-6aa4yx` / 기준 main `4e7abd0`. 사용자 요청: "같은 컨셉으로 행맨 게임 만들어줘요. 이건 코드에서 독자적으로 갑시다" → Claude Code 직접 구현(역할 분담표보다 사용자 지시 우선). 범위: 새 폴더 `games/family-hangman/`, 새 CI `.github/workflows/family-hangman-android.yml`, 루트 README 한 줄. 체스·다른 게임·루트 `index.html`·공용 자산 변경 없음.
+- 내용: 혼자 하기(기초 영어 358단어·10주제·한국어 뜻, 난이도=글자 수), 둘이서(단어+한글 힌트 입력 → 건네기), 단어장(통계·맞힌/놓친 단어·놓친 단어 다시 하기), 그림은 설정에서 사용자별 선택 — 풍선 바구니(기본)/클래식 행맨(2026-11-04 사용자 결정 "풍선 아이디어 좋다, 옵션에서 선택"), 단어는 영어만(사용자 확인), 힌트 2종, 별 1~3. 체스 공통 모듈(저장·백업·한영·효과음·Capacitor 래퍼·UI) 복사, 앱 ID `com.playvault.familyhangman`(영구), 같은 가족 서명 키.
+- 검증(이번 세션): tsc, 단위 26/26, 오프라인 E2E 12/12(dist·play 각각, 외부 0), 웹 빌드 재현, 하위 경로·PLAYVAULT 링크. CI #1(`c158795`) 전체 통과 — APK 빌드·가족 키·INTERNET 없음·Android 14 에뮬레이터 오프라인 검사. 그림 옵션 포함 CI #3(`1cdad61`, run 41813876364)도 전체 통과. 최신 debug APK: 그 실행의 `FamilyHangman-v1.0.0-debug-apk`(아티팩트 13313108751, 2027-02-02 만료).
+- 남은 일: 사용자 승인 후 main 병합(Release `family-hangman-v1.0.0` 생성) → 태블릿 설치·아이 피드백. PLAYVAULT 첫 화면 카드는 Codex 메인 화면 작업 뒤 별도. PR 미제출, 병합·배포 없음.
+
+## (당시 기록) 작업지시서 제출 · 가족 블록 게임(가칭 BLOCK MASTER) 1차 혼자 하기 / ChatGPT 구현 전
+
+2026-11-04 / Claude Code / `ccr-33a67370-6aa4yx` / 기준 main `4e7abd0`. 사용자 요청: "체스마스터 컨셉으로 테트리스를 앱으로", 1차는 **혼자 하기만**, Android APK + PC 웹, 아이가 체스와 **같은 태블릿**에서 사용. 사용자 지정으로 **구현 담당 ChatGPT**(역할 분담표보다 사용자 지시 우선).
+- 지시서: `games/family-blocks/docs/GPT_TASK_01.md` — 폴더 `games/family-blocks/`, 앱 ID `com.playvault.familyblocks`(영구 고정), 작업 브랜치 `chatgpt/family-blocks-solo`, 모드 3종(차근차근·도전·40줄), 원목 스킨 1종, 체스 공통 모듈 복사 재사용, 같은 가족 서명 키, CI 4단계, 단위·E2E 검사 목록.
+- 결정 대기(사용자): 화면 이름 — 지시서는 상표를 피한 가칭 `BLOCK MASTER`(상수 1곳). 배경음 — 자작곡 또는 민요 「코로베이니키」 선율 직접 편곡(기존 게임 편곡·음원 복사 금지).
+- 범위 밖: 2인·컴퓨터 대전·복기·아카데미·스킨 추가·PLAYVAULT 카드(메인 화면은 Codex 작업 중). 게임 코드 없음, 병합·배포 없음.
 
 ## 병합 완료 · CHESS MASTER PC 웹 버전 + PLAYVAULT 카드 + 고정 서명 키·Release (PR #26 → main `48440c9`, 2026-11-04)
 

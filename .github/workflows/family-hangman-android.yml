@@ -1,0 +1,176 @@
+# Builds the HANGMAN MASTER debug APK and runs it on an Android emulator with
+# networking switched off. Scoped to games/family-hangman only (copied from the
+# CHESS MASTER workflow).
+name: family-hangman-android
+
+on:
+  push:
+    paths:
+      - 'games/family-hangman/**'
+      - '.github/workflows/family-hangman-android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: games/family-hangman
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: games/family-hangman/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit -p tsconfig.json
+      - run: npx vitest run
+      - name: Committed web build (play/) matches the source
+        run: |
+          npm run build:web
+          git status --porcelain -- play
+          test -z "$(git status --porcelain -- play)" || { echo "play/ is stale: run npm run build:web and commit"; exit 1; }
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: games/family-hangman/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Android SDK packages (runner's preinstalled SDK)
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          SDKM=$(ls -d $ANDROID_HOME/cmdline-tools/*/bin | sort -V | tail -1)/sdkmanager
+          yes | $SDKM --licenses > /dev/null || true
+          $SDKM "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+      - run: npm ci
+      - name: Web build
+        run: npm run build
+      - name: Capacitor sync
+        run: npx cap sync android
+      - name: Assemble debug APK
+        working-directory: games/family-hangman/android
+        run: ./gradlew assembleDebug --no-daemon
+      - name: Name the APK
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk out/FamilyHangman-v1.0.0-debug.apk
+          ls -l out
+          unzip -l out/FamilyHangman-v1.0.0-debug.apk | grep -E "assets/public/index.html|icons/icon-192" || true
+          AAPT2=$(ls -d $ANDROID_HOME/build-tools/*/aapt2 | sort -V | tail -1)
+          $AAPT2 dump permissions out/FamilyHangman-v1.0.0-debug.apk | tee out/permissions.txt
+          grep -q "permission" out/permissions.txt || { echo "could not read permissions"; exit 1; }
+          if grep -q "android.permission.INTERNET" out/permissions.txt; then echo "INTERNET permission must not be in the APK"; exit 1; fi
+      - name: Verify the fixed family signing key
+        run: |
+          APKSIGNER=$(ls -d $ANDROID_HOME/build-tools/*/apksigner | sort -V | tail -1)
+          $APKSIGNER verify --print-certs out/FamilyHangman-v1.0.0-debug.apk | tee out/signer.txt
+          grep -q "SHA-256 digest: $FAMILY_CERT_SHA256" out/signer.txt || { echo "APK is not signed with the family key"; exit 1; }
+        env:
+          FAMILY_CERT_SHA256: bc658c0933d0a9cdedecd65926f5eb14c5c767882f65fc8317295772d53e8a6a
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FamilyHangman-v1.0.0-debug-apk
+          path: games/family-hangman/out/FamilyHangman-v1.0.0-debug.apk
+          if-no-files-found: error
+
+  emulator-offline-test:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: FamilyHangman-v1.0.0-debug-apk
+          path: games/family-hangman/out
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Enable KVM
+        working-directory: .
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Playwright (Android driver only, no browsers; separate folder)
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw"
+          npm install --prefix "$RUNNER_TEMP/pw" --no-audit --no-fund playwright@1.63.0
+          echo "NODE_PATH=$RUNNER_TEMP/pw/node_modules" >> "$GITHUB_ENV"
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+      - name: Install and run on a tablet emulator (network off)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          ram-size: 4096M
+          heap-size: 512M
+          # landscape tablet-sized screen (1280x800 at 160 dpi)
+          emulator-options: -no-window -gpu swangle_indirect -noaudio -no-boot-anim -camera-back none -skin 1280x800 -prop qemu.sf.lcd_density=160
+          working-directory: games/family-hangman
+          script: |
+            adb install -r out/FamilyHangman-v1.0.0-debug.apk
+            adb shell dumpsys package com.playvault.familyhangman | grep -E "versionName|android.permission" || true
+            mkdir -p android-smoke; (adb logcat -v time > android-smoke/logcat-full.txt 2>&1 &); node tests/android/smoke.cjs android-smoke || { echo '--- logcat (crash related) ---'; grep -iE 'FATAL|crash|tombstone|died|lowmemory|lmkd|renderer|chromium.*(error|fatal)|AndroidRuntime|DEBUG   :|signal [0-9]' android-smoke/logcat-full.txt | tail -150; exit 1; }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-smoke-results
+          path: games/family-hangman/android-smoke
+
+  # Keeps the APK permanently: Actions artifacts expire after 90 days, release
+  # files do not. Runs only on main, and only after the emulator test passed.
+  release:
+    needs: [unit-tests, build, emulator-offline-test]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: FamilyHangman-v1.0.0-debug-apk
+          path: games/family-hangman/out
+      - name: Publish or update the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="family-hangman-v$VERSION"
+          APK="out/FamilyHangman-v$VERSION-debug.apk"
+          ( cd out && sha256sum "$(basename "$APK")" > "$(basename "$APK").sha256" )
+          {
+            echo "HANGMAN MASTER v$VERSION - offline Android tablet word game (family build)."
+            echo ""
+            echo "Install: download $(basename "$APK"), copy it to the tablet and tap it (allow installs from this source)."
+            echo "Signed with the fixed family key (certificate SHA-256 bc658c09...3e8a6a), so later builds install over this one and keep the records."
+            echo ""
+            echo "Built from ${GITHUB_SHA::7} by run ${GITHUB_RUN_NUMBER}. Unit tests and the offline emulator test passed."
+            echo "Personal sideload build, not for the Play Store."
+          } > out/notes.md
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" "$APK.sha256" --clobber
+            gh release edit "$TAG" --notes-file out/notes.md
+          else
+            gh release create "$TAG" "$APK" "$APK.sha256" --target "$GITHUB_SHA" --title "HANGMAN MASTER v$VERSION" --notes-file out/notes.md
+          fi

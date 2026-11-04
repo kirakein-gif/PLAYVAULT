@@ -1,0 +1,151 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "OK",
+    "close": "Close",
+    "save": "Save",
+    "start": "Start",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "home": {
+    "solo": "Solo",
+    "soloSub": "Guess English words",
+    "two": "Two players",
+    "twoSub": "Set a word, guess it",
+    "words": "Word book",
+    "wordsSub": "Found · missed words",
+    "exitTitle": "Close the app?",
+    "exit": "Close",
+    "hub": "← PLAYVAULT",
+    "record": "{won} wins · best streak {best}"
+  },
+  "setup": {
+    "title": "Solo",
+    "level": "Level",
+    "category": "Topic",
+    "all": "All",
+    "start": "Start",
+    "count": "{n} words",
+    "none": "No words match these choices",
+    "levels": {
+      "easy": "Easy",
+      "normal": "Normal",
+      "hard": "Hard",
+      "all": "Mixed"
+    },
+    "levelSub": {
+      "easy": "2-4 letters",
+      "normal": "5-6 letters",
+      "hard": "7+ letters",
+      "all": "Any length"
+    }
+  },
+  "game": {
+    "lives": "{n} balloons left",
+    "meaningBtn": "Show meaning",
+    "letterBtn": "Show a letter",
+    "letterCost": "1 balloon",
+    "meaning": "Meaning: {m}",
+    "hint": "Hint: {h}",
+    "tried": "Tried",
+    "quit": "Stop",
+    "quitAsk": "Stop this word?",
+    "won": "You got it!",
+    "lost": "So close",
+    "answer": "Answer",
+    "next": "Next word",
+    "home": "Home",
+    "again": "Again",
+    "repeat": "You already tried that letter",
+    "streak": "{n} in a row",
+    "practice": "Missed words",
+    "practiceDone": "All missed words found!",
+    "livesClassic": "{n} chances left",
+    "letterCostClassic": "1 chance"
+  },
+  "two": {
+    "title": "Two players",
+    "step1": "Word setter: type an English word",
+    "step1Sub": "Don't let the guesser see",
+    "show": "Show",
+    "hide": "Hide",
+    "hintLabel": "Hint (optional)",
+    "hintPh": "e.g. lives in the sea",
+    "invalid": "Use {min}-{max} English letters",
+    "next": "Next",
+    "erase": "Erase",
+    "handoff": "Hand the tablet to the guesser",
+    "handoffSub": "The word has {n} letters",
+    "go": "Start",
+    "winGuesser": "The guesser wins!",
+    "winSetter": "The setter wins!",
+    "newWord": "Set a new word"
+  },
+  "words": {
+    "title": "Word book",
+    "played": "Played",
+    "won": "Won",
+    "rate": "Win rate",
+    "streak": "Streak",
+    "best": "Best streak",
+    "tabMissed": "Missed",
+    "tabWon": "Found",
+    "tabAll": "All words",
+    "empty": "Nothing here yet. Play Solo to find words!",
+    "practice": "Practise missed words ({n})",
+    "progress": "{done} / {total}"
+  },
+  "settings": {
+    "title": "Settings",
+    "sound": "Sound effects",
+    "volume": "Volume",
+    "haptics": "Vibration",
+    "lowPower": "Power saving",
+    "lowPowerDesc": "Fewer screen and balloon animations",
+    "language": "Language",
+    "profiles": "Players",
+    "current": "in use",
+    "rename": "Rename",
+    "use": "Use",
+    "namePrompt": "New name",
+    "data": "Backup",
+    "export": "Export records",
+    "exportShare": "Share",
+    "import": "Import records",
+    "exportOk": "Saved: {path}",
+    "exportFail": "Could not save",
+    "importFail": "Could not import ({reason})",
+    "importConfirm": "Replace the current records with the backup from {date} ({profiles})? Current records will be lost.",
+    "importOk": "Records imported",
+    "uninstallWarn": "Uninstalling the app deletes its records. Export them first.",
+    "about": "About",
+    "version": "Version {v}",
+    "offline": "Works without the internet. No ads, no data collection.",
+    "words": "{n} words (English with Korean meanings)",
+    "device": "Device: {info}",
+    "licenses": "Open-source licenses",
+    "errors": {
+      "notJson": "not a JSON file",
+      "wrongApp": "file from another app",
+      "notObject": "bad format",
+      "noSchema": "bad format",
+      "newerSchema": "file from a newer version",
+      "noProfiles": "no players",
+      "badProfile": "bad player data"
+    },
+    "picture": "Picture",
+    "pictureDesc": "What changes on a wrong guess (per player)",
+    "pictures": {
+      "balloon": "Balloon basket",
+      "classic": "Classic hangman"
+    }
+  },
+  "licenses": {
+    "title": "Open-source licenses",
+    "intro": "Open-source software and fonts inside this app. Full texts are in the LICENSES folder of the source."
+  },
+  "web": {
+    "narrow": "Made for tablet and PC screens. Turn the device sideways or open it on a bigger screen."
+  }
+}
