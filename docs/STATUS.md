@@ -1,13 +1,13 @@
 # PLAYVAULT · 현재 개발 현황
 
-# 작업 중 · BLOCK MASTER 1차 (ChatGPT 전담)
+## 개발·검토 대기 · BLOCK MASTER v1.0.0 (ChatGPT 전담, 2026-11-04)
 
-- 시작: 2026-11-04 (Asia/Seoul), 기준 main \`4e7abd0\`, 브랜치 \`chatgpt/family-blocks-solo\`.
-- 담당: ChatGPT. 범위: \`games/family-blocks/\`, \`.github/workflows/family-blocks-android.yml\`, 공통 작업 이력 문서(필요 항목에 한함).
-- 상태: 신규 게임 개발 중, APK·웹·테스트는 아직 완료/통과로 표기하지 않음. 다른 AI의 게임 폴더·루트 런처·공통 자산 불변.
-- 인계: 사용자 지정 1차 혼자 하기 3모드만, 작업 완료 시 초안 PR로 검토 요청. main 병합/배포는 사용자 승인 후.
-
-
+- 담당: **ChatGPT**, 시작 main `4e7abd0`, 작업 브랜치 `chatgpt/family-blocks-solo`. 담당 범위 `games/family-blocks/`, `.github/workflows/family-blocks-android.yml`, 작업 관리 문서 3종.
+- 구현: 완전 오프라인 가족용 4칸 블록 게임. 차근차근 / 도전 / 40줄 달리기, 60Hz 시드 기반 순수 TS 엔진, 10×22칸, 킥·홀드·점수·고스트, 터치·키보드, 프로필 2개·한/영·기록·JSON 백업, 한 캔버스 원목 렌더링, 자체 작곡 음악.
+- Android: 체스와 별도 앱 ID `com.playvault.familyblocks`, 가족 고정 서명 키를 복사하고 웹·APK CI 구성. PLAYVAULT 루트 첫 화면 카드·다른 게임은 변경하지 않음.
+- 검증: GitHub Actions [run 41808095710](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41808095710)에서 Node 22 TypeScript 및 웹 빌드 통과, Vitest **31/31 통과**, 브라우저 E2E **11/11 통과**(853×533/1280×800, 동시 터치·한글 키코드·60초 자동 플레이), 외부 요청·콘솔 오류 0건. Android APK/오프라인 에뮬레이터는 해당 실행의 **결과 확인 대기**.
+- 브랜치 상태: 작업 중이며 PR 검토 후 사용자 승인 전 **main 병합 및 Release·배포 금지**.
+- 후속: Android CI 성공 여부 확인, docs/TEST_REPORT.md 업데이트, 다른 AI(Claude Code 또는 Codex)의 교차 검토, 태블릿 실기 조작감·음량·진동 확인.
 
 확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
 

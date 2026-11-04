@@ -1517,3 +1517,13 @@
 - 범위 조정: 사용자가 딸깍 배지 10회 목적지 변경과 PLAYVAULT 메인 분위기 정리를 Codex로 별도 진행하기로 함. 이 세션에서 `ddalkkak-hub`에 착수했던 목적지 변경(로컬)은 사용자 지시로 폐기, 원격 푸시 없음. 위치 안내만 전달: PLAYVAULT `index.html`(카드 `<section class="grid">`)·`assets/site.css`, ddalkkak-hub `site/index.html` 20행 `data-game-url`·`site/easter-egg.js`·`functions/[[path]].js`.
 - 관리 문서: STATUS·WORK_LOG·CHANGELOG·DEVELOPMENT_SUMMARY 갱신. AGENTS·CLAUDE 절차 변경 없음.
 - 사용자 재요청 횟수: 0회. 다음: 태블릿 1회 재설치·실기 확인.
+
+### 2026-11-04 (Asia/Seoul) · BLOCK MASTER 신규 게임 1차 구현 · 브라우저 인수 검사 (ChatGPT)
+
+- 담당: ChatGPT(사용자 지정; Claude Code 작업지시서 `GPT_TASK_01.md`). 시작 SHA main `4e7abd0`; 브랜치 `chatgpt/family-blocks-solo`; 최종 PR은 draft, 사용자 승인 전 병합/배포 금지.
+- 범위: `games/family-blocks/**`, `.github/workflows/family-blocks-android.yml`, `docs/WORK_LOG.md`, `docs/STATUS.md`, `CHANGELOG.md`. 다른 게임·`assets/`·루트 런처·Cloudflare 설정 변경하지 않음.
+- 신규 기능: 7종 7-bag 시드 난수, 10×22(보임20) 판, 60Hz 고정 틱, 회전/벽 차기·홀드·착지 예고, 3개 모드, 0.5초 고정, 터치/키보드, 세이브·2 프로필·JSON 백업, 2개 언어·원목 렌더링·자작곡, Android 별도 앱 ID·가족 고정 키, 웹 빌드 play/ 자동 생성 작업.
+- 검증(이번 실행): GitHub Actions run `41808095710`에서 TypeScript 컴파일·웹 빌드 성공, Vitest 31/31, 브라우저 오프라인 Playwright 11/11(853×533·1280×800·60초 고정시드 자동플레이), 외부 네트워크 요청 0·브라우저 오류 0. 수정 전 실패: 미사용 TS import 1건, E2E 시험 서버 연결 1건(모두 수정 후 위 검사 성공). Android 빌드·에뮬레이터는 확인 대기.
+- 미확인: 실물 저가형 태블릿 지연·화면·음량·진동·파일 공유. 게임의 출시/스토어 배포는 수행하지 않음.
+- 공통 관리 문서 5개 검토: STATUS/WORK_LOG/CHANGELOG 이번 작업 기록; AGENTS.md/CLAUDE.md 공통 절차 변경 없음.
+- 검토 담당/지적 수: 아직 교차 검토 전. 사용자 재요청 횟수: 0회. 다음: CI 최종 확인 → ChatGPT 초안 PR → Claude/Codex 교차 검토 → 사용자 병합 승인.
