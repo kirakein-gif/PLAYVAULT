@@ -11,7 +11,7 @@
 | 오프라인 브라우저 E2E | `node tests/e2e/run-e2e.mjs` (dist) | **12/12 통과, 외부 요청 0건** |
 | 같은 E2E, 웹 빌드 대상 | `E2E_OUTDIR=play ...` | **12/12 통과, 외부 요청 0건** |
 | 하위 경로·PLAYVAULT 링크 | 저장소 루트 정적 서버에서 `/games/family-hangman/play/` → `← PLAYVAULT` | 루트로 이동, 외부 요청 0, 오류 0 |
-| Android APK 빌드·에뮬레이터 | GitHub Actions `family-hangman-android` | **이 세션에서는 실행 못 함**(Android SDK 다운로드 차단). push 후 CI 결과로 확인 |
+| Android APK 빌드·에뮬레이터 | GitHub Actions `family-hangman-android` 실행 #1 (`c158795`, run 41810360132) | **전체 통과**: unit-tests(tsc·Vitest·`play/` 일치), build(APK 11.9MB 아티팩트, 가족 키 지문·INTERNET 권한 없음 확인), emulator-offline-test(Android 14·1280×800·네트워크 차단: 둘이서 한 판·혼자 한 판·재실행 후 기록 유지, 외부 요청 0). release는 main 전용이라 건너뜀 |
 
 ## E2E 항목
 1~3. 853×533 · 1280×800 · 1920×1080에서 홈 카드·설정·자판(줄 끝 Q/P/A/L/Z/M 포함)·단어 칸·풍선·힌트 버튼이 화면 안, 단어 칸과 자판이 겹치지 않음, 글자 키 44px 이상.
@@ -26,4 +26,4 @@
 12. 영어 화면, 설정, 기록 내보내기 JSON(`app: family-hangman`), 이름 변경.
 
 ## 확인하지 못한 것
-실제 태블릿에서의 터치감·소리 크기·진동, 에뮬레이터 실행(CI 결과 대기), 아이의 난이도 체감, 단어 뜻의 가족 검토.
+실제 태블릿에서의 터치감·소리 크기·진동, 아이의 난이도 체감, 단어 뜻의 가족 검토.

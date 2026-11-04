@@ -1538,3 +1538,4 @@
 - 미실행: APK 빌드·에뮬레이터(이 환경 Android SDK 차단 → push 후 CI). 실제 태블릿 미확인.
 - 관리 문서: STATUS·WORK_LOG·CHANGELOG 갱신, 루트 README 한 줄. AGENTS·CLAUDE 검토, 절차 변경 없음. 루트 `index.html` 카드는 Codex 메인 화면 작업과 겹쳐 추가하지 않음.
 - 사용자 재요청 횟수: 0회. 다음: CI 결과 확인 → 사용자 승인 후 main 병합 → Release APK 태블릿 설치·피드백.
+- CI(추가 기록): `family-hangman-android` 실행 #1(`c158795`, run 41810360132) 전체 성공 — unit-tests, build(가족 키 지문·aapt2 권한 확인), emulator-offline-test(smoke 단계 성공 = `ANDROID SMOKE: PASS`, 실패 시 exit 1), release는 main 전용으로 건너뜀. APK 아티팩트 `FamilyHangman-v1.0.0-debug-apk`(2027-02-02 만료).
