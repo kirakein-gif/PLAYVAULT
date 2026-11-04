@@ -1527,3 +1527,14 @@
 - 미확인: 실물 저가형 태블릿 지연·화면·음량·진동·파일 공유. 게임의 출시/스토어 배포는 수행하지 않음.
 - 공통 관리 문서 5개 검토: STATUS/WORK_LOG/CHANGELOG 이번 작업 기록; AGENTS.md/CLAUDE.md 공통 절차 변경 없음.
 - 검토 담당/지적 수: 아직 교차 검토 전. 사용자 재요청 횟수: 0회. 다음: CI 최종 확인 → ChatGPT 초안 PR → Claude/Codex 교차 검토 → 사용자 병합 승인.
+
+### 2026-11-04 (Asia/Seoul) · BLOCK MASTER Android 오프라인 검증 통과·테스트 안정화
+
+- 담당/인계: ChatGPT(중단된 기존 세션의 `chatgpt/family-blocks-solo` 브랜치 인수). 최초 기준 main `4e7abd0`, 기존 작업·PR #28·원본 소스를 보존하고 신규 게임을 다시 만들지 않음.
+- 대상: `games/family-blocks/src/render/canvas.ts`, `tests/android/smoke.cjs`, `tests/e2e/run-e2e.mjs`, `docs/TEST_REPORT.md`, 개발 관리 문서. 버전 1.0.0 유지. 다른 게임·루트 런처·공용 자산·배포 설정 변경 없음.
+- 수정: (1) Android WebView에서 지원되지 않을 수 있는 Playwright `.tap()` 대신 실제 Android ADB `input tap`으로 앱 터치 검증, 터치 전후 상태·화면·결과·재실행 증거를 수집. (2) 브라우저 멀티터치 검사를 회전 가능한 고정 시드 T 블록으로 재현 가능하게 함(O 블록 회전 불변이라는 정상 규칙은 유지). (3) 화면 왼쪽 아래 이동 버튼과 겹치던 모드 이름 중복 렌더 제거.
+- 실패 이력 구분: 이전 실행 41808095710 Android 하드드롭 검사 실패, 41821010109 `.tap()` 지원 오류, 41822268923·41823050606 시험 선택자 파싱 오류, 41822593679 랜덤 O 블록의 회전 검사 오탐. 결함을 은폐하거나 검사를 생략하지 않고 수정 후 전체 CI 재실행.
+- 최종 실측 검증: GitHub Actions [41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763)에서 TypeScript 성공, Vitest 31/31, 오프라인 브라우저 E2E 11/11(853×533 및 1280×800, 60초 자동플레이, 외부 요청·JS 오류 각 0), 소스/웹 빌드 일치, Android APK 빌드·INTERNET 권한 없음·동일 가족 키 SHA-256 확인, Android 14 오프라인 에뮬레이터에서 실제 ADB 터치 이동/회전/하드드롭과 앱 완전 종료 후 기록 유지 성공. Android smoke 결과 errors 0/external 0.
+- 결과물: `FamilyBlocks-v1.0.0-debug-apk` Actions 아티팩트(13318451426, 임시 보관), `android-smoke-results`(13318571430), `family-blocks-browser-e2e`(13318266752). 소스는 Draft [PR #28](https://github.com/kirakein-gif/PLAYVAULT/pull/28)에 유지, 사용자 승인 전 main 병합·Release·배포 없음.
+- 미확인: 실물 저가형 Android 태블릿 조작 지연·프레임·소리 크기·진동·파일 공유, 타 AI(Claude Code/Codex) 교차 리뷰. GitHub Actions의 성공을 실제 태블릿 검증으로 확대하지 않음.
+- 다음 담당: 교차 검토(Claude/Codex) → 사용자 병합 승인 → main CI/Release → 실기 확인. 공통 관리 문서 5종 점검: STATUS/WORK_LOG/CHANGELOG 갱신, AGENTS.md/CLAUDE.md 변경 필요 없음. 사용자 추가 요청: 중단 후 이어서 진행 1회.
