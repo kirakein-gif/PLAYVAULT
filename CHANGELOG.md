@@ -349,3 +349,7 @@ PR #20, 기준00479e7 + 정정 규격abbcd8f(병합ffe7736). Noah 제자리 가�
 - [PR #24](https://github.com/kirakein-gif/PLAYVAULT/pull/24), 검토 브랜치 `1d32619` 병합 후 `ee8f57c`: 큰 Ethan으로 자동 교대한 같은 틱에 벽·봉쇄물·부서지지 않은 벽 밖으로 가장 가까운 좌우→아래 자리 보정(최대8단위). 천장/모서리 포함, 수동 교대와 다른 수치는 유지.
 - enemies17/17·exploration-edge13/13·exploration-browser6/6 및 요구 회귀 재실행. 검토 담당의 검사 정정본은 그대로 병합, 이전 검사 충돌2개 해소. 완주4214틱 유지. [이번 결과·로그](games/the-hollow-keep/next/assets/combat2-review/down-swap/TEST_RESULTS.md).
 - 최신 main `4e7abd0` 변경은 작업 브랜치에 보존 반영. 다른 게임·홈 화면에 새 수정 없음. 버전 번호 변경·main에 PR 병합·수동 배포 없음. 다음 Claude Code 재검토.
+
+## THE HOLLOW KEEP · 전투 2차 재검토 (2026-11-04, Asia/Seoul)
+
+- PR #24 `d66bc41` 재검토: 쓰러짐 자동 교대 자리 보정 확인, 요구 검사 전체 통과, 무작위 입력 94.2만 틱 겹침 0건. 발견 문제 0건. 사용자 병합 승인 대기. 게임 버전 번호 변경 없음.

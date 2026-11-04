@@ -1556,3 +1556,16 @@
 - 완주: 입력 파일 변경 없음(4214틱/70.2초). 실제 앱 키 입력으로8방·모든 장치/열쇠/출입문·특정 적2처치·defeat0·성문 복귀 UI 재확인. 이전 탐험 검사2개 충돌은 검토 담당 정정으로 해소됨. 새 결과·원본 로그·재현은 next/assets/combat2-review/down-swap/TEST_RESULTS.md; 이전 보고/실패 로그·캡처는 덮어쓰지 않음. 그림 생성 없음, 실물 모바일 손맛/성능은 미확인.
 - 5개 관리 문서 검토: STATUS·WORK_LOG·CHANGELOG 갱신, AGENTS·CLAUDE는 절차 변경 없음. 루트 README와 대상 규격/추가지시/실제소스 검토, next/README와 검증 안내 갱신. 병합으로 들어온 기존 체스 라이선스의 CRLF/공백 검사 경고는 고치지 않았으며, 이번 변경과 PR 관련 경로는 diff --check로 확인.
 - 버전: UI/게임/자산 버전 번호 변경 없음. 종료: 같은 PR #24 수정 제출, 다음 Claude Code 재검토. 검토 담당 Claude Code / 이전 발견1건 / 이번 수정의 재검토 아직 미실행. 이번 사용자 수정 재요청1회. main에 PR 병합·수동 배포 없음.
+
+### 2026-11-04 (Asia/Seoul) · PR #24(TASK_10 추가 수정 지시 1, `d66bc41`) 재검토
+
+- 담당 AI: Claude Code(검토).
+- 대상: PR #24 head `d66bc41`(`git archive` 사본, 로컬 HTTP 서버). 검토 브랜치 `1d32619`와 main `4e7abd0` 포함 확인. 검사 원본은 검토 브랜치와 같음(Codex 보완 검사 combat2-browser·down-swap-edge 추가만). main의 홈 화면·공개 진입 변경 보존 확인.
+- 자리 보정: `correctDownSwapPosition` — 교대 틱에 막힌 칸과 겹치면 같은 발 높이에서 좌우 최대 8단위 중 가장 가까운 빈 자리로 옮김.
+- 테스트 통과: enemies-contract 17/17, down-swap-edge 5/5, area-data 24/24, pixel-assets 135/135, weapons 22/22·edge 6/6, foundation 51/51·edge 16/16, exploration-contract 16/16·edge 13/13·browser 6/6, entrance 9/9, ladder-actions 10/10·edge 4/4, combo-render 5/5, pixel-render 구역·시험 방 7/7, ladder-render 7/7, tile-mosaic-render 7/7, keyboard-ime 7/7, mobile-layout 20/20, mobile-fullscreen 6/6, browser-playtest 20/20, room-traversal 4/4, combat2-browser 4/4, ABYSSFALL 회귀 3종 exit 0.
+- 무작위 입력: 2개 시드 × 314곳 × 1500틱(94.2만 틱) 주인공·적 겹침 0건, 방 밖 0건.
+- 회사 PC 미리보기 Artifact를 `d66bc41` 빌드로 갱신(버전 9, sim.js만 바뀜).
+- 검토 담당 / 발견 문제 수: Claude Code / 0건.
+- 사용자 재요청 횟수: 0회.
+- 다음: 사용자 손맛 확인·병합 승인 → PR #25(이 브랜치, PR #24 head 포함) main 병합 → PR #24 자동 병합 처리 확인.
+- 종료 상태: 재검토 완료, 사용자 판단 대기.

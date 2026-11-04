@@ -1,5 +1,12 @@
 # PLAYVAULT · 현재 개발 현황
 
+
+확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(THE HOLLOW KEEP PR #24 `d66bc41` 재검토 완료, 사용자 병합 승인 대기). 아래 기존 이력은 보존합니다.
+
+## 재검토 완료 · THE HOLLOW KEEP PR #24(전투 2차) / 사용자 병합 승인 대기
+
+2026-11-04 / Claude Code / `claude/hollow-keep-combat2-review`(PR #25, PR #24 head `d66bc41` 포함). 요구 검사 전체 통과, 무작위 입력 94.2만 틱 겹침 0건, 발견 0건. 회사 PC 미리보기 버전 9(`d66bc41`). 승인 시 PR #25 → main, PR #24 자동 병합 처리.
+
 ## 수정 제출 · TASK_10 추가 수정 지시 1 (2026-11-04) / PR #24
 
 확인일: **2026-11-04 (Asia/Seoul)** / Codex / `codex/hollow-keep-combat-enemies` / PR #24. 시작 `812d362`, 검토 `1d32619` 병합 `b4b4180`, 자리 보정 `ee8f57c`, 최신 main `4e7abd0` 보존 병합 `ca7ea74`. 사용자 지시로 검토 브랜치를 병합하고, 쓰러짐 교대 시 새 몸이 벽·닫힌 봉쇄물·부서지지 않은 벽에 묻히지 않도록 같은 틱에 최대8단위 좌우→아래 보정합니다. 수동 교대·무적·이동/무기 수치는 유지합니다.
