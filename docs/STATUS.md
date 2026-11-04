@@ -1,13 +1,12 @@
 # PLAYVAULT · 현재 개발 현황
 
-## 개발·검토 대기 · BLOCK MASTER v1.0.0 (ChatGPT 전담, 2026-11-04)
+## 구현·CI 검증 완료 · BLOCK MASTER v1.0.0 (Draft PR #28, 사용자 승인·교차검토 대기)
 
-- 담당: **ChatGPT**, 시작 main `4e7abd0`, 작업 브랜치 `chatgpt/family-blocks-solo`. 담당 범위 `games/family-blocks/`, `.github/workflows/family-blocks-android.yml`, 작업 관리 문서 3종.
-- 구현: 완전 오프라인 가족용 4칸 블록 게임. 차근차근 / 도전 / 40줄 달리기, 60Hz 시드 기반 순수 TS 엔진, 10×22칸, 킥·홀드·점수·고스트, 터치·키보드, 프로필 2개·한/영·기록·JSON 백업, 한 캔버스 원목 렌더링, 자체 작곡 음악.
-- Android: 체스와 별도 앱 ID `com.playvault.familyblocks`, 가족 고정 서명 키를 복사하고 웹·APK CI 구성. PLAYVAULT 루트 첫 화면 카드·다른 게임은 변경하지 않음.
-- 검증: GitHub Actions [run 41808095710](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41808095710)에서 Node 22 TypeScript 및 웹 빌드 통과, Vitest **31/31 통과**, 브라우저 E2E **11/11 통과**(853×533/1280×800, 동시 터치·한글 키코드·60초 자동 플레이), 외부 요청·콘솔 오류 0건. Android APK/오프라인 에뮬레이터는 해당 실행의 **결과 확인 대기**.
-- 브랜치 상태: 작업 중이며 PR 검토 후 사용자 승인 전 **main 병합 및 Release·배포 금지**.
-- 후속: Android CI 성공 여부 확인, docs/TEST_REPORT.md 업데이트, 다른 AI(Claude Code 또는 Codex)의 교차 검토, 태블릿 실기 조작감·음량·진동 확인.
+- 2026-11-04 / 담당 **ChatGPT** / 시작 main `4e7abd0` / 브랜치 `chatgpt/family-blocks-solo` / [Draft PR #28](https://github.com/kirakein-gif/PLAYVAULT/pull/28). 중단된 기존 세션의 코드를 인수하여 해당 브랜치에만 후속 수정. 게임 폴더·전용 CI·관리 문서만 변경하고 타 게임/루트 `index.html`/공용 자산/배포 설정 변경 없음.
+- 기능: 완전 오프라인 4칸 블록 퍼즐(7종 시드 묶음), 차근차근·도전·40줄 달리기, 60Hz 게임 엔진·회전 킥·홀드·고스트·점수, 터치·키보드, 한영·2프로필·기록·JSON 백업, 원목 스킨·자작 음악. Android 앱 ID `com.playvault.familyblocks`, 체스와 같은 가족 고정 서명 키, PC 웹 빌드 `play/`.
+- 최신 검증: [GitHub Actions 41823354763](https://github.com/kirakein-gif/PLAYVAULT/actions/runs/41823354763) **전체 필수 단계 성공**(TypeScript, Vitest 31/31, 브라우저 E2E 11/11 / 853×533·1280×800·60초 자동 플레이 / 외부 요청 및 JS 오류 0, APK 생성·가족 키 지문·INTERNET 권한 없음, Android 14 오프라인 에뮬레이터 ADB 실제 터치 이동·회전·즉시 낙하·앱 재실행 후 기록 유지). Release 단계는 main이 아니므로 계획대로 건너뜀.
+- 화면·검사 개선: 게임 아래쪽 모드 이름이 좌하단 이동 버튼과 겹치던 문제 제거; 브라우저 멀티터치 고정 시드와 Android ADB 입력 테스트 안정화. 게임 버전 **1.0.0 유지**.
+- 남은 일: Claude Code/Codex 교차 리뷰(아직 안 함), 사용자 승인 후 main 병합·Release 영구 보관, 실물 저가형 태블릿 터치 지연·성능·소리·진동·파일 공유 확인. **main 병합·웹 공개 배포·Release 미수행**.
 
 확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
 
