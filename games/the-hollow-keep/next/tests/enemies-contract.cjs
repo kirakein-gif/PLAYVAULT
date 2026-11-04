@@ -203,7 +203,8 @@ test('shield: 앞에서 맞은 2단 충전탄은 막지 못하고 stagger — �
   const hp1 = en(w, 's1').hp;
   assert.ok(hp1 < sh.hp, '충전탄 피해 없음');
   run(w, I(), 2);
-  const ev2 = until(w, (i) => I({ attack: i === 0 }), (W, e) => has(e, 'hit', { target: 's1' }) || has(e, 'blocked'), 50);
+  // 충전탄 뒤 공격 대기가 끝나는 대로 1단이 나가도록 눌렀다 뗐다 반복(방패형 위치에 따라 대기 중일 수 있음)
+  const ev2 = until(w, (i) => I({ attack: i % 2 === 0 }), (W, e) => has(e, 'hit', { target: 's1' }) || has(e, 'blocked'), 50);
   assert.ok(has(ev2, 'hit', { target: 's1' }) && !has(ev2, 'blocked'), 'stagger 중 1단이 막힘');
 });
 
@@ -315,6 +316,56 @@ test('shield 밀치기(§5-1, 2026-11-04 보완): 판정은 방패 앞 bashReach
   w = setup(20); let hurt = null;
   for (let t = 0; t < 60 && !hurt; t++) { const ev = HK.step(w, I()); const h = ev.find((e) => e.type === 'hurt'); if (h) hurt = h; }
   assert.ok(hurt && hurt.damage === c.bashDamage, `거리 20에서 밀치기 피해 ${c.bashDamage}를 받지 않음(${JSON.stringify(hurt)})`);
+});
+
+// 위층 바닥(12행, 윗면 y 360)을 사다리(15열)가 지나고 양옆은 발판 — COMBAT2 §6-1 사다리 층계참
+function twoFloors(objects, { from = 3, to = 28, through = false } = {}) {
+  const set = [];
+  if (through) for (let r = 8; r <= 11; r++) set.push([r, 15, 'H']); // 사다리가 위층 바닥을 지나 더 올라감(꼭대기가 아닌 층계참)
+  for (let c = from; c <= to; c++) set.push([12, c, c === 15 ? 'H' : c === 14 || c === 16 ? '-' : '#']);
+  for (let r = 13; r <= 16; r++) set.push([r, 15, 'H']);
+  return room([0, 0], { set, objects });
+}
+const UPPER = 360;
+
+test('적 반응(§4-1, 2026-11-04 보완): 사다리에 매달린 주인공에게는 반응하지 않고 순찰, 사다리에서 내린 뒤 ladderGraceTicks 동안 공격을 시작하지 않음', () => {
+  const grace = HK.CONFIG.ladderGraceTicks;
+  assert.ok(Number.isFinite(grace) && grace >= 20, `CONFIG.ladderGraceTicks ${grace} ≥ 20`);
+  for (const [kind, col] of [['shield', 18], ['crawler', 19]]) {
+    const a = area({ room: 'a', hero: 'ethan', ...at('ethan', 15) }, { a: twoFloors([enemy('s', kind, col, 11, { face: -1 })]) });
+    const w = world(a, { hp: { ethan: 6, noah: 5 } });
+    const xs = []; let left = -1, attackStart = -1;
+    for (let t = 0; t < 400 && attackStart < 0; t++) {
+      const climbingBefore = P(w).climbing, p0 = P(w);
+      const goingUp = left < 0 && !(p0.onGround && !p0.climbing && p0.y + p0.h <= UPPER + 0.5);
+      HK.step(w, I({ up: goingUp }));
+      const p = P(w), e = en(w, 's');
+      if (left < 0 && climbingBefore && !p.climbing && p.y + p.h <= UPPER + 0.5) left = t;
+      if (p.climbing) { xs.push(e.x); assert.ok(!['windup', 'bash', 'charge'].includes(e.state), `${kind}: 사다리에 매달린 주인공에게 ${e.state}(${t}틱)`); }
+      if (left >= 0 && ['windup', 'charge'].includes(e.state)) attackStart = t;
+    }
+    assert.ok(left >= 0, `${kind}: 주인공이 위층에 오르지 못함(검사 준비)`);
+    assert.ok(Math.max(...xs) - Math.min(...xs) >= 10, `${kind}: 주인공이 사다리를 오르는 동안 ${(Math.max(...xs) - Math.min(...xs)).toFixed(1)}단위만 움직임(순찰하지 않고 기다림)`);
+    assert.ok(attackStart < 0 || attackStart - left >= grace, `${kind}: 사다리에서 내린 ${left}틱 뒤 ${attackStart - left}틱 만에 공격 시작(기준 ${grace})`);
+  }
+});
+
+test('적 순찰(§4-1): 지상 적은 바닥 높이의 사다리 칸(양옆 바닥·발판)을 건너가고, 다른 층 주인공을 따라와 기다리지 않음', () => {
+  for (const kind of ['shield', 'crawler']) {
+    // 주인공은 아래층 왼쪽(다른 층), 적은 위층 사다리 오른쪽에서 왼쪽으로 순찰
+    const a = area({ room: 'a', hero: 'ethan', ...at('ethan', 4) }, { a: twoFloors([enemy('s', kind, 20, 11, { face: -1 })], { through: true }) });
+    const w = world(a);
+    let crossed = false, minX = Infinity, maxX = -Infinity;
+    const limit = Math.ceil((2 * 26 * T) / E(kind).speed); // 위층을 한 번 왕복할 시간
+    for (let t = 0; t < limit; t++) {
+      HK.step(w, I()); const e = en(w, 's');
+      assert.ok(Math.abs(e.y + e.h - UPPER) < 0.5, `${kind}: 위층에서 떨어짐(${t}틱, 발 ${(e.y + e.h).toFixed(1)})`);
+      if (e.x + e.w / 2 < 15 * T) crossed = true;
+      minX = Math.min(minX, e.x); maxX = Math.max(maxX, e.x);
+    }
+    assert.ok(crossed, `${kind}: 사다리 칸(15열)을 건너가지 못함(x ${minX.toFixed(0)}~${maxX.toFixed(0)})`);
+    assert.ok(minX <= 5 * T && maxX + E(kind).width >= 26 * T, `${kind}: 위층 양 끝까지 오가지 않음(x ${minX.toFixed(0)}~${(maxX + E(kind).width).toFixed(0)}, 바닥 3~28열)`);
+  }
 });
 
 test('결정성: 같은 입력 → 같은 결과(적·피격·교대 섞음)', () => {

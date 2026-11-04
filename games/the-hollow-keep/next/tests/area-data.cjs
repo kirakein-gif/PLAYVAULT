@@ -356,6 +356,21 @@ check('적 배치(COMBAT2 §4): 적 몸이 벽과 겹치지 않고, 땅 위 적�
   }
   assert.deepEqual(bad, [], bad.join(' / '));
 });
+if (REQ) check('COMBAT2 §6-1 사다리 층계참: 사다리가 지나는 바닥 줄에서 사다리 양옆 빈칸이 없음(발판 -로 이어짐)', () => {
+  const bad = [];
+  for (const [id, r] of Object.entries(area.rooms)) {
+    const g = r.grid;
+    for (let y = 1; y < g.length; y++) for (let x = 1; x < 31; x++) {
+      if (g[y][x] !== 'H') continue;
+      for (const dx of [-1, 1]) {
+        const c = x + dx, o = x + 2 * dx;
+        // 사다리 바깥 칸이 바닥(# 또는 -)이고 그 위가 비어 있는 줄 = 사다리가 지나는 바닥 줄
+        if (g[y][c] === '.' && (g[y][o] === '#' || g[y][o] === '-') && g[y - 1][o] !== '#' && g[y - 1][c] === '.') bad.push(`${id} ${y}행 ${c}열`);
+      }
+    }
+  }
+  assert.deepEqual(bad, [], `사다리 옆 바닥이 끊긴 칸 ${bad.length}곳: ${bad.slice(0, 6).join(', ')}`);
+});
 if (REQ) check('COMBAT2 §6: 적 8마리 이상·3종 각 2 이상·두 종류가 함께 있는 방, 시작 방은 적 없고 쉼터 있음, 특정 적 봉쇄물(방패형 포함), 구역에 표적 없음', () => {
   const es = objects.filter((o) => o.type === 'enemy'), bad = [];
   if (es.length < 8) bad.push(`적 ${es.length}마리`);
