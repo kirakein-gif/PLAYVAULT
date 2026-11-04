@@ -41,7 +41,9 @@ try{
     });
     const page=await context.newPage();
     page.on('pageerror',e=>result.errors.push(String(e)));
-    await page.goto(url);
+    // Stable scenario seed 77 starts with a T piece. Random starts can be O,
+    // whose rotation is intentionally a no-op; that must not fail multi-touch.
+    await page.goto(url+'?seed=77');
     await page.getByTestId('start-gentle').waitFor({timeout:30000});
     return {context,page};
   }
@@ -119,7 +121,10 @@ try{
         return {a:centre('[data-testid=ctrl-left]'),b:centre('[data-testid=ctrl-cw]')};
       });
       const cdp=await context.newCDPSession(page);
-      const rot0=await page.evaluate(()=>window.__familyBlocksState.active.rotation);
+      const initial=await page.evaluate(()=>({rotation:window.__familyBlocksState.active.rotation,
+        kind:window.__familyBlocksState.active.kind}));
+      assert(initial.kind==='T','fixed-seed multi-touch setup unexpectedly changed: '+initial.kind);
+      const rot0=initial.rotation;
       await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.a.x,y:bounds.a.y,id:1}]});
       await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.a.x,y:bounds.a.y,id:1},{x:bounds.b.x,y:bounds.b.y,id:2}]});
       await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[{x:bounds.a.x,y:bounds.a.y,id:1}]});
