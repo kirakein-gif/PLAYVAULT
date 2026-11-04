@@ -1517,3 +1517,34 @@
 - 범위 조정: 사용자가 딸깍 배지 10회 목적지 변경과 PLAYVAULT 메인 분위기 정리를 Codex로 별도 진행하기로 함. 이 세션에서 `ddalkkak-hub`에 착수했던 목적지 변경(로컬)은 사용자 지시로 폐기, 원격 푸시 없음. 위치 안내만 전달: PLAYVAULT `index.html`(카드 `<section class="grid">`)·`assets/site.css`, ddalkkak-hub `site/index.html` 20행 `data-game-url`·`site/easter-egg.js`·`functions/[[path]].js`.
 - 관리 문서: STATUS·WORK_LOG·CHANGELOG·DEVELOPMENT_SUMMARY 갱신. AGENTS·CLAUDE 절차 변경 없음.
 - 사용자 재요청 횟수: 0회. 다음: 태블릿 1회 재설치·실기 확인.
+
+### 2026-11-04 (Asia/Seoul) · 가족 블록 게임 1차 작업지시서 (Claude Code → ChatGPT)
+
+- 요청: "체스마스터 만든 컨셉으로 테트리스를 앱으로 만들고 싶습니다" → 선택 답변: 1차 범위 "혼자 하기만 먼저", 배포 "Android APK + PC 웹", 담당 "ChatGPT에게 맡기려 함, 작업지시서를 만들어 달라. 아이가 같은 태블릿에서", 질문 "판매하지 않으면 이름 괜찮지 않을까요?", "테트리스 음악도 저작권 걸릴까요?".
+- 기준: main `4e7abd0`(fetch 확인), 작업 브랜치 `ccr-33a67370-6aa4yx`. 체스 `games/family-chess-premium/`의 package.json·capacitor·vite 설정·android 서명·storage·platform·audio·i18n·CI workflow를 읽고 재사용 범위를 지시서에 명시.
+- 변경: `games/family-blocks/docs/GPT_TASK_01.md` 신규(규칙 수치·조작·스킨·소리·데이터 구조·검사 목록·제출물). STATUS 맨 위 항목 추가. 게임 코드 없음.
+- 답변 요지(법률 자문 아님): 비판매여도 상표·저작권 침해 여부 자체는 남음. 가족 태블릿 개인 설치는 실질 위험 낮음, 공개 사이트(PLAYVAULT 웹)는 위험이 있어 상표 용어 미사용·외형 차별화 권장 → 지시서는 가칭 BLOCK MASTER. 「코로베이니키」 민요 선율은 공유 저작물이나 게임판 편곡·녹음은 보호 대상 → 직접 편곡 또는 자작곡, 출처 기록.
+- 검증: 문서 전용. `git diff --check` 확인. 지시서 수치(등장 열·고정 대기 15회·낙하 표)의 서로 간 일관성 검토. 실행 테스트 없음.
+- 관리 문서: STATUS·WORK_LOG 갱신. CHANGELOG는 게임이 아직 없어 변경 없음. AGENTS·CLAUDE 검토 — ChatGPT도 AGENTS 적용 대상이라 절차 변경 없음(역할 분담표 조정은 사용자 결정 사항으로 남김).
+- 사용자 재요청 횟수: 0회. 다음: 사용자가 지시서를 ChatGPT에 전달 → ChatGPT 구현·draft PR → 교차 검토.
+
+### 2026-11-04 (Asia/Seoul) · HANGMAN MASTER v1.0.0 1차 구현 (Claude Code)
+
+- 요청: "같은 컨셉으로 행맨 게임 만들어줘요. 이건 코드에서 독자적으로 갑시다." → Claude Code가 직접 구현(작업지시서·다른 AI 없음). 사용자 개별 지시가 역할 분담표("신규 1차 구현 = Codex")보다 우선.
+- 기준: main `4e7abd0`(fetch 확인), 브랜치 `ccr-33a67370-6aa4yx`(앞 커밋 `77dfeb4` 블록 게임 지시서 포함). 다른 열린 작업과 경로 겹침 없음(새 폴더).
+- 판단(사용자에게 보고): ① 교수대 그림은 아이용으로 부적절하다고 보고 **풍선 바구니**로 대체(6번 기회, 다 날아가면 바구니가 언덕에 내려앉음). ② 한글 자모 행맨은 받침·조합 문제로 1차 제외, **영어 단어 + 한국어 뜻**(학습 겸용). ③ 난이도는 글자 수로 결정(검증 가능). ④ "둘이서"를 가족 대국 대응 모드로.
+- 변경: `games/family-hangman/` 전체 신규 — `src/game/hangman.ts`(순수 규칙), `words.ts`(358단어 자작 목록), `storage/schema.ts`(새 형식·검증·`recordSolo`), 화면 6개, `BalloonScene`·`LetterKeyboard`, CSS(체스 공통 규칙 복사 + 새 규칙), 체스에서 복사한 `platform/native.ts`·`audio/sound.ts`·`i18n.ts`·`ui.tsx`·`icons.tsx`·`store.ts`·`backup.ts`(저장 키 `fhm.*`, 백업 파일명·폴더명 변경), `android/`(체스 프로젝트 복사, 앱 ID `com.playvault.familyhangman`, 키 파일 복사), `scripts/build-icons.cjs`(풍선 아이콘·스플래시 생성 후 결과 커밋), `play/` 웹 빌드, 단위·E2E·Android smoke 테스트, README·LICENSES·`docs/TEST_REPORT.md`. 새 CI `.github/workflows/family-hangman-android.yml`(체스 workflow 복사, aapt2로 INTERNET 권한 없음 확인 단계 추가). 루트 README 게임 목록 한 줄.
+- 검증(이번 실행): tsc 통과, Vitest 26/26, `npm run build`·`build:web` 통과, `play/` 2회 빌드 해시 동일, 오프라인 E2E 12/12(dist)·12/12(play), 외부 요청 0, 저장소 루트 정적 서버 하위 경로·`← PLAYVAULT` 이동 확인. 첫 E2E 실행은 CSS 미닫힌 `@media` 괄호(체스 CSS 발췌 실수)로 10/12 실패 → 수정 후 통과. 853×533 스크린샷에서 자판 오른쪽 잘림을 발견(테스트가 자판 전체 상자만 검사해 통과했었음) → 키 크기·열 비율 수정, 줄 끝 키 검사 추가 후 통과.
+- 미실행: APK 빌드·에뮬레이터(이 환경 Android SDK 차단 → push 후 CI). 실제 태블릿 미확인.
+- 관리 문서: STATUS·WORK_LOG·CHANGELOG 갱신, 루트 README 한 줄. AGENTS·CLAUDE 검토, 절차 변경 없음. 루트 `index.html` 카드는 Codex 메인 화면 작업과 겹쳐 추가하지 않음.
+- 사용자 재요청 횟수: 0회. 다음: CI 결과 확인 → 사용자 승인 후 main 병합 → Release APK 태블릿 설치·피드백.
+- CI(추가 기록): `family-hangman-android` 실행 #1(`c158795`, run 41810360132) 전체 성공 — unit-tests, build(가족 키 지문·aapt2 권한 확인), emulator-offline-test(smoke 단계 성공 = `ANDROID SMOKE: PASS`, 실패 시 exit 1), release는 main 전용으로 건너뜀. APK 아티팩트 `FamilyHangman-v1.0.0-debug-apk`(2027-02-02 만료).
+
+### 2026-11-04 (Asia/Seoul) · HANGMAN MASTER 그림 선택 옵션 (Claude Code)
+
+- 요청: "행맨이니까 영어만이요. 풍선 아이디어도 좋습니다. 이건 옵션에서 선택할 수 있게 합시다." → 단어는 영어만 유지(한글 자모 모드 만들지 않음, 한국어 뜻 표시는 유지), 그림을 설정에서 고르게 함.
+- 변경: `src/components/ClassicScene.tsx`(교수대 + 머리·몸·팔2·다리2, 맞히면 줄 없이 언덕에서 손 흔드는 사람; 같은 하늘·언덕 배경, 차분한 분필색 선), `Scene.tsx`(선택에 따라 두 그림 전환), 프로필 `picture: 'balloon' | 'classic'`(기본 풍선, 이전 저장 데이터·잘못된 값은 풍선으로 복구), 설정 "그림" 줄, 클래식일 때 "기회 n번 남음"·"기회 1번" 문구, 한/영 문자열, `play/` 재빌드.
+- 검증(이번 실행): tsc 통과, Vitest 27/27(그림 설정 검증 1개 추가), E2E 13/13(dist)·13/13(play), 외부 요청 0. 새 E2E: 클래식 선택 → 2번 틀리면 부위 2개, 지면 6개, 맞히면 풀려난 그림, 새로고침 후 유지, 다른 사용자는 풍선 유지. CI는 push 후 다시 실행.
+- 관리 문서: STATUS·CHANGELOG·WORK_LOG, 게임 README·TEST_REPORT 갱신. AGENTS·CLAUDE 변경 없음. 버전 1.0.0 유지(아직 main 미병합 첫 버전).
+- 사용자 재요청 횟수: 0회(기능 추가 요청 1회). 다음: CI 확인 → 사용자 승인 후 main 병합.
+- CI #3(`1cdad61`, run 41813876364, 그림 옵션 포함) 전체 성공. 사용자에게 APK 아티팩트 링크 전달(GitHub 로그인 필요, zip 안에 APK). 영구 Release 링크는 main 병합 후 생성.

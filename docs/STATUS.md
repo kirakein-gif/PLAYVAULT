@@ -1,6 +1,20 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
+확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(HANGMAN MASTER 1차 구현, 가족 블록 게임 작업지시서). 아래 기존 이력은 보존합니다.
+
+## 구현 · HANGMAN MASTER v1.0.0 (가족 행맨, `games/family-hangman/`) / CI APK 확인·사용자 실기 대기
+
+2026-11-04 / Claude Code / `ccr-33a67370-6aa4yx` / 기준 main `4e7abd0`. 사용자 요청: "같은 컨셉으로 행맨 게임 만들어줘요. 이건 코드에서 독자적으로 갑시다" → Claude Code 직접 구현(역할 분담표보다 사용자 지시 우선). 범위: 새 폴더 `games/family-hangman/`, 새 CI `.github/workflows/family-hangman-android.yml`, 루트 README 한 줄. 체스·다른 게임·루트 `index.html`·공용 자산 변경 없음.
+- 내용: 혼자 하기(기초 영어 358단어·10주제·한국어 뜻, 난이도=글자 수), 둘이서(단어+한글 힌트 입력 → 건네기), 단어장(통계·맞힌/놓친 단어·놓친 단어 다시 하기), 그림은 설정에서 사용자별 선택 — 풍선 바구니(기본)/클래식 행맨(2026-11-04 사용자 결정 "풍선 아이디어 좋다, 옵션에서 선택"), 단어는 영어만(사용자 확인), 힌트 2종, 별 1~3. 체스 공통 모듈(저장·백업·한영·효과음·Capacitor 래퍼·UI) 복사, 앱 ID `com.playvault.familyhangman`(영구), 같은 가족 서명 키.
+- 검증(이번 세션): tsc, 단위 26/26, 오프라인 E2E 12/12(dist·play 각각, 외부 0), 웹 빌드 재현, 하위 경로·PLAYVAULT 링크. CI #1(`c158795`) 전체 통과 — APK 빌드·가족 키·INTERNET 없음·Android 14 에뮬레이터 오프라인 검사. 그림 옵션 포함 CI #3(`1cdad61`, run 41813876364)도 전체 통과. 최신 debug APK: 그 실행의 `FamilyHangman-v1.0.0-debug-apk`(아티팩트 13313108751, 2027-02-02 만료).
+- 남은 일: 사용자 승인 후 main 병합(Release `family-hangman-v1.0.0` 생성) → 태블릿 설치·아이 피드백. PLAYVAULT 첫 화면 카드는 Codex 메인 화면 작업 뒤 별도. PR 미제출, 병합·배포 없음.
+
+## 작업지시서 제출 · 가족 블록 게임(가칭 BLOCK MASTER) 1차 혼자 하기 / ChatGPT 구현 대기
+
+2026-11-04 / Claude Code / `ccr-33a67370-6aa4yx` / 기준 main `4e7abd0`. 사용자 요청: "체스마스터 컨셉으로 테트리스를 앱으로", 1차는 **혼자 하기만**, Android APK + PC 웹, 아이가 체스와 **같은 태블릿**에서 사용. 사용자 지정으로 **구현 담당 ChatGPT**(역할 분담표보다 사용자 지시 우선).
+- 지시서: `games/family-blocks/docs/GPT_TASK_01.md` — 폴더 `games/family-blocks/`, 앱 ID `com.playvault.familyblocks`(영구 고정), 작업 브랜치 `chatgpt/family-blocks-solo`, 모드 3종(차근차근·도전·40줄), 원목 스킨 1종, 체스 공통 모듈 복사 재사용, 같은 가족 서명 키, CI 4단계, 단위·E2E 검사 목록.
+- 결정 대기(사용자): 화면 이름 — 지시서는 상표를 피한 가칭 `BLOCK MASTER`(상수 1곳). 배경음 — 자작곡 또는 민요 「코로베이니키」 선율 직접 편곡(기존 게임 편곡·음원 복사 금지).
+- 범위 밖: 2인·컴퓨터 대전·복기·아카데미·스킨 추가·PLAYVAULT 카드(메인 화면은 Codex 작업 중). 게임 코드 없음, 병합·배포 없음.
 
 ## 병합 완료 · CHESS MASTER PC 웹 버전 + PLAYVAULT 카드 + 고정 서명 키·Release (PR #26 → main `48440c9`, 2026-11-04)
 

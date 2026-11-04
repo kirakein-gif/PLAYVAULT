@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Hangman Master</string>
+    <string name="title_activity_main">Hangman Master</string>
+    <string name="package_name">com.playvault.familyhangman</string>
+    <string name="custom_url_scheme">com.playvault.familyhangman</string>
+</resources>
