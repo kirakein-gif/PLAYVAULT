@@ -1,4 +1,4 @@
-import { BOARD_W, BOARD_H, HIDDEN_H, KINDS, CLEAR_TICKS, LOCK_TICKS, MAX_LOCK_RESETS, LINE_SCORES, gravityTicks, type Kind, type Mode } from './config';
+import { BOARD_W, BOARD_H, KINDS, CLEAR_TICKS, LOCK_TICKS, MAX_LOCK_RESETS, LINE_SCORES, gravityTicks, type Kind, type Mode } from './config';
 import { blocks, kicks, spawn, type ActivePiece } from './pieces';
 export type Cell = Kind | null;
 export type Phase = 'active' | 'clearing' | 'over' | 'won';
