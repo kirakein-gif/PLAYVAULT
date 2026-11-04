@@ -1,4 +1,4 @@
-package com.playvault.familychess;
+package com.playvault.familyblocks;
 
 import android.os.Bundle;
 import android.webkit.WebView;

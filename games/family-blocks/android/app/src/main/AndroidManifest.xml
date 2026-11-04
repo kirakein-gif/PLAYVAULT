@@ -3,9 +3,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_block_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_block_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
@@ -36,7 +36,7 @@
     </application>
 
     <!-- Permissions
-         No INTERNET permission: the engine, puzzles, fonts, images and sounds are all
+         No INTERNET permission: the block puzzle, fonts and synthesized sounds are all
          inside the APK and Capacitor serves them locally (https://localhost).
          Storage permission is only needed on Android 9 and older to export backups
          to the public Documents folder. -->

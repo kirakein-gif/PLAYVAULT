@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.playvault.familychess"
+    namespace = "com.playvault.familyblocks"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.playvault.familychess"
+        applicationId "com.playvault.familyblocks"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -21,7 +21,7 @@ android {
     // old one and keeps the saved records. Personal sideload use only; not for Play.
     signingConfigs {
         family {
-            storeFile file('../family-chess.keystore')
+            storeFile file('../family-blocks.keystore')
             storePassword 'familychess'
             keyAlias 'familychess'
             keyPassword 'familychess'

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Chess Master</string>
-    <string name="title_activity_main">Chess Master</string>
-    <string name="package_name">com.playvault.familychess</string>
-    <string name="custom_url_scheme">com.playvault.familychess</string>
+    <string name="app_name">Block Master</string>
+    <string name="title_activity_main">Block Master</string>
+    <string name="package_name">com.playvault.familyblocks</string>
+    <string name="custom_url_scheme">com.playvault.familyblocks</string>
 </resources>
