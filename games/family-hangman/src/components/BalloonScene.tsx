@@ -20,7 +20,7 @@ export function BalloonScene({ lives, state }: { lives: number; state: 'playing'
   const dy = state === 'won' ? -14 : state === 'lost' ? 85 : (MAX_LIVES - lives) * 14;
   const mouth = state === 'lost' ? 'M-4 3 h8' : 'M-5 2 q5 5 10 0';
   return (
-    <svg className={`scene ${state}`} viewBox="0 0 400 380" role="img" aria-label={`${lives}/${MAX_LIVES}`} data-testid="scene" data-lives={lives}>
+    <svg className={`scene ${state}`} viewBox="0 0 400 380" role="img" aria-label={`${lives}/${MAX_LIVES}`} data-testid="scene" data-lives={lives} data-picture="balloon">
       <defs>
         <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#1a2834" />

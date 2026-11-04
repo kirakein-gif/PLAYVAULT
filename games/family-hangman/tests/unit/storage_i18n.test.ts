@@ -51,6 +51,22 @@ describe('storage', () => {
     expect(v.data.profiles.p1.stats.played).toBe(0);
   });
 
+  it('picture: balloon by default, classic kept, anything else repaired', () => {
+    const d = defaultData() as unknown as Record<string, any>;
+    expect(d.profiles.p1.picture).toBe('balloon');
+    d.profiles.p1.picture = 'classic';
+    d.profiles.p2.picture = 'gallows3d';
+    const v = validateData(d);
+    expect(v.ok).toBe(true);
+    if (!v.ok) return;
+    expect(v.data.profiles.p1.picture).toBe('classic');
+    expect(v.data.profiles.p2.picture).toBe('balloon');
+    // data saved before this option existed
+    delete d.profiles.p1.picture;
+    const old = validateData(d);
+    expect(old.ok && old.data.profiles.p1.picture).toBe('balloon');
+  });
+
   it('rejects broken or foreign data', () => {
     expect(validateData(null).ok).toBe(false);
     expect(validateData({ schema: 99, profiles: {}, profileOrder: [] }).ok).toBe(false);

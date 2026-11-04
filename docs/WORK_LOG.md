@@ -1539,3 +1539,11 @@
 - 관리 문서: STATUS·WORK_LOG·CHANGELOG 갱신, 루트 README 한 줄. AGENTS·CLAUDE 검토, 절차 변경 없음. 루트 `index.html` 카드는 Codex 메인 화면 작업과 겹쳐 추가하지 않음.
 - 사용자 재요청 횟수: 0회. 다음: CI 결과 확인 → 사용자 승인 후 main 병합 → Release APK 태블릿 설치·피드백.
 - CI(추가 기록): `family-hangman-android` 실행 #1(`c158795`, run 41810360132) 전체 성공 — unit-tests, build(가족 키 지문·aapt2 권한 확인), emulator-offline-test(smoke 단계 성공 = `ANDROID SMOKE: PASS`, 실패 시 exit 1), release는 main 전용으로 건너뜀. APK 아티팩트 `FamilyHangman-v1.0.0-debug-apk`(2027-02-02 만료).
+
+### 2026-11-04 (Asia/Seoul) · HANGMAN MASTER 그림 선택 옵션 (Claude Code)
+
+- 요청: "행맨이니까 영어만이요. 풍선 아이디어도 좋습니다. 이건 옵션에서 선택할 수 있게 합시다." → 단어는 영어만 유지(한글 자모 모드 만들지 않음, 한국어 뜻 표시는 유지), 그림을 설정에서 고르게 함.
+- 변경: `src/components/ClassicScene.tsx`(교수대 + 머리·몸·팔2·다리2, 맞히면 줄 없이 언덕에서 손 흔드는 사람; 같은 하늘·언덕 배경, 차분한 분필색 선), `Scene.tsx`(선택에 따라 두 그림 전환), 프로필 `picture: 'balloon' | 'classic'`(기본 풍선, 이전 저장 데이터·잘못된 값은 풍선으로 복구), 설정 "그림" 줄, 클래식일 때 "기회 n번 남음"·"기회 1번" 문구, 한/영 문자열, `play/` 재빌드.
+- 검증(이번 실행): tsc 통과, Vitest 27/27(그림 설정 검증 1개 추가), E2E 13/13(dist)·13/13(play), 외부 요청 0. 새 E2E: 클래식 선택 → 2번 틀리면 부위 2개, 지면 6개, 맞히면 풀려난 그림, 새로고침 후 유지, 다른 사용자는 풍선 유지. CI는 push 후 다시 실행.
+- 관리 문서: STATUS·CHANGELOG·WORK_LOG, 게임 README·TEST_REPORT 갱신. AGENTS·CLAUDE 변경 없음. 버전 1.0.0 유지(아직 main 미병합 첫 버전).
+- 사용자 재요청 횟수: 0회(기능 추가 요청 1회). 다음: CI 확인 → 사용자 승인 후 main 병합.

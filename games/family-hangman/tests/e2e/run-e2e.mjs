@@ -137,6 +137,7 @@ await test('two players: the guesser finds the word (with Korean hint)', async (
   const page = await newPage();
   await startTwo(page, 'cat', '고양이');
   assert((await page.getAttribute('[data-testid=word]', 'data-len')) === '3', 'word length');
+  assert((await page.getAttribute('[data-testid=scene]', 'data-picture')) === 'balloon', 'balloons by default');
   assert((await page.textContent('[data-testid=clue]')).includes('고양이'), 'hint shown');
   await typeWord(page, 'zca');
   assert((await lives(page)) === 5, 'one miss');
@@ -263,6 +264,43 @@ await test('back during a round asks first', async () => {
   await click(page, 'back');
   await click(page, 'confirm-yes');
   await page.waitForSelector('[data-testid=entry], [data-testid=menu-solo]');
+});
+
+await test('picture option: classic hangman per player, kept after reload', async () => {
+  const page = await newPage();
+  await click(page, 'settings-btn');
+  await click(page, 'picture-classic');
+  await click(page, 'settings-close');
+  await startTwo(page, 'cat');
+  assert((await page.getAttribute('[data-testid=scene]', 'data-picture')) === 'classic', 'classic scene');
+  assert((await page.textContent('[data-testid=lives]')).includes('기회'), 'classic wording');
+  await typeWord(page, 'zq');
+  assert((await page.locator('[data-testid=part]').count()) === 2, 'two parts after two misses');
+  await page.screenshot({ path: join(out, 'classic-playing.png') });
+  await typeWord(page, 'cat');
+  await page.waitForSelector('[data-testid=freed]');
+  await page.screenshot({ path: join(out, 'classic-won.png') });
+  await click(page, 'result-new');
+  await typeWord(page, 'dog');
+  await click(page, 'two-next');
+  await click(page, 'two-go');
+  await typeWord(page, 'abcefh');
+  await page.waitForSelector('[data-testid=result][data-result=lost]');
+  assert((await page.locator('[data-testid=part]').count()) === 6, 'six parts when lost');
+  await page.screenshot({ path: join(out, 'classic-lost.png') });
+  await page.waitForTimeout(500);
+  await page.reload();
+  await page.waitForSelector('[data-testid=menu-two]');
+  await startTwo(page, 'cat');
+  assert((await page.getAttribute('[data-testid=scene]', 'data-picture')) === 'classic', 'kept after reload');
+  // the other player still has the balloons
+  await page.goto(BASE);
+  await page.waitForSelector('[data-testid=settings-btn]');
+  await click(page, 'settings-btn');
+  await click(page, 'use-p2');
+  await click(page, 'settings-close');
+  await startTwo(page, 'cat');
+  assert((await page.getAttribute('[data-testid=scene]', 'data-picture')) === 'balloon', 'other player unchanged');
 });
 
 await test('English UI and settings', async () => {

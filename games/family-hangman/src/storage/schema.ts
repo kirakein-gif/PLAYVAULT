@@ -7,6 +7,9 @@ export const SCHEMA_VERSION = 1;
 export const APP_ID = 'family-hangman';
 
 export type Lang = 'ko' | 'en';
+/** Picture for wrong guesses, chosen per player in Settings. */
+export type Picture = 'balloon' | 'classic';
+export const PICTURES: Picture[] = ['balloon', 'classic'];
 
 export interface WordRecord {
   played: number;
@@ -29,6 +32,7 @@ export interface Profile {
   name: string;
   lang: Lang;
   level: Level | 'all';
+  picture: Picture;
   category: CategoryId | 'all';
   words: Record<string, WordRecord>;
   recent: string[]; // most recent last, capped at RECENT_MAX
@@ -60,6 +64,7 @@ export function newProfile(id: string, name: string, lang: Lang = 'ko'): Profile
     name,
     lang,
     level: 'easy',
+    picture: 'balloon',
     category: 'all',
     words: {},
     recent: [],
@@ -134,6 +139,7 @@ export function validateData(raw: unknown): { ok: true; data: AppData } | { ok: 
     profiles[id] = {
       ...base,
       level: (LEVELS as string[]).includes(p.level as string) || p.level === 'all' ? (p.level as Profile['level']) : 'easy',
+      picture: p.picture === 'classic' ? 'classic' : 'balloon',
       category: CATEGORIES.some((c) => c.id === p.category) || p.category === 'all' ? (p.category as Profile['category']) : 'all',
       words: cleanWords(p.words),
       recent: Array.isArray(p.recent) ? (p.recent as unknown[]).filter((x): x is string => typeof x === 'string').slice(-RECENT_MAX) : [],

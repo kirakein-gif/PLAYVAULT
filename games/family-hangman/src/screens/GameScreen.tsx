@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '../state';
 import { Btn, Confirm, Modal, TopBar } from '../components/ui';
 import { Stars } from '../components/icons';
-import { BalloonScene } from '../components/BalloonScene';
+import { Scene } from '../components/Scene';
 import { LetterKeyboard, letterFromKey } from '../components/LetterKeyboard';
 import { sound } from '../audio/sound';
 import {
@@ -145,8 +145,8 @@ export function GameScreen(props: Props) {
       <TopBar title={title} onBack={leave} right={<span className="streak">{props.mode === 'solo' && profile.stats.streak > 1 ? t('game.streak', { n: profile.stats.streak }) : ''}</span>} />
       <div className="gameBody">
         <div className="sceneBox">
-          <BalloonScene lives={lives} state={st} />
-          <p className="livesText" data-testid="lives">{t('game.lives', { n: lives })}</p>
+          <Scene picture={profile.picture} lives={lives} state={st} />
+          <p className="livesText" data-testid="lives">{t(profile.picture === 'classic' ? 'game.livesClassic' : 'game.lives', { n: lives })}</p>
         </div>
         <div className="playBox">
           <div className="slots" data-testid="word" data-len={round.word.length}>
@@ -167,7 +167,7 @@ export function GameScreen(props: Props) {
                 {t('game.meaningBtn')}
               </Btn>
               <Btn size="sm" kind="ghost" disabled={!canLetterHint(round)} testId="hint-letter" onClick={() => { setRound((r) => letterHint(r)); sound.play('wrong'); }}>
-                {t('game.letterBtn')} <small>({t('game.letterCost')})</small>
+                {t('game.letterBtn')} <small>({t(profile.picture === 'classic' ? 'game.letterCostClassic' : 'game.letterCost')})</small>
               </Btn>
             </div>
           )}

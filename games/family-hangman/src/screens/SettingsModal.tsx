@@ -6,7 +6,7 @@ import { backupFileName, makeBackup, parseBackup } from '../storage/backup';
 import { replaceAll } from '../storage/store';
 import { pickTextFile, saveTextFile, shareFile, isNative } from '../platform/native';
 import { sound } from '../audio/sound';
-import type { AppData } from '../storage/schema';
+import { PICTURES, type AppData } from '../storage/schema';
 import { APP_TITLE, APP_VERSION } from '../brand';
 import { WORDS } from '../game/words';
 
@@ -20,7 +20,7 @@ export function deviceInfo(): string {
 
 export function SettingsModal() {
   const app = useApp();
-  const { t, settings, updateSettings, data, setData, lang, setLang, openSettings, click, toast } = app;
+  const { t, settings, updateSettings, data, setData, lang, setLang, openSettings, click, toast, profile, updateProfile } = app;
   const [renaming, setRenaming] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [pending, setPending] = useState<{ data: AppData; text: string } | null>(null);
@@ -77,6 +77,22 @@ export function SettingsModal() {
           )}
           {isNative && row(t('settings.haptics'), <Toggle on={settings.haptics} onChange={(v) => updateSettings({ haptics: v })} />)}
           {row(t('settings.lowPower'), <Toggle testId="set-lowpower" on={settings.lowPower} onChange={(v) => updateSettings({ lowPower: v })} />, t('settings.lowPowerDesc'))}
+          {row(
+            t('settings.picture'),
+            <div className="segmented">
+              {PICTURES.map((pic) => (
+                <button
+                  key={pic}
+                  className={profile.picture === pic ? 'on' : ''}
+                  data-testid={`picture-${pic}`}
+                  onClick={() => { click(); updateProfile((p) => ({ ...p, picture: pic })); }}
+                >
+                  {t(`settings.pictures.${pic}`)}
+                </button>
+              ))}
+            </div>,
+            t('settings.pictureDesc'),
+          )}
           {row(
             t('settings.language'),
             <div className="segmented">

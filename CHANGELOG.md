@@ -8,7 +8,7 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 
 ## HANGMAN MASTER · 2026-11-04 v1.0.0 첫 버전 (새 게임)
 
-`games/family-hangman/`. CHESS MASTER와 같은 컨셉의 오프라인 Android 태블릿 + PC 웹 영어 단어 맞히기. 혼자 하기(358단어·10주제·한국어 뜻·난이도 3단계+섞기), 둘이서(단어·한글 힌트 입력 후 건네기), 단어장(통계·놓친 단어 다시 하기), 풍선 바구니 그림(6번 기회), 뜻/글자 힌트, 별 1~3, 프로필 2개·한/영·백업. 단위 26/26, 오프라인 E2E 12/12(외부 0). APK는 새 CI `family-hangman-android`. 브랜치 `ccr-33a67370-6aa4yx`, main 병합 전(WORK_LOG 2026-11-04 참조).
+`games/family-hangman/`. CHESS MASTER와 같은 컨셉의 오프라인 Android 태블릿 + PC 웹 영어 단어 맞히기. 혼자 하기(358단어·10주제·한국어 뜻·난이도 3단계+섞기), 둘이서(단어·한글 힌트 입력 후 건네기), 단어장(통계·놓친 단어 다시 하기), 그림 선택(풍선 바구니 기본·클래식 행맨, 사용자별 설정, 6번 기회), 뜻/글자 힌트, 별 1~3, 프로필 2개·한/영·백업. 단위 27/27, 오프라인 E2E 13/13(외부 0), CI #1 APK·에뮬레이터 통과(그림 옵션 이전 커밋 기준). APK는 새 CI `family-hangman-android`. 브랜치 `ccr-33a67370-6aa4yx`, main 병합 전(WORK_LOG 2026-11-04 참조).
 
 ## CHESS MASTER · 2026-11-04 PC 웹 버전
 
