@@ -63,28 +63,52 @@ try{
         assert(await page.getByTestId('game-screen').isVisible(),'game canvas absent');
         const gameState=await page.evaluate(()=>({
           mode:window.__familyBlocksState?.mode,boardRows:window.__familyBlocksState?.board.length,
-          preview:window.__familyBlocksState?.queue.length
+          preview:window.__familyBlocksState?.queue.length,active:{...window.__familyBlocksState.active}
         }));
         assert(gameState.mode===mode&&gameState.boardRows===22&&gameState.preview>=3,'wrong game setup');
+        assert(gameState.active.kind==='T'&&gameState.active.y===1,
+          'seeded T must spawn with its bottom row visible immediately: '+JSON.stringify(gameState.active));
         await page.screenshot({path:join(dir,mode+'-'+width+'.png')});
+        // Verify a real painted cell in the first visible row, not just a ghost.
+        const painted=await page.evaluate(()=>{
+          const cv=document.querySelector('.game-canvas'),s=window.__familyBlocksState;
+          const w=cv.clientWidth,h=cv.clientHeight,dpr=cv.width/w;
+          const cell=Math.max(13,Math.floor(Math.min((h-30)/20,(w-450)/10)));
+          const bx=Math.floor((w-cell*10)/2),by=Math.floor((h-cell*20)/2);
+          const x=Math.round((bx+(s.active.x+1.5)*cell)*dpr);
+          const y=Math.round((by+cell/2)*dpr);
+          return [...cv.getContext('2d').getImageData(x,y,1,1).data];
+        });
+        assert(painted[0]+painted[1]+painted[2]>125,
+          'first-row block is not visibly painted: '+painted.join(','));
         // Real pointer event produced by Playwright click, not an artificial onClick call.
         const before=await page.evaluate(()=>window.__familyBlocksState.active.x);
         await page.getByTestId('ctrl-left').click();
         const after=await page.evaluate(()=>window.__familyBlocksState.active.x);
-        assert(after<=before,'left button did not move');
+        assert(after===before-1,'left button must move exactly one cell: '+before+' → '+after);
         await page.getByTestId('ctrl-cw').click();
         await page.getByTestId('ctrl-drop').click();
         const blocks=await page.evaluate(()=>window.__familyBlocksState.board.flat().filter(Boolean).length);
         assert(blocks>=4,'hard drop did not lock a piece');
         const metrics=await page.evaluate(()=>{
           const w=innerWidth,h=innerHeight,cell=Math.max(13,Math.floor(Math.min((h-30)/20,(w-450)/10)));
-          const bx=Math.floor((w-cell*10)/2),left=document.querySelector('.left-controls').getBoundingClientRect(),
+          const bx=Math.floor((w-cell*10)/2),by=Math.floor((h-cell*20)/2);
+          const left=document.querySelector('.left-controls').getBoundingClientRect(),
             right=document.querySelector('.right-controls').getBoundingClientRect();
+          const hold=document.querySelector('[data-testid=ctrl-hold]').getBoundingClientRect();
+          const ctx=document.querySelector('.game-canvas').getContext('2d');
+          ctx.font='600 20px Nunito, "Gowun Dodum", sans-serif';
+          const level='레벨  '+window.__familyBlocksState.level;
+          const x=bx+cell*10+25+7,y=by+cell*20*.80;
+          const label={left:x,top:y-21,right:x+ctx.measureText(level).width,bottom:y+5};
+          const clear=(r)=>r.right<=hold.left||r.left>=hold.right||r.bottom<=hold.top||r.top>=hold.bottom;
           return {leftClear:left.right<=bx,rightClear:right.left>=bx+cell*10,
+            levelHoldClear:clear(label),levelRect:label,holdRect:{x:hold.x,y:hold.y,width:hold.width,height:hold.height},
             inViewport:[left.left>=0,right.right<=innerWidth,left.bottom<=innerHeight,right.bottom<=innerHeight],
             bodyOverflow:document.documentElement.scrollWidth>innerWidth};
         });
         assert(metrics.leftClear&&metrics.rightClear,'controls overlap the board');
+        assert(metrics.levelHoldClear,'level label overlaps hold button: '+JSON.stringify(metrics));
         assert(metrics.inViewport.every(Boolean)&&!metrics.bodyOverflow,'controls clip viewport');
         await page.getByTestId('pause').click();
         await page.getByTestId('quit').click(); // JS confirm auto-dismiss unless handled
@@ -106,7 +130,7 @@ try{
         window.dispatchEvent(new KeyboardEvent('keyup',{code:'ArrowLeft',key:'ㅁ',bubbles:true}));
       });
       const b=await page.evaluate(()=>window.__familyBlocksState.active.x);
-      assert(b<=a,'event.code handler missed Korean key event');
+      assert(b===a-1,'Korean keycode must move exactly one cell: '+a+' → '+b);
       await page.keyboard.press('Escape');
       assert(await page.getByTestId('pause-overlay').isVisible(),'Esc did not pause');
       await page.getByTestId('resume').click();
@@ -135,9 +159,25 @@ try{
       page.once('dialog',d=>d.accept());
       await page.getByTestId('quit').click();
       assert(await page.getByTestId('game-result').isVisible(),'quit should save a result');
+      await page.getByRole('button',{name:/처음으로|Home/}).last().click();
+      await page.getByRole('button',{name:/기록|Records/}).last().click();
+      const snapshot=await page.evaluate(()=>({
+        challenge:document.querySelector('[data-testid=record-challenge]')?.textContent,
+        recent:[...document.querySelectorAll('[data-testid=recent-games] p')].map(e=>e.textContent),
+      }));
+      assert(/게임 횟수:\s*[1-9]/.test(snapshot.challenge??''),'saved challenge games count is missing');
+      assert(snapshot.recent.some(t=>t.includes('도전')),'saved challenge entry is missing');
+      // Don't reload until Preferences has actually flushed the completed game.
+      await page.waitForFunction(()=>Object.keys(localStorage)
+        .some(k=>k.includes('family-blocks.data.v1')),{},{polling:100,timeout:10000});
       await page.reload();
       await page.getByRole('button',{name:/기록|Records/}).last().click();
-      assert(await page.getByTestId('records').isVisible(),'records not retained after refresh');
+      const reloaded=await page.evaluate(()=>({
+        challenge:document.querySelector('[data-testid=record-challenge]')?.textContent,
+        recent:[...document.querySelectorAll('[data-testid=recent-games] p')].map(e=>e.textContent),
+      }));
+      assert(JSON.stringify(reloaded)===JSON.stringify(snapshot),
+        'saved games count or recent records changed after reload: '+JSON.stringify({snapshot,reloaded}));
     });
     await context.close();
   }
