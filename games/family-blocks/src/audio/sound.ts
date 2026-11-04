@@ -32,7 +32,7 @@ class AudioEngine {
     };
     const tones=f[name];
     for(let i=0;i<tones.length;i++)
-      setTimeout(()=>this.tone(tones[i],name==='end'?.19:.1,this.volume*(name==='move'?.045:.13),'triangle'),i*65);
+      setTimeout(()=>this.tone(tones[i],name==='end' ? 0.19 : 0.1,this.volume*(name==='move'?.045:.13),'triangle'),i*65);
   }
   syncMusic(){
     if(this.timer){clearInterval(this.timer);this.timer=null;}

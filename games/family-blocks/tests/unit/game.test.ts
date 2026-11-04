@@ -105,6 +105,12 @@ describe('Tick-accurate gravity, locking and drop actions',()=>{
     step(s,true);expect(s.active.y).toBe(y);
     step(s,true);expect(s.active.y).toBe(y+1);expect(s.score).toBe(1);
   });
+  it('soft drop overrides natural gravity even at the fastest start level',()=>{
+    const s=createGame('challenge',10), y=s.active.y;
+    for(let i=0;i<10;i++)step(s,true);
+    expect(s.active.y).toBe(y+5);
+    expect(s.score).toBe(5);
+  });
   it('hard drop scores 2 per cell, locks immediately',()=>{
     const s=createGame('challenge');const y=s.active.y;
     const length=hardDrop(s);

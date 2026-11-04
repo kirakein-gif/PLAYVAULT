@@ -71,6 +71,13 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Offline browser E2E (two tablet sizes + 60s autoplay)
         run: node tests/e2e/run-e2e.mjs
+      - name: Save browser layout screenshots and test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: family-blocks-browser-e2e
+          path: games/family-blocks/test-results/e2e
+          if-no-files-found: warn
       - name: Committed web build (play/) matches the source
         run: |
           npm run build:web
@@ -117,6 +124,13 @@ jobs:
           cp android/app/build/outputs/apk/debug/app-debug.apk out/FamilyBlocks-v1.0.0-debug.apk
           ls -l out
           unzip -l out/FamilyBlocks-v1.0.0-debug.apk | grep -E "assets/.*[.]js|index[.]html"
+      - name: Assert packaged APK has no INTERNET permission
+        run: |
+          AAPT=$(ls -d $ANDROID_HOME/build-tools/*/aapt | sort -V | tail -1)
+          $AAPT dump permissions out/FamilyBlocks-v1.0.0-debug.apk | tee out/permissions.txt
+          if grep -q 'android.permission.INTERNET' out/permissions.txt; then
+            echo 'Offline policy violation in packaged APK'; exit 1
+          fi
       - name: Verify the fixed family signing key
         run: |
           APKSIGNER=$(ls -d $ANDROID_HOME/build-tools/*/apksigner | sort -V | tail -1)

@@ -33,25 +33,23 @@ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
    await wait(500);
  }
  async function tap(q){
-   const pos=await page.evaluate(sel=>{
-     const rect=document.querySelector(sel).getBoundingClientRect();
-     return {x:rect.x+rect.width/2,y:rect.y+rect.height/2,w:innerWidth,h:innerHeight};
-   },q);
-   const dims=(await device.shell('wm size')).toString();
-   const m=dims.match(/(\d+)x(\d+)/);
-   const w=m?Number(m[1]):1280,h=m?Number(m[2]):800;
-   await device.shell('input tap '+Math.round(pos.x*w/pos.w)+' '+Math.round(pos.y*h/pos.h));
-   await wait(350);
+   await waitSelector(q);
+   // Coordinate mapping through the WebView avoids mixing the Android
+   // status/task bars (physical 1280×800) with CSS viewport height (~716).
+   // Playwright sends a real touchscreen tap, not a JS-dispatched event.
+   await page.locator(q).tap({force:true,timeout:15000});
+   await wait(450);
  }
  await waitSelector('[data-testid=start-gentle]');
  log('home loaded',{size:await page.evaluate(()=>[innerWidth,innerHeight])});
+ await wait(1300);
  await device.screenshot({path:path.join(out,'home.png')});
  await click('[data-testid=start-gentle]');
  await waitSelector('[data-testid=game-screen]');
  const before=await page.evaluate(()=>window.__familyBlocksState.active.x);
  await tap('[data-testid=ctrl-left]');
  const after=await page.evaluate(()=>window.__familyBlocksState.active.x);
- if(after>before)throw Error('Left touch moved in the wrong direction');
+ if(after!==before-1)throw Error('Physical left tap did not move the active piece by one cell: '+before+' → '+after);
  await tap('[data-testid=ctrl-cw]');
  await tap('[data-testid=ctrl-drop]');
  const pieces=await page.evaluate(()=>window.__familyBlocksState.board.flat().filter(Boolean).length);

@@ -40,7 +40,7 @@ export function exitApp() {
 export async function haptic(kind: 'light' | 'medium' | 'heavy') {
   try {
     if (isNative) await Haptics.impact({ style: kind === 'light' ? ImpactStyle.Light : kind === 'medium' ? ImpactStyle.Medium : ImpactStyle.Heavy });
-    else if (navigator.vibrate) navigator.vibrate(kind === 'light' ? 8 : kind === 'medium' ? 14 : 22);
+    // Web has no vibration. This is an Android-only family-app feature.
   } catch {
     /* devices without a vibrator simply skip haptics */
   }

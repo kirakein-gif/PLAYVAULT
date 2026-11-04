@@ -149,18 +149,22 @@ export function step(s: GameState, soft=false) {
     return;
   }
   if(soft) {
+    // Soft drop replaces natural gravity while held: exactly 1 cell / 2 ticks.
+    s.gravityCounter=0;
     s.softCounter++;
     if(s.softCounter>=2) {
       s.softCounter=0;
       const p={...s.active,y:s.active.y+1};
-      if(fits(s,p)){afterPlacement(s,p,grounded(s));s.score++;s.gravityCounter=0;}
+      if(fits(s,p)){afterPlacement(s,p,grounded(s));s.score++;}
     }
-  } else s.softCounter=0;
-  s.gravityCounter++;
-  if(s.gravityCounter>=gravityTicks(s.level)) {
-    s.gravityCounter=0;
-    const p={...s.active,y:s.active.y+1};
-    if(fits(s,p)) afterPlacement(s,p,grounded(s));
+  } else {
+    s.softCounter=0;
+    s.gravityCounter++;
+    if(s.gravityCounter>=gravityTicks(s.level)) {
+      s.gravityCounter=0;
+      const p={...s.active,y:s.active.y+1};
+      if(fits(s,p)) afterPlacement(s,p,grounded(s));
+    }
   }
   if(grounded(s)) {
     s.lockCounter++;

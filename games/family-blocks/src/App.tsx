@@ -25,6 +25,7 @@ export default function App(){
   const [startLevel,setStartLevel]=useState(1);
   const [session,setSession]=useState(0);
   const [result,setResult]=useState<GameState|null>(null);
+  const [newBest,setNewBest]=useState(false);
   useEffect(()=>{
     let mounted=true;
     void loadData().then(({data:loaded,recovered})=>{
@@ -55,6 +56,16 @@ export default function App(){
     setSession(v=>v+1);setScreen('play');
   };
   const finish=(game:GameState)=>{
+    const existing=data.profiles.find(p=>p.id===data.activeProfileId)??data.profiles[0];
+    const achieved=game.mode==='gentle'
+      ? game.lines>existing.records.gentle.bestLinesOneGame
+      : game.mode==='challenge'
+        ? game.score>existing.records.challenge.bestScore ||
+          game.level>existing.records.challenge.bestLevel ||
+          game.lines>existing.records.challenge.bestLines
+        : game.phase==='won' && (existing.records.sprint40.bestMs===null ||
+          Math.round(game.ticks*1000/60)<existing.records.sprint40.bestMs);
+    setNewBest(achieved);
     const next=recordGame(data,game);persist(next);
     setResult(game);setScreen('result');sound.suspend();
   };
@@ -198,6 +209,7 @@ export default function App(){
         <p className="eyebrow">{T('finish')}</p>
         <h1>{result.phase==='won'?T('done'):result.phase==='over'?T('over'):T('noRecord')}</h1>
         <p>{T(result.mode)}</p>
+        <p className="result-feedback" role="status">{newBest?T('newRecord'):T('noRecord')}</p>
         <div className="result-stats"><div><small>{T('score')}</small><strong>{result.score.toLocaleString()}</strong></div>
           <div><small>{T('lines')}</small><strong>{result.lines}</strong></div>
           <div><small>{T('level')}</small><strong>{result.level}</strong></div>
