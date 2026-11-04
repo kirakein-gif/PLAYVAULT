@@ -1554,3 +1554,12 @@
 - 사용자 승인("병합해주세요"). main `4e7abd0` 변화 없음 확인 후 PR #29 생성 → merge commit `2185514`(head `e3cc8a0`, 블록 게임 지시서 포함).
 - main CI #4(run 41814988727) 전체 성공, release 작업이 Release `family-hangman-v1.0.0` 생성: APK 12,318,895 bytes(digest sha256:2a7a04f1…), `.sha256` 업로드 확인. 사이트 배포는 Cloudflare Pages의 main 자동 반영 방식(카드 없음, 직접 확인 못 함).
 - 이 기록은 병합 후 작업 브랜치에 추가한 커밋으로, main에는 다음 병합 때 반영.
+
+### 2026-11-04 (Asia/Seoul) · BLOCK MASTER PR #28 교차 검토 (검토 Claude Code / 구현 ChatGPT)
+
+- 요청: "태트리스 교차검증 해주세요". 대상 `chatgpt/family-blocks-solo` head `99d5e45`(base main `4e7abd0`). 검토 담당이므로 구현 브랜치 수정 없음 — 코드는 `git archive`로 scratchpad에 내보내 실행.
+- 재현: `npm ci`, tsc 통과, Vitest 32/32, build, PR E2E 11/11(외부 0, 오류 0). 범위 확인(게임 폴더·새 workflow·관리 문서 3개), 상표 용어 없음, chess.js·stockfish 번들 미포함.
+- 규칙 대조: SRS 벽 차기 16항목(y 반전 포함), 회전, 등장 열, 고정 30틱·15회, 드롭 점수, 레벨, 40줄, 홀드, 7개 묶음 — 모두 지시서와 일치.
+- 발견 7건: [높음] 생성 y=0이 숨은 2줄 안이라 새 블록이 레벨 1에서 1~2초 보이지 않음(seed 77, 48틱 캡처로 확인, 원인 일부는 지시서 문구 모호 — 기준 정정 전달). [중간] Android 뒤로가기(홈·설정에서 확인 없이 종료, 일시정지 중 나갈 수 없음). [중간] E2E 단언 약함(`after<=before`, 기록 유지 내용 미확인, 캔버스 글자 겹침 미검사). [경미] 차근차근 그만하기 결과 문구 중복, 미사용 의존성, 미리보기 작음(실기 판단), main과 문서 3개 충돌.
+- PR #28에 리뷰(COMMENT — 같은 계정 PR이라 변경 요청 불가)로 기록. 평가: 검토 담당 Claude Code, 발견 문제 7건(수정 요청 3), 사용자 재요청 0회.
+- 다음: ChatGPT 수정 → Claude Code 재검토 → 사용자 승인 후 병합.

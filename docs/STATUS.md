@@ -2,6 +2,10 @@
 
 확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(HANGMAN MASTER 1차 구현, 가족 블록 게임 작업지시서). 아래 기존 이력은 보존합니다.
 
+## 교차 검토 · BLOCK MASTER PR #28 (ChatGPT 구현) / 수정 요청 → 재검토 대기
+
+2026-11-04 / 검토 Claude Code / head `99d5e45`. 재현: tsc, Vitest 32/32, E2E 11/11(외부 0). SRS 표·고정·점수·레벨 등 규칙은 지시서와 일치. 수정 요청 3건(높음: 새 블록이 숨은 줄에서 생성돼 1~2초 안 보임 / 중간: Android 뒤로가기, E2E 약한 단언), 경미 4건(결과 문구 중복, 미사용 의존성, 미리보기 크기, main과 문서 3개 충돌). 구현 브랜치 수정 없음. 병합 보류.
+
 ## 병합 완료 · HANGMAN MASTER v1.0.0 (PR #29 → main `2185514`, 2026-11-04) / 사용자 실기 대기
 
 - main CI #4 전체 통과, **Release `family-hangman-v1.0.0`** 생성: `FamilyHangman-v1.0.0-debug.apk`(12,318,895 bytes) + `.sha256`. https://github.com/kirakein-gif/PLAYVAULT/releases/tag/family-hangman-v1.0.0
