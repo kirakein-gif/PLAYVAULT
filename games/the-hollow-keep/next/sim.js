@@ -302,6 +302,23 @@
     Object.assign(p,{x:start.x,y:start.y,w:c.width,h:c.height,vx:0,vy:0,face:1,climbing:false,ladderLock:0,knockTicks:0,hurtTicks:0,invuln:CONFIG.downSwapInvulnTicks,coyote:0,jumpBuffer:0,jumpKind:null,takeoffVx:0,charge:{ticks:0,level:0},combo:{step:0,started:0,buffered:false}});
     p.onGround=supported(p,[...w.room.solids,...(w.room.platforms||[])]);ev.push({type:'respawn',hero});
   }
+  function correctDownSwapPosition(w,p) {
+    const {x,y}=p,limit=8,solids=w.room.solids;
+    const free=body=>body.x>=0&&body.x+body.w<=w.room.width&&body.y>=0&&body.y+body.h<=w.room.height
+      &&!solids.some(s=>overlap(body,s));
+    if(free(p))return;
+    // Exact solid boundaries retain fractional coordinates (e.g. the 1.5-unit
+    // width increase). Prefer the nearest sideways escape at the same feet.
+    const offsets=[0,-x,w.room.width-p.w-x,...solids.flatMap(s=>[s.x-p.w-x,s.x+s.w-x])]
+      .filter(dx=>Math.abs(dx)<=limit).sort((a,b)=>Math.abs(a)-Math.abs(b)||a-b);
+    for(const dx of offsets){const body={...p,x:x+dx};if(free(body)){p.x=body.x;return;}}
+    // Growing under a ceiling can require lowering the body; a corner can
+    // require both axes. Keep the whole correction within eight units.
+    const lower=[...new Set(solids.map(s=>s.y+s.h-y).filter(dy=>dy>0&&dy<=limit))];
+    const candidates=lower.flatMap(dy=>offsets.map(dx=>({dx,dy,distance:Math.hypot(dx,dy)})))
+      .filter(c=>c.distance<=limit).sort((a,b)=>a.distance-b.distance||Math.abs(a.dx)-Math.abs(b.dx)||a.dx-b.dx);
+    for(const {dx,dy} of candidates){const body={...p,x:x+dx,y:y+dy};if(free(body)){p.x=body.x;p.y=body.y;return;}}
+  }
   function hurtPlayer(w,source,damage,ev) {
     const p=w.player;if(p.invuln)return;
     const hero=w.active,h=w.heroes[hero],dir=Math.sign(p.x+p.w/2-source.x-source.w/2)||-source.face||-1;
@@ -310,7 +327,13 @@
     ev.push({type:'hurt',hero,damage,hp:h.hp});
     if(h.down){
       ev.push({type:'down',hero});const to=hero==='ethan'?'noah':'ethan',next=w.heroes[to];
-      if(!next.down){const c=CONFIG.heroes[to];Object.assign(p,{x:p.x+(p.w-c.width)/2,y:p.y+p.h-c.height,w:c.width,h:c.height,invuln:CONFIG.downSwapInvulnTicks,charge:{ticks:0,level:0},combo:{step:0,started:0,buffered:false}});w.active=to;w.attacks=w.attacks.filter(a=>a.kind==='projectile');w.swapCooldown=CONFIG.swapCooldownTicks;ev.push({type:'swap',from:hero,to,reason:'down'});}
+      if(!next.down){
+        const c=CONFIG.heroes[to];
+        Object.assign(p,{x:p.x+(p.w-c.width)/2,y:p.y+p.h-c.height,w:c.width,h:c.height,invuln:CONFIG.downSwapInvulnTicks,charge:{ticks:0,level:0},combo:{step:0,started:0,buffered:false}});
+        correctDownSwapPosition(w,p);
+        w.active=to;w.attacks=w.attacks.filter(a=>a.kind==='projectile');w.swapCooldown=CONFIG.swapCooldownTicks;
+        ev.push({type:'swap',from:hero,to,reason:'down'});
+      }
       else {ev.push({type:'defeat'});respawn(w,ev);}
     }
   }
