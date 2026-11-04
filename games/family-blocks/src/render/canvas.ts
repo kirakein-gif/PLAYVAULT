@@ -113,8 +113,9 @@ export function renderGame(canvas:HTMLCanvasElement,s:GameState,settings:Setting
   label(c,t(lang,'score'),right+7,by+bh*.62,16,'#c3b29c');
   label(c,s.score.toLocaleString(),right+7,by+bh*.62+36,Math.min(29,Math.max(23,cell*1.2)));
   label(c,t(lang,'level')+'  '+s.level,right+7,by+bh*.80,20);
-  label(c,s.mode==='gentle'?t(lang,'gentle'):s.mode==='challenge'?t(lang,'challenge'):t(lang,'sprint40'),
-    left+5,by+bh-12,16,'#bda98b');
+  // The current mode is already named in the top-left HTML chip.
+  // Do not draw it at the bottom-left: that rail is reserved for the
+  // physical touch buttons and would overlap them even at 1280x800.
   return {boardX:bx,boardY:by,cell,boardRight:bx+bw};
 }
 export function formatTime(ms:number):string{
