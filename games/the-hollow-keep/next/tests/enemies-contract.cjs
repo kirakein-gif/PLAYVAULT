@@ -259,6 +259,64 @@ test('쓰러짐 교대: 더 큰 Ethan이 벽·닫힌 봉쇄물에 묻히지 않�
   }
 });
 
+test('피격 판정(§2-1, 2026-11-04 보완): getHurtbox는 몸에서 앞뒤 hurtInset 안쪽, 적 몸이 이 상자에 닿아야 맞음', () => {
+  const inset = HK.CONFIG.hurtInset;
+  assert.ok(Number.isFinite(inset) && inset >= 3 && inset <= 6, `CONFIG.hurtInset ${inset} (3~6)`);
+  for (const hero of ['ethan', 'noah']) {
+    const a = area({ room: 'a', hero, ...at(hero, 8) }, { a: room([0, 0], { objects: [enemy('c', 'crawler', 20)] }) });
+    const w = world(a, { hero });
+    HK.step(w, I({ right: true }));
+    const hb = HK.getHurtbox(w), p = P(w);
+    assert.ok(Math.abs(hb.x - (p.x + inset)) < 1e-6 && Math.abs(hb.w - (p.w - 2 * inset)) < 1e-6 && hb.y === p.y && hb.h === p.h, `${hero} getHurtbox ${JSON.stringify(hb)}`);
+    let found = false;
+    for (let t = 0; t < 600 && !found; t++) {
+      const before = { ...P(w) }; const ev = HK.step(w, I());
+      if (has(ev, 'hurt')) {
+        const e = en(w, 'c'), pen = Math.min(before.x + before.w, e.x + e.w) - Math.max(before.x, e.x);
+        assert.ok(pen >= inset - 0.01, `${hero}: 돌격형 몸이 주인공 몸에 ${pen.toFixed(2)}단위만 겹쳤는데 맞음(그림보다 먼저 맞음, 기준 ${inset} 이상)`);
+        found = true;
+      }
+    }
+    assert.ok(found, `${hero}: 돌격형에 맞지 않음(검사 준비)`);
+  }
+});
+
+test('shield 밀치기(§5-1, 2026-11-04 보완): 판정은 방패 앞 bashReach(그림 효과)만 — 준비 중 거리를 두면 피하고, 다음 준비까지 recoveryTicks 이상', () => {
+  const c = E('shield');
+  assert.ok(c.bashReach >= 24 && c.bashReach <= 40, `bashReach ${c.bashReach} (24~40)`);
+  assert.ok(c.bashRange > c.bashReach, `준비 시작 거리 bashRange ${c.bashRange}가 판정 bashReach ${c.bashReach}보다 커야 물러나 피할 수 있음`);
+  assert.ok(c.recoveryTicks >= 80, `recoveryTicks ${c.recoveryTicks} ≥ 80 (너무 자주 밀침)`);
+  const sx = 16 * T + T / 2 - c.width / 2; // 방패형 왼쪽 끝(앞)
+  const setup = (gap) => {
+    const a = area({ room: 'a', hero: 'ethan', x: sx - gap - cfg('ethan').width, y: FLOOR - cfg('ethan').height }, { a: room([0, 0], { objects: [enemy('s', 'shield', 16, 16, { face: -1 })] }) });
+    const w = world(a); HK.step(w, I({ right: true })); return w;
+  };
+  // 거리 45: 준비는 시작하지만 밀치기는 닿지 않는다
+  let w = setup(45), sawBash = false, bashEnd = -1;
+  for (let t = 0; t < 80; t++) {
+    const ev = HK.step(w, I()), boxes = HK.getEnemyHitboxes(w), s = en(w, 's');
+    assert.ok(!has(ev, 'hurt'), `거리 45에서 ${t}틱에 맞음(방패 앞 ${c.bashReach}만 닿아야 함)`);
+    if (s.state === 'bash') {
+      sawBash = true;
+      assert.equal(boxes.length, 1, 'bash 중 getEnemyHitboxes 1개');
+      const b = boxes[0];
+      assert.ok(Math.abs(b.x + b.w - s.x) < 0.01 && Math.abs(b.w - c.bashReach) < 0.01, `밀치기 판정 ${JSON.stringify(b)}이 방패 앞(왼쪽 ${s.x.toFixed(1)}) ${c.bashReach}가 아님`);
+    } else {
+      assert.equal(boxes.length, 0, `${s.state} 중에 적 공격 판정이 있음`);
+      if (sawBash && bashEnd < 0) bashEnd = t;
+    }
+  }
+  assert.ok(sawBash && bashEnd > 0, '거리 45에서 준비·밀치기가 일어나지 않음(검사 준비)');
+  // 다음 준비까지의 간격(맞아서 밀려나도 됨)
+  let next = -1;
+  for (let t = 80; t < bashEnd + 200 && next < 0; t++) { HK.step(w, I()); if ((en(w, 's') || {}).state === 'windup') next = t; } // 위 반복이 80틱을 이미 진행함
+  assert.ok(next < 0 || next - bashEnd >= c.recoveryTicks, `밀치기 끝 ${bashEnd}틱 → 다음 준비 ${next}틱, 간격 ${next - bashEnd} < recoveryTicks ${c.recoveryTicks}`);
+  // 거리 20: 밀치기에 맞는다(피해 2), 맞는 순간 판정이 피격 상자와 겹침
+  w = setup(20); let hurt = null;
+  for (let t = 0; t < 60 && !hurt; t++) { const ev = HK.step(w, I()); const h = ev.find((e) => e.type === 'hurt'); if (h) hurt = h; }
+  assert.ok(hurt && hurt.damage === c.bashDamage, `거리 20에서 밀치기 피해 ${c.bashDamage}를 받지 않음(${JSON.stringify(hurt)})`);
+});
+
 test('결정성: 같은 입력 → 같은 결과(적·피격·교대 섞음)', () => {
   const a = area({ room: 'a', ...at('ethan', 4) }, { a: room([0, 0], { objects: [enemy('c1', 'crawler', 14), enemy('w1', 'wisp', 20, 13), enemy('s1', 'shield', 26)] }) });
   const script = (i) => I({ right: (i % 90) < 40, left: (i % 90) > 70, attack: i % 17 === 0, jump: i % 60 === 0, swap: i % 200 === 0 });

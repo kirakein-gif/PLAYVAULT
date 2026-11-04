@@ -508,7 +508,7 @@ async function analyze(page, file, opts) {
       const ENEMY_ANIMS = {
         crawler: { walk: 4, charge: 2, hurt: 1, die: 3 },
         wisp: { hover: 4, dive: 2, hurt: 1, die: 3 },
-        shield: { walk: 4, guard: 1, windup: 2, bash: 2, stagger: 2, die: 3 },
+        shield: { walk: 4, guard: 1, windup: 2, bash: 2, stagger: 2, die: 3, 'fx-bash': 3 }, // fx-bash: COMBAT2 §5-1(2026-11-04)
       };
       const LOOP = ['walk', 'hover'], GROUND_ENEMY = ['crawler', 'shield'];
       const enemies = manifest.enemies || {}, CE = SIM.CONFIG.enemies || {};
@@ -527,7 +527,7 @@ async function analyze(page, file, opts) {
             assert.ok(a.pivot && Number.isInteger(a.pivot.x) && Number.isInteger(a.pivot.y) && a.pivot.x >= 0 && a.pivot.x < a.frameW && a.pivot.y >= 0 && a.pivot.y < a.frameH, `${name} pivot이 프레임 밖`);
             assert.ok(Array.isArray(a.ticks) && a.ticks.length === a.frames && a.ticks.every(isInt), `${name} ticks는 프레임 수만큼의 양의 정수`);
             if (LOOP.includes(name)) assert.equal(a.loop, true, `${name}.loop는 true`);
-            if (name === 'die') assert.notEqual(a.loop, true, 'die.loop가 true(한 번만 재생해야 함)');
+            if (name === 'die' || name.startsWith('fx-')) assert.notEqual(a.loop, true, `${name}.loop가 true(한 번만 재생해야 함)`);
             assert.ok(/\.png$/i.test(a.file || ''), `${name} 파일은 .png`);
           }
         });
@@ -561,6 +561,17 @@ async function analyze(page, file, opts) {
         });
         if (GROUND_ENEMY.includes(kind) && R.walk) check(`enemy ${kind}/walk: 모든 프레임의 발이 기준선(pivot.y-2 ~ pivot.y)에 있음`, () => {
           R.walk.boxes.forEach((b, i) => assert.ok(b && b.maxY >= anims.walk.pivot.y - 2 && b.maxY <= anims.walk.pivot.y, `${i}번 프레임 발 y=${b && b.maxY}, 기준 ${anims.walk.pivot.y}`));
+        });
+        if (kind === 'shield' && R['fx-bash'] && CE.shield) check('enemy shield/fx-bash: 밀치기 효과가 판정과 같은 자리(§5-1) — 기준점=방패 앞·발, 앞으로 bashReach까지, 높이는 발에서 8~(키-8)', () => {
+          const a = anims['fx-bash'], reach = CE.shield.bashReach, H = CE.shield.height, bad = [];
+          assert.ok(Number.isFinite(reach), 'sim.js CONFIG.enemies.shield.bashReach 없음');
+          R['fx-bash'].boxes.forEach((b, i) => {
+            const back = (a.pivot.x - b.minX) / SCALE, front = (b.maxX + 1 - a.pivot.x) / SCALE, top = (a.pivot.y - b.minY) / SCALE, low = (a.pivot.y - b.maxY) / SCALE;
+            if (back > 2) bad.push(`${i}번 방패 뒤로 ${back.toFixed(1)}단위`);
+            if (front < reach - 6 || front > reach + 4) bad.push(`${i}번 앞 끝 ${front.toFixed(1)}단위(판정 ${reach}, 허용 ${reach - 6}~${reach + 4})`);
+            if (top > H - 4 || low < 4) bad.push(`${i}번 높이 발에서 ${low.toFixed(1)}~${top.toFixed(1)}(판정 8~${H - 8}, 허용 4~${H - 4})`);
+          });
+          assert.deepEqual(bad, [], bad.join(', '));
         });
         if (kind === 'shield' && R.walk) check('enemy shield: 막기·준비·경직이 걷기와 다른 그림(§5 "그림으로 알 수 있어야")', () => {
           const walk = new Set(R.walk.frameHashes), same = [];

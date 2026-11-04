@@ -1,7 +1,11 @@
 # PLAYVAULT · 현재 개발 현황
 
 
-확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(THE HOLLOW KEEP PR #24 `d66bc41` 재검토 완료, 사용자 병합 승인 대기). 아래 기존 이력은 보존합니다.
+확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(THE HOLLOW KEEP 적 공격 판정 규격 보완, Codex 추가 수정 지시 2 대기). 아래 기존 이력은 보존합니다.
+
+## 수정 요청 · THE HOLLOW KEEP PR #24 적 공격 판정 / Codex 추가 수정 지시 2 대기
+
+2026-11-04 / Claude Code / `claude/hollow-keep-combat2-review`. 사용자 손맛 확인에서 "적 공격이 닿기 전에 맞는다". 규격 §2-1(피격 상자 앞뒤 4 안쪽)·§5-1(밀치기 판정 = 충격파 그림, 방패 앞 32, 회복 90틱) 보완, enemies-contract 19·pixel-assets fx-bash 검사. 다음: Codex `CODEX_TASK_10.md` 추가 수정 지시 2. 병합 승인은 수정 후 다시 요청.
 
 ## 재검토 완료 · THE HOLLOW KEEP PR #24(전투 2차) / 사용자 병합 승인 대기
 

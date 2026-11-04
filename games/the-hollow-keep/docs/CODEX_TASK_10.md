@@ -93,3 +93,40 @@ PLAYVAULT — THE HOLLOW KEEP: 쓰러짐 자동 교대 시 Ethan이 벽·봉쇄�
 
 [금지] 검사 원본 약화, 1단계 이동·1차 무기 수치 변경, 병합·배포
 ```
+
+## 추가 수정 지시 2 (2026-11-04, 사용자 손맛 확인 후)
+
+```text
+PLAYVAULT — THE HOLLOW KEEP: 적 공격이 그림보다 먼저 맞는 문제(피격 상자·방패 밀치기 충격파·밀치기 빈도)
+
+저장소: kirakein-gif/PLAYVAULT
+작업 브랜치: codex/hollow-keep-combat-enemies (PR #24를 이어서 수정한다)
+먼저 할 일: origin/claude/hollow-keep-combat2-review 를 이 브랜치에 병합한다(규격 §2-1·§5-1·§7 보완, 검사 추가).
+
+사용자 의견: "적들의 공격 모션이 아군에게 닿지도 않았는데 충돌로 인식한다",
+"밀칠 때의 이펙트 같은 게 있으면 좋겠고, 그게 충돌하면 맞는다", "너무 자주 밀친다". 방패 막기 범위는 그대로 둔다.
+
+[원인 — Claude Code 측정]
+- 방패 밀치기 판정이 방패 앞 50단위인데 그림은 3단위만 나와, 맞는 순간 그림 사이 간격이 약 54단위.
+- 주인공 그림 앞 끝(기준점에서 16)보다 몸 상자(21·19.5)가 앞에 있어 돌격형도 2~3단위 먼저 맞음.
+- 밀치기 주기 준비20 + 밀치기10 + 회복30 = 60틱(1초).
+
+[규칙 — COMBAT2_SPEC §2-1·§5-1]
+- CONFIG.hurtInset = 4. 적에게 맞는 판정만 몸 상자에서 앞뒤 4단위씩 줄인 상자(HKSim.getHurtbox). 이동·벽·교대·줍기는 지금 상자 그대로.
+- CONFIG.enemies.shield.bashReach = 32. 밀치기 판정은 방패 앞면에서 바라보는 쪽 32, 높이 발에서 8~56. HKSim.getEnemyHitboxes(world)로 밀치기 중 판정 공개.
+- bashRange(준비 시작 거리 50)는 그대로 — 준비를 보고 물러나면 피할 수 있어야 함. recoveryTicks 30 → 90.
+- F2 패널에 hurtInset·bashReach·recoveryTicks.
+
+[그림 — §5-1·§7, ART_DIRECTION 규칙]
+- shield fx-bash: 밀치기 충격파 3프레임 이상, 한 번(loop 아님). 기준점 = 방패 앞면·발 높이.
+  모든 프레임이 앞으로 bashReach(32) −6~+4단위까지 닿고, 높이는 발에서 4~60 안. 방패 뒤로 2단위 넘게 나가지 않음.
+- 렌더러: 밀치기 중 fx-bash를 방패 앞에 바라보는 쪽으로 그린다(보이는 충격파 = 판정).
+- 디버그 표시(F2)에 getHurtbox와 getEnemyHitboxes 상자를 그려 확인할 수 있게 한다.
+
+[검증]
+1. enemies-contract 19/19(피격 판정·밀치기 판정/빈도 추가), pixel-assets 전부(fx-bash 위치 포함)
+2. 나머지 회귀 전체, down-swap-edge·combat2-browser 유지, 완주 기록(바뀌면 다시 기록·보고)
+3. 캡처: 방패 준비 → 충격파가 닿는 순간 맞음, 준비 중 물러나 피함, 돌격형이 몸에 닿는 순간(디버그 상자 표시 포함)
+
+[금지] 검사 원본 약화, 방패 막기 범위 변경(사용자 결정: 그대로), 1단계 이동·1차 무기 수치 변경, 병합·배포
+```
