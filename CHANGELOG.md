@@ -8,11 +8,11 @@ main `41f7517`의 전체 233커밋과 미병합 `codex/wgg-action-prototype`의 
 
 ## CHESS MASTER · 2026-11-04 PC 웹 버전
 
-같은 소스로 PC 웹 버전을 만들어 PLAYVAULT 첫 화면에 카드로 등록했습니다(`games/family-chess-premium/play/`, `npm run build:web`). PC·태블릿 가로 화면 기준, 웹에서는 진동 설정 숨김·`← PLAYVAULT` 링크·세로 휴대폰 안내. 웹 빌드 대상 E2E 23/23. CI가 커밋된 웹 빌드와 소스 일치를 확인합니다. 사용자 병합 승인 대기.
+같은 소스로 PC 웹 버전을 만들어 PLAYVAULT 첫 화면에 카드로 등록했습니다(`games/family-chess-premium/play/`, `npm run build:web`). PC·태블릿 가로 화면 기준, 웹에서는 진동 설정 숨김·`← PLAYVAULT` 링크·세로 휴대폰 안내. 웹 빌드 대상 E2E 23/23. CI가 커밋된 웹 빌드와 소스 일치를 확인합니다. PR #26으로 main 병합(`48440c9`).
 
 ## CHESS MASTER · 2026-11-04 고정 서명 키 · APK 영구 보관
 
-빌드마다 서명 키가 달라 새 APK를 덮어 설치할 수 없던 문제를 고정 키(`android/family-chess.keystore`)로 해결하고, CI가 인증서 지문을 확인합니다. main 반영 시 테스트 통과 후 GitHub Release `family-chess-v1.0.0`에 APK를 자동 보관합니다(Artifacts 90일 만료 대비). 개발 정리 문서 `docs/DEVELOPMENT_SUMMARY.md` 추가. 앱 기능·버전 변경 없음. 이전 APK 사용자는 한 번 기록 내보내기→재설치→불러오기가 필요합니다. 사용자 병합 승인 대기.
+빌드마다 서명 키가 달라 새 APK를 덮어 설치할 수 없던 문제를 고정 키(`android/family-chess.keystore`)로 해결하고, CI가 인증서 지문을 확인합니다. main 반영 시 테스트 통과 후 GitHub Release `family-chess-v1.0.0`에 APK를 자동 보관합니다(Artifacts 90일 만료 대비). 개발 정리 문서 `docs/DEVELOPMENT_SUMMARY.md` 추가. 앱 기능·버전 변경 없음. 이전 APK 사용자는 한 번 기록 내보내기→재설치→불러오기가 필요합니다. PR #26으로 main 병합, Release `family-chess-v1.0.0` 생성 확인(CI #23).
 
 ## CHESS MASTER · 2026-11-03 스킨 3종 확정
 
