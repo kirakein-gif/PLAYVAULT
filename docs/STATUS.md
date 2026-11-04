@@ -2,7 +2,11 @@
 
 확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(HANGMAN MASTER 1차 구현, 가족 블록 게임 작업지시서). 아래 기존 이력은 보존합니다.
 
-## 구현 · HANGMAN MASTER 발음 듣기(🔊) + 발음 속도 옵션 / CI 확인·병합 승인 대기
+## 병합 완료 · HANGMAN MASTER 발음 듣기(🔊) + 발음 속도 옵션 (PR #30 → main `ef3aa54`, 2026-11-04) / 태블릿 소리 확인 대기
+
+- main CI #7 전체 통과, Release `family-hangman-v1.0.0` APK 교체(12,325,525 bytes, ef3aa54 빌드). 같은 영구 링크, 덮어 설치로 기록 유지.
+
+### (당시 기록) 구현 · 발음 듣기
 
 2026-11-04 / Claude Code / `ccr-33a67370-6aa4yx`(main `2185514` 이후). 결과 창(정답·오답 모두)과 단어장에 🔊, 기기 음성 엔진(Android `@capacitor-community/text-to-speech` 8.0.2, 웹 speechSynthesis), 사용자별 발음 속도 느리게/보통/빠르게, 영어 음성 없으면 흐림·안내·설치 화면 버튼. INTERNET 권한 추가 없음. 단위 28/28, E2E 15/15(dist·play, 외부 0). 실제 소리는 태블릿 확인 필요. 앱 버전 1.0.0 → 병합 시 Release `family-hangman-v1.0.0` 파일이 교체됨(같은 키라 덮어 설치 가능).
 

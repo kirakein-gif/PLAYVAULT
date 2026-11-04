@@ -1572,3 +1572,4 @@
 - 검증(이번 실행): tsc, Vitest 28/28, E2E 15/15(dist)·15/15(play), 외부 0. E2E는 speechSynthesis를 기록용 가짜로 대체해 호출 단어·언어·속도 확인(실제 음성 아님). APK·에뮬레이터는 push 후 CI.
 - 사용자 재요청 횟수: 0회(기능 추가 1회). 다음: CI → 사용자 승인 후 main 병합(Release 파일 교체) → 태블릿에서 소리 확인.
 - CI #6(`2d6e820`, run 41831202054) 전체 성공: 에뮬레이터(네트워크 차단)에서 영어 음성 상태 `ready`, 🔊 탭 오류 없음, 설치 권한은 VIBRATE뿐. 소리는 에뮬레이터 `-noaudio`라 확인 못 함. APK 아티팩트 13322798657.
+- 병합(추가 기록): 사용자 승인("병합해주세요")으로 PR #30 → main merge `ef3aa54`. main CI #7(run 41834930191) 성공, Release `family-hangman-v1.0.0` APK 교체(12,325,525 bytes, digest sha256:39c2fb7f…). 이 기록은 다음 병합 때 main 반영.
