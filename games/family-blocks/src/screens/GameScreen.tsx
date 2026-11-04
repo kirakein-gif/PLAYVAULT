@@ -105,7 +105,7 @@ export function GameScreen({mode,level,lang,settings,onFinish,onRestart}:GameScr
     window.addEventListener('keydown',down);window.addEventListener('keyup',up);
     window.addEventListener('blur',lost);
     const offLife=onLifecycle(()=>{lost();},()=>{});
-    const offBack=onBackButton(()=>{setPaused(true);});
+    const offBack=onBackButton(()=>{setPaused(v=>!v);});
     return()=>{
       window.removeEventListener('keydown',down);window.removeEventListener('keyup',up);
       window.removeEventListener('blur',lost);offLife();offBack();

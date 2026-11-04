@@ -9,7 +9,7 @@ import type { GameState } from './core/game';
 import type { Mode } from './core/config';
 import { translate as t } from './i18n';
 import { sound } from './audio/sound';
-import { hubUrl, isNative, pickTextFile, saveTextFile, shareFile } from './platform/native';
+import { hubUrl, isNative, onBackButton, exitApp, pickTextFile, saveTextFile, shareFile } from './platform/native';
 import './styles/app.css';
 
 type Screen='home'|'settings'|'records'|'play'|'result'|'licenses';
@@ -34,6 +34,14 @@ export default function App(){
       profiles:[makeProfile('dad','아빠'),makeProfile('child','아이')]});setRecoverNotice(true);}});
     return()=>{mounted=false;};
   },[]);
+  useEffect(()=>{
+    if(!data||screen==='play')return;
+    return onBackButton(()=>{
+      if(screen!=='home'){setScreen('home');return;}
+      const profile=data.profiles.find(p=>p.id===data.activeProfileId)??data.profiles[0];
+      if(window.confirm(t(profile?.lang??'ko','appExitConfirm')))exitApp();
+    });
+  },[screen,data]);
   if(!data)return <main className="loading">{GAME_TITLE}</main>;
   const current=data.profiles.find(p=>p.id===data.activeProfileId)??data.profiles[0];
   const lang=current.lang;
@@ -185,7 +193,7 @@ export default function App(){
       {screen==='records'&&<section className="content-card" data-testid="records">
         <div className="section-title"><p className="eyebrow">{current.name}</p><h1>{T('records')}</h1></div>
         <div className="record-grid">
-          {MODES.map(m=><div className="record-panel" key={m}><h2>{T(m)}</h2>
+          {MODES.map(m=><div className="record-panel" key={m} data-testid={'record-'+m}><h2>{T(m)}</h2>
             {m==='gentle'&&<><p>{T('plays')}: {current.records.gentle.plays}</p>
               <p>{T('totalLines')}: {current.records.gentle.totalLines}</p>
               <p>{T('bestLines')}: {current.records.gentle.bestLinesOneGame}</p></>}
@@ -198,7 +206,7 @@ export default function App(){
               <p>{T('sprintBest')}: {current.records.sprint40.bestMs===null?T('notYet'):formatTime(current.records.sprint40.bestMs)}</p></>}
           </div>)}
         </div>
-        {current.recent.length>0&&<div className="recent-games">
+        {current.recent.length>0&&<div className="recent-games" data-testid="recent-games">
           {current.recent.map((g,i)=><p key={i}>
             <span>{T(g.mode)}</span><span>{new Date(g.date).toLocaleDateString()}</span>
             <span>{g.lines} {T('lines')}</span><span>{g.score.toLocaleString()}</span>
@@ -207,7 +215,7 @@ export default function App(){
       </section>}
       {screen==='result'&&result&&<section className="result-view" data-testid="game-result">
         <p className="eyebrow">{T('finish')}</p>
-        <h1>{result.phase==='won'?T('done'):result.phase==='over'?T('over'):T('noRecord')}</h1>
+        <h1>{result.phase==='won'?T('done'):result.phase==='over'?T('over'):T('finish')}</h1>
         <p>{T(result.mode)}</p>
         <p className="result-feedback" role="status">{newBest?T('newRecord'):T('noRecord')}</p>
         <div className="result-stats"><div><small>{T('score')}</small><strong>{result.score.toLocaleString()}</strong></div>

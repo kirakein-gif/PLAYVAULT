@@ -26,14 +26,36 @@ describe('Spawning and shapes',()=>{
   it('uses the documented spawn columns for all seven kinds',()=>{
     for(const k of KINDS){
       const p=spawn(k),positions=blocks(p).map(q=>q[0]);
-      expect(p.y).toBe(0);
+      expect(p.y).toBe(1);
       expect(Math.min(...positions)).toBe(k==='O'?4:3);
       expect(Math.max(...positions)).toBe(k==='I'?6:k==='O'?5:5);
     }
   });
+  it('shows all seven kinds immediately in the first visible row',()=>{
+    for(const kind of KINDS){
+      const p=spawn(kind);
+      expect(blocks(p).some(([,y])=>y===2)).toBe(true);
+      const s=createGame('challenge',1,9);
+      s.queue.unshift(kind);nextPiece(s);
+      expect(s.active.kind).toBe(kind);
+      expect(s.active.y).toBe(1);
+      expect(blocks(s.active).some(([,y])=>y===2)).toBe(true);
+    }
+  });
+  it('falls back to hidden rows only when the visible entrance is blocked',()=>{
+    for(const kind of KINDS){
+      const s=createGame('challenge',1,9);
+      s.board[2].fill('J');
+      s.queue.unshift(kind);nextPiece(s);
+      expect(s.phase).toBe('active');
+      expect(s.active.kind).toBe(kind);
+      expect(s.active.y).toBe(0);
+      expect(blocks(s.active).every(([,y])=>y<2)).toBe(true);
+    }
+  });
   it('loses on blocked spawn except for gentle mode',()=>{
     for(const mode of ['challenge','sprint40','gentle'] as const){
-      const s=createGame(mode,1,11);s.board[0].fill('J');s.board[1].fill('J');nextPiece(s);
+      const s=createGame(mode,1,11);s.board[0].fill('J');s.board[1].fill('J');s.board[2].fill('J');nextPiece(s);
       if(mode==='gentle'){expect(s.phase).toBe('active');expect(s.rescues).toBe(1);expect(s.board[0].every(x=>x===null)).toBe(true);}
       else expect(s.phase).toBe('over');
     }
