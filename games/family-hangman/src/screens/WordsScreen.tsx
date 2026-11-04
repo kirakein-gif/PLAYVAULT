@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useApp } from '../state';
 import { Btn, TopBar } from '../components/ui';
 import { Stars } from '../components/icons';
+import { SpeakButton } from '../components/SpeakButton';
 import { CATEGORIES, WORDS, WORD_BY_KEY } from '../game/words';
 import { missedWords } from '../storage/schema';
 
@@ -76,6 +77,7 @@ export function WordsScreen() {
           list.map((w) => (
             <div className="wordRow" key={w}>
               <b>{w.toUpperCase()}</b>
+              <SpeakButton word={w} size="sm" />
               <span>{WORD_BY_KEY[w]?.ko ?? ''}</span>
               {tab === 'won' && <Stars n={profile.words[w].bestStars} size="26px" />}
             </div>

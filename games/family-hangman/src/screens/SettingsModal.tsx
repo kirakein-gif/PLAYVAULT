@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApp } from '../state';
 import { Btn, Confirm, Modal, Toggle } from '../components/ui';
 import { Icon } from '../components/icons';
@@ -9,6 +9,7 @@ import { sound } from '../audio/sound';
 import { PICTURES, type AppData } from '../storage/schema';
 import { APP_TITLE, APP_VERSION } from '../brand';
 import { WORDS } from '../game/words';
+import { SPEECH_RATES, openVoiceInstall, speak, speechStatus, type SpeechStatus } from '../platform/speech';
 
 /** One line a tester can photograph: WebView engine, Android version, CSS screen size. */
 export function deviceInfo(): string {
@@ -26,6 +27,10 @@ export function SettingsModal() {
   const [pending, setPending] = useState<{ data: AppData; text: string } | null>(null);
   const [exported, setExported] = useState<{ where: string; uri?: string } | null>(null);
   const close = () => openSettings(false);
+  const [voice, setVoice] = useState<SpeechStatus>('checking');
+  useEffect(() => {
+    void speechStatus(true).then(setVoice);
+  }, []);
 
   const row = (label: string, control: React.ReactNode, desc?: string) => (
     <div className="settingRow">
@@ -94,6 +99,31 @@ export function SettingsModal() {
             t('settings.pictureDesc'),
           )}
           {row(
+            t('speech.rate'),
+            <div className="segmented">
+              {SPEECH_RATES.map((r) => (
+                <button
+                  key={r}
+                  className={profile.speechRate === r ? 'on' : ''}
+                  data-testid={`rate-${r}`}
+                  onClick={() => {
+                    click();
+                    updateProfile((p) => ({ ...p, speechRate: r }));
+                    void speak('apple', r);
+                  }}
+                >
+                  {t(`speech.rates.${r}`)}
+                </button>
+              ))}
+            </div>,
+            voice === 'missing' ? t('speech.missing') : t('speech.rateDesc'),
+          )}
+          {voice === 'missing' && isNative && (
+            <div className="rowBtns">
+              <Btn size="sm" onClick={() => void openVoiceInstall()} testId="voice-install">{t('speech.install')}</Btn>
+            </div>
+          )}
+          {row(
             t('settings.language'),
             <div className="segmented">
               <button className={lang === 'ko' ? 'on' : ''} onClick={() => { click(); setLang('ko'); }}>한국어</button>
@@ -154,7 +184,7 @@ export function SettingsModal() {
           <p>{APP_TITLE} · {t('settings.version', { v: APP_VERSION })}</p>
           <p className="hintText">{t('settings.offline')}</p>
           <p className="hintText">{t('settings.words', { n: WORDS.length })}</p>
-          <p className="hintText" data-testid="device-info">{t('settings.device', { info: deviceInfo() })}</p>
+          <p className="hintText" data-testid="device-info">{t('settings.device', { info: deviceInfo() })} · {t('speech.status')}: <span data-testid="voice-status">{t(`speech.statuses.${voice}`)}</span></p>
           <Btn kind="ghost" onClick={() => { close(); app.go({ name: 'licenses' }); }} testId="licenses">{t('settings.licenses')}</Btn>
         </section>
       </div>
