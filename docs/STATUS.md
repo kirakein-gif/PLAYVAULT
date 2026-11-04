@@ -2,14 +2,14 @@
 
 확인일: **2026-11-03 (Asia/Seoul)** / 확인 AI: **Claude Code**(CHESS MASTER 고정 서명 키·Release 영구 보관·개발 정리, 후속 게임 가능성 등록). 아래 기존 이력은 보존합니다.
 
-## 제출 · CHESS MASTER PC 웹 버전 + PLAYVAULT 카드 / 사용자 병합 승인 대기
+## 병합 승인(2026-11-04 "네 합쳐주세요") · CHESS MASTER PC 웹 버전 + PLAYVAULT 카드 + 고정 서명 키·Release
 
 Claude Code / `ccr-6aa2a39e-1vn67a` / 2026-11-04. 사용자 결정: "웹버전은 PC기반으로" (휴대폰은 너무 작음). 판매·이름 변경(체스 아카데미 등)은 가능성으로 보류.
 - `npm run build:web` → `games/family-chess-premium/play/` 커밋(약 6.9MB, 빌드 재현성 확인), 루트 `index.html`에 카드 추가(루트 런처 첫 등록), 홈에 `← PLAYVAULT` 링크(웹만), 진동 설정은 앱에서만, 세로 좁은 화면 안내.
 - 검증: 타입·Vitest 396/396, 웹 빌드 대상 E2E 23/23(외부 0), 저장소 루트 정적 서버에서 하위 경로·카드 이동·1920×1080/1366×768 화면 확인. Cloudflare Pages 실제 배포 확인은 병합 후.
 - CI: `play/`가 소스와 다르면 실패하는 검사 추가.
 
-## 제출 · CHESS MASTER 고정 서명 키 + GitHub Release 영구 보관 + 개발 정리 / 사용자 병합 승인 대기
+## (위 항목과 함께 병합) CHESS MASTER 고정 서명 키 + GitHub Release 영구 보관 + 개발 정리
 
 Claude Code / `ccr-6aa2a39e-1vn67a` / 기준 main `57fe108` / 2026-11-04. 사용자 요청: "apk 자료를 날아가지 않는 별도 자료에 정리하고 지금까지 개발한 내용도 정리".
 - 발견: 기존 CI APK는 빌드마다 임시 debug 키로 서명 → 새 APK 덮어 설치 불가(이전 안내 "덮어 설치해도 기록 유지"는 틀렸음, 정정). 사용자 결정(저장소에 키 보관)으로 `android/family-chess.keystore`(PKCS12, 30년) 추가, debug·release 빌드 모두 이 키로 서명, CI가 인증서 지문 확인.

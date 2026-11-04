@@ -1507,3 +1507,4 @@
 - 검증: tsc, Vitest 396/396, 웹 빌드 두 번 해시 동일, `E2E_OUTDIR=play` E2E 23/23(외부 0), 저장소 루트 정적 서버에서 `/games/family-chess-premium/play/` 1920×1080·1366×768 홈·대국 화면, 허브 링크→루트, 카드→게임 이동 확인(외부 요청 0). 실제 Cloudflare Pages·Android CI는 push/병합 후 확인.
 - 다른 게임 변경 없음. 루트 런처는 이번에 처음 체스 카드 추가(사용자 요청 범위).
 - 사용자 재요청 횟수: 0회. 다음: CI 확인 → 사용자 승인 후 main 병합 → Release·Pages 확인.
+- 병합 승인: 사용자 "네 합쳐주세요"(2026-11-04). CI #21(`755182a`, 고정 키 지문 확인 포함) 성공, #22(`dd66981`) 확인 후 PR로 main 병합(merge commit). 병합 후 main CI의 release 작업으로 Release `family-chess-v1.0.0` 생성 확인 예정. 배포(사이트 반영)는 Cloudflare Pages가 main을 그대로 제공하는 기존 방식 — 실제 반영 확인 필요.
