@@ -1624,3 +1624,13 @@
 - 원인: 첫 작업 `web-build-refresh`가 `chatgpt/family-blocks-solo`에서만 실행. main에서 skip되면 `build`(조건 없음)가 기본 `success()` 판정으로 함께 skip되어 뒤 작업 전체가 연쇄 skip. 브랜치 CI에서는 그 작업이 실행돼 드러나지 않았음.
 - 수정: build·emulator·release에 `!cancelled()` + 앞 작업 결과 `success` 명시 조건. 게임 코드 변경 없음. 작업 브랜치에서 build·에뮬레이터가 실제 실행되는지 확인 후 사용자 승인을 받아 main에 병합 예정.
 - 검증: 작업 브랜치 CI #20(`932eee1`, run 41840246818) — `web-build-refresh`가 main과 같이 skip된 상태에서도 build(APK 아티팩트 13328692893)·emulator-offline-test 실제 실행·성공. release는 main 전용이라 미실행(정상). main 병합은 사용자 승인 대기.
+- 병합(추가 기록): 사용자 승인("병합하세요")으로 PR #31 → main `8474c56`. main CI #21(run 기준 8474c56) build·emulator·release 실행·성공, Release `family-blocks-v1.0.0` 생성(APK 5,983,105 bytes, digest sha256:25305113…). 이 기록은 다음 병합 때 main 반영.
+
+### 2026-11-05 (Asia/Seoul) · 행맨 단어 확장·전체화면 / BLOCK MASTER 세로 모드·전체화면 (Claude Code)
+
+- 요청: "행맨은 단어를 더 많이 넣어주세요. 한국의 중학생이 배우는 수준까지는 다 있었으면 합니다. 그리고 테트리스는 가로모드인데 세로모드었으면 합니다. 둘다 전체화면으로도 가능하면 좋겠어요." BLOCK MASTER는 ChatGPT 구현이지만 사용자 개별 지시로 Claude Code가 수정.
+- 기준: main `8474c56` + 작업 브랜치 기록 커밋.
+- 행맨: 단어 358 → **1,586개**, 17개 주제(새 7개: 옷·소지품, 움직임·하는 일, 모양·성질, 마음·생각, 시간·날짜, 생활·사회, 기본 낱말). 직접 작성, 중복 28개 정리. **한계**: 교육과정 기본 어휘표(ncic.re.kr) 원문은 이 환경에서 접속 차단(403)되어 1:1 대조 못 함 — '중학교 수준까지 다'라는 충족 여부는 확인 불가로 기록. 853×533에서 주제 18칸이 한 화면에 들어가도록 설정 창 축소. 전체화면: 로컬 Android 플러그인(`FullscreenPlugin.java`, WindowInsetsControllerCompat로 시스템 바 숨김·밀면 잠깐 표시) + 웹 Fullscreen API, 첫 화면 버튼·설정 토글, APK는 설정 저장·시작/복귀 시 재적용.
+- BLOCK MASTER: `screenOrientation=portrait`(+Android 16 큰 화면 호환 속성), 캔버스 세로 배치 `computeLayout`(높이>너비면 세로), 세로 CSS(홈 카드 1열 등), 폭 480px 미만만 안내 화면, 전체화면(같은 방식, 사용자별 설정). 렌더러가 배치를 내보내고 E2E가 그 값으로 겹침 검사(기존 가로 공식 하드코딩 제거). CI 에뮬레이터 800×1280 세로.
+- 검증(이번 실행): 행맨 tsc·단위 29/29·E2E 17/17(dist·play, 외부 0). 블록 tsc·단위 39/39·E2E 22/22(가로 2·세로 2 크기, 외부 0, 오류 0). 두 게임 smoke에 전체화면(WebView 높이 증가·재실행 후 유지) 검사 추가, 블록 smoke에 세로 확인 추가 — CI 결과 확인 전.
+- CI(추가 기록): `0574c0c` — family-hangman-android #9(run 42008061574)·family-blocks-android #22(run 42008061536) 전체 성공(release는 main 전용 skip). 에뮬레이터 smoke의 세로 확인(블록, 에뮬레이터 800×1280)·전체화면(WebView 높이 증가·재실행 후 유지, 두 게임) 단계 통과 — 실패 시 예외로 종료하는 검사. APK 아티팩트: 행맨 13405722339, 블록 13405387626. main 병합은 사용자 승인 대기.

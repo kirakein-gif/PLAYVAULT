@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useApp } from '../state';
 import { Btn, LangToggle, Modal, SettingsButton } from '../components/ui';
 import { BalloonScene } from '../components/BalloonScene';
+import { FullscreenButton } from '../components/FullscreenButton';
 import { APP_TITLE } from '../brand';
 import { hubUrl } from '../platform/native';
 import { LEVELS, wordPool, type Level } from '../game/hangman';
@@ -131,6 +132,7 @@ export function HomeScreen() {
             {data.profileOrder.length > 1 && <small> · {t('home.record', { won: profile.stats.won, best: profile.stats.bestStreak })}</small>}
           </span>
           <LangToggle compact />
+          <FullscreenButton />
           <SettingsButton />
         </div>
       </header>

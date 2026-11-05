@@ -101,6 +101,7 @@ input[type=range]{accent-color:#c2a778}
 .dialog button{font-size:18px}
 .dialog .muted{margin:4px 0 0}
 .rotate-message{display:none}
+button.fs-button{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px}
 @media(max-width:920px){
   .main-shell{padding:14px 20px 8px}
   .site-header{padding-bottom:10px}
@@ -137,7 +138,28 @@ input[type=range]{accent-color:#c2a778}
  .settings-grid select,.settings-grid input:not([type=checkbox]){min-height:32px}
  .settings-actions{margin-top:9px;padding-top:9px}
 }
-@media (orientation:portrait), (max-width:759px){
+/* Portrait tablet (the APK is locked upright): stack the home cards and
+   keep every screen inside a 533x853 to 800x1280 viewport. */
+@media (orientation:portrait){
+ .main-shell{padding:14px 18px 8px}
+ .site-header{flex-wrap:wrap;gap:8px}
+ .header-actions{gap:8px;flex-wrap:wrap;justify-content:flex-end}
+ .intro h1{font-size:24px}
+ .mode-cards{grid-template-columns:1fr;gap:10px}
+ .mode-card{min-height:0;padding:12px 15px}
+ .mode-card>p{min-height:0;margin-bottom:8px}
+ .card-bottom{grid-template-columns:1fr auto auto}
+ .card-bottom .primary{grid-column:auto;width:auto;min-width:120px}
+ .home-bottom{flex-direction:column;align-items:flex-start}
+ .settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .record-grid{grid-template-columns:1fr}
+ .result-stats{grid-template-columns:repeat(2,1fr)}
+ .result-view h1{font-size:36px}
+ .content-card{padding:16px;margin:12px auto}
+ .touch-controls{bottom:14px;left:12px;right:12px}
+}
+/* Phones are too small for the board and buttons; tablets and PCs only. */
+@media (max-width:479px){
  .rotate-message{position:fixed;inset:0;background:#1a2823;z-index:90;color:#e8dbc1;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;font-size:23px;text-align:center}
  .rotate-icon{font-size:74px;color:#c7aa7f}

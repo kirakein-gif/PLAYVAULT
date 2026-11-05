@@ -80,6 +80,17 @@ describe('storage', () => {
     expect(RATE_VALUE.normal).toBeLessThan(RATE_VALUE.fast);
   });
 
+  it('full screen setting: off by default, kept when valid', () => {
+    const d = defaultData() as unknown as Record<string, any>;
+    expect(d.settings.fullscreen).toBe(false);
+    d.settings.fullscreen = true;
+    const v = validateData(d);
+    expect(v.ok && v.data.settings.fullscreen).toBe(true);
+    d.settings.fullscreen = 'yes';
+    const w = validateData(d);
+    expect(w.ok && w.data.settings.fullscreen).toBe(false);
+  });
+
   it('rejects broken or foreign data', () => {
     expect(validateData(null).ok).toBe(false);
     expect(validateData({ schema: 99, profiles: {}, profileOrder: [] }).ok).toBe(false);

@@ -11,6 +11,7 @@ import { Confirm } from './components/ui';
 import { exitApp, isNative, onBackButton, onLifecycle } from './platform/native';
 import { flushSave } from './storage/store';
 import { sound } from './audio/sound';
+import { setFullscreen } from './platform/fullscreen';
 
 function Router() {
   const { screen: s, screenKey: k } = useApp();
@@ -45,18 +46,20 @@ function Shell() {
     [app, exitAsk],
   );
 
-  // keep data safe when the app goes to the background
-  useEffect(
-    () =>
-      onLifecycle(
-        () => {
-          void flushSave();
-          sound.suspend();
-        },
-        () => undefined,
-      ),
-    [],
-  );
+  // keep data safe when the app goes to the background; restore full screen on return
+  const fsSaved = app.settings.fullscreen;
+  useEffect(() => {
+    if (isNative && fsSaved) void setFullscreen(true);
+    return onLifecycle(
+      () => {
+        void flushSave();
+        sound.suspend();
+      },
+      () => {
+        if (isNative && fsSaved) void setFullscreen(true);
+      },
+    );
+  }, [fsSaved]);
 
   // unlock audio on the very first touch / key anywhere
   useEffect(() => {

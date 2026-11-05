@@ -6,6 +6,8 @@ export interface Settings {
   touchButtons: 'auto'|'on'|'off'; repeatSpeed: Speed;
   ghost: boolean; previews: 1|3;
   sfx: boolean; music: boolean; volume: number; vibration: boolean;
+  /** APK: hide Android's status/navigation bars (web full screen is per visit) */
+  fullscreen: boolean;
 }
 export interface RecentGame {mode: Mode;date:string;score:number;lines:number;ms:number}
 export interface Profile {
@@ -21,7 +23,7 @@ export interface Profile {
 export interface AppData {version:1;activeProfileId:string;profiles:Profile[]}
 export function defaultSettings():Settings {
   return {touchButtons:'auto',repeatSpeed:'normal',ghost:true,previews:3,
-    sfx:true,music:true,volume:0.35,vibration:true};
+    sfx:true,music:true,volume:0.35,vibration:true,fullscreen:false};
 }
 export function makeProfile(id:string,name:string):Profile {
   return {id,name,lang:'ko',settings:defaultSettings(),records:{
@@ -67,7 +69,8 @@ export function validateData(raw:unknown):{ok:true;data:AppData;recovered:boolea
         repeatSpeed:option(s.repeatSpeed,['slow','normal','fast'] as const,'normal'),
         ghost:bool(s.ghost,true),previews:s.previews===1?1:3,
         sfx:bool(s.sfx,true),music:bool(s.music,true),
-        volume:Math.min(1,number(s.volume,0.35)),vibration:bool(s.vibration,true)
+        volume:Math.min(1,number(s.volume,0.35)),vibration:bool(s.vibration,true),
+        fullscreen:bool(s.fullscreen,false)
       },
       records:{
         gentle:{totalLines:positiveInt(g.totalLines),bestLinesOneGame:positiveInt(g.bestLinesOneGame),plays:positiveInt(g.plays)},

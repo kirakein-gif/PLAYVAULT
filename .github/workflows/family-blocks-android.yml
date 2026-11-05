@@ -183,8 +183,8 @@ jobs:
           disable-animations: true
           ram-size: 4096M
           heap-size: 512M
-          # landscape tablet-sized screen (1280x800 at 160 dpi)
-          emulator-options: -no-window -gpu swangle_indirect -noaudio -no-boot-anim -camera-back none -skin 1280x800 -prop qemu.sf.lcd_density=160
+          # portrait tablet-sized screen (800x1280 at 160 dpi): the APK is locked upright
+          emulator-options: -no-window -gpu swangle_indirect -noaudio -no-boot-anim -camera-back none -skin 800x1280 -prop qemu.sf.lcd_density=160
           working-directory: games/family-blocks
           script: |
             adb install -r out/FamilyBlocks-v1.0.0-debug.apk

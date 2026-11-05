@@ -47,7 +47,8 @@ try{
     await page.getByTestId('start-gentle').waitFor({timeout:30000});
     return {context,page};
   }
-  for(const [width,height] of [[853,533],[1280,800]]){
+  // landscape (PC web) and portrait (the APK is locked upright since 2026-11-05)
+  for(const [width,height] of [[853,533],[1280,800],[533,853],[800,1280]]){
     const {context,page}=await pageFor(width,height);
     await check('home '+width+'x'+height,async()=>{
       await page.screenshot({path:join(dir,'home-'+width+'.png')});
@@ -72,9 +73,8 @@ try{
         // Verify a real painted cell in the first visible row, not just a ghost.
         const painted=await page.evaluate(()=>{
           const cv=document.querySelector('.game-canvas'),s=window.__familyBlocksState;
-          const w=cv.clientWidth,h=cv.clientHeight,dpr=cv.width/w;
-          const cell=Math.max(13,Math.floor(Math.min((h-30)/20,(w-450)/10)));
-          const bx=Math.floor((w-cell*10)/2),by=Math.floor((h-cell*20)/2);
+          const w=cv.clientWidth,dpr=cv.width/w,L=window.__familyBlocksLayout;
+          const cell=L.cell,bx=L.boardX,by=L.boardY;
           const x=Math.round((bx+(s.active.x+1.5)*cell)*dpr);
           const y=Math.round((by+cell/2)*dpr);
           return [...cv.getContext('2d').getImageData(x,y,1,1).data];
@@ -90,25 +90,28 @@ try{
         await page.getByTestId('ctrl-drop').click();
         const blocks=await page.evaluate(()=>window.__familyBlocksState.board.flat().filter(Boolean).length);
         assert(blocks>=4,'hard drop did not lock a piece');
+        // Uses the layout the renderer really drew (portrait and landscape differ).
         const metrics=await page.evaluate(()=>{
-          const w=innerWidth,h=innerHeight,cell=Math.max(13,Math.floor(Math.min((h-30)/20,(w-450)/10)));
-          const bx=Math.floor((w-cell*10)/2),by=Math.floor((h-cell*20)/2);
+          const L=window.__familyBlocksLayout;
+          const board={x:L.boardX,y:L.boardY,w:L.boardRight-L.boardX,h:L.boardBottom-L.boardY};
+          const box=e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,id:e.dataset.testid||e.className};};
+          const buttons=[...document.querySelectorAll('.touch-button,.button-pause')].map(box);
+          const hit=(a,b)=>a.x<b.x+b.w&&b.x<a.x+a.w&&a.y<b.y+b.h&&b.y<a.y+a.h;
+          const overlaps=[];
+          for(const b of buttons){
+            if(hit(b,board))overlaps.push('board×'+b.id);
+            for(const [k,t] of Object.entries(L.texts))if(hit(b,t))overlaps.push(k+'×'+b.id);
+          }
           const left=document.querySelector('.left-controls').getBoundingClientRect(),
             right=document.querySelector('.right-controls').getBoundingClientRect();
-          const hold=document.querySelector('[data-testid=ctrl-hold]').getBoundingClientRect();
-          const ctx=document.querySelector('.game-canvas').getContext('2d');
-          ctx.font='600 20px Nunito, "Gowun Dodum", sans-serif';
-          const level='레벨  '+window.__familyBlocksState.level;
-          const x=bx+cell*10+25+7,y=by+cell*20*.80;
-          const label={left:x,top:y-21,right:x+ctx.measureText(level).width,bottom:y+5};
-          const clear=(r)=>r.right<=hold.left||r.left>=hold.right||r.bottom<=hold.top||r.top>=hold.bottom;
-          return {leftClear:left.right<=bx,rightClear:right.left>=bx+cell*10,
-            levelHoldClear:clear(label),levelRect:label,holdRect:{x:hold.x,y:hold.y,width:hold.width,height:hold.height},
+          return {mode:L.mode,overlaps,
+            textsInView:Object.values(L.texts).every(t=>t.x>=0&&t.x+t.w<=innerWidth&&t.y>=0&&t.y+t.h<=innerHeight),
             inViewport:[left.left>=0,right.right<=innerWidth,left.bottom<=innerHeight,right.bottom<=innerHeight],
             bodyOverflow:document.documentElement.scrollWidth>innerWidth};
         });
-        assert(metrics.leftClear&&metrics.rightClear,'controls overlap the board');
-        assert(metrics.levelHoldClear,'level label overlaps hold button: '+JSON.stringify(metrics));
+        assert(metrics.mode===(height>width?'portrait':'landscape'),'wrong layout mode '+metrics.mode);
+        assert(metrics.overlaps.length===0,'buttons overlap the board or HUD text: '+metrics.overlaps.join(', '));
+        assert(metrics.textsInView,'HUD text outside the screen');
         assert(metrics.inViewport.every(Boolean)&&!metrics.bodyOverflow,'controls clip viewport');
         await page.getByTestId('pause').click();
         await page.getByTestId('quit').click(); // JS confirm auto-dismiss unless handled
@@ -181,6 +184,16 @@ try{
     });
     await context.close();
   }
+  await check('full screen button (web) enters and leaves',async()=>{
+    const {context,page}=await pageFor(1280,800);
+    assert((await page.getByTestId('fullscreen-btn').getAttribute('data-on'))==='0','starts windowed');
+    await page.getByTestId('fullscreen-btn').click();
+    await page.waitForFunction(()=>!!document.fullscreenElement,null,{timeout:5000});
+    assert((await page.getByTestId('fullscreen-btn').getAttribute('data-on'))==='1','button shows full screen');
+    await page.getByTestId('fullscreen-btn').click();
+    await page.waitForFunction(()=>!document.fullscreenElement,null,{timeout:5000});
+    await context.close();
+  });
   await check('60-second fixed-seed random autoplay and animation budget',async()=>{
     const {context,page}=await pageFor(853,533);
     await page.getByTestId('start-gentle').click();

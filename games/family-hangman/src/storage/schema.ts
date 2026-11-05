@@ -47,6 +47,8 @@ export interface Settings {
   volume: number; // 0..1
   haptics: boolean;
   lowPower: boolean;
+  /** APK: hide Android's status/navigation bars (web full screen is per visit) */
+  fullscreen: boolean;
 }
 
 export interface AppData {
@@ -59,7 +61,7 @@ export interface AppData {
 
 export const RECENT_MAX = 40;
 
-export const DEFAULT_SETTINGS: Settings = { soundOn: true, volume: 0.8, haptics: true, lowPower: false };
+export const DEFAULT_SETTINGS: Settings = { soundOn: true, volume: 0.8, haptics: true, lowPower: false, fullscreen: false };
 
 export function newProfile(id: string, name: string, lang: Lang = 'ko'): Profile {
   return {
@@ -165,6 +167,7 @@ export function validateData(raw: unknown): { ok: true; data: AppData } | { ok: 
         volume: typeof s.volume === 'number' && s.volume >= 0 && s.volume <= 1 ? s.volume : DEFAULT_SETTINGS.volume,
         haptics: typeof s.haptics === 'boolean' ? s.haptics : DEFAULT_SETTINGS.haptics,
         lowPower: typeof s.lowPower === 'boolean' ? s.lowPower : DEFAULT_SETTINGS.lowPower,
+        fullscreen: typeof s.fullscreen === 'boolean' ? s.fullscreen : DEFAULT_SETTINGS.fullscreen,
       },
       profiles,
     },

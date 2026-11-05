@@ -1,8 +1,15 @@
 # PLAYVAULT · 현재 개발 현황
 
-확인일: **2026-11-04 (Asia/Seoul)** / 확인 AI: **Claude Code**(BLOCK MASTER PR #28 재검토·병합, HANGMAN MASTER). 아래 기존 이력은 보존합니다.
+확인일: **2026-11-05 (Asia/Seoul)** / 확인 AI: **Claude Code**(행맨 단어 확장·전체화면, BLOCK MASTER 세로 모드·전체화면). 아래 기존 이력은 보존합니다.
 
-## 병합 · BLOCK MASTER v1.0.0 (PR #28, Claude Code 재검토 통과·사용자 승인 "직접 병합해주세요" 2026-11-04) / Release 확인·실기 대기
+## 구현 · 행맨 단어 1,586개·전체화면 / BLOCK MASTER 세로 모드·전체화면 / CI 확인·병합 승인 대기
+
+2026-11-05 / Claude Code / `ccr-33a67370-6aa4yx`(main `8474c56` 이후). 행맨: 17개 주제 1,586단어(교육과정 어휘표 1:1 대조는 접속 차단으로 못 함), 전체화면. 블록: APK 세로 고정·세로 배치, 전체화면. 로컬 검증: 행맨 단위 29/29·E2E 17/17, 블록 단위 39/39·E2E 22/22. 두 게임 Android smoke에 전체화면 검사 추가(CI 결과 대기). 실기·Android 16 방향 고정 미확인.
+
+## 병합 완료 · BLOCK MASTER v1.0.0 (PR #28 → main `1ece577`, CI 수정 PR #31 → `8474c56`, 2026-11-04) / 실기 대기
+
+- main CI #21 전체 통과, **Release `family-blocks-v1.0.0`** 생성: `FamilyBlocks-v1.0.0-debug.apk`(5,983,105 bytes) + `.sha256`. https://github.com/kirakein-gif/PLAYVAULT/releases/tag/family-blocks-v1.0.0
+- 남은 일: 태블릿 설치·아이 피드백(조작감·미리보기 크기·소리), 경미 1건(차근차근 그만하기 결과 제목 중복), PLAYVAULT 첫 화면 카드(Codex 메인 화면 작업 뒤).
 
 ### (당시 기록) 수정 완료·재검토 대기 · BLOCK MASTER v1.0.0 (Draft PR #28)
 

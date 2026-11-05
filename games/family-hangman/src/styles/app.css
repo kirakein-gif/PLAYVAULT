@@ -232,6 +232,16 @@ input[type='range'] { width: 220px; accent-color: var(--gold); height: 32px; }
   .clueLine { font-size: 19px; }
   .btn.sm { min-height: 42px; }
   .menuCard { min-height: 200px; }
+  /* solo setup: 17 topics must fit without scrolling on an 853x533 tablet */
+  .setupH { font-size: 19px; margin: 0 0 6px; }
+  .choiceRow { gap: 8px; margin-bottom: 8px; }
+  .choice { padding: 6px 6px; }
+  .choice b { font-size: 19px; } .choice small { font-size: 14px; }
+  .catGrid { gap: 6px; }
+  .chip { min-height: 40px; padding: 4px 12px; font-size: 16px; }
+  .modalTitle { padding-top: 12px; font-size: 26px; }
+  .modalBody { padding-top: 6px; padding-bottom: 6px; }
+  .modalActions { padding-top: 8px; padding-bottom: 12px; }
 }
 @media (orientation: portrait) {
   .gameBody { grid-template-columns: 1fr; grid-template-rows: minmax(0, 0.7fr) auto; }

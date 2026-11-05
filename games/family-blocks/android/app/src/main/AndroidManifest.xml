@@ -15,7 +15,12 @@
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBarLaunch"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:exported="true">
+            <!-- Family request 2026-11-05: play upright. Android 16 ignores orientation
+                 locks on large screens for targetSdk 36 unless this opt-out is set; the
+                 game also lays itself out for landscape if a device still rotates. -->
+            <property android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY" android:value="true" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
