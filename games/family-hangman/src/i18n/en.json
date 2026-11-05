@@ -165,5 +165,12 @@
       "ready": "available",
       "missing": "missing"
     }
+  },
+  "fullscreen": {
+    "title": "Full screen",
+    "enter": "Full screen",
+    "leave": "Exit full screen",
+    "descApp": "Hides the status and navigation bars (swipe from an edge to show them briefly)",
+    "descWeb": "Browser full screen (Esc to leave)"
   }
 }

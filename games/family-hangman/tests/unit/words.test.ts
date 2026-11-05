@@ -3,7 +3,7 @@ import { CATEGORIES, WORDS } from '../../src/game/words';
 import { LEVELS, levelOf } from '../../src/game/hangman';
 
 describe('built-in word list', () => {
-  it('has at least 300 words', () => expect(WORDS.length).toBeGreaterThanOrEqual(300));
+  it('has at least 1500 words (up to middle-school level)', () => expect(WORDS.length).toBeGreaterThanOrEqual(1500));
 
   it('every word is lowercase a-z, 2-12 letters, with a Korean meaning', () => {
     for (const w of WORDS) {

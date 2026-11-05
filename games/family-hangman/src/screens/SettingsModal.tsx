@@ -9,6 +9,8 @@ import { sound } from '../audio/sound';
 import { PICTURES, type AppData } from '../storage/schema';
 import { APP_TITLE, APP_VERSION } from '../brand';
 import { WORDS } from '../game/words';
+import { useFullscreen } from '../components/FullscreenButton';
+import { fullscreenSupported } from '../platform/fullscreen';
 import { SPEECH_RATES, openVoiceInstall, speak, speechStatus, type SpeechStatus } from '../platform/speech';
 
 /** One line a tester can photograph: WebView engine, Android version, CSS screen size. */
@@ -28,6 +30,7 @@ export function SettingsModal() {
   const [exported, setExported] = useState<{ where: string; uri?: string } | null>(null);
   const close = () => openSettings(false);
   const [voice, setVoice] = useState<SpeechStatus>('checking');
+  const [fsOn, toggleFs] = useFullscreen();
   useEffect(() => {
     void speechStatus(true).then(setVoice);
   }, []);
@@ -81,6 +84,7 @@ export function SettingsModal() {
             />,
           )}
           {isNative && row(t('settings.haptics'), <Toggle on={settings.haptics} onChange={(v) => updateSettings({ haptics: v })} />)}
+          {fullscreenSupported && row(t('fullscreen.title'), <Toggle testId="set-fullscreen" on={fsOn} onChange={() => toggleFs()} />, t(isNative ? 'fullscreen.descApp' : 'fullscreen.descWeb'))}
           {row(t('settings.lowPower'), <Toggle testId="set-lowpower" on={settings.lowPower} onChange={(v) => updateSettings({ lowPower: v })} />, t('settings.lowPowerDesc'))}
           {row(
             t('settings.picture'),

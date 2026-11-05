@@ -124,6 +124,9 @@ for (const vp of [
     for (const id of ['menu-solo', 'menu-two', 'menu-words', 'settings-btn', 'brand']) await inView(`[data-testid=${id}]`);
     await click(page, 'menu-solo');
     await inView('[data-testid=setup-start]');
+    // every topic chip is visible without scrolling (17 topics + all)
+    for (const id of ['cat-all', 'cat-basic', 'cat-life', 'cat-time']) await inView(`[data-testid=${id}]`);
+    await page.waitForTimeout(250);
     await page.screenshot({ path: join(out, `setup-${vp.width}.png`) });
     await click(page, 'setup-start');
     await page.waitForSelector('[data-testid=keyboard]');
@@ -379,6 +382,35 @@ await test('pronunciation: no English voice → button dimmed with a notice', as
   await click(page, 'speak-dog');
   await page.waitForSelector('[data-testid=toast]');
   assert((await page.evaluate(() => window.__spoken.length)) === 0, 'nothing spoken');
+});
+
+await test('more words: 1500+ in all topics, new topics playable', async () => {
+  const page = await newPage();
+  await click(page, 'menu-solo');
+  await click(page, 'level-all');
+  await click(page, 'cat-all');
+  const total = Number((await page.textContent('[data-testid=pool-count]')).replace(/[^0-9]/g, ''));
+  assert(total >= 1500, 'total words ' + total);
+  await page.screenshot({ path: join(out, 'setup-topics.png') });
+  for (const cat of ['actions', 'describe', 'mind', 'time', 'life', 'basic', 'clothes']) assert(await page.$(`[data-testid=cat-${cat}]`), 'topic ' + cat);
+  await click(page, 'cat-mind');
+  await click(page, 'setup-start');
+  await page.waitForSelector('[data-testid=word]');
+  assert((await page.textContent('.topTitle')).includes('마음'), 'mind topic title');
+});
+
+await test('full screen button (web): enters and leaves', async () => {
+  const page = await newPage();
+  assert((await page.getAttribute('[data-testid=fullscreen-btn]', 'data-on')) === '0', 'starts windowed');
+  await click(page, 'fullscreen-btn');
+  await page.waitForFunction(() => !!document.fullscreenElement, null, { timeout: 5000 });
+  await page.waitForSelector('[data-testid=fullscreen-btn][data-on="1"]');
+  await click(page, 'settings-btn');
+  assert(await page.$('[data-testid=set-fullscreen].on'), 'settings toggle shows on');
+  await click(page, 'set-fullscreen');
+  await page.waitForFunction(() => !document.fullscreenElement, null, { timeout: 5000 });
+  await click(page, 'settings-close');
+  await page.waitForSelector('[data-testid=fullscreen-btn][data-on="0"]');
 });
 
 await test('English UI and settings', async () => {
