@@ -53,15 +53,41 @@ function drawPiece(c:CanvasRenderingContext2D,kind:Kind,x:number,y:number,size:n
 function rounded(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,color:string,r=12){
   c.fillStyle=color;c.beginPath();c.roundRect(x,y,w,h,r);c.fill();
 }
-export interface Layout {boardX:number;boardY:number;cell:number;boardRight:number}
+export interface Rect {x:number;y:number;w:number;h:number}
+export interface Layout {
+  mode:'landscape'|'portrait';
+  boardX:number;boardY:number;cell:number;boardRight:number;boardBottom:number;
+  /** canvas text boxes that must stay clear of the HTML touch buttons (tests read these) */
+  texts:Record<string,Rect>;
+}
+/** Space kept free under the board for the touch buttons in portrait. */
+export const PORTRAIT_CONTROLS_H=150;
+const PORTRAIT_TOP=58;
+export function computeLayout(w:number,h:number):{mode:Layout['mode'];cell:number;bx:number;by:number;railW:number} {
+  if(h>w){
+    // Portrait (tablet held upright): board in the middle, narrow rails on both
+    // sides, touch buttons underneath (see .touch-controls in app.css).
+    const railW=Math.max(92,Math.min(170,Math.floor(w*.2)));
+    const cell=Math.max(13,Math.floor(Math.min((w-2*railW-24)/10,(h-PORTRAIT_TOP-PORTRAIT_CONTROLS_H-16)/20)));
+    const bx=Math.floor((w-cell*10)/2);
+    const by=PORTRAIT_TOP+Math.max(0,Math.floor((h-PORTRAIT_TOP-PORTRAIT_CONTROLS_H-cell*20)/2));
+    return {mode:'portrait',cell,bx,by,railW};
+  }
+  const cell=Math.max(13,Math.floor(Math.min((h-30)/20,(w-450)/10)));
+  return {mode:'landscape',cell,bx:Math.floor((w-cell*10)/2),by:Math.floor((h-cell*20)/2),railW:0};
+}
+function textBox(c:CanvasRenderingContext2D,txt:string,x:number,y:number,size:number):Rect{
+  c.font='600 '+size+'px Nunito, "Gowun Dodum", sans-serif';
+  return {x,y:y-size,w:c.measureText(txt).width,h:size+5};
+}
 export function renderGame(canvas:HTMLCanvasElement,s:GameState,settings:Settings,lang:'ko'|'en'):Layout {
   const box=canvas.getBoundingClientRect(), w=box.width,h=box.height,dpr=Math.min(2,window.devicePixelRatio||1);
   const pw=Math.round(w*dpr),ph=Math.round(h*dpr);
   if(canvas.width!==pw||canvas.height!==ph){canvas.width=pw;canvas.height=ph;}
   const c=canvas.getContext('2d',{alpha:false})!;
   c.setTransform(dpr,0,0,dpr,0,0);
-  const cell=Math.max(13,Math.floor(Math.min((h-30)/20,(w-450)/10)));
-  const bh=cell*20,bw=cell*10,bx=Math.floor((w-bw)/2),by=Math.floor((h-bh)/2);
+  const L=computeLayout(w,h),cell=L.cell,bx=L.bx,by=L.by;
+  const bh=cell*20,bw=cell*10;
   c.fillStyle='#192621';c.fillRect(0,0,w,h);
   // Muted wood backdrop; no runtime gradients or shadows.
   for(let i=0;i<Math.ceil(h/30);i++){
@@ -93,30 +119,59 @@ export function renderGame(canvas:HTMLCanvasElement,s:GameState,settings:Setting
     for(const [x,y] of blocks(s.active))if(y>=HIDDEN_H&&y<BOARD_H)
       c.drawImage(tile(s.active.kind),bx+x*cell,by+(y-HIDDEN_H)*cell,cell-.5,cell-.5);
   }
-  // Quiet, spacious information rails keep the board clear at 853 x 533.
-  const left=Math.max(18,bx-225),right=bx+bw+25;
-  rounded(c,left,by+14,Math.min(190,bx-left-15),128,'rgba(231,205,160,.065)');
-  label(c,t(lang,'hold'),left+14,by+43,17);
-  if(s.hold)drawPiece(c,s.hold,left+23,by+58,19);
-  label(c,t(lang,'time'),left+6,by+203,16,'#c3b29c');
-  label(c,formatTime(s.ticks*1000/60),left+6,by+239,24);
-  label(c,t(lang,'lines'),left+6,by+280,16,'#c3b29c');
-  label(c,String(s.lines),left+6,by+316,26);
-  const sideW=Math.max(120,Math.min(206,w-right-16));
-  rounded(c,right,by+14,sideW,Math.min(214,bh*.46),'rgba(231,205,160,.065)');
-  label(c,t(lang,'next'),right+15,by+43,17);
+  const texts:Record<string,Rect>={};
+  const put=(key:string,txt:string,x:number,y:number,size:number,color?:string)=>{
+    texts[key]=textBox(c,txt,x,y,size);label(c,txt,x,y,size,color);
+  };
   const count=settings.previews===1?1:3;
-  for(let i=0;i<count;i++){
-    const next=s.queue[i];if(!next)break;
-    drawPiece(c,next,right+13,by+51+i*61,Math.min(15,Math.max(11,cell*.55)));
+  if(L.mode==='portrait'){
+    const rw=Math.min(L.railW,bx-24),left=bx-14-rw,right=bx+bw+14;
+    // bigger previews than landscape: the side rails are the only place for them
+    const ps=Math.max(10,Math.min(26,Math.floor((rw-16)/4)));
+    rounded(c,left,by,rw,ps*2+46,'rgba(231,205,160,.065)');
+    put('hold',t(lang,'hold'),left+10,by+24,15);
+    if(s.hold)drawPiece(c,s.hold,left+(rw-ps*4)/2,by+34,ps);
+    const ly=by+ps*2+80;
+    put('timeLabel',t(lang,'time'),left+4,ly,14,'#c3b29c');
+    put('time',formatTime(s.ticks*1000/60),left+4,ly+28,21);
+    put('linesLabel',t(lang,'lines'),left+4,ly+64,14,'#c3b29c');
+    put('lines',String(s.lines),left+4,ly+92,23);
+    const ns=Math.max(9,Math.min(22,Math.floor((rw-16)/4)));
+    rounded(c,right,by,rw,34+count*(ns*2+18),'rgba(231,205,160,.065)');
+    put('next',t(lang,'next'),right+10,by+24,15);
+    for(let i=0;i<count;i++){
+      const next=s.queue[i];if(!next)break;
+      drawPiece(c,next,right+(rw-ns*4)/2,by+34+i*(ns*2+18),ns);
+    }
+    const sy=by+46+count*(ns*2+18)+24;
+    put('scoreLabel',t(lang,'score'),right+4,sy,14,'#c3b29c');
+    put('score',s.score.toLocaleString(),right+4,sy+28,Math.min(23,Math.floor(rw/5)));
+    put('level',t(lang,'level')+' '+s.level,right+4,sy+64,18);
+  }else{
+    // Quiet, spacious information rails keep the board clear at 853 x 533.
+    const left=Math.max(18,bx-225),right=bx+bw+25;
+    rounded(c,left,by+14,Math.min(190,bx-left-15),128,'rgba(231,205,160,.065)');
+    put('hold',t(lang,'hold'),left+14,by+43,17);
+    if(s.hold)drawPiece(c,s.hold,left+23,by+58,19);
+    put('timeLabel',t(lang,'time'),left+6,by+203,16,'#c3b29c');
+    put('time',formatTime(s.ticks*1000/60),left+6,by+239,24);
+    put('linesLabel',t(lang,'lines'),left+6,by+280,16,'#c3b29c');
+    put('lines',String(s.lines),left+6,by+316,26);
+    const sideW=Math.max(120,Math.min(206,w-right-16));
+    rounded(c,right,by+14,sideW,Math.min(214,bh*.46),'rgba(231,205,160,.065)');
+    put('next',t(lang,'next'),right+15,by+43,17);
+    for(let i=0;i<count;i++){
+      const next=s.queue[i];if(!next)break;
+      drawPiece(c,next,right+13,by+51+i*61,Math.min(15,Math.max(11,cell*.55)));
+    }
+    put('scoreLabel',t(lang,'score'),right+7,by+bh*.62,16,'#c3b29c');
+    put('score',s.score.toLocaleString(),right+7,by+bh*.62+36,Math.min(29,Math.max(23,cell*1.2)));
+    put('level',t(lang,'level')+'  '+s.level,right+7,by+bh*.80,20);
+    // The current mode is already named in the top-left HTML chip.
+    // Do not draw it at the bottom-left: that rail is reserved for the
+    // physical touch buttons and would overlap them even at 1280x800.
   }
-  label(c,t(lang,'score'),right+7,by+bh*.62,16,'#c3b29c');
-  label(c,s.score.toLocaleString(),right+7,by+bh*.62+36,Math.min(29,Math.max(23,cell*1.2)));
-  label(c,t(lang,'level')+'  '+s.level,right+7,by+bh*.80,20);
-  // The current mode is already named in the top-left HTML chip.
-  // Do not draw it at the bottom-left: that rail is reserved for the
-  // physical touch buttons and would overlap them even at 1280x800.
-  return {boardX:bx,boardY:by,cell,boardRight:bx+bw};
+  return {mode:L.mode,boardX:bx,boardY:by,cell,boardRight:bx+bw,boardBottom:by+bh,texts};
 }
 export function formatTime(ms:number):string{
   const total=Math.max(0,Math.floor(ms/1000)),min=Math.floor(total/60),sec=total%60;

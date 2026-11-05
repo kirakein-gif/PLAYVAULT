@@ -47,16 +47,19 @@ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
    const id=q.startsWith('[data-testid=') && q.endsWith(']')
      ? q.slice('[data-testid='.length,-1) : null;
    if(target.hit!==id)throw Error('Touch target obscured or outside viewport: '+q+' '+JSON.stringify(target));
-   // This CI emulator is an Android 14 1280x800 tablet at 160dpi.
-   // The 24px top status bar is outside the WebView's 1280x716 CSS viewport;
-   // its bottom taskbar occupies the remaining area.
+   // This CI emulator is an Android 14 800x1280 portrait tablet at 160dpi.
+   // The 24px top status bar is outside the WebView's CSS viewport;
+   // the navigation bar occupies the bottom.
    const physicalX=Math.round(target.x),physicalY=Math.round(target.y+24);
    log('adb touch',{target:q,physicalX,physicalY});
    await device.shell('input tap '+physicalX+' '+physicalY);
    await wait(500);
  }
  await waitSelector('[data-testid=start-gentle]');
- log('home loaded',{size:await page.evaluate(()=>[innerWidth,innerHeight])});
+ const homeSize=await page.evaluate(()=>[innerWidth,innerHeight]);
+ log('home loaded',{size:homeSize});
+ // The APK is locked upright (family request 2026-11-05).
+ if(!(homeSize[1]>homeSize[0]))throw Error('App is not in portrait: '+JSON.stringify(homeSize));
  await wait(1300);
  await device.screenshot({path:path.join(out,'home.png')});
  await click('[data-testid=start-gentle]');
@@ -157,6 +160,23 @@ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
  if(!await reloaded.evaluate(()=>!!document.querySelector('[data-testid=start-gentle]')))
    throw Error('App exited after declining Android Back confirmation');
  log('Android Back on home requested exit confirmation; dismissed successfully');
+ // Full screen: hiding the status and navigation bars makes the WebView taller,
+ // and the saved choice is applied again after a full restart.
+ const normalH=await reloaded.evaluate(()=>innerHeight);
+ await reloaded.evaluate(()=>[...document.querySelectorAll('button')].find(x=>x.textContent.trim()==='설정')?.click());
+ await reloaded.waitForFunction(()=>!!document.querySelector('[data-testid=set-fullscreen]'),null,{polling:150,timeout:10000});
+ await reloaded.evaluate(()=>document.querySelector('[data-testid=set-fullscreen]').click());
+ await reloaded.waitForFunction(h=>innerHeight>h,normalH,{polling:200,timeout:10000});
+ const fullH=await reloaded.evaluate(()=>innerHeight);
+ log('full screen on',{normalH,fullH});
+ await device.screenshot({path:path.join(out,'fullscreen.png')});
+ await wait(1100);
+ await device.shell('am force-stop '+PKG);
+ await device.shell('am start -n '+PKG+'/.MainActivity');
+ const again=await (await device.webView({pkg:PKG},{timeout:60000})).page();
+ await again.waitForFunction(()=>!!document.querySelector('[data-testid=start-gentle]'),null,{polling:300,timeout:60000});
+ await again.waitForFunction(h=>innerHeight>h,normalH,{polling:200,timeout:15000});
+ log('full screen kept after restart',{height:await again.evaluate(()=>innerHeight)});
  state.ok=state.errors.length===0&&state.external.length===0;
  state.finished=new Date().toISOString();
  fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(state,null,2));

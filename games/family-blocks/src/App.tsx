@@ -9,7 +9,8 @@ import type { GameState } from './core/game';
 import type { Mode } from './core/config';
 import { translate as t } from './i18n';
 import { sound } from './audio/sound';
-import { hubUrl, isNative, onBackButton, exitApp, pickTextFile, saveTextFile, shareFile } from './platform/native';
+import { hubUrl, isNative, onBackButton, onLifecycle, exitApp, pickTextFile, saveTextFile, shareFile } from './platform/native';
+import { fullscreenSupported, isWebFullscreen, onWebFullscreenChange, setFullscreen } from './platform/fullscreen';
 import './styles/app.css';
 
 type Screen='home'|'settings'|'records'|'play'|'result'|'licenses';
@@ -42,6 +43,16 @@ export default function App(){
       if(window.confirm(t(profile?.lang??'ko','appExitConfirm')))exitApp();
     });
   },[screen,data]);
+  // Full screen: APK keeps the per-player choice and re-applies it on start and
+  // resume; the web build follows the browser's own full-screen state.
+  const [webFs,setWebFs]=useState(isWebFullscreen());
+  useEffect(()=>onWebFullscreenChange(setWebFs),[]);
+  const savedFs=!!data&&(data.profiles.find(p=>p.id===data.activeProfileId)??data.profiles[0]).settings.fullscreen;
+  useEffect(()=>{
+    if(!isNative||!data)return;
+    void setFullscreen(savedFs);
+    return onLifecycle(()=>{},()=>{if(savedFs)void setFullscreen(true);});
+  },[savedFs,!!data]);
   if(!data)return <main className="loading">{GAME_TITLE}</main>;
   const current=data.profiles.find(p=>p.id===data.activeProfileId)??data.profiles[0];
   const lang=current.lang;
@@ -105,6 +116,8 @@ export default function App(){
     return p.records.sprint40.bestMs===null?T('notYet'):formatTime(p.records.sprint40.bestMs);
   };
   const settings=current.settings;
+  const fsOn=isNative?settings.fullscreen:webFs;
+  const toggleFs=()=>{void setFullscreen(!fsOn).then(now=>{if(isNative)settingsUpdate('fullscreen',now);else setWebFs(now);});};
   return <div className="app-shell">
     <div className="rotate-message"><div className="rotate-icon">↻</div>{T('rotateDevice')}</div>
     {screen==='play'?<GameScreen key={session} mode={mode} level={startLevel} lang={lang}
@@ -125,6 +138,10 @@ export default function App(){
               </select>
             </label>
           </>:<button className="back-link" onClick={()=>setScreen('home')}>← {T('home')}</button>}
+          {fullscreenSupported&&<button className="outline fs-button" data-testid="fullscreen-btn" data-on={fsOn?'1':'0'}
+            aria-label={T(fsOn?'fullscreenExit':'fullscreen')} title={T(fsOn?'fullscreenExit':'fullscreen')} onClick={toggleFs}>
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d={fsOn?'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5':'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5'}/></svg></button>}
           {screen==='home'&&<button className="outline" onClick={()=>setScreen('settings')}>{T('settings')}</button>}
         </div>
       </header>
@@ -175,6 +192,7 @@ export default function App(){
             <option value="slow">{T('slow')}</option><option value="normal">{T('normal')}</option><option value="fast">{T('fast')}</option></select></label>
           <label>{T('previews')}<select value={settings.previews} onChange={e=>settingsUpdate('previews',e.target.value==='1'?1:3)}>
             <option value="1">{T('pieces1')}</option><option value="3">{T('pieces3')}</option></select></label>
+          {fullscreenSupported&&<label className="toggle-row"><span>{T('fullscreen')}</span><input type="checkbox" data-testid="set-fullscreen" checked={fsOn} onChange={toggleFs}/></label>}
           <label className="toggle-row"><span>{T('ghost')}</span><input type="checkbox" checked={settings.ghost} onChange={e=>settingsUpdate('ghost',e.target.checked)}/></label>
           <label className="toggle-row"><span>{T('sfx')}</span><input type="checkbox" checked={settings.sfx} onChange={e=>settingsUpdate('sfx',e.target.checked)}/></label>
           <label className="toggle-row"><span>{T('music')}</span><input type="checkbox" checked={settings.music} onChange={e=>settingsUpdate('music',e.target.checked)}/></label>

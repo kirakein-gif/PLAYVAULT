@@ -8,6 +8,8 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // local plugin: immersive full screen (Settings → Full screen)
+        registerPlugin(FullscreenPlugin.class);
         super.onCreate(savedInstanceState);
         // The UI is laid out for tablets with large type already (body 19-22 px,
         // buttons 20-28 px). Android's system font-size setting would multiply

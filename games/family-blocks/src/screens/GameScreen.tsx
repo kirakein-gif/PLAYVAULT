@@ -136,7 +136,7 @@ export function GameScreen({mode,level,lang,settings,onFinish,onRestart}:GameScr
         }
       }else accumulator=0;
       if(notice&&now>=noticeExpire.current)setNotice('');
-      if(canvas.current)renderGame(canvas.current,game,settings,lang);
+      if(canvas.current)Object.assign(window,{__familyBlocksLayout:renderGame(canvas.current,game,settings,lang)});
       last=now;raf=requestAnimationFrame(frame);
     };
     Object.assign(window,{__familyBlocksState:game});

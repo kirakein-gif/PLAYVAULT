@@ -89,6 +89,22 @@ const log = (s, extra = {}) => { console.log(s, JSON.stringify(extra)); result.s
   await p2.evaluate(() => document.querySelector('[data-testid=menu-words]').click());
   await p2.waitForFunction(() => /1/.test(document.querySelector('[data-testid=stats]')?.textContent || ''), null, { polling: 300, timeout: 30000 });
   log('restart keeps records');
+  // Full screen: hiding the system bars makes the WebView taller; kept after restart.
+  await p2.evaluate(() => document.querySelector('[data-testid=back]')?.click());
+  await p2.waitForFunction(() => !!document.querySelector('[data-testid=settings-btn]'), null, { polling: 300, timeout: 20000 });
+  const normalH = await p2.evaluate(() => innerHeight);
+  await p2.evaluate(() => document.querySelector('[data-testid=fullscreen-btn]').click());
+  await p2.waitForFunction((h) => innerHeight > h, normalH, { polling: 200, timeout: 10000 });
+  const fullH = await p2.evaluate(() => innerHeight);
+  log('full screen on', { normalH, fullH });
+  await device.screenshot({ path: path.join(out, '06-fullscreen.png') });
+  await p2.waitForTimeout(900);
+  await device.shell(`am force-stop ${PKG}`);
+  await device.shell(`am start -n ${PKG}/.MainActivity`);
+  const p3 = await (await device.webView({ pkg: PKG }, { timeout: 60000 })).page();
+  await p3.waitForFunction(() => !!document.querySelector('[data-testid=menu-solo]'), null, { polling: 300, timeout: 60000 });
+  await p3.waitForFunction((h) => innerHeight > h, normalH, { polling: 200, timeout: 15000 });
+  log('full screen kept after restart', { height: await p3.evaluate(() => innerHeight) });
   await device.screenshot({ path: path.join(out, '05-words-after-restart.png') });
 
   result.ok = result.external.length === 0 && result.errors.length === 0;
