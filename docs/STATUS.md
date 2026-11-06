@@ -339,6 +339,8 @@ Codex / `codex/hollow-keep-foundation` / 2026-10-31 (Asia/Seoul). **검토 담�
 
 > 2026-11-06 사용자 결정: 가위바위보 기본=작게(크게 내미는 반대 손은 상대 트릭으로 추후), 냄비=플레이어 한 손·상대는 성향별, **동작 실험실 구현 담당 Codex**. 지시서 `games/worlds-greatest-game/docs/CODEX_TASK_01_MOTION_LAB.md`(작업 브랜치 `codex/wgg-motion-lab`, 경로 `motion-lab/`). 상태: 지시서 제출, Codex 착수 전. PR 미제출.
 
+> 2026-11-06 Codex 구현 [Draft PR #33](https://github.com/kirakein-gif/PLAYVAULT/pull/33)(head `1b7d414`) → Claude Code 교차 검토 **수정 요청**: ① 플레이어 직접 조작의 조작 면 불연속·장전 불가(팔을 수직으로 뻗어 상대 머리 위에서 내려찍음) ② 카메라 0이 어깨 너머가 아님(약 2m 뒤·위) ③ 브라우저 검사의 실시간 의존. 상대 스크립트 동작·관절 제약·3D 판정은 기준 충족. 병합 보류, Codex 수정 대기.
+
 ### main에 보존된 기준선
 
 | 항목 | 확인된 상태 |

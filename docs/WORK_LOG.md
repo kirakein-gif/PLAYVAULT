@@ -1685,3 +1685,15 @@
 - 다음: 사용자가 지시서 블록을 Codex에 전달 → Codex 구현·Draft PR → Claude Code 교차 검토 → 사용자 손맛 판정.
 - 5개 관리 문서 검토: WORK_LOG·STATUS 갱신, AGENTS·CLAUDE·CHANGELOG 변경 없음.
 - 검토 담당: 검토 대기. 사용자 재요청 0회. 종료 상태: 지시서 제출, Codex 착수 대기.
+
+### 2026-11-06 (Asia/Seoul) · 동작 실험실 PR #33 교차 검토 (Claude Code)
+
+- 검토 담당: Claude Code / 구현 담당: Codex. 대상: Draft PR #33 `codex/wgg-motion-lab` head `1b7d414`(구현 `d4f3105`). 구현 브랜치 수정 없음.
+- 재현(이번 실행, 클라우드 Chromium headless, GPU 없음 약 21~30fps): `tests/unit.mjs` 12/12 통과. `tests/browser.cjs`(channel 옵션만 뺀 사본) 1번 통과·2번 망치 명중 `miss`로 실패·이후 미실행. Playwright `page.clock`으로 프레임을 고정한 같은 경로는 손 공개 후 0.93s `hit` → 판정 결함이 아니라 검사의 실시간 의존. 상대 스크립트 각도 재계산은 MOTION_REFERENCE 0절과 일치.
+- 발견: 높음 2(플레이어 조작 면 불연속·장전 불가로 수직 내려찍기 / 카메라 0이 어깨 너머 아님), 중간 1(브라우저 검사 실시간 의존), 경미 4(흔들기 위팔 35° vs 측정 약 60~65°, 카운트 1.12s·선택 자동, 손목 스냅 ±8°, 냄비 보간 경로). 지시서의 팔꿈치 표기 혼동(안쪽 각도/굽힘량)은 작성자 쪽 문제였고 Codex가 바르게 정리함.
+- 문서: MOTION_REFERENCE 0-1절에 작게 흔들기 위팔 들림 약 60~65° 보강(지시서·문서 누락분), STATUS 갱신.
+- 커밋/PR: PR #33에 검토 COMMENT 등록(같은 계정 PR). 이 기록은 `ccr-a50ca9fd-k3ai31`에 푸시.
+- 다음: Codex가 1·2·3 수정 → Claude Code 재검토 → 사용자 손맛 판단. 병합 보류.
+- 5개 관리 문서 검토: WORK_LOG·STATUS 갱신, AGENTS·CLAUDE·CHANGELOG 변경 없음.
+- 검토 담당 / 발견 문제 수: Claude Code / 7건(높음 2·중간 1·경미 4). 사용자 재요청 0회.
+- 종료 상태: 수정 요청, Codex 수정 대기.
