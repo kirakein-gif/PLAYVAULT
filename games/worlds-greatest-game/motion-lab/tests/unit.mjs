@@ -5,6 +5,8 @@ import { motionFrame, stages } from '../motion.mjs';
 import { Strike, Equip, Match, outcome } from '../rules.mjs';
 import { Scene } from '../vendor/three.module.min.js';
 import { Actor, Tool } from '../scene.mjs';
+import { toolFrame } from '../poses.mjs';
+import { DirectInput } from '../input.mjs';
 let passed=0;
 function test(name,fn){fn();console.log(`PASS ${name}`);passed++;}
 let seed=20261106;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/2**32;};
@@ -46,7 +48,7 @@ test('all default motion timings inside reference ±0.05s',()=>{
   assert.ok(Math.abs(C.timing.enemyStart+DURATIONS.hammer-1.05)<1e-9);
 });
 test('authored keyframes reconstruct measured inner angles and upper-arm lift',()=>{
-  for(const [k,t,inner,lift] of [['small',0,50,35],['small',.225,75,35],['small',1.12,80,35],['large',1.12,130,55],['hammer',.4,77,92],['hammer',.55,165,108],['hammer',.73,165,95],['one',.285,55,75],['two',.365,65,100]]){
+  for(const [k,t,inner,lift] of [['small',0,50,62.5],['small',.225,75,62.5],['small',1.12,80,62.5],['large',1.12,130,55],['hammer',.4,77,92],['hammer',.55,165,108],['hammer',.73,165,95],['one',.285,55,75],['two',.365,65,100]]){
     const f=motionFrame(k,t),r=buildRig(f.targets,f),a=r.arms[k==='large'?1:0];
     assert.ok(Math.abs(a.inner-inner)<1e-6,`${k} elbow`);assert.ok(Math.abs(a.lift-lift)<1e-6,`${k} upper`);
   }
@@ -90,7 +92,47 @@ test('pot needs 3D location, normal and dwell; leaving or releasing clears defen
 });
 test('RPS cyclic rule; wrong tool, tie tool and early grab are fouls',()=>{
   assert.equal(outcome(0,2),'win');assert.equal(outcome(1,0),'win');assert.equal(outcome(2,1),'win');
-  for(const [selection,tool] of [[2,'pot'],[0,'hammer'],[1,'pot']]){const m=new Match(()=>.5);m.selection=selection;m.start(0);m.tick(1.13);assert.equal(m.grab(tool,1.14),false);assert.equal(m.result,'foul');}
+  for(const [selection,tool] of [[2,'pot'],[0,'hammer'],[1,'pot']]){const m=new Match(()=>.5);m.start(0);m.choose(selection,.1);m.tick(1.13);assert.equal(m.grab(tool,1.14),false);assert.equal(m.result,'foul');assert.notEqual(m.reason,'늦은 손');}
   const m=new Match();m.start(0);m.grab('hammer',.1);assert.equal(m.result,'foul');assert.equal(m.resolve('hit',.2),false);
 });
-console.log(`${passed}/${passed} unit groups passed; 20,000 randomized/dense samples.`);
+test('2-1-0 deadline: just-before, at/after-zero foul, last choice, no carry',()=>{
+  for(const beat of [.25,.45,.9]){
+    const saved=C.timing.pump;C.timing.pump=beat;
+    const m=new Match(()=>.5);m.start(0);assert.equal(m.selection,null);assert.ok(m.choose(0,beat*2-.001));m.tick(beat*2);assert.equal(m.phase,'reveal');
+    m.tick(beat*2+C.timing.reveal);assert.equal(m.phase,'react');
+    m.start(10);assert.equal(m.selection,null);m.tick(10+beat*2);assert.equal(m.result,'foul');assert.equal(m.reason,'늦은 손');
+    m.start(20);m.choose(0,20+.01);m.choose(2,20+beat*2-.001);m.tick(20+beat*2+.23);assert.equal(m.selection,2);assert.equal(m.rule,'win');
+    m.start(30);assert.equal(m.choose(1,30+beat*2+.001),false);assert.equal(m.result,'foul');
+    for(const k of ['small','large'])for(let t=0;t<beat*2-.1;t+=.001)assert.equal(motionFrame(k,t,2).reveal,0);
+    C.timing.pump=saved;
+  }
+});
+test('pot joint interpolation never folds past 55 degrees, including 0.15s',()=>{
+  for(let i=0;i<=1000;i++){const f=motionFrame('one',i/1000*C.timing.potOne),a=buildRig(f.targets,f).arms[0];assert.ok(a.inner>=55-1e-6);}
+});
+test('direct poses have a head-side load, short arc and fixed lengths; no vertical arm',()=>{
+  const home=new V(-.31,.91,.26);
+  for(let i=0;i<=1000;i++){const f=toolFrame('hammer',i/1000,home),r=buildRig(f.targets,f);assert.equal(violations(r),0);assert.ok(r.arms[0].lift<112);}
+  for(const [p,inner,lift] of [[C.input.loadProgress,77,92],[C.input.peakProgress,165,108],[1,165,95]]){
+    const f=toolFrame('hammer',p,home),a=buildRig(f.targets,f).arms[0];assert.ok(Math.abs(a.inner-inner)<1e-6);assert.ok(Math.abs(a.lift-lift)<1e-6);
+    if(p===C.input.loadProgress){assert.ok(a.hand.y>a.shoulder.y);assert.ok(a.hand.z<.4);}
+  }
+});
+test('10,000 one-pixel moves plus arbitrary jumps: requested hand Lipschitz bound',()=>{
+  for(const kind of ['hammer','pot']){
+    const points=kind==='hammer'?[{p:0,x:600,y:600},{p:.46,x:720,y:270},{p:.78,x:440,y:180},{p:1,x:340,y:290}]:[{p:0,x:400,y:600},{p:1,x:720,y:280}];
+    const c=new DirectInput(kind,new V(-.31,.91,.26),points,points[0]);
+    for(let i=0;i<5000;i++){const old=c.frame().targets[0].clone(),oldCursor={...c.cursor};const angle=random()*Math.PI*2;c.move(c.cursor.x+Math.cos(angle),c.cursor.y+Math.sin(angle),true);assert.ok(c.frame().targets[0].distanceTo(old)<=C.input.maxTargetMetersPerPixel+1e-9);}
+    c.move(0,0,true);c.move(2000,1000,true);assert.equal(c.violations,0);assert.ok(c.maxRatio<=C.input.maxTargetMetersPerPixel+1e-9);
+  }
+});
+test('load corner latch advances only with fresh cursor input, then reverses',()=>{
+  const points=[{p:0,x:400,y:700},{p:.46,x:620,y:220},{p:.78,x:450,y:330},{p:1,x:400,y:500}];
+  const c=new DirectInput('hammer',new V(-.31,.91,.52),points,points[0]);
+  c.move(points[1].x,points[1].y,false);assert.ok(c.progress<=.46);const stopped=c.progress;
+  c.frame();c.frame();assert.equal(c.progress,stopped);
+  c.move(points[2].x,points[2].y,true);assert.ok(c.progress>.75);
+  c.move(points[3].x,points[3].y,true);assert.ok(c.progress>.98);
+  c.move(points[2].x,points[2].y,true);assert.ok(c.progress<.9);assert.equal(c.violations,0);
+});
+console.log(`${passed}/${passed} unit groups passed.`);

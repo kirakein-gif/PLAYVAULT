@@ -339,7 +339,17 @@ Codex / `codex/hollow-keep-foundation` / 2026-10-31 (Asia/Seoul). **검토 담�
 
 > 2026-11-06 사용자 결정: 가위바위보 기본=작게(크게 내미는 반대 손은 상대 트릭으로 추후), 냄비=플레이어 한 손·상대는 성향별, **동작 실험실 구현 담당 Codex**. 지시서 `games/worlds-greatest-game/docs/CODEX_TASK_01_MOTION_LAB.md`(작업 브랜치 `codex/wgg-motion-lab`, 경로 `motion-lab/`). 상태: 지시서 제출, Codex 착수 전. PR 미제출.
 
-### 동작 실험실 구현 · 2026-11-06 Codex / Draft PR #33
+### 수정 01-1 · Motion Lab 0.2 · 2026-11-06 Codex / Draft PR #33 재검토 대기
+
+- 사용자 수정 지시01-1 및 Claude Code 리뷰 `5794752764`를 확인하고 기존 `codex/wgg-motion-lab`에서 계속 구현. 수정 전 `1b7d414`, 동작/사용자 결정 기준 문서는 **`ccr-a50ca9fd-k3ai31` `80cf145` 최신본**을 읽었다. 원격 문서 브랜치를 병합하거나 대상 밖 문서를 덮어쓰지 않았다.
+- 직접 입력: 면 전환 제거, 마우스 이동만으로 관절 경로 진행/되돌리기·좌우 편차. 실제 장전77°/92°→최고165°/108°→끝165°/95°. 요청 목표 .006m/px 상한, 장전 통과 전 진행 제한. 상대 머리 위로 팔을 수직으로 뻗는 자세가 나오지 않으며 기존 수직 커서 경로는 miss. 기존 Strike/Equip 판정 그대로.
+- 카메라0: `(-.45,1.90,.96)`에서 `(0,1.36,-.49)`를 봄, FOV70°. 내 머리 뒤 .47m/위 .33m, 오른쪽 전경의 뒤통수·어깨·팔, 상대 얼굴·손을 크게. 기준 궤적의 공개/장전/최고점/충돌/냄비에서 상대 머리/손 투영·전경 가림 검사 통과.
+- 2→1→0(가위/바위/보), 0 전 마지막 선택·미선택/늦은 변경 파울·매 판 선택 초기화. 박자 .45초 기본/패널 조절, 스냅 최대값 config/패널 조절. 작게 위팔62.5°, 냄비 관절보간으로55°보다 더 접히는 구간 제거. 새 판에 이전 hitstop 미승계.
+- 최종 검사: **Node17/17 묶음**. Chrome156 + Chrome채널 없는 Chromium141/SwiftShader 소프트웨어에서 **30fps·60fps 각각14/14 묶음(총56)**, 명중/방어/상대방어/수직입력/늦은손 결과 일치. 관절·입력 위반/JS·콘솔오류/외부요청0. 고정 시계는 성능 측정값이 아니며 이번 실측 성능 벤치는 미실행.
+- [수정 항목별 처리·각도·캡처·녹화·재현](../games/worlds-greatest-game/motion-lab/evidence/revision-01-1/TEST_RESULTS.md). [Draft PR #33](https://github.com/kirakein-gif/PLAYVAULT/pull/33) 본문에 처리 표와 새 자료 연결. Claude Code **독립 재검토 요청 대상**이며 재검토 실행·사용자 손맛 판정은 아직 미실행. main 병합·직접 배포 명령/배포설정 변경 없음.
+- 범위: motion-lab/ 및 사용자 보고 지시의 STATUS·WORK_LOG만. CHANGELOG·AGENTS·CLAUDE 검토/변경 없음. 몸체 관통 방지·근골격 모델·모든 해상도/편차 가림·실물 마우스/태블릿·장기/Windows/Steam 한계 유지. 자동 검증은 손맛 완성이 아님.
+
+### (이전 기록) 동작 실험실 0.1 구현 · 2026-11-06 Codex / Draft PR #33
 
 - 담당: **Codex**, 사용자 지정 인계 확인. 브랜치 `codex/wgg-motion-lab`, 기준 `ccr-a50ca9fd-k3ai31` **`be913a26896e5d8bf1677d67e6956ca17c9f38af`** (main `c04c0f4`).
 - 범위: 신규 `games/worlds-greatest-game/motion-lab/`와 STATUS·WORK_LOG·CHANGELOG의 이번 작업 기록. 기존 HTML·prototype·다른 게임·공용 자산·배포 설정 보존.

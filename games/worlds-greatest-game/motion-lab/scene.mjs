@@ -116,18 +116,25 @@ export function createScene(canvas) {
   const grid=new T.GridHelper(8,40,0x64706a,0x37463f);grid.position.y=.001;scene.add(grid);
   mesh(new T.BoxGeometry(1.28,.055,.72),mat(0x74817a),scene,[1,1,1],[0,C.tableY-.0275,0]);
   for(const x of [-.52,.52])for(const z of [-.25,.25])mesh(new T.BoxGeometry(.045,.81,.045),joint,scene,[1,1,1],[x,.405,z]);
-  const camera=new T.PerspectiveCamera(43,1,.02,100);
-  const presets=[[[1.15,2.14,2.5],[0,1.08,0]],[[2.65,1.85,.05],[0,1.05,0]],[[.65,1.95,-2.6],[0,1.10,0]]];
+  const camera=new T.PerspectiveCamera(64,1,.02,100);
+  const presets=[[[ -.45,1.9,.96],[0,1.36,-.49]],[[2.65,1.85,.05],[0,1.05,0]],[[.65,1.95,-2.6],[0,1.10,0]]];
   let cam=0;
-  function cameraMode(index){cam=index;camera.position.set(...presets[index][0]);camera.lookAt(...presets[index][1]);camera.updateMatrixWorld();}
+  function cameraMode(index){cam=index;camera.fov=index===0?70:43;camera.position.set(...presets[index][0]);camera.lookAt(...presets[index][1]);camera.updateProjectionMatrix();camera.updateMatrixWorld();}
   cameraMode(0);
   const actors=[new Actor(scene,C.seatZ,Math.PI,'player'),new Actor(scene,-C.seatZ,0,'enemy')];
   // Opponent's basic hand is on the visible side; the large gesture uses its other hand.
-  actors[1].group.scale.x=-1;actors[1].group.updateMatrixWorld(true);
+  for(const a of actors){a.group.scale.x=-1;a.group.updateMatrixWorld(true);}
   const tools=Object.fromEntries(Object.entries(C.homes).map(([kind,p])=>[kind,new Tool(scene,kind,new V(...p))]));
   const enemyTools={hammer:new Tool(scene,'hammer',new V(.31,.91,-.23)),pot:new Tool(scene,'pot',new V(-.31,.91,-.2))};
   const aim=mesh(sphere,new T.MeshBasicMaterial({color:0xebc577,wireframe:true}),scene,[.028,.028,.028]);aim.visible=false;
   function resize(){const r=canvas.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();}
-  function screen(p){const q=p.clone().project(camera),r=canvas.getBoundingClientRect();return {x:r.left+(q.x+1)*r.width/2,y:r.top+(1-q.y)*r.height/2};}
-  return {renderer,scene,camera,actors,tools,enemyTools,aim,screen,resize,cameraMode,get cam(){return cam;},render(){renderer.render(scene,camera);}};
+  function screen(p){const q=p.clone().project(camera),r=canvas.getBoundingClientRect();return {x:r.left+(q.x+1)*r.width/2,y:r.top+(1-q.y)*r.height/2,ndc:q.toArray()};}
+  function visibility(point){
+    scene.updateMatrixWorld(true);const projected=screen(point),direction=point.clone().sub(camera.position),distance=direction.length();
+    const caster=new T.Raycaster(camera.position,direction.normalize(),0,distance-.045);
+    const blockers=caster.intersectObjects([...actors[0].links.map(b=>b.m),actors[0].head,...actors[0].hands.map(h=>h.g),...Object.values(tools).filter(t=>t.g.visible).map(t=>t.g)],true);
+    return {...projected,inFrame:projected.ndc.every(n=>n>=-1&&n<=1),occluded:blockers.length>0,
+      blockers:blockers.slice(0,3).map(b=>({center:b.object.getWorldPosition(new V()).toArray(),point:b.point.toArray(),link:actors[0].links.findIndex(x=>x.m===b.object)}))};
+  }
+  return {renderer,scene,camera,actors,tools,enemyTools,aim,screen,visibility,resize,cameraMode,get cam(){return cam;},render(){renderer.render(scene,camera);}};
 }

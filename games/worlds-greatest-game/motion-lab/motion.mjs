@@ -1,5 +1,6 @@
 import { C, DURATIONS } from './config.mjs';
 import { V, rad, ease, clamp, buildRig } from './kinematics.mjs';
+import { toolFrame } from './poses.mjs';
 export const idle=()=>[new V(-.27,.91,.18),new V(.27,.91,.18)];
 const pairMix=(a,b,t)=>a.map((n,i)=>n+(b[i]-n)*ease(t));
 export function motionFrame(kind,t,shape=0,home=new V(-.31,.91,.26)) {
@@ -50,6 +51,11 @@ export function motionFrame(kind,t,shape=0,home=new V(-.31,.91,.26)) {
     }
     if(ret)goal.lerp(idle()[i],ret);
     targets[i]=goal;poles[i]=elbow;
+  }
+  if(kind==='one'){
+    const d=DURATIONS.one,p=t>d+.6?1-ease((t-d-.6)/T.potReturn):ease(t/d);
+    const one=toolFrame('pot',p,home,0,grips[0]);
+    return {...one,tool,toolPitch,stage};
   }
   return {targets,wrists,grips,shapes,reveal,lean,twist,neck,tool,toolPitch,stage,poles,clavRaises};
 }

@@ -29,11 +29,21 @@ export class Equip {
   }
 }
 export class Match {
-  constructor(random=Math.random){this.random=random;this.round=0;this.phase='idle';this.selection=1;this.held=null;this.result=null;this.equip=new Equip();}
-  start(now){this.round++;this.phase='count';this.at=now;this.enemy=Math.floor(this.random()*3);this.result=null;this.held=null;this.equip.reset();}
+  constructor(random=Math.random){this.random=random;this.round=0;this.phase='idle';this.selection=null;this.held=null;this.result=null;this.equip=new Equip();}
+  start(now){this.round++;this.phase='count';this.at=now;this.beat=C.timing.pump;this.zeroAt=now+this.beat*2;this.selection=null;this.rule=null;this.reason='';this.reactAt=null;this.resolvedAt=null;this.enemy=Math.floor(this.random()*3);this.result=null;this.held=null;this.equip.reset();}
+  choose(hand,now){
+    this.tick(now);
+    if(!Number.isInteger(hand)||hand<0||hand>2)return false;
+    if(this.phase==='count'&&now<this.zeroAt){this.selection=hand;return true;}
+    if(this.phase==='reveal'||this.phase==='react')this.resolve('foul',now,'늦은 손');
+    return false;
+  }
   tick(now) {
-    const countEnd=C.timing.pump*2+C.timing.reveal;
-    if(this.phase==='count'&&now-this.at>=countEnd){this.phase='react';this.reactAt=this.at+countEnd;this.rule=outcome(this.selection,this.enemy);}
+    if(this.phase==='count'&&now>=this.zeroAt){
+      if(this.selection===null){this.resolve('foul',this.zeroAt,'늦은 손');return;}
+      this.phase='reveal';this.rule=outcome(this.selection,this.enemy);
+    }
+    if(this.phase==='reveal'&&now>=this.zeroAt+C.timing.reveal){this.phase='react';this.reactAt=this.zeroAt+C.timing.reveal;}
     if(this.phase==='react') {
       const age=now-this.reactAt;
       if(this.rule==='tie'&&age>=.5)this.resolve('tie',now);
@@ -42,9 +52,9 @@ export class Match {
   }
   grab(kind,now) {
     if(this.phase==='result'||this.phase==='idle'||this.held)return false;
-    if(this.phase!=='react'||this.rule==='tie'||kind!==(this.rule==='win'?'hammer':'pot')){this.resolve('foul',now);return false;}
+    if(this.phase!=='react'||this.rule==='tie'||kind!==(this.rule==='win'?'hammer':'pot')){this.resolve('foul',now,this.phase!=='react'?'조기 출발':this.rule==='tie'?'무승부 중 도구':'잘못된 도구');return false;}
     this.held=kind;this.grabAt=now;this.strike=new Strike();return true;
   }
-  resolve(result,now){if(this.phase==='result')return false;this.result=result;this.phase='result';this.resolvedAt=now;this.held=null;return true;}
+  resolve(result,now,reason=''){if(this.phase==='result')return false;this.result=result;this.reason=reason;this.phase='result';this.resolvedAt=now;this.held=null;return true;}
   release(cancel=false){if(!cancel&&this.held==='hammer')this.resolve('miss',this.now||0);this.held=null;this.equip.reset();}
 }

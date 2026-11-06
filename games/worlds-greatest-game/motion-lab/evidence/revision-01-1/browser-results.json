@@ -1,0 +1,432 @@
+{
+  "browser": "156.0.8078.80",
+  "softwareGL": false,
+  "viewport": "1440x1100",
+  "clock": "page.clock paused; rAF callbacks at 30/60fps",
+  "runs": [
+    {
+      "clockFps": 30,
+      "passed": 14,
+      "checks": [
+        "direct loaded short arc hits crown; camera head/hand visible",
+        "direct one-hand pot uses 55/75 and bows head; blocks 3D strike",
+        "one pixel continuity across old surface boundary; 0 input violations",
+        "legacy vertical overhead cursor path cannot make a vertical arm",
+        "late attack meets actual opponent pot guard",
+        "wrong tool and tie tool remain fouls",
+        "held click cannot auto-attack; release is miss",
+        "pot retreat removes defense and allows actual enemy hit",
+        "cancel, focus loss and resize release captures",
+        "2-1-0 chants, just-before-zero selection succeeds",
+        "late/no choice foul, including a change attempted after zero",
+        "last pre-zero choice wins and next round inherits nothing",
+        "adjustable beat preserves hidden hands; snap setting remains bounded",
+        "three cameras, large opposite hand, two-hand pot and slow motion"
+      ],
+      "motion": {
+        "load": {
+          "inner": 77.0000157355781,
+          "lift": 91.9999791669955,
+          "neck": 0,
+          "hand": [
+            -0.10256122146668371,
+            1.6006157198606505,
+            0.25837330976271833
+          ]
+        },
+        "peak": {
+          "inner": 164.993690616675,
+          "lift": 107.9988528393954,
+          "neck": 0,
+          "hand": [
+            -0.007266938631977471,
+            1.5527295493973916,
+            0.627295348164359
+          ]
+        },
+        "contact": {
+          "inner": 165.00000000000014,
+          "lift": 98.14506768916966,
+          "elapsed": 0.8049999999999913,
+          "hand": [
+            0.003731838598482473,
+            1.4457953409011972,
+            0.6656551920565248
+          ],
+          "tip": [
+            0.0037318385984825894,
+            1.6998591223756039,
+            -0.4582354371957152
+          ]
+        },
+        "pot": {
+          "inner": 55.00000565709642,
+          "lift": 74.99999021976818,
+          "neck": 17.999996841818614,
+          "hand": [
+            -0.17267859587008413,
+            1.4920945082605037,
+            0.2293930763806928
+          ]
+        },
+        "verticalResult": "miss"
+      },
+      "captures": {
+        "reveal": {
+          "head": {
+            "x": 560,
+            "y": 480.8536631125433,
+            "ndc": [
+              -1.6680195093484285e-17,
+              0.0421903534469545,
+              0.9753110505426628
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          },
+          "hand": {
+            "x": 702.5199246003733,
+            "y": 525.7466509018482,
+            "ndc": [
+              0.2663923824306043,
+              -0.08285975181573309,
+              0.9696830438909837
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          }
+        },
+        "load": {
+          "head": {
+            "x": 560,
+            "y": 480.8536631125433,
+            "ndc": [
+              -1.6680195093484285e-17,
+              0.0421903534469545,
+              0.9753110505426628
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          },
+          "hand": {
+            "x": 702.5199246003733,
+            "y": 525.7466509018482,
+            "ndc": [
+              0.2663923824306043,
+              -0.08285975181573309,
+              0.9696830438909837
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          }
+        },
+        "peak": {
+          "head": {
+            "x": 560,
+            "y": 480.8536631125433,
+            "ndc": [
+              -1.6680195093484285e-17,
+              0.0421903534469545,
+              0.9753110505426628
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          },
+          "hand": {
+            "x": 536.8629814310807,
+            "y": 655.499538104399,
+            "ndc": [
+              -0.04324676368022311,
+              -0.4442884069760418,
+              0.9716970212646221
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          }
+        },
+        "impact": {
+          "head": {
+            "x": 560.2169417648247,
+            "y": 481.0741205333843,
+            "ndc": [
+              0.0004054986258404977,
+              0.04157626592372054,
+              0.9752789189366343
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          },
+          "hand": {
+            "x": 484.0384316412594,
+            "y": 688.2159591307857,
+            "ndc": [
+              -0.14198423992287956,
+              -0.5354204989715478,
+              0.9715922515598441
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          }
+        },
+        "pot": {
+          "head": {
+            "x": 562.654008168482,
+            "y": 483.63943688710873,
+            "ndc": [
+              0.004960762931741983,
+              0.03443053791891731,
+              0.9749194897101843
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          },
+          "hand": {
+            "x": 637.850421558013,
+            "y": 534.8478877230291,
+            "ndc": [
+              0.14551480665049146,
+              -0.10821138641512254,
+              0.9674849845082232
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          }
+        }
+      },
+      "outcomes": {
+        "strike": "hit",
+        "defense": "block",
+        "opponentGuard": "guarded",
+        "vertical": "miss",
+        "lateHand": "foul"
+      },
+      "violations": 0,
+      "inputViolations": 0,
+      "maxTargetRatio": 0.004591699206869258,
+      "errors": [],
+      "external": []
+    },
+    {
+      "clockFps": 60,
+      "passed": 14,
+      "checks": [
+        "direct loaded short arc hits crown; camera head/hand visible",
+        "direct one-hand pot uses 55/75 and bows head; blocks 3D strike",
+        "one pixel continuity across old surface boundary; 0 input violations",
+        "legacy vertical overhead cursor path cannot make a vertical arm",
+        "late attack meets actual opponent pot guard",
+        "wrong tool and tie tool remain fouls",
+        "held click cannot auto-attack; release is miss",
+        "pot retreat removes defense and allows actual enemy hit",
+        "cancel, focus loss and resize release captures",
+        "2-1-0 chants, just-before-zero selection succeeds",
+        "late/no choice foul, including a change attempted after zero",
+        "last pre-zero choice wins and next round inherits nothing",
+        "adjustable beat preserves hidden hands; snap setting remains bounded",
+        "three cameras, large opposite hand, two-hand pot and slow motion"
+      ],
+      "motion": {
+        "load": {
+          "inner": 77.00035169320722,
+          "lift": 91.99953437871265,
+          "neck": 0,
+          "hand": [
+            -0.10255926992606051,
+            1.6006139023802124,
+            0.25837733789269324
+          ]
+        },
+        "peak": {
+          "inner": 164.95593216471826,
+          "lift": 107.99198766631248,
+          "neck": 0,
+          "hand": [
+            -0.0072901957161775055,
+            1.552841364908287,
+            0.6271985735320014
+          ]
+        },
+        "contact": {
+          "inner": 165.0000000000001,
+          "lift": 97.83610491109219,
+          "elapsed": 0.8152222222222163,
+          "hand": [
+            0.003993664105558209,
+            1.4423415732621816,
+            0.6665682948620631
+          ],
+          "tip": [
+            0.003993664105558326,
+            1.691361161598358,
+            -0.46360356207653164
+          ]
+        },
+        "pot": {
+          "inner": 55.00002125732951,
+          "lift": 74.99996324941227,
+          "neck": 17.99998813269252,
+          "hand": [
+            -0.1726784454837252,
+            1.4920944125815054,
+            0.2293932663019911
+          ]
+        },
+        "verticalResult": "miss"
+      },
+      "captures": {
+        "reveal": {
+          "head": {
+            "x": 560,
+            "y": 480.8536631125433,
+            "ndc": [
+              -1.6680195093484285e-17,
+              0.0421903534469545,
+              0.9753110505426628
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          },
+          "hand": {
+            "x": 702.5199246003733,
+            "y": 525.7466509018482,
+            "ndc": [
+              0.2663923824306043,
+              -0.08285975181573309,
+              0.9696830438909837
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          }
+        },
+        "load": {
+          "head": {
+            "x": 560,
+            "y": 480.8536631125433,
+            "ndc": [
+              -1.6680195093484285e-17,
+              0.0421903534469545,
+              0.9753110505426628
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          },
+          "hand": {
+            "x": 702.5199246003733,
+            "y": 525.7466509018482,
+            "ndc": [
+              0.2663923824306043,
+              -0.08285975181573309,
+              0.9696830438909837
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          }
+        },
+        "peak": {
+          "head": {
+            "x": 560,
+            "y": 480.8536631125433,
+            "ndc": [
+              -1.6680195093484285e-17,
+              0.0421903534469545,
+              0.9753110505426628
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          },
+          "hand": {
+            "x": 539.652544100318,
+            "y": 653.449597295627,
+            "ndc": [
+              -0.038032627849872803,
+              -0.4385782654474288,
+              0.9716747983546555
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          }
+        },
+        "impact": {
+          "head": {
+            "x": 560.3616160083202,
+            "y": 481.22741804697256,
+            "ndc": [
+              0.0006759177725610406,
+              0.041149253351051324,
+              0.9752575991389079
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          },
+          "hand": {
+            "x": 485.11683338967384,
+            "y": 683.1815822767966,
+            "ndc": [
+              -0.13996853572023585,
+              -0.521397165116425,
+              0.9712247318653523
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          }
+        },
+        "pot": {
+          "head": {
+            "x": 562.3828010902727,
+            "y": 483.3404612697237,
+            "ndc": [
+              0.0044538338135936655,
+              0.03526333908154963,
+              0.974959256056356
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          },
+          "hand": {
+            "x": 637.5261816691664,
+            "y": 538.6538023877333,
+            "ndc": [
+              0.14490875078348853,
+              -0.1188128200215413,
+              0.9675218806361768
+            ],
+            "inFrame": true,
+            "occluded": false,
+            "blockers": []
+          }
+        }
+      },
+      "outcomes": {
+        "strike": "hit",
+        "defense": "block",
+        "opponentGuard": "guarded",
+        "vertical": "miss",
+        "lateHand": "foul"
+      },
+      "violations": 0,
+      "inputViolations": 0,
+      "maxTargetRatio": 0.004591695664616853,
+      "errors": [],
+      "external": []
+    }
+  ]
+}
