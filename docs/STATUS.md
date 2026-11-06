@@ -339,13 +339,15 @@ Codex / `codex/hollow-keep-foundation` / 2026-10-31 (Asia/Seoul). **검토 담�
 
 > 2026-11-06 사용자 결정: 가위바위보 기본=작게(크게 내미는 반대 손은 상대 트릭으로 추후), 냄비=플레이어 한 손·상대는 성향별, **동작 실험실 구현 담당 Codex**. 지시서 `games/worlds-greatest-game/docs/CODEX_TASK_01_MOTION_LAB.md`(작업 브랜치 `codex/wgg-motion-lab`, 경로 `motion-lab/`). 상태: 지시서 제출, Codex 착수 전. PR 미제출.
 
-### 동작 실험실 착수 · 2026-11-06 Codex
+### 동작 실험실 구현 · 2026-11-06 Codex / Draft PR #33
 
 - 담당: **Codex**, 사용자 지정 인계 확인. 브랜치 `codex/wgg-motion-lab`, 기준 `ccr-a50ca9fd-k3ai31` **`be913a26896e5d8bf1677d67e6956ca17c9f38af`** (main `c04c0f4`).
 - 범위: 신규 `games/worlds-greatest-game/motion-lab/`와 STATUS·WORK_LOG·CHANGELOG의 이번 작업 기록. 기존 HTML·prototype·다른 게임·공용 자산·배포 설정 보존.
 - 원격 확인: 열린 PR #24/#25는 HOLLOW KEEP 대상. motion-lab 원격 브랜치/열린 PR 없음. 원격 밖 PC 작업은 미확인이나 사용자 지정 신규 폴더에서 진행.
-- 계획: 내장 Three.js 기반 3D 골격·두 마디 IK/손가락 → 직접 포인터 도구 조작·판정·한 판 흐름 → 단독 재생/카메라/각도·시간 디버그 → 10,000 목표 단위 검사 및 실제 pointer 브라우저 검사·캡처.
-- 상태: 착수 선언, Draft PR 제출 진행. 다음 인계: 구현 후 독립 교차 검토 및 사용자 손맛 판단. 병합·배포 없음.
+- 구현: 내장 Three.js 0.180.0, 3D 골격·두 마디 IK/5개 3마디 손가락, 직접 포인터 망치·냄비, 실제 표시 위치의 3D 판정, 목·머리 반동/hitstop, 세 카메라·단독 재생·슬라이더·각도/시간 디버그. 실험실 독립 버전 0.1, 기존 원본/프로토타입 버전 유지.
+- 이번 검증: 단위 **12/12 묶음**(무작위 목표 10,000·스크립트 프레임 10,000·실제 소켓/손목 1,000·상대 냄비 좌우 소켓), Chrome 브라우저 **11/11 묶음**(실제 포인터 명중·양측 방어·파울·클릭만 유지·냄비 이탈·취소/크기 변경·12개 시점 캡처). 위반·외부 요청·JS/콘솔 오류 0. 성능 수치는 motion-lab/evidence/browser-results.json에 별도 300프레임 측정.
+- [Draft PR #33](https://github.com/kirakein-gif/PLAYVAULT/pull/33), 실행·조작·한계·검사·캡처·녹화는 `games/worlds-greatest-game/motion-lab/README.md` 및 `evidence/TEST_RESULTS.md`.
+- 상태: 구현 및 이번 자동 검증 완료, **독립 교차 검토·사용자 손맛 판단 대기**. 근골격/몸체 관통 방지·실물 마우스 감각·타 브라우저/GPU·장기 QA는 미확인. 병합·배포 없음. 다음 담당은 사용자 지정 Claude Code 교차 검토(아직 실행되지 않음).
 
 ### main에 보존된 기준선
 
