@@ -339,6 +339,14 @@ Codex / `codex/hollow-keep-foundation` / 2026-10-31 (Asia/Seoul). **검토 담�
 
 > 2026-11-06 사용자 결정: 가위바위보 기본=작게(크게 내미는 반대 손은 상대 트릭으로 추후), 냄비=플레이어 한 손·상대는 성향별, **동작 실험실 구현 담당 Codex**. 지시서 `games/worlds-greatest-game/docs/CODEX_TASK_01_MOTION_LAB.md`(작업 브랜치 `codex/wgg-motion-lab`, 경로 `motion-lab/`). 상태: 지시서 제출, Codex 착수 전. PR 미제출.
 
+### 동작 실험실 착수 · 2026-11-06 Codex
+
+- 담당: **Codex**, 사용자 지정 인계 확인. 브랜치 `codex/wgg-motion-lab`, 기준 `ccr-a50ca9fd-k3ai31` **`be913a26896e5d8bf1677d67e6956ca17c9f38af`** (main `c04c0f4`).
+- 범위: 신규 `games/worlds-greatest-game/motion-lab/`와 STATUS·WORK_LOG·CHANGELOG의 이번 작업 기록. 기존 HTML·prototype·다른 게임·공용 자산·배포 설정 보존.
+- 원격 확인: 열린 PR #24/#25는 HOLLOW KEEP 대상. motion-lab 원격 브랜치/열린 PR 없음. 원격 밖 PC 작업은 미확인이나 사용자 지정 신규 폴더에서 진행.
+- 계획: 내장 Three.js 기반 3D 골격·두 마디 IK/손가락 → 직접 포인터 도구 조작·판정·한 판 흐름 → 단독 재생/카메라/각도·시간 디버그 → 10,000 목표 단위 검사 및 실제 pointer 브라우저 검사·캡처.
+- 상태: 착수 선언, Draft PR 제출 진행. 다음 인계: 구현 후 독립 교차 검토 및 사용자 손맛 판단. 병합·배포 없음.
+
 ### main에 보존된 기준선
 
 | 항목 | 확인된 상태 |
