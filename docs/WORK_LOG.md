@@ -1673,3 +1673,15 @@
 - 미해결: 어깨 너머 각도·두 사람 실제 경기 촬영, 가위바위보 기본 방식·냄비 방식 사용자 결정, 동작 실험실 담당 결정.
 - 5개 관리 문서 검토: WORK_LOG·STATUS 갱신, AGENTS·CLAUDE·CHANGELOG 변경 없음.
 - 검토 담당: 검토 대기. 사용자 재요청 0회. 종료 상태: 동작 기준 v0.2 기록, 사용자 결정 대기.
+
+### 2026-11-06 (Asia/Seoul) · 세계 최고의 게임 동작 실험실 Codex 작업지시서 (Claude Code)
+
+- 담당: Claude Code(지시서 작성) → 구현 담당 Codex(사용자 지정, 역할 분담표의 "WGG 프로토타입 = Codex"와 일치).
+- 사용자 결정: 가위바위보 기본 작게 방식, 크게 내미는 방식은 상대의 반대 손 트릭으로 추후. 냄비는 플레이어 한 손, 상대는 성향에 따라 한 손/두 손. 구현은 Codex.
+- 변경: `games/worlds-greatest-game/docs/CODEX_TASK_01_MOTION_LAB.md`(신규 — 3D 골격 회색 마네킹 실험실, 관절 가동 범위·IK·마우스→3D 목표·측정값 기반 동작·디버그·검사·실패 기준), `MOTION_REFERENCE.md`에 사용자 결정 절, 게임 README 문서 안내, STATUS.
+- 기준: `ccr-a50ca9fd-k3ai31` `be9b9a3`. 게임 버전·코드 변경 없음.
+- 테스트: 문서 작업, `git diff --check`.
+- 커밋/PR: 이 브랜치에 푸시, PR 미제출(사용자 요청 시 제출). Codex는 병합 전이면 이 브랜치를 기준으로 시작.
+- 다음: 사용자가 지시서 블록을 Codex에 전달 → Codex 구현·Draft PR → Claude Code 교차 검토 → 사용자 손맛 판정.
+- 5개 관리 문서 검토: WORK_LOG·STATUS 갱신, AGENTS·CLAUDE·CHANGELOG 변경 없음.
+- 검토 담당: 검토 대기. 사용자 재요청 0회. 종료 상태: 지시서 제출, Codex 착수 대기.
