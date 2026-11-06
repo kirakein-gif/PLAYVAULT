@@ -99,6 +99,12 @@ Noah 각 타를 같은 기본 자세로 끝내고 2·3타 준비4·6틱 뒤에 �
 | 2026-10-08 | 캐시 12 및 후속 수정 | 조이스틱/터치와 첫 플레이 경로로 Chapter I 정리, 나머지 방은 후속용 정의로 보존. 종지기 보스 사후 출구/승강기 및 중앙홀 복귀 연결 수정 | [e56a45b](https://github.com/kirakein-gif/PLAYVAULT/commit/e56a45b067c9cba5f3fa966cf9d319ba7ae3a2de) · [cabbe8c](https://github.com/kirakein-gif/PLAYVAULT/commit/cabbe8cdc8b4e5d8afb4a8319a1946c22602efde) · [a9d357f](https://github.com/kirakein-gif/PLAYVAULT/commit/a9d357f10088dad1ac67a08b8c026be1a9b52a22) · [60a9f8d](https://github.com/kirakein-gif/PLAYVAULT/commit/60a9f8d0119926abfe443890dce3e93b841aac68) |
 | 2026-10-08 | 캐시 분리: CSS 13→16, art 13→15, core 13 | 타이틀 키 비주얼·플레이 영웅·HD 그림 순차 반영, 고딕 아트를 스테이지·적까지 확장. 공식 단일 게임 버전 확인 불가 | [9fec3ae](https://github.com/kirakein-gif/PLAYVAULT/commit/9fec3aeed6e9dbaa2ecbee6f86cee32d6d9c64a5) · [5c99507](https://github.com/kirakein-gif/PLAYVAULT/commit/5c995077ad6cbbcdc508b3617c3643b524930ac8) · [e4e2661](https://github.com/kirakein-gif/PLAYVAULT/commit/e4e26619fa548ae980592609f071e26935c6681f) · [1911abd](https://github.com/kirakein-gif/PLAYVAULT/commit/1911abdf3575d2196929bcd3af7f76e183d14095) · [d9a9859](https://github.com/kirakein-gif/PLAYVAULT/commit/d9a9859063204cb5a770a5ad47fd2eb4f74a0e83) |
 
+## 세계 최고의 게임 · 동작 실험실 (독립 0.1)
+
+| 날짜(KST) | 버전 | 변경 | 근거 |
+| --- | --- | --- | --- |
+| 2026-11-06 | Motion Lab 0.1 신규 / 원본 v0.1·prototype 0.13 유지 | 신규 motion-lab/: 촬영 v0.2 기반 3D 골격·관절 IK·손가락, 직접 드래그 망치/한 손 냄비, 3D 판정·반동·hitstop, 세 카메라·상대 단독 재생·각도/시간 디버그. 내장 Three.js 0.180.0, 외부 요청 없음. 단위12/12·브라우저11/11 묶음 통과. 독립 교차 검토·사용자 손맛 판단 대기, 병합·배포 없음 | [Draft PR #33](https://github.com/kirakein-gif/PLAYVAULT/pull/33), WORK_LOG 2026-11-06 Codex 구현 항목 |
+
 ## 세계 최고의 게임 · main 원본
 
 | 날짜(KST) | 버전·근거 종류 | 주요 추가·구조 변경·수정 | 관련 커밋 |

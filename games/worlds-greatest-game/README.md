@@ -35,6 +35,8 @@
 - [조작·승패·파울·타격 설계](docs/COMBAT_AND_INPUT.md)
 - [개발 단계별 완료 기준](docs/ROADMAP.md)
 - [Codex 작업 전달 및 금지사항](docs/CODEX_HANDOFF.md)
+- [동작 기준 · 실제 사람 촬영 분석](docs/MOTION_REFERENCE.md)
+- [Codex 작업 지시 01 · 동작 실험실](docs/CODEX_TASK_01_MOTION_LAB.md)
 
 ## 저장소 정책
 
