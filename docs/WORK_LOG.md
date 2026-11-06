@@ -1733,3 +1733,11 @@
 - 미실행/한계: Claude Code독립재검토·사람손맛·모든해상도/편차가림·실물태블릿·장기플레이·몸체관통방지/근골격·Windows/Steam. 안내점은커서용궤적이며도구중심과항상일치하지않음. 자동검사통과를손맛완성으로쓰지않음.
 - 5개문서검토: STATUS·WORK_LOG갱신. 사용자경로제한에따라 CHANGELOG·AGENTS·CLAUDE변경없음(제품변경은전용README/검증문서에기록). main병합·직접배포명령/배포설정변경없음. 기존Cloudflare봇의자동미리보기는별도이며착수시PR코멘트에서기존본자동배포를확인함.
 - PR/인계: 기존 Draft PR #33을유지해본문을수정항목표·새캡처/녹화/결과로갱신, 완료후Claude Code재검토요청코멘트. 확정제출SHA/요청코멘트는후속기록. 검토/사용자손맛판정대기.
+
+### 2026-11-06 (Asia/Seoul) · 수정01-1 제출·재검토 요청 확정 (Codex)
+
+- 원격 구현/최종검사 커밋 **e1cdaff0ba1b702ad5b7869408cbb301c808a1e8**, 기존 `codex/wgg-motion-lab`에 fast-forward 푸시하고 PR #33 head를 확인했다. 제출 직전 main c04c0f4·기준문서80cf145·기존PR1b7d414는 동시변경 없었다.
+- PR #33 본문을 현재0.2 구현 기준으로 갱신: 필수1~3/사용자결정/경미 처리표, 직접조작77°/92°→165°/108°→명중/한손냄비 영상, 새카메라4핵심캡처+최고점, Chrome/소프트웨어Chromium30/60fps 각14/14 및 Node17/17, 미실행/한계 구분.
+- **Claude Code 재검토 요청 코멘트6676416430** 제출: https://github.com/kirakein-gif/PLAYVAULT/pull/33#issuecomment-6676416430 . 구현SHA와수정전비교·검사자료·읽기전용재검토요청을 명시했다. 독립검토가 이미 실행됐다고 주장하지 않는다.
+- 마지막 보존/문서 검증: 기존WORK_LOG전체원문, AGENTS/CLAUDE/CHANGELOG·원본게임·루트런처 동일. Strike/Equip코어동일, **78개 로컬링크/ES import**·diff/범위검사 통과. 이 후속커밋은 제출상태문서만 보충하며 구현소스와검사결과는변경없음.
+- 전달: 추적파일만 포함한 Motion-Lab-0.2 ZIP(폴더에서 node start.cjs), 수정01-1 직접조작WEBM. main병합·직접배포명령/설정변경없음. Draft PR #33·Claude Code재검토/사용자손맛판정대기 상태로 인계.

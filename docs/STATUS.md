@@ -347,6 +347,7 @@ Codex / `codex/hollow-keep-foundation` / 2026-10-31 (Asia/Seoul). **검토 담�
 - 2→1→0(가위/바위/보), 0 전 마지막 선택·미선택/늦은 변경 파울·매 판 선택 초기화. 박자 .45초 기본/패널 조절, 스냅 최대값 config/패널 조절. 작게 위팔62.5°, 냄비 관절보간으로55°보다 더 접히는 구간 제거. 새 판에 이전 hitstop 미승계.
 - 최종 검사: **Node17/17 묶음**. Chrome156 + Chrome채널 없는 Chromium141/SwiftShader 소프트웨어에서 **30fps·60fps 각각14/14 묶음(총56)**, 명중/방어/상대방어/수직입력/늦은손 결과 일치. 관절·입력 위반/JS·콘솔오류/외부요청0. 고정 시계는 성능 측정값이 아니며 이번 실측 성능 벤치는 미실행.
 - [수정 항목별 처리·각도·캡처·녹화·재현](../games/worlds-greatest-game/motion-lab/evidence/revision-01-1/TEST_RESULTS.md). [Draft PR #33](https://github.com/kirakein-gif/PLAYVAULT/pull/33) 본문에 처리 표와 새 자료 연결. Claude Code **독립 재검토 요청 대상**이며 재검토 실행·사용자 손맛 판정은 아직 미실행. main 병합·직접 배포 명령/배포설정 변경 없음.
+- 원격 구현/검증 SHA **`e1cdaff0ba1b702ad5b7869408cbb301c808a1e8`** 푸시·PR head 확인. [Claude Code 재검토 요청 코멘트6676416430](https://github.com/kirakein-gif/PLAYVAULT/pull/33#issuecomment-6676416430) 제출 완료. 이후 변경은 제출 상태 문서뿐이며 구현 소스 기준은 위 SHA. 재검토 결과는 아직 없음.
 - 범위: motion-lab/ 및 사용자 보고 지시의 STATUS·WORK_LOG만. CHANGELOG·AGENTS·CLAUDE 검토/변경 없음. 몸체 관통 방지·근골격 모델·모든 해상도/편차 가림·실물 마우스/태블릿·장기/Windows/Steam 한계 유지. 자동 검증은 손맛 완성이 아님.
 
 ### (이전 기록) 동작 실험실 0.1 구현 · 2026-11-06 Codex / Draft PR #33
