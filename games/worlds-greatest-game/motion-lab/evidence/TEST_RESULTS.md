@@ -1,6 +1,6 @@
 # Motion Lab 0.1 · 이번 실행 검증
 
-2026-11-06 Asia/Seoul / 구현·검사 Codex / 기준 `be913a2` / 브랜치 `codex/wgg-motion-lab` / [Draft PR #33](https://github.com/kirakein-gif/PLAYVAULT/pull/33). **독립 AI 검토·사람 손맛 판단은 미실행**입니다.
+2026-11-06 Asia/Seoul / 구현·검사 Codex / 기준 `be913a2` / 검사 대상 구현 소스 **`d4f3105`** / 브랜치 `codex/wgg-motion-lab` / [Draft PR #33](https://github.com/kirakein-gif/PLAYVAULT/pull/33). **독립 AI 검토·사람 손맛 판단은 미실행**입니다.
 
 ## 통과
 

@@ -347,6 +347,7 @@ Codex / `codex/hollow-keep-foundation` / 2026-10-31 (Asia/Seoul). **검토 담�
 - 구현: 내장 Three.js 0.180.0, 3D 골격·두 마디 IK/5개 3마디 손가락, 직접 포인터 망치·냄비, 실제 표시 위치의 3D 판정, 목·머리 반동/hitstop, 세 카메라·단독 재생·슬라이더·각도/시간 디버그. 실험실 독립 버전 0.1, 기존 원본/프로토타입 버전 유지.
 - 이번 검증: 단위 **12/12 묶음**(무작위 목표 10,000·스크립트 프레임 10,000·실제 소켓/손목 1,000·상대 냄비 좌우 소켓), Chrome 브라우저 **11/11 묶음**(실제 포인터 명중·양측 방어·파울·클릭만 유지·냄비 이탈·취소/크기 변경·12개 시점 캡처). 위반·외부 요청·JS/콘솔 오류 0. 성능 수치는 motion-lab/evidence/browser-results.json에 별도 300프레임 측정.
 - [Draft PR #33](https://github.com/kirakein-gif/PLAYVAULT/pull/33), 실행·조작·한계·검사·캡처·녹화는 `games/worlds-greatest-game/motion-lab/README.md` 및 `evidence/TEST_RESULTS.md`.
+- 원격 구현 확인 SHA: **`d4f3105a3dd74676b9e77338c4ec1f2f940b18be`**. 최초 담당 선언 `1e5279d`, 구현·검증·캡처를 위 커밋으로 푸시하고 PR 본문 갱신 확인. main은 `c04c0f4`, 인계는 `be913a2`로 제출 직전 재확인.
 - 상태: 구현 및 이번 자동 검증 완료, **독립 교차 검토·사용자 손맛 판단 대기**. 근골격/몸체 관통 방지·실물 마우스 감각·타 브라우저/GPU·장기 QA는 미확인. 병합·배포 없음. 다음 담당은 사용자 지정 Claude Code 교차 검토(아직 실행되지 않음).
 
 ### main에 보존된 기준선
